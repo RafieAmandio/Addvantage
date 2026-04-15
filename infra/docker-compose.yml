@@ -1,0 +1,32 @@
+services:
+  worker:
+    build:
+      context: ..
+      dockerfile: apps/worker/Dockerfile
+    image: tradevantage/worker:latest
+    container_name: tradevantage-worker
+    restart: unless-stopped
+    env_file:
+      - ../apps/worker/.env
+    environment:
+      NODE_ENV: production
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # Optional: run the Next.js app on the same VPS.
+  # Comment this block out if you deploy web to Vercel instead.
+  web:
+    image: node:20-alpine
+    container_name: tradevantage-web
+    working_dir: /app
+    restart: unless-stopped
+    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @tradevantage/web build && pnpm --filter @tradevantage/web start"
+    volumes:
+      - ..:/app
+    env_file:
+      - ../apps/web/.env.production
+    ports:
+      - "127.0.0.1:3000:3000"

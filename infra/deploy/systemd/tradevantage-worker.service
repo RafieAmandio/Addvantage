@@ -1,0 +1,15 @@
+[Unit]
+Description=TradeVantage ingestion worker
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/srv/tradevantage/infra
+ExecStart=/usr/bin/docker compose up worker
+ExecStop=/usr/bin/docker compose down
+
+[Install]
+WantedBy=multi-user.target

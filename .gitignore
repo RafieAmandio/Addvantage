@@ -4,8 +4,14 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.production
 dist/
 build/
+.next/
+.turbo/
 .cache/
 .vscode/
 .idea/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+coverage/

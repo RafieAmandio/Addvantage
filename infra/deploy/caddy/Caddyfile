@@ -1,0 +1,25 @@
+tradevantage.gg, www.tradevantage.gg {
+    encode zstd gzip
+
+    # Reverse proxy to the Next.js container on localhost:3000
+    reverse_proxy 127.0.0.1:3000 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    log {
+        output file /var/log/caddy/tradevantage.log {
+            roll_size 10mb
+            roll_keep 10
+        }
+    }
+}
