@@ -12,16 +12,19 @@ Create the project by importing `github.com/RafieAmandio/Addvantage`. Then in
 | Setting | Value |
 |---|---|
 | **Framework Preset** | Next.js |
-| **Root Directory** | *(leave blank — build runs from repo root)* |
-| **Include source files outside of the Root Directory in the Build Step** | *(off — not needed with `vercel.json`)* |
+| **Root Directory** | Either *blank* OR `apps/web` — both work |
 | **Node.js Version** | 20.x |
 | **Install Command** | *(override from `vercel.json`)* |
 | **Build Command** | *(override from `vercel.json`)* |
 | **Output Directory** | *(override from `vercel.json`)* |
 
-> The committed `vercel.json` already overrides install / build / output. You
-> should NOT also set them in the dashboard — dashboard settings and
-> `vercel.json` conflict unpredictably.
+> Two `vercel.json` files are committed: one at repo root (used when Root
+> Directory is blank) and one at `apps/web/vercel.json` (used when Root
+> Directory = `apps/web`). Whichever you pick, the commands are the same
+> shape — install + build at the workspace root, filter to the web app.
+>
+> You should NOT also set install/build/output in the dashboard — dashboard
+> settings and `vercel.json` conflict unpredictably.
 
 ## Environment Variables
 
