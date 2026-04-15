@@ -1,0 +1,17 @@
+# Don't upload the worker, infra, or docs to Vercel — they bloat the
+# deployment and aren't needed by the Next.js build.
+apps/worker
+infra
+docs
+.github
+
+# Standard
+.git
+node_modules
+.next
+.turbo
+dist
+*.log
+.env
+.env.*
+!.env.example
