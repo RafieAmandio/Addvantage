@@ -1,0 +1,7 @@
+flowchart TD
+    LP[Landing Page\nPublic] --> WA[Web App\nSubscribers & Authors]
+    WA --> API[Backend API]
+    API --> DB[(Database)]
+    API --> PAY[Xendit / Midtrans\nPayments]
+    API --> NR[Auto News\nRecycler Service]
+    NR --> AI[AI Services\nText Rewrite\nImage Redraw]

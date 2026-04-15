@@ -1,0 +1,5 @@
+flowchart TD
+    A[Subscription Approaching Expiry] --> B[Payment Reminder\nemail / in-app]
+    B --> C{User Pays?}
+    C -->|Yes| D[Continue Access]
+    C -->|No| E[Subscription Expires\nLose All Access]

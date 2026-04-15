@@ -1,0 +1,9 @@
+flowchart TD
+    A["News Source\nRSS / API / Scrape / Manual"] --> B[Ingest & Parse]
+    B --> C[AI Rewrites Text\nParaphrase with original wording]
+    C --> D[AI Redraws Images\nGenerate new visuals]
+    D --> E[Auto-tag Category\nExtract Metadata]
+    E --> F[Review Queue]
+    F --> G{Author Decision}
+    G -->|Approve| H[Published to\nsubscriber feed]
+    G -->|Reject| I[Discarded or\nedited manually]

@@ -1,0 +1,7 @@
+flowchart TD
+    A[Author Dashboard] --> B[Create Post]
+    B --> C[Select Category]
+    C --> D[Write / Edit Content]
+    D --> E{Action}
+    E -->|Publish| F[Post appears in\nsubscriber feed]
+    E -->|Save| G[Save as Draft]

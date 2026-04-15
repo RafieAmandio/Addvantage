@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap");
+
+:root {
+  color-scheme: dark;
+  --grain-opacity: 0.035;
+}
+
+html, body {
+  background-color: #0A0908;
+  color: #F5F1E8;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-feature-settings: "ss01", "ss02", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #F59E0B;
+  color: #0A0908;
+}
+
+/* Grid background utility */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(245, 158, 11, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 158, 11, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.bg-grid-fine {
+  background-image:
+    linear-gradient(to right, rgba(245, 241, 232, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(245, 241, 232, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Film grain overlay */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Classification stripe */
+.classification-stripe {
+  background: repeating-linear-gradient(
+    -45deg,
+    #F59E0B 0,
+    #F59E0B 12px,
+    #0A0908 12px,
+    #0A0908 24px
+  );
+}
+
+/* Subtle scanline for "live" panels */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(245, 158, 11, 0.08) 50%,
+    transparent 100%
+  );
+  height: 40%;
+  animation: scan 6s linear infinite;
+  pointer-events: none;
+}
+
+/* LED dot */
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #65A30D;
+  box-shadow: 0 0 6px #65A30D, 0 0 12px rgba(101, 163, 13, 0.5);
+}
+.led.red {
+  background: #DC2626;
+  box-shadow: 0 0 6px #DC2626, 0 0 12px rgba(220, 38, 38, 0.5);
+}
+.led.amber {
+  background: #F59E0B;
+  box-shadow: 0 0 6px #F59E0B, 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #14110F; }
+::-webkit-scrollbar-thumb { background: #2A231C; border: 2px solid #14110F; }
+::-webkit-scrollbar-thumb:hover { background: #B45309; }
+
+/* Toast progress bar */
+@keyframes toastBar {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* Notification badge pulse — fires on first paint only, 2 cycles, then stops */
+@keyframes pulseOnce {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+.animate-pulse-once {
+  animation: pulseOnce 1.6s ease-out 2;
+}
+
+/* Stagger reveal helper */
+.stagger > * {
+  animation: revealUp 0.6s ease-out both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+.stagger > *:nth-child(8) { animation-delay: 420ms; }
