@@ -101,7 +101,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Rate limiting + cache + single-flight (Upstash Redis)** — one credential set, three uses: `@upstash/ratelimit` token bucket; response cache for hot reads; single-flight lock to coalesce duplicate fetches (if 2000 users hit the same `/api/bars`, fan-in to one upstream call). Envs: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. All helpers gracefully no-op when unset (mirrors heartbeat + Twelve Data key patterns). (Decided tick 36, scope expanded tick 37.)
   - [x] **R1.** Lib scaffolds — `apps/web/lib/redis.ts` (Upstash REST client, returns `null` if unset), `lib/ratelimit.ts` (`@upstash/ratelimit` token bucket factory), `lib/cache.ts` (typed get/set with TTL), `lib/singleflight.ts` (`SET key 1 NX EX 30` lock + wait-loop)
   - [x] **R2.** Apply rate limit to admin server actions, OpenAI-touching server actions, and `/api/bars`
-  - [ ] **R3.** CDN cache headers on `/api/bars` (`Cache-Control: public, s-maxage=60, stale-while-revalidate=300`) + Upstash-backed `listBars` wrapper + `React.cache()` per-request memo
+  - [x] **R3.** CDN cache headers on `/api/bars` (`Cache-Control: public, s-maxage=60, stale-while-revalidate=300`) + Upstash-backed `listBars` wrapper + `React.cache()` per-request memo
   - [ ] **R4.** Worker `run:bars` uses single-flight on `(provider,symbol,interval,from,to)` so concurrent invocations dedupe to one Twelve Data call
 - [x] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14

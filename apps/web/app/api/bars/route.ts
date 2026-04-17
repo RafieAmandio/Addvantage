@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "invalid_input", issues: parsed.error.issues },
-      { status: 400 },
+      { status: 400, headers: { "Cache-Control": "no-store" } },
     );
   }
   const { symbol, interval, limit } = parsed.data;
@@ -46,7 +46,10 @@ export async function GET(request: Request) {
       { error: "rate_limited" },
       {
         status: 429,
-        headers: { "Retry-After": String(retryAfter) },
+        headers: {
+          "Retry-After": String(retryAfter),
+          "Cache-Control": "no-store",
+        },
       },
     );
   }
@@ -61,7 +64,12 @@ export async function GET(request: Request) {
         to: to.toISOString(),
         bars,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      },
     );
   } catch (err) {
     logger.error("/api/bars failed", {
@@ -70,6 +78,9 @@ export async function GET(request: Request) {
       symbol,
       interval,
     });
-    return NextResponse.json({ error: "internal_error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "internal_error" },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
   }
 }
