@@ -99,7 +99,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] **Health check endpoint (web)** — `/api/health` returns 200/503 with Supabase ping
 - [ ] **Heartbeat pings from worker** — worker pushes periodic liveness signal (uptime monitor target TBD)
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
-- [ ] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
+- [x] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
 - [ ] **GitHub Actions CI** — typecheck + lint + build on every PR
 

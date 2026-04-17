@@ -15,18 +15,16 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
-
-  # Optional: run the Next.js app on the same VPS.
-  # Comment this block out if you deploy web to Vercel instead.
-  web:
-    image: node:20-alpine
-    container_name: tradevantage-web
-    working_dir: /app
-    restart: unless-stopped
-    command: sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @tradevantage/web build && pnpm --filter @tradevantage/web start"
-    volumes:
-      - ..:/app
-    env_file:
-      - ../apps/web/.env.production
-    ports:
-      - "127.0.0.1:3000:3000"
+    # Liveness: container is considered unhealthy if no node process is running.
+    # The worker is a long-poll bot + cron, no HTTP port to probe.
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'node dist/index.js' > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Resource limits — the worker is light (a few adapters/hour + grammY long poll).
+    # Adjust upward if a future adapter does heavy local processing.
+    mem_limit: 512m
+    mem_reservation: 128m
+    cpus: 0.5
