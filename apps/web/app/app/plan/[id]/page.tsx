@@ -5,9 +5,9 @@ import {
   getLatestPlan,
   getAllPlans,
   tradingPlans,
-} from "@/lib/mock/plans";
-import { PlanDetail } from "@/components/ui/PlanDetail";
-import { PlanSiblingKeys } from "@/components/ui/PlanSiblingKeys";
+} from "@/features/plan/mock";
+import { PlanDetail } from "@/features/plan/components/PlanDetail";
+import { PlanSiblingKeys } from "@/features/plan/components/PlanSiblingKeys";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 /**

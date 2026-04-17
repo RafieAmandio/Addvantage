@@ -5,7 +5,7 @@ import { useAppState, isPaid } from "@/lib/state";
 import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/cn";
 import Link from "next/link";
-import { NotificationBell } from "./NotificationBell";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import type { Tier } from "@/lib/mock/types";
 
 export function TopBar() {

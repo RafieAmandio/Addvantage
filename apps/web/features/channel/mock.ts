@@ -1,4 +1,4 @@
-import type { ChannelPost } from "./types";
+import type { ChannelPost } from "@/lib/mock/types";
 
 export const channelPosts: ChannelPost[] = [
   {

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { primers } from "@/lib/mock/primers";
-import { channelPosts } from "@/lib/mock/channel";
-import { getPlanById } from "@/lib/mock/plans";
-import { useSeenNews } from "@/lib/seenNews";
+import { primers } from "@/features/education/mock";
+import { channelPosts } from "@/features/channel/mock";
+import { getPlanById } from "@/features/plan/mock";
+import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
   DataLabel,
   SectionNumber,
@@ -14,9 +14,9 @@ import {
   BiasBadge,
 } from "@/components/ui/Marker";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { WatchPin } from "@/components/ui/WatchPin";
+import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { formatDate, formatTime } from "@/lib/cn";
-import type { NewsListItem } from "@/lib/queries/news";
+import type { NewsListItem } from "@/features/news/queries/news";
 
 interface Props {
   item: NewsListItem;

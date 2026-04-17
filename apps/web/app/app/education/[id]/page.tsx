@@ -2,9 +2,9 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { primers } from "@/lib/mock/primers";
+import { primers } from "@/features/education/mock";
 import { useAppState, isPaid } from "@/lib/state";
-import { useReadPrimers } from "@/lib/reading";
+import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { useToast } from "@/lib/toast";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";

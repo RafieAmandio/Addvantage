@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { news } from "@/lib/mock/news";
-import { calendar } from "@/lib/mock/calendar";
-import { CalendarPeekRow } from "@/components/ui/CalendarPeekRow";
-import { tradingPlans, getAllPlans } from "@/lib/mock/plans";
-import { channelPosts } from "@/lib/mock/channel";
-import { primers } from "@/lib/mock/primers";
-import { consultSessions } from "@/lib/mock/consultations";
+import { news } from "@/features/news/mock";
+import { calendar } from "@/features/calendar/mock";
+import { CalendarPeekRow } from "@/features/calendar/components/CalendarPeekRow";
+import { tradingPlans, getAllPlans } from "@/features/plan/mock";
+import { channelPosts } from "@/features/channel/mock";
+import { primers } from "@/features/education/mock";
+import { consultSessions } from "@/features/consult/mock";
 import { useAppState, isPaid } from "@/lib/state";
-import { useReadPrimers } from "@/lib/reading";
-import { useWatchlist } from "@/lib/watchlist";
-import { useSeenNews } from "@/lib/seenNews";
+import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
+import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
+import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { WatchPin } from "@/components/ui/WatchPin";
+import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { formatDate, formatTime } from "@/lib/cn";
 
 const OPERATOR_ID = "U-00417";

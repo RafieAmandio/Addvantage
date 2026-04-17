@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getApprovedNewsById, listApprovedNews } from "@/lib/queries/news";
+import { getApprovedNewsById, listApprovedNews } from "@/features/news/queries/news";
 import { NewsDetailClient } from "./NewsDetailClient";
 
 export const dynamic = "force-dynamic";

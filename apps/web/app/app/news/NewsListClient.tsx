@@ -13,10 +13,10 @@ import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { useSeenNews } from "@/lib/seenNews";
+import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import { useToast } from "@/lib/toast";
 import { formatTime } from "@/lib/cn";
-import type { NewsListItem } from "@/lib/queries/news";
+import type { NewsListItem } from "@/features/news/queries/news";
 
 type Filter = "all" | "high" | "medium" | "low" | "bullish" | "bearish";
 

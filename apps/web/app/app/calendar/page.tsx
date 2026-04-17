@@ -3,8 +3,8 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { calendar, calendarDayMeta, CURRENCIES } from "@/lib/mock/calendar";
-import { news } from "@/lib/mock/news";
+import { calendar, calendarDayMeta, CURRENCIES } from "@/features/calendar/mock";
+import { news } from "@/features/news/mock";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { cn } from "@/lib/cn";
 import type { CalendarEvent, Impact } from "@/lib/mock/types";

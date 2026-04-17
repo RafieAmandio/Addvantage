@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { notifications } from "@/lib/mock/notifications";
-import type { NotificationKind, MockNotification } from "@/lib/mock/notifications";
-import { useReadNotifications } from "@/lib/notifications";
-import { useWatchlist } from "@/lib/watchlist";
+import { notifications } from "@/features/notifications/mock";
+import type { NotificationKind, MockNotification } from "@/features/notifications/mock";
+import { useReadNotifications } from "@/features/notifications/notifications";
+import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { formatTime, formatDate, cn } from "@/lib/cn";
 

@@ -6,10 +6,10 @@ import { useAppState, isPaid } from "@/lib/state";
 import { useToast } from "@/lib/toast";
 import { DataLabel, SectionNumber, BiasBadge, ImpactPill } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";
-import { WatchPin } from "@/components/ui/WatchPin";
+import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { formatDate, formatTime } from "@/lib/cn";
-import { computePlanOutcome } from "@/lib/mock/plans";
-import { news } from "@/lib/mock/news";
+import { computePlanOutcome } from "@/features/plan/mock";
+import { news } from "@/features/news/mock";
 import type { TradingPlan, SetupOutcome, TradingSetup } from "@/lib/mock/types";
 
 function setupToText(s: TradingSetup, planId: string): string {

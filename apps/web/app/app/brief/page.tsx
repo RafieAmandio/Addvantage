@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { news } from "@/lib/mock/news";
-import { calendar } from "@/lib/mock/calendar";
-import { tradingPlans } from "@/lib/mock/plans";
-import { channelPosts } from "@/lib/mock/channel";
+import { news } from "@/features/news/mock";
+import { calendar } from "@/features/calendar/mock";
+import { tradingPlans } from "@/features/plan/mock";
+import { channelPosts } from "@/features/channel/mock";
 import { useAppState, isPaid } from "@/lib/state";
-import { useSeenNews } from "@/lib/seenNews";
+import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
   SectionNumber,
   DataLabel,
   ImpactPill,
   BiasBadge,
 } from "@/components/ui/Marker";
-import { CalendarPeekRow } from "@/components/ui/CalendarPeekRow";
+import { CalendarPeekRow } from "@/features/calendar/components/CalendarPeekRow";
 import { formatTime, formatDate } from "@/lib/cn";
 
 export default function BriefPage() {

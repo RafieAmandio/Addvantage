@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { primers } from "@/lib/mock/primers";
+import { primers } from "@/features/education/mock";
 import { useAppState, isPaid } from "@/lib/state";
-import { useReadPrimers } from "@/lib/reading";
+import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Highlight } from "@/components/ui/Highlight";

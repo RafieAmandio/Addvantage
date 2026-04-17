@@ -1,4 +1,4 @@
-import type { Hashtag } from "./types";
+import type { Hashtag } from "@/lib/mock/types";
 
 export const hashtagMeta: Record<Hashtag, { label: string; description: string }> = {
   "losing-streak": {

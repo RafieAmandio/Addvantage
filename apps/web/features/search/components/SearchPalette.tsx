@@ -9,7 +9,7 @@ import {
   KIND_META,
   type SearchResult,
   type ResultKind,
-} from "@/lib/search";
+} from "@/features/search/search";
 import { getRecentVisits, type RecentVisit } from "@/lib/visits";
 import { Highlight } from "@/components/ui/Highlight";
 import { cn } from "@/lib/cn";

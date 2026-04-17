@@ -1,6 +1,6 @@
 "use client";
 
-import { useWatchlist } from "@/lib/watchlist";
+import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/cn";
 

@@ -1,4 +1,4 @@
-import type { Primer } from "./types";
+import type { Primer } from "@/lib/mock/types";
 
 export const primers: Primer[] = [
   {

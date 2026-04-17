@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { notifications } from "@/lib/mock/notifications";
-import { useReadNotifications } from "@/lib/notifications";
+import { notifications } from "@/features/notifications/mock";
+import { useReadNotifications } from "@/features/notifications/notifications";
 
 /**
  * Reflects the unread notification count in the browser tab title.

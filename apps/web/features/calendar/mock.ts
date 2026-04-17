@@ -1,4 +1,4 @@
-import type { CalendarEvent, CalendarDayMeta } from "./types";
+import type { CalendarEvent, CalendarDayMeta } from "@/lib/mock/types";
 
 /**
  * Fixed currency order used by every `scores` tuple on a calendar event.

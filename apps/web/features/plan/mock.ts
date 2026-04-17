@@ -1,4 +1,4 @@
-import type { TradingPlan, Plan } from "./types";
+import type { TradingPlan, Plan } from "@/lib/mock/types";
 
 export const tradingPlans: TradingPlan[] = [
   {

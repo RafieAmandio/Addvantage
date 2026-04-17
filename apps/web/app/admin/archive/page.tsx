@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listRejectedNews } from "@/lib/queries/news";
+import { listRejectedNews } from "@/features/news/queries/news";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { getLatestPlan } from "@/lib/mock/plans";
-import { PlanDetail } from "@/components/ui/PlanDetail";
+import { getLatestPlan } from "@/features/plan/mock";
+import { PlanDetail } from "@/features/plan/components/PlanDetail";
 
 export default function PlanPage() {
   const plan = getLatestPlan();

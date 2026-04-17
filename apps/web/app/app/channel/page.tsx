@@ -1,4 +1,4 @@
-import { channelPosts } from "@/lib/mock/channel";
+import { channelPosts } from "@/features/channel/mock";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate, formatTime } from "@/lib/cn";
 import Link from "next/link";

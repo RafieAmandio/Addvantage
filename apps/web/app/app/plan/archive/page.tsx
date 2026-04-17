@@ -7,7 +7,7 @@ import {
   getAllPlans,
   getLatestPlan,
   computePlanOutcome,
-} from "@/lib/mock/plans";
+} from "@/features/plan/mock";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { subscriptionPlans } from "@/lib/mock/plans";
+import { subscriptionPlans } from "@/features/plan/mock";
 import { useAppState, isPaid } from "@/lib/state";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Button } from "@/components/ui/Button";

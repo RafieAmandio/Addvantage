@@ -1,10 +1,10 @@
-import { news } from "./mock/news";
-import { primers } from "./mock/primers";
-import { channelPosts } from "./mock/channel";
-import { consultSessions } from "./mock/consultations";
-import { allHashtags, hashtagMeta } from "./mock/hashtags";
-import { tradingPlans } from "./mock/plans";
-import type { ConsultMessage } from "./mock/types";
+import { news } from "@/features/news/mock";
+import { primers } from "@/features/education/mock";
+import { channelPosts } from "@/features/channel/mock";
+import { consultSessions } from "@/features/consult/mock";
+import { allHashtags, hashtagMeta } from "@/features/tags/mock";
+import { tradingPlans } from "@/features/plan/mock";
+import type { ConsultMessage } from "@/lib/mock/types";
 
 export type ResultKind =
   | "news"

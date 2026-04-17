@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useRef, useEffect, useLayoutEffect, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { consultSessions as mockSessions } from "@/lib/mock/consultations";
+import { consultSessions as mockSessions } from "@/features/consult/mock";
 import { useAppState, isPaid } from "@/lib/state";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";

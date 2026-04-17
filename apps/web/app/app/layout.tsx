@@ -3,7 +3,7 @@ import { ToastProvider } from "@/lib/toast";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { Shortcuts } from "@/components/layout/Shortcuts";
-import { SearchPalette } from "@/components/layout/SearchPalette";
+import { SearchPalette } from "@/features/search/components/SearchPalette";
 import { VisitTracker } from "@/components/layout/VisitTracker";
 import { DocumentTitle } from "@/components/layout/DocumentTitle";
 

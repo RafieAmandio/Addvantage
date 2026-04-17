@@ -1,6 +1,6 @@
-import { news } from "./mock/news";
-import { primers } from "./mock/primers";
-import { allHashtags, hashtagMeta } from "./mock/hashtags";
+import { news } from "@/features/news/mock";
+import { primers } from "@/features/education/mock";
+import { allHashtags, hashtagMeta } from "@/features/tags/mock";
 import type { Hashtag } from "./mock/types";
 
 const KEY = "ants-domain-recent-visits";

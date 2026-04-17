@@ -8,7 +8,7 @@ import {
   getLatestPlan,
   getPlanById,
   computePlanOutcome,
-} from "@/lib/mock/plans";
+} from "@/features/plan/mock";
 import {
   DataLabel,
   SectionNumber,

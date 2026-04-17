@@ -1,4 +1,4 @@
-import type { ConsultSession } from "./types";
+import type { ConsultSession } from "@/lib/mock/types";
 
 export const consultSessions: ConsultSession[] = [
   {

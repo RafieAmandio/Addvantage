@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { news } from "@/lib/mock/news";
-import { tradingPlans, getAllPlans } from "@/lib/mock/plans";
-import { calendar, CURRENCIES } from "@/lib/mock/calendar";
-import { useWatchlist } from "@/lib/watchlist";
+import { news } from "@/features/news/mock";
+import { tradingPlans, getAllPlans } from "@/features/plan/mock";
+import { calendar, CURRENCIES } from "@/features/calendar/mock";
+import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { DataLabel, SectionNumber, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { WatchPin } from "@/components/ui/WatchPin";
+import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { formatDate, formatTime, cn } from "@/lib/cn";
 import type { CalendarEvent, TradingPlan, TradingSetup } from "@/lib/mock/types";

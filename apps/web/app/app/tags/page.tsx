@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { allHashtags, hashtagMeta } from "@/lib/mock/hashtags";
-import { primers } from "@/lib/mock/primers";
-import { news } from "@/lib/mock/news";
-import { consultSessions } from "@/lib/mock/consultations";
-import { channelPosts } from "@/lib/mock/channel";
+import { allHashtags, hashtagMeta } from "@/features/tags/mock";
+import { primers } from "@/features/education/mock";
+import { news } from "@/features/news/mock";
+import { consultSessions } from "@/features/consult/mock";
+import { channelPosts } from "@/features/channel/mock";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
