@@ -9,13 +9,24 @@ Status snapshot as of 2026-04-17. Living document — update as work lands.
 ### Reusability is non-negotiable
 Every new component, hook, query, or adapter must be built for reuse from day one. Before writing anything new, check if something existing covers it.
 
-**Component rules:**
-- Live in `apps/web/components/ui/` (primitives) or `apps/web/components/<domain>/` (domain-specific, e.g. `components/chart/`, `components/timeline/`). **Never** inline a reusable piece inside a `page.tsx`.
-- Accept props, not hardcoded data. Any fetching happens in the page/server component, not the UI component.
-- No direct Supabase calls inside display components — pass data in. Queries live in `apps/web/lib/queries/`.
-- Expose a `className` prop and use `cn()` so callers can restyle without forking.
-- If a component takes more than ~3 responsibilities, split it. Target: one component, one job.
-- Storybook-style "dumb" components beat clever all-in-one components.
+**Project layout (feature-based):**
+- `apps/web/app/` — thin route tree. Pages compose from features, no business logic.
+- `apps/web/features/<name>/` — everything a feature owns:
+  - `components/` — feature-specific UI
+  - `hooks/` — feature-specific hooks (e.g. `useWatchlist`)
+  - `queries/` — Supabase reads, Zod-validated, one file per domain
+  - `mock.ts` — mock data while feature is not yet wired to real DB
+  - `types.ts` — feature-local types
+- `apps/web/components/ui/` — **true primitives only**, feature-agnostic (Button, Marker, Highlight, Breadcrumbs, Paywall, ConfirmDialog, PageSearchInput, Classification, BackToTop, Ticker)
+- `apps/web/components/layout/` — app chrome that wraps every page (Sidebar, TopBar, Shortcuts, VisitTracker, DocumentTitle)
+- `apps/web/lib/` — cross-cutting utilities only (supabase clients, auth helpers, cn, state, toast, visits, config)
+
+**Rules:**
+- Feature-specific UI → `features/<name>/components/`, never in `page.tsx` and never in `components/ui/`
+- If a component is used by 2+ features, promote it to `components/ui/`
+- No direct Supabase calls inside display components — pass data in or use a feature query
+- Expose a `className` prop and use `cn()` so callers can restyle without forking
+- If a component takes more than ~3 responsibilities, split it
 
 **Hook rules:**
 - Anything touching `localStorage`, `window`, realtime subscriptions, or polling → custom hook in `apps/web/lib/hooks/`.
