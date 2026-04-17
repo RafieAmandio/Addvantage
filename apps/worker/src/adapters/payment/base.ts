@@ -5,12 +5,12 @@
  * the web app (creating checkout sessions from Server Actions / Route
  * Handlers). Kept framework-neutral — pure TS, no Next.js or grammY imports.
  *
- * Tier is passed as an opaque string. The source of truth for the enum of
- * valid tiers lives in the DB (`profiles.tier`), with parallel constants in
- * `packages/shared/src/constants/` when those land. Concrete adapters MAY
- * tighten the type, but the interface stays loose so providers can be
- * registered without a circular dep on shared taxonomy.
+ * Tier uses the shared `Tier` enum from `@tradevantage/shared` (tick 67).
+ * Concrete adapters narrow further (e.g. `PaidTier` for checkout) when
+ * needed.
  */
+
+import type { Tier } from "@tradevantage/shared";
 
 /** Normalized payment status across providers. */
 export type PaymentStatus =
@@ -38,8 +38,8 @@ export interface PaymentEvent {
   externalRef: string;
   /** Addvantage profile id — present when the provider echoed our metadata. */
   profileId?: string;
-  /** Tier string echoed from checkout metadata; opaque at this layer. */
-  tier?: string;
+  /** Tier echoed from checkout metadata. */
+  tier?: Tier;
   /** When the event occurred according to the provider. */
   occurredAt: Date;
   /** Original provider payload, untouched. */
@@ -47,8 +47,8 @@ export interface PaymentEvent {
 }
 
 export interface CreateCheckoutSessionInput {
-  /** Target tier the user is purchasing/renewing. Opaque string (see module doc). */
-  tier: string;
+  /** Target tier the user is purchasing/renewing. */
+  tier: Tier;
   /** Addvantage `profiles.id` initiating the checkout. */
   profileId: string;
   /** Absolute URL the provider should redirect to on success. */

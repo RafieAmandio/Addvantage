@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isPaidTier, TIERS, TIER_PRICE_IDR, type Tier } from "@tradevantage/shared";
 import { config } from "../../lib/config";
 import { retry } from "../../lib/retry";
 import type {
@@ -65,24 +66,16 @@ const InvoiceCallbackSchema = z.object({
 
 type InvoiceCallback = z.infer<typeof InvoiceCallbackSchema>;
 
-/**
- * Default price table for a tier. The Xendit Invoices API requires an
- * amount at checkout time; the enum of tiers / prices is expected to land
- * in `packages/shared` (see `base.ts` doc). Until then we keep a minimal
- * table here and fail loudly on unknown tiers rather than silently charging
- * zero.
- */
-const TIER_PRICE_IDR: Record<string, number> = {
-  pro: 199_000,
-  plus: 99_000,
-};
-
 function resolveAmount(tier: string): number {
-  const amt = TIER_PRICE_IDR[tier.toLowerCase()];
-  if (amt === undefined) {
-    throw new Error(`xendit: no price configured for tier "${tier}"`);
+  if (!isPaidTier(tier)) {
+    throw new Error(`xendit: cannot create checkout for non-paid tier "${tier}"`);
   }
-  return amt;
+  return TIER_PRICE_IDR[tier];
+}
+
+function narrowTier(t: string | undefined): Tier | undefined {
+  if (!t) return undefined;
+  return (TIERS as readonly string[]).includes(t) ? (t as Tier) : undefined;
 }
 
 function basicAuthHeader(secret: string): string {
@@ -222,7 +215,7 @@ export class XenditAdapter implements PaymentAdapter {
       kind: statusToEventKind(status),
       externalRef: cb.id,
       profileId: cb.metadata?.profile_id,
-      tier: cb.metadata?.tier,
+      tier: narrowTier(cb.metadata?.tier),
       occurredAt: occurredAtOf(cb),
       raw: cb,
     };
