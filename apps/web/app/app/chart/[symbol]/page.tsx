@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
 import { SymbolNav } from "@/features/chart/components/SymbolNav";
+import { toChartBars } from "@/features/chart/lib/bars";
 import { generateMockBars } from "@/features/chart/mock";
 import { listBars } from "@/features/chart/queries/bars";
 import {
@@ -46,23 +47,7 @@ export default async function ChartPage({
     to,
   });
 
-  // Drop rows with null OHLC (DB columns are nullable) — PriceChart needs numbers.
-  const chartBars: ChartBar[] = realBars.flatMap((b) => {
-    if (b.open === null || b.high === null || b.low === null || b.close === null) {
-      return [];
-    }
-    return [
-      {
-        time: b.ts,
-        open: b.open,
-        high: b.high,
-        low: b.low,
-        close: b.close,
-        volume: b.volume ?? undefined,
-      },
-    ];
-  });
-
+  const chartBars = toChartBars(realBars);
   const usingMock = chartBars.length === 0;
   const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
   const sinceIso = bars[0]?.time;
