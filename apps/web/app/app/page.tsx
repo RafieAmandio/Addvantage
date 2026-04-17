@@ -16,16 +16,14 @@ import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { formatDate, formatTime } from "@/lib/cn";
-
-const OPERATOR_ID = "U-00417";
-
-function greeting(h: number) {
-  if (h < 5) return "Late shift";
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  if (h < 21) return "Good evening";
-  return "Night watch";
-}
+import { OPERATOR_ID } from "@/features/dashboard/types";
+import { greeting } from "@/features/dashboard/lib/greeting";
+import {
+  collectWatchArchiveSetups,
+  filterNewsByWatch,
+  filterSetupsByWatch,
+} from "@/features/dashboard/lib/watchlist-mentions";
+import { pickFeaturedPrimer } from "@/features/dashboard/lib/featured";
 
 export default function HomePage() {
   const { tier, setSearchOpen, operatorName } = useAppState();
@@ -57,34 +55,22 @@ export default function HomePage() {
   const plan = tradingPlans[0];
   const upcoming = calendar.slice(0, 3);
   const recentSession = consultSessions[0];
-  // Featured primer = first unread accessible one, or fall back to first unlocked
-  const accessiblePrimers = primers.filter((p) => !p.locked || paid);
-  const featuredPrimer =
-    accessiblePrimers.find((p) => !readIds.includes(p.id)) ??
-    accessiblePrimers[0] ??
-    primers[0];
+  const featuredPrimer = pickFeaturedPrimer(primers, readIds, paid);
   const channelTop = channelPosts[0];
 
   // Watchlist mentions — news + plan setups that touch any pinned ticker
   const watchNewsMentions = watchHydrated
-    ? news.filter((n) => n.affects.some((a) => tickers.includes(a)))
+    ? filterNewsByWatch(news, tickers)
     : [];
   const watchSetupMentions = watchHydrated
-    ? plan.setups.filter((s) => tickers.includes(s.instrument))
+    ? filterSetupsByWatch(plan.setups, tickers)
     : [];
 
   // Historical setups on watched tickers, across all archived plans.
   // Used to surface "edge on my pins" — wins/losses specific to the user's
   // watchlist instruments. Ordered newest-first, capped at 6.
   const watchArchiveSetups = watchHydrated
-    ? getAllPlans()
-        .filter((p) => p.id !== plan.id) // exclude live plan
-        .flatMap((p) =>
-          p.setups
-            .filter((s) => tickers.includes(s.instrument))
-            .map((s) => ({ plan: p, setup: s }))
-        )
-        .slice(0, 6)
+    ? collectWatchArchiveSetups(getAllPlans(), tickers, plan.id)
     : [];
 
   // Quick stats
