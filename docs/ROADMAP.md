@@ -112,7 +112,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Deploy pipeline for worker** — GHCR image build + SSH deploy to VPS on main push
 
 ### Low priority
-- [ ] Admin routes: redirect instead of rendering "FORBIDDEN"
+- [x] Admin routes: redirect instead of rendering "FORBIDDEN"
 - [ ] Pin Node version in Vercel project settings
 - [ ] Split `/app/consult/page.tsx` (1021 LOC single file)
 - [ ] Migration rollback strategy (currently append-only)

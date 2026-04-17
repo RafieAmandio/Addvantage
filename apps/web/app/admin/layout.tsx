@@ -14,11 +14,11 @@ export default async function AdminLayout({
     redirect("/login?next=/admin/review");
   }
   if (!profile.is_admin) {
-    return (
-      <div className="min-h-screen bg-ink p-12 font-mono text-[11px] uppercase tracking-widest2 text-blood">
-        ● FORBIDDEN — ADMIN ACCESS ONLY
-      </div>
-    );
+    // Logged-in but non-admin: bounce to the operator dashboard rather than
+    // render a dead "FORBIDDEN" page. Avoids the impression that the admin
+    // surface even exists for ordinary users, and keeps URLs in /app/* on
+    // accidental link follows.
+    redirect("/app");
   }
   return (
     <div className="min-h-screen bg-ink">
