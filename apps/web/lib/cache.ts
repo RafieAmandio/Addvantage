@@ -1,4 +1,5 @@
 import { getRedis } from "@/lib/redis";
+import { logger } from "@/lib/logger";
 
 if (typeof window !== "undefined") {
   throw new Error("lib/cache.ts is server-only");
@@ -26,7 +27,12 @@ export async function getCache<T>(key: string): Promise<T | null> {
 
   try {
     return JSON.parse(raw) as T;
-  } catch {
+  } catch (error) {
+    logger.warn("cache payload failed to parse", {
+      error,
+      scope: "cache.getCache",
+      key,
+    });
     return null;
   }
 }
