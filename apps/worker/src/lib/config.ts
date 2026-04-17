@@ -68,6 +68,14 @@ const EnvSchema = z.object({
   MARKET_DATA_PROVIDER: z
     .preprocess(emptyToUndef, z.enum(["twelvedata"]).optional()),
   MARKET_DATA_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
+  /** Upstash Redis REST creds for single-flight coalescing. Optional —
+   *  when unset, singleflight degrades to a direct fetcher() call. */
+  UPSTASH_REDIS_REST_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  UPSTASH_REDIS_REST_TOKEN: z.preprocess(
+    emptyToUndef,
+    z.string().min(1).optional()
+  ),
 })
 .refine(
   (env) =>
