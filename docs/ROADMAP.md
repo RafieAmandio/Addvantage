@@ -101,7 +101,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
 - [x] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
-- [ ] **GitHub Actions CI** — typecheck + lint + build on every PR
+- [x] **GitHub Actions CI** — typecheck + lint + build on every PR
 
 ### Medium priority
 - [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only)
