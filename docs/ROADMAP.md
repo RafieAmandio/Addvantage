@@ -212,7 +212,7 @@ create index on timeline_events (occurred_at desc);
 **New worker adapters:**
 - [ ] **Trump tweet adapter** — Truth Social RSS or scraper; run every 5 min
 - [ ] **Market data adapter** — Polygon.io, Alpaca, or Tiingo free tier → `instrument_bars`
-- [ ] **Backfill job** — migrate existing `news_items` into `timeline_events` with `kind='news'`
+- [x] **Backfill job** — migrate existing `news_items` into `timeline_events` with `kind='news'` _(done tick 74 — migration 0014 unique-index + backfill + auto-mirror trigger; timeline query now reads timeline_events as single source)_
 
 **Web app:**
 - [ ] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated (page is thin, just composes reusable components)
