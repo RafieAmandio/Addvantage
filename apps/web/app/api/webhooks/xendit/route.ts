@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { serverConfig } from "@/lib/config/server";
+import { sendBrevoTemplate } from "@/lib/email/brevo";
 import { logger } from "@/lib/logger";
 import { verifyXenditWebhook } from "@/lib/payment/verify-xendit";
 import { rateLimit } from "@/lib/ratelimit";
@@ -88,6 +90,13 @@ export async function POST(request: Request) {
 
   const { event } = result;
 
+  // payment_failed → send a dunning email before 200'ing. All graceful
+  // no-op paths still return 200 so Xendit stops retrying (these are user
+  // / config issues, not transient infra failures).
+  if (event.kind === "payment_failed") {
+    return handlePaymentFailed(event);
+  }
+
   // Only tier upgrades/downgrades affect profiles; other kinds are logged
   // and 200'd so Xendit stops retrying. Renewals/cancellations will be
   // wired in a follow-up tick.
@@ -157,5 +166,158 @@ export async function POST(request: Request) {
       { error: "internal_error" },
       { status: 500, headers: { "Cache-Control": "no-store" } }
     );
+  }
+}
+
+type VerifiedPaymentEvent = Extract<
+  ReturnType<typeof verifyXenditWebhook>,
+  { valid: true }
+>["event"];
+
+/**
+ * Handle a verified `payment_failed` event: DM the affected user a dunning
+ * email and log the send. Every failure path still returns 200 to prevent
+ * Xendit retries — we've already acknowledged receipt, and the user/config
+ * issues here aren't fixed by replaying the webhook.
+ */
+async function handlePaymentFailed(
+  event: VerifiedPaymentEvent
+): Promise<NextResponse> {
+  const okResponse = (data: Record<string, unknown>) =>
+    NextResponse.json(data, {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+    });
+
+  if (!event.profileId) {
+    logger.warn("xendit payment_failed: missing profile_id metadata", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+    });
+    return okResponse({
+      received: true,
+      sent: false,
+      reason: "missing_profile_id",
+    });
+  }
+
+  const templateId = serverConfig.DUNNING_TEMPLATE_ID;
+  if (!templateId) {
+    logger.warn("xendit payment_failed: DUNNING_TEMPLATE_ID unset", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+      profileId: event.profileId,
+    });
+    return okResponse({
+      received: true,
+      sent: false,
+      reason: "template_unset",
+    });
+  }
+
+  const admin = supabaseAdmin();
+
+  const { data: profile, error: profileErr } = await admin
+    .from("profiles")
+    .select("email,handle,tier")
+    .eq("id", event.profileId)
+    .single();
+
+  if (profileErr || !profile) {
+    logger.warn("xendit payment_failed: profile lookup failed", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+      profileId: event.profileId,
+      error: profileErr ?? undefined,
+    });
+    return okResponse({
+      received: true,
+      sent: false,
+      reason: "profile_not_found",
+    });
+  }
+
+  if (!profile.email) {
+    logger.warn("xendit payment_failed: profile email missing", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+      profileId: event.profileId,
+    });
+    return okResponse({
+      received: true,
+      sent: false,
+      reason: "email_missing",
+    });
+  }
+
+  try {
+    const result = await sendBrevoTemplate({
+      to: {
+        email: profile.email,
+        name: profile.handle ?? undefined,
+      },
+      templateId,
+      params: {
+        tier: profile.tier,
+        externalRef: event.externalRef,
+        occurredAt: event.occurredAt.toISOString(),
+      },
+    });
+
+    if (!result) {
+      return okResponse({
+        received: true,
+        sent: false,
+        reason: "email_provider_unset",
+      });
+    }
+
+    const { error: insertErr } = await admin.from("email_log").insert({
+      profile_id: event.profileId,
+      kind: "dunning",
+      provider: result.provider,
+      external_message_id: result.messageId,
+      template_id: String(templateId),
+      payload: JSON.parse(
+        JSON.stringify({
+          externalRef: event.externalRef,
+          raw: event.raw ?? null,
+        })
+      ),
+    });
+
+    if (insertErr) {
+      // Send already happened — log loudly but don't fail the webhook.
+      logger.error(
+        "xendit payment_failed: email_log insert failed (send succeeded)",
+        {
+          scope: "api.webhooks.xendit",
+          externalRef: event.externalRef,
+          profileId: event.profileId,
+          error: insertErr,
+        }
+      );
+    }
+
+    logger.info("xendit payment_failed: dunning email sent", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+      profileId: event.profileId,
+      messageId: result.messageId,
+    });
+
+    return okResponse({ received: true, sent: true });
+  } catch (err) {
+    logger.error("xendit payment_failed: send failed", {
+      scope: "api.webhooks.xendit",
+      externalRef: event.externalRef,
+      profileId: event.profileId,
+      error: err,
+    });
+    return okResponse({
+      received: true,
+      sent: false,
+      reason: "send_error",
+    });
   }
 }

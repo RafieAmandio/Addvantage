@@ -30,6 +30,25 @@ const ServerEnvSchema = z.object({
     emptyToUndef,
     z.string().min(1).optional()
   ),
+  // Brevo transactional email (web-side duplicate of worker config; both
+  // apps send independently). All optional: helpers no-op when unset.
+  BREVO_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  EMAIL_PROVIDER: z.preprocess(
+    emptyToUndef,
+    z.enum(["brevo"]).optional()
+  ),
+  EMAIL_SENDER_EMAIL: z.preprocess(
+    emptyToUndef,
+    z.string().email().optional()
+  ),
+  EMAIL_SENDER_NAME: z.preprocess(
+    emptyToUndef,
+    z.string().min(1).optional()
+  ),
+  DUNNING_TEMPLATE_ID: z.preprocess(
+    emptyToUndef,
+    z.coerce.number().int().positive().optional()
+  ),
 });
 
 const parsed = ServerEnvSchema.safeParse(process.env);

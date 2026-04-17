@@ -23,7 +23,8 @@
     "BREVO_API_KEY",
     "EMAIL_SENDER_EMAIL",
     "EMAIL_SENDER_NAME",
-    "RENEWAL_TEMPLATE_ID"
+    "RENEWAL_TEMPLATE_ID",
+    "DUNNING_TEMPLATE_ID"
   ],
   "tasks": {
     "build": {
