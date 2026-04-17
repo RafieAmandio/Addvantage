@@ -24,7 +24,8 @@ Walk the ROADMAP checkboxes in this order and take the **first unchecked item** 
 
 1. **Section 2 — Production Readiness Gaps**, in order: Critical → High → Medium → Low
 2. **Section 4 — Timeline Chart**, phases in order: A (Skeleton) → B (Real data) → C (Tweet source) → D (Polish)
-3. **Section 3 — Feature Backlog** last
+3. **Section 6 — Improvement Backlog (auto-discovered)**, oldest first
+4. **Section 3 — Feature Backlog** last
 
 **Skip and list for the user (do not attempt) any item requiring:**
 - Rotating keys / credential changes
@@ -82,7 +83,38 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 
 Do **not** push. The user controls pushes.
 
-### 6. Report (under 100 words)
+### 6. Scan for improvements (always do this, even if you skipped step 3)
+
+After the implementation commit (or after deciding to skip), spend a **small, bounded** amount of effort looking for one concrete improvement opportunity the project didn't already know about. Do not rewrite anything here — you are only **logging findings** so a future tick can pick them up.
+
+Rotate the focus each tick so coverage broadens over time. Pick the category based on `date +%s % 6`:
+
+0. **Code quality** — duplicated logic, oversized files (>400 LOC), inline components that belong in `components/`, `any` types, missing error handling at an async boundary
+1. **Performance** — N+1 queries, missing indexes, non-paginated `.select('*')`, large client bundles (check imports), synchronous work on the render path, missing `React.memo` on hot components, unbounded list renders
+2. **Reusability** — near-duplicate components across pages, hooks reimplemented inline, Supabase calls outside `lib/queries/`, enums duplicated outside `packages/shared/`
+3. **Security** — missing `requireAdmin()` on server actions, `supabaseAdmin()` imported from client-reachable code, unvalidated user input reaching DB, secrets in code, CORS/CSRF gaps
+4. **Observability** — silent `catch` blocks that return `[]` or `null`, missing logger calls on errors, no request IDs, console.log instead of structured logs
+5. **DX / build** — slow turbo tasks, missing `turbo.json` outputs, stale generated types, redundant deps, `transpilePackages` drift, failing lint rules being ignored
+
+**How to scan (fast, no rabbit holes):**
+- Pick 2–4 files related to today's category and read them critically
+- Or grep for the category's tell-tale pattern (e.g. `as \w+Row`, `.select\("\*"\)`, `catch.*return \[\]`, `console\.(log|error)`)
+- Cap this step at ~5 tool calls
+
+**Log the finding** by appending a single item to `docs/ROADMAP.md` under a section named `## 6. Improvement Backlog (auto-discovered)`. Create that section if it doesn't exist. Format:
+
+```
+- [ ] **[<category>] <short title>** — <what's wrong, 1 sentence> _(found tick <N>, <file:line>)_
+```
+
+Rules:
+- **Deduplicate** — read the existing Improvement Backlog first; if the same issue is already listed, do not re-add it
+- If you find nothing worth logging, write nothing. Empty ticks are fine
+- Improvement items become eligible for future ticks after all Critical + High items are done, but **before** Feature Backlog
+
+Include the backlog append (if any) in the same commit as step 5.
+
+### 7. Report (under 100 words)
 
 Format:
 ```
@@ -90,6 +122,7 @@ Format:
 - Did: <one sentence>
 - Files: <comma-separated paths>
 - Verify: typecheck ✓ / build ✓ / ui-visual ✗ (not tested)
+- Improvement logged: <title or "none">
 - Next up: <next unchecked item from ROADMAP>
 - Blockers (if any): <list>
 ```
