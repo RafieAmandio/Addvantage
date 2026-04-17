@@ -14,3 +14,11 @@ export function isPaidTier(t: string): t is PaidTier {
 export const TIER_PRICE_IDR: Record<PaidTier, number> = {
   vip: 199_000,
 };
+
+// Hourly request budget per tier for tier-gated APIs (consult LLM, etc.).
+// TODO(limits): placeholders — tune with actual usage data + LLM cost model.
+export const TIER_RATE_LIMIT_HOURLY: Record<Tier, number> = {
+  visitor: 5,
+  free: 20,
+  vip: 100,
+};
