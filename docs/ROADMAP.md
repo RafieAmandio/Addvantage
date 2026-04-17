@@ -96,7 +96,8 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Error tracking** — Sentry on both apps (web + worker), DSN via env
 - [x] **Structured logging on web** — currently only `console.error` in one place
 - [ ] **Ship worker logs off-box** — pino → Axiom / Better Stack / Loki
-- [ ] **Health check endpoints** — `/api/health` on web, heartbeat pings from worker
+- [x] **Health check endpoint (web)** — `/api/health` returns 200/503 with Supabase ping
+- [ ] **Heartbeat pings from worker** — worker pushes periodic liveness signal (uptime monitor target TBD)
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
 - [ ] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
@@ -279,3 +280,4 @@ Once those land, Phase A of the timeline chart can start.
 ## 6. Improvement Backlog (auto-discovered)
 
 - [ ] **[performance] Admin news queries select `*` and are unpaginated** — `listPendingNews` / `listRejectedNews` fetch every row of `news_items` with every column; as the queue grows, this gets slow and bloats the payload. Narrow the column list (match `listApprovedNews` at line 60) and add `.range()` pagination. _(found tick 1, apps/web/features/news/queries/news.ts:69-89)_
+- [ ] **[observability] Search query silently swallows errors** — `catch { return []; }` discards the error, so a broken search looks like "no results" with no signal in logs. Replace with `logger.warn("search failed", { error: err })` (logger already exists at `lib/logger.ts`) before returning `[]`. _(found tick 5, apps/web/features/search/search.ts:97)_
