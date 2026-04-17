@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/session";
 import { rateLimit } from "@/lib/ratelimit";
+import { logger } from "@/lib/logger";
 import { NewsItemEditSchema } from "@tradevantage/shared";
 import type { TablesUpdate } from "@tradevantage/db";
 
@@ -69,7 +70,10 @@ export async function saveDraft(
     .update(update)
     .eq("id", id);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    logger.error("saveDraft failed", { id, error, scope: "admin.saveDraft" });
+    return { ok: false, error: error.message };
+  }
 
   revalidatePath(`/admin/review/${id}`);
   revalidatePath("/admin/review");
