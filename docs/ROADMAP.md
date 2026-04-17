@@ -88,7 +88,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 
 ### Critical (must fix before real users)
 - [ ] **Rotate Supabase service role key** — currently visible in `apps/worker/.env`; verify git history is clean
-- [ ] **Add `.env` to `.gitignore` audit** — confirm no secrets ever committed
+- [x] **Add `.env` to `.gitignore` audit** — confirm no secrets ever committed
 - [x] **Add `app/error.tsx` and `app/global-error.tsx`** — web app has no error boundaries
 - [x] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
 
@@ -99,7 +99,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Health check endpoints** — `/api/health` on web, heartbeat pings from worker
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
 - [ ] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
-- [ ] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
+- [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
 - [ ] **GitHub Actions CI** — typecheck + lint + build on every PR
 
 ### Medium priority
