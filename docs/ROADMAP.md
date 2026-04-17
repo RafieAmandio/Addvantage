@@ -94,7 +94,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 
 ### High priority
 - [ ] **Error tracking** — Sentry on both apps (web + worker), DSN via env
-- [ ] **Structured logging on web** — currently only `console.error` in one place
+- [x] **Structured logging on web** — currently only `console.error` in one place
 - [ ] **Ship worker logs off-box** — pino → Axiom / Better Stack / Loki
 - [ ] **Health check endpoints** — `/api/health` on web, heartbeat pings from worker
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
