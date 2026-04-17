@@ -3,271 +3,37 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { calendar, calendarDayMeta, CURRENCIES } from "@/features/calendar/mock";
+import { calendar, CURRENCIES } from "@/features/calendar/mock";
 import { news } from "@/features/news/mock";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { cn } from "@/lib/cn";
-import type { CalendarEvent, Impact } from "@/lib/mock/types";
-
-// ─────────────────────────────────────────────────────────────
-// Anchor / "today" for the demo. The mock data is dated April
-// 2026, so we anchor on the day inside that window where the
-// dashboard / brief already pivot.
-// ─────────────────────────────────────────────────────────────
-const DEMO_TODAY_YMD = "2026-04-07";
-
-// ─────────────────────────────────────────────────────────────
-// View / filter types
-// ─────────────────────────────────────────────────────────────
-type ViewMode = "day" | "week" | "month";
-type ImpactFilter = "all" | Impact;
-type RegionFilter = "all" | CalendarEvent["region"];
-
-const REGIONS: ReadonlyArray<CalendarEvent["region"]> = [
-  "US",
-  "EU",
-  "UK",
-  "JP",
-  "CN",
-  "ID",
-  "GLOBAL",
-];
-
-// ─────────────────────────────────────────────────────────────
-// Date helpers — all anchor / range math is done in WIB (UTC+7)
-// because that's what the rest of the table uses.
-// ─────────────────────────────────────────────────────────────
-
-function ymdToDate(ymd: string): Date {
-  return new Date(ymd + "T00:00:00Z");
-}
-
-function dateToYmd(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
-function addDays(ymd: string, n: number): string {
-  const d = ymdToDate(ymd);
-  d.setUTCDate(d.getUTCDate() + n);
-  return dateToYmd(d);
-}
-
-function addMonths(ymd: string, n: number): string {
-  const d = ymdToDate(ymd);
-  d.setUTCMonth(d.getUTCMonth() + n);
-  return dateToYmd(d);
-}
-
-function startOfWeek(ymd: string): string {
-  const d = ymdToDate(ymd);
-  const dow = d.getUTCDay(); // 0 = Sun, 1 = Mon
-  const diff = (dow + 6) % 7; // make Mon = 0
-  d.setUTCDate(d.getUTCDate() - diff);
-  return dateToYmd(d);
-}
-
-function startOfMonth(ymd: string): string {
-  return ymd.slice(0, 7) + "-01";
-}
-
-function endOfMonth(ymd: string): string {
-  const d = ymdToDate(ymd);
-  d.setUTCMonth(d.getUTCMonth() + 1);
-  d.setUTCDate(0);
-  return dateToYmd(d);
-}
-
-/**
- * For the month grid: return 42 consecutive YYYY-MM-DD strings starting
- * from the Monday of the week containing the 1st of the anchor's month.
- * Always yields 6 full weeks so the grid footprint is stable.
- */
-function monthGridDays(anchorYmd: string): string[] {
-  const first = startOfMonth(anchorYmd);
-  const gridStart = startOfWeek(first);
-  const days: string[] = [];
-  let cursor = gridStart;
-  for (let i = 0; i < 42; i++) {
-    days.push(cursor);
-    cursor = addDays(cursor, 1);
-  }
-  return days;
-}
-
-/** WIB date for an ISO timestamp (the operator's local calendar day). */
-function wibYmd(iso: string): string {
-  const d = new Date(new Date(iso).getTime() + 7 * 60 * 60 * 1000);
-  return d.toISOString().slice(0, 10);
-}
-
-function rangeForView(view: ViewMode, anchorYmd: string): {
-  start: string;
-  end: string;
-} {
-  if (view === "day") return { start: anchorYmd, end: anchorYmd };
-  if (view === "week") {
-    const start = startOfWeek(anchorYmd);
-    return { start, end: addDays(start, 6) };
-  }
-  return { start: startOfMonth(anchorYmd), end: endOfMonth(anchorYmd) };
-}
-
-function stepAnchor(view: ViewMode, anchorYmd: string, dir: 1 | -1): string {
-  if (view === "day") return addDays(anchorYmd, dir);
-  if (view === "week") return addDays(anchorYmd, dir * 7);
-  return addMonths(anchorYmd, dir);
-}
-
-function rangeLabel(view: ViewMode, anchorYmd: string): string {
-  const { start, end } = rangeForView(view, anchorYmd);
-  if (view === "day") {
-    return formatDayHeader(start);
-  }
-  if (view === "week") {
-    const a = ymdToDate(start);
-    const b = ymdToDate(end);
-    const sameMonth = a.getUTCMonth() === b.getUTCMonth();
-    const left = a.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      timeZone: "UTC",
-    });
-    const right = sameMonth
-      ? b.toLocaleDateString("en-US", { day: "numeric", timeZone: "UTC" })
-      : b.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          timeZone: "UTC",
-        });
-    return `${left} — ${right}`;
-  }
-  // month
-  return ymdToDate(anchorYmd).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
-// ─────────────────────────────────────────────────────────────
-// Existing helpers (unchanged)
-// ─────────────────────────────────────────────────────────────
-
-function formatCalendarTime(
-  iso: string,
-  anchorLocalYmd: string,
-  showOffset = true
-): string {
-  const d = new Date(iso);
-  const wibMs = d.getTime() + 7 * 60 * 60 * 1000;
-  const wib = new Date(wibMs);
-  const hh = String(wib.getUTCHours()).padStart(2, "0");
-  const mm = String(wib.getUTCMinutes()).padStart(2, "0");
-  if (!showOffset) return `${hh}${mm}`;
-  const eventYmd = wib.toISOString().slice(0, 10);
-  const anchor = ymdToDate(anchorLocalYmd).getTime();
-  const eventMid = ymdToDate(eventYmd).getTime();
-  const dayOffset = Math.round((eventMid - anchor) / (1000 * 60 * 60 * 24));
-  const sign = dayOffset >= 0 ? "+" : "";
-  return `${hh}${mm}${sign}${dayOffset}`;
-}
-
-function formatDayHeader(ymd: string): string {
-  const d = ymdToDate(ymd);
-  const weekday = d.toLocaleDateString("en-US", {
-    weekday: "long",
-    timeZone: "UTC",
-  });
-  const month = d.toLocaleDateString("en-US", {
-    month: "short",
-    timeZone: "UTC",
-  });
-  const day = d.getUTCDate();
-  return `${weekday} ${month} ${day}`;
-}
-
-function deriveSummary(events: CalendarEvent[]): string {
-  const ymd = wibYmd(events[0].ts);
-  const curated = calendarDayMeta.find((m) => m.date === ymd);
-  if (curated) return curated.summary;
-  const highs = events.filter((e) => e.impact === "high");
-  if (highs.length > 0) {
-    return highs.slice(0, 3).map((e) => shortName(e.title)).join(" + ");
-  }
-  return `${events.length} ${events.length === 1 ? "event" : "events"}`;
-}
-
-function shortName(title: string): string {
-  return title
-    .replace(/\s+(MoM|YoY|QoQ|Final\s+Q\d|Q\d|Prel|[A-Z]{3})\b/g, "")
-    .replace(/\s+Rate$/i, "")
-    .replace(/\s+MoM\/YoY.*$/i, "")
-    .trim();
-}
-
-function groupByDay(
-  events: CalendarEvent[]
-): Array<{ ymd: string; events: CalendarEvent[] }> {
-  const map = new Map<string, CalendarEvent[]>();
-  for (const e of events) {
-    const ymd = wibYmd(e.ts);
-    const list = map.get(ymd) ?? [];
-    list.push(e);
-    map.set(ymd, list);
-  }
-  return Array.from(map.entries())
-    .map(([ymd, events]) => ({
-      ymd,
-      events: events.sort((a, b) => a.ts.localeCompare(b.ts)),
-    }))
-    .sort((a, b) => a.ymd.localeCompare(b.ymd));
-}
-
-const IMPACT_LABEL: Record<Impact, string> = {
-  high: "High",
-  medium: "Mod",
-  low: "Low",
-};
-
-const IMPACT_STYLE: Record<Impact, string> = {
-  high: "border-blood/60 bg-blood/20 text-[#fda4af]",
-  medium: "border-lime/60 bg-lime/10 text-lime",
-  low: "border-moss/60 bg-moss/10 text-moss",
-};
-
-function scoreStyle(n: number): string {
-  if (n >= 9) return "bg-[#7f1d1d] text-[#fecaca]";
-  if (n >= 8) return "bg-[#991b1b] text-[#fee2e2]";
-  if (n >= 7) return "bg-[#b45309] text-[#fef3c7]";
-  if (n >= 6) return "bg-[#b45309]/80 text-[#fef3c7]";
-  if (n >= 5) return "bg-[#78350f] text-[#fef3c7]";
-  if (n >= 4) return "bg-[#57330a] text-[#f5d478]";
-  if (n >= 3) return "bg-[#3f6212] text-[#d9f99d]";
-  if (n >= 2) return "bg-[#365314] text-[#d9f99d]";
-  return "bg-[#1a2e05] text-[#a3e635]";
-}
-
-// ─────────────────────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────────────────────
-
-function parseViewMode(v: string | null): ViewMode {
-  return v === "day" || v === "month" ? v : "week";
-}
-function parseImpact(v: string | null): ImpactFilter {
-  return v === "high" || v === "medium" || v === "low" ? v : "all";
-}
-function parseRegion(v: string | null): RegionFilter {
-  if (!v) return "all";
-  return (REGIONS as ReadonlyArray<string>).includes(v)
-    ? (v as RegionFilter)
-    : "all";
-}
-function parseAnchor(v: string | null): string {
-  if (!v) return DEMO_TODAY_YMD;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-  return DEMO_TODAY_YMD;
-}
+import type { CalendarEvent } from "@/lib/mock/types";
+import {
+  DEMO_TODAY_YMD,
+  REGIONS,
+  type ImpactFilter,
+  type RegionFilter,
+  type ViewMode,
+} from "@/features/calendar/types";
+import { addDays, monthGridDays, startOfMonth, wibYmd, ymdToDate } from "@/features/calendar/lib/date";
+import { formatCalendarTime, formatDayHeader, shortName } from "@/features/calendar/lib/format";
+import {
+  parseAnchor,
+  parseImpact,
+  parseRegion,
+  parseViewMode,
+  rangeForView,
+  rangeLabel,
+  stepAnchor,
+} from "@/features/calendar/lib/view";
+import { deriveSummary, groupByDay } from "@/features/calendar/lib/group";
+import {
+  IMPACT_DOT,
+  IMPACT_LABEL,
+  IMPACT_STYLE,
+  MAX_EVENTS_IN_CELL,
+  scoreStyle,
+} from "@/features/calendar/lib/style";
 
 export default function CalendarPage() {
   return (
@@ -857,14 +623,6 @@ function ScoreCell({ value }: { value: number }) {
 // ─────────────────────────────────────────────────────────────
 // Month grid
 // ─────────────────────────────────────────────────────────────
-
-const IMPACT_DOT: Record<Impact, string> = {
-  high: "bg-[#991b1b] border-[#fda4af]",
-  medium: "bg-lime border-lime",
-  low: "bg-moss border-moss",
-};
-
-const MAX_EVENTS_IN_CELL = 3;
 
 function MonthGrid({
   anchor,
