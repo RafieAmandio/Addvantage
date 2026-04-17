@@ -115,7 +115,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] Admin routes: redirect instead of rendering "FORBIDDEN"
 - [ ] Pin Node version in Vercel project settings
 - [ ] Split `/app/consult/page.tsx` (1021 LOC single file)
-- [ ] Migration rollback strategy (currently append-only)
+- [x] Migration rollback strategy (currently append-only) — documented in `packages/db/README.md` (forward-only convention, how to revert via new migration, pre-flight checks)
 - [ ] Staging environment (separate Supabase + preview VPS/Fly app)
 
 ---
