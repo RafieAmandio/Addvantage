@@ -29,11 +29,11 @@ Every new component, hook, query, or adapter must be built for reuse from day on
 - If a component takes more than ~3 responsibilities, split it
 
 **Hook rules:**
-- Anything touching `localStorage`, `window`, realtime subscriptions, or polling → custom hook in `apps/web/lib/hooks/`.
-- Examples of hooks that should already exist and be reused: `useWatchlist`, `useSeenNews`, `useReadPrimers`. Do not reimplement localStorage logic inline.
+- Anything touching `localStorage`, `window`, realtime subscriptions, or polling → custom hook in `apps/web/features/<name>/hooks/` (feature-local) or `apps/web/lib/hooks/` only if truly cross-feature.
+- Examples of hooks that should already exist and be reused: `useWatchlist` (`features/watchlist/hooks/`), `useSeenNews` (`features/news/hooks/`), `useReadPrimers` (`features/education/hooks/`). Do not reimplement localStorage logic inline.
 
 **Query rules:**
-- All Supabase reads go through `apps/web/lib/queries/<domain>.ts` (e.g. `queries/news.ts`, future `queries/timeline.ts`, `queries/bars.ts`).
+- All Supabase reads go through `apps/web/features/<name>/queries/<domain>.ts` (e.g. `features/news/queries/news.ts`, future `features/chart/queries/bars.ts`, `features/timeline/queries/timeline.ts`).
 - Validate shape with Zod at the query boundary — do not `as SomeType` cast.
 - Queries return plain serializable objects, not Supabase response wrappers.
 
@@ -52,7 +52,7 @@ Every new component, hook, query, or adapter must be built for reuse from day on
 3. Will someone else reuse this within 3 months? If yes, put it in a shared folder with a clear name.
 
 ### Refactor-as-you-go
-When touching a page that inlines UI or duplicates logic from another page, lift the shared piece into `components/` or `lib/hooks/` in the same PR. Don't leave breadcrumbs for later.
+When touching a page that inlines UI or duplicates logic from another page, lift the shared piece into `features/<name>/components/`, `features/<name>/hooks/`, or (if truly generic) `components/ui/` in the same PR. Don't leave breadcrumbs for later.
 
 ---
 
@@ -207,17 +207,17 @@ create index on timeline_events (occurred_at desc);
 - [ ] API route: `GET /api/events?symbols[]=SPX&from=...&to=...`
 - [ ] Realtime: Supabase realtime channel on `timeline_events` for live pin drops
 
-**Reusable components to produce (build these as standalone, reuse everywhere):**
-- `components/chart/PriceChart.tsx` — dumb wrapper over Lightweight Charts. Props: `bars[]`, `interval`, `onCrosshairMove`. No data fetching.
-- `components/chart/TimelineMarkers.tsx` — renders event dots on a time axis. Props: `events[]`, `onHover`, `onClick`. Works standalone (useful on `/app/news` too as a mini-timeline).
-- `components/chart/EventDrawer.tsx` — side drawer showing event body + source. Reuse for news detail, tweet detail, macro detail.
-- `components/chart/SymbolSearch.tsx` — combobox for instrument lookup. Reuse anywhere a user picks a symbol (watchlist add, plan authoring).
-- `components/chart/IntervalPicker.tsx` — 1m/5m/1h/1d toggle. Small, but reused.
-- `components/timeline/EventFeed.tsx` — vertical list of timeline events. Reuse on chart page, news page, and plan detail page.
-- `components/timeline/EventCard.tsx` — single event row (icon by kind, title, time, bias pill). Reuse inside `EventFeed` and in the drawer.
-- `lib/hooks/useBars.ts` — fetches + caches candles. SWR-style.
-- `lib/hooks/useTimelineEvents.ts` — fetches + subscribes to realtime events for given symbols + range.
-- `lib/queries/bars.ts` + `lib/queries/timeline.ts` — Supabase reads, Zod-validated.
+**Reusable components to produce (build these as standalone, reuse everywhere). New features `features/chart/` and `features/timeline/` will be created:**
+- `features/chart/components/PriceChart.tsx` — dumb wrapper over Lightweight Charts. Props: `bars[]`, `interval`, `onCrosshairMove`. No data fetching.
+- `features/timeline/components/TimelineMarkers.tsx` — renders event dots on a time axis. Props: `events[]`, `onHover`, `onClick`. Works standalone (useful on `/app/news` too as a mini-timeline).
+- `features/timeline/components/EventDrawer.tsx` — side drawer showing event body + source. Reuse for news detail, tweet detail, macro detail.
+- `features/chart/components/SymbolSearch.tsx` — combobox for instrument lookup. Reuse anywhere a user picks a symbol (watchlist add, plan authoring).
+- `features/chart/components/IntervalPicker.tsx` — 1m/5m/1h/1d toggle. Small, but reused.
+- `features/timeline/components/EventFeed.tsx` — vertical list of timeline events. Reuse on chart page, news page, and plan detail page.
+- `features/timeline/components/EventCard.tsx` — single event row (icon by kind, title, time, bias pill). Reuse inside `EventFeed` and in the drawer.
+- `features/chart/hooks/useBars.ts` — fetches + caches candles. SWR-style.
+- `features/timeline/hooks/useTimelineEvents.ts` — fetches + subscribes to realtime events for given symbols + range.
+- `features/chart/queries/bars.ts` + `features/timeline/queries/timeline.ts` — Supabase reads, Zod-validated.
 
 **UX sketch:**
 - Top: symbol search + interval picker (1m/5m/1h/1d)
