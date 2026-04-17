@@ -263,7 +263,7 @@ create index on timeline_events (occurred_at desc);
 
 **Phase D — Polish (ongoing):**
 - [ ] **D1.** Symbol search — `features/chart/components/SymbolSearch.tsx` combobox over `SUPPORTED_SYMBOLS`; URL-routes on select (`/app/chart/[symbol]`). Keyboard: `/` focus, ArrowUp/Down, Enter. Reuses `PageSearchInput` primitive if shapes align. Unblocked.
-- [ ] **D2.** IntervalPicker — `features/chart/components/IntervalPicker.tsx` over `1m/5m/1h/1d`; chart route reads `?interval=` search param, defaults to `1h`. Pairs with B3 `listBars` interval arg. Unblocked.
+- [x] **D2.** IntervalPicker — `features/chart/components/IntervalPicker.tsx` over `1m/5m/1h/1d`; chart route reads `?interval=` search param, defaults to `1h`. Pairs with B3 `listBars` interval arg. _(done tick 88 — component + `isChartInterval` guard + wired into `/app/chart/[symbol]` next to `SymbolNav`)_
 - [ ] **D3.** Realtime updates — subscribe to Supabase `postgres_changes` on `timeline_events` filtered by symbols; append new rows into `EventFeed` client-side. Needs `useTimelineEvents` hook (`features/timeline/hooks/`). Unblocked.
 - [ ] **D4.** User pins — `kind='user_pin'` insert flow, auth-gated. **Blocked** until real-auth (Section 2 Medium) lands.
 - [ ] **D5.** More macro sources — FOMC / CPI ingested into `timeline_events`. **Blocked** until economic-calendar provider is picked (Section 3).

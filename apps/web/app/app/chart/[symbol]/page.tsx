@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
 import { SymbolNav } from "@/features/chart/components/SymbolNav";
+import {
+  IntervalPicker,
+  isChartInterval,
+  type ChartInterval,
+} from "@/features/chart/components/IntervalPicker";
 import { toChartBars } from "@/features/chart/lib/bars";
 import { generateMockBars } from "@/features/chart/mock";
 import { listBars } from "@/features/chart/queries/bars";
@@ -27,15 +32,23 @@ function isSupportedSymbol(s: string): s is RouteSymbol {
 }
 
 const DEFAULT_WINDOW_DAYS = 30;
-const DEFAULT_INTERVAL = "1h" as const;
+const DEFAULT_INTERVAL: ChartInterval = "1h";
 
 export default async function ChartPage({
   params,
+  searchParams,
 }: {
   params: { symbol: string };
+  searchParams?: { interval?: string };
 }) {
   const symbol = params.symbol.toUpperCase();
   if (!isSupportedSymbol(symbol)) notFound();
+
+  const intervalParam = searchParams?.interval;
+  const interval: ChartInterval =
+    intervalParam && isChartInterval(intervalParam)
+      ? intervalParam
+      : DEFAULT_INTERVAL;
 
   const to = new Date();
   const from = new Date(to.getTime() - DEFAULT_WINDOW_DAYS * 24 * 3600 * 1000);
@@ -46,7 +59,7 @@ export default async function ChartPage({
   const [realBars, events] = await Promise.all([
     listBars({
       symbol: canonical,
-      interval: DEFAULT_INTERVAL,
+      interval,
       from,
       to,
     }),
@@ -73,10 +86,20 @@ export default async function ChartPage({
             {symbol} <span className="italic text-lime">chart</span>
           </h1>
           <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-            {usingMock ? "mock OHLC" : `real OHLC · ${DEFAULT_INTERVAL}`} · {bars.length} bars · {events.length} events
+            {usingMock ? "mock OHLC" : `real OHLC · ${interval}`} · {bars.length} bars · {events.length} events
           </div>
         </div>
-        <SymbolNav symbols={SUPPORTED_SYMBOLS} current={symbol} />
+        <div className="flex flex-col items-end gap-2">
+          <SymbolNav symbols={SUPPORTED_SYMBOLS} current={symbol} />
+          <IntervalPicker
+            current={interval}
+            hrefFor={(i) =>
+              i === DEFAULT_INTERVAL
+                ? `/app/chart/${symbol}`
+                : `/app/chart/${symbol}?interval=${i}`
+            }
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
