@@ -235,7 +235,7 @@ create index on timeline_events (occurred_at desc);
 - [x] **A1.** Migration 0007 — `instrument_bars` + `timeline_events` tables, RLS, indexes
 - [x] **A2.** Wire existing `news_items` as `timeline_events` via a feature query (`features/timeline/queries/timeline.ts`) — join, no backfill yet
 - [x] **A3.** Add `lightweight-charts` dep + `features/chart/components/PriceChart.tsx` dumb wrapper
-- [ ] **A4.** Stub `/app/chart/[symbol]` route — composes `PriceChart` with hardcoded SPX mock bars + the timeline query from A2
+- [x] **A4.** Stub `/app/chart/[symbol]` route — composes `PriceChart` with hardcoded SPX mock bars + the timeline query from A2
 
 **Phase B — Real data (3-5 days):**
 - Market data adapter in worker
