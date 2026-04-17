@@ -108,7 +108,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
 - [ ] **Retry/backoff** on Supabase + OpenAI calls (HTTP already has retries)
 - [x] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`
-- [ ] **Zod validation at query boundaries** — replace `as NewsRow` casts with schema parses
+- [x] **Zod validation at query boundaries** — replace `as NewsRow` casts with schema parses; admin/sources page lifted into `features/sources/queries/`
 - [ ] **Deploy pipeline for worker** — GHCR image build + SSH deploy to VPS on main push
 
 ### Low priority

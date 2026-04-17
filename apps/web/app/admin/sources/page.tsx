@@ -1,27 +1,10 @@
-import { supabaseServer } from "@/lib/supabase/server";
+import { listSources } from "@/features/sources/queries/sources";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-interface SourceRow {
-  code: string;
-  name: string;
-  url: string;
-  enabled: boolean;
-  poll_minutes: number;
-  last_polled_at: string | null;
-  last_success_at: string | null;
-  last_error: string | null;
-}
-
 export default async function AdminSourcesPage() {
-  const supabase = supabaseServer();
-  const { data } = await supabase
-    .from("sources")
-    .select("code,name,url,enabled,poll_minutes,last_polled_at,last_success_at,last_error")
-    .order("code");
-
-  const rows = (data ?? []) as SourceRow[];
+  const rows = await listSources();
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
