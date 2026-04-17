@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { listBars } from "@/features/chart/queries/bars";
 import { logger } from "@/lib/logger";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -29,6 +30,26 @@ export async function GET(request: Request) {
   const { symbol, interval, limit } = parsed.data;
   const to = parsed.data.to ?? new Date();
   const from = parsed.data.from ?? new Date(to.getTime() - THIRTY_DAYS_MS);
+
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = await rateLimit({
+    key: `bars:${ip}:${symbol}:${interval}`,
+    limit: 60,
+    windowSec: 60,
+  });
+  if (!rl.success) {
+    const retryAfter = rl.reset
+      ? Math.max(1, Math.ceil((rl.reset - Date.now()) / 1000))
+      : 60;
+    return NextResponse.json(
+      { error: "rate_limited" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(retryAfter) },
+      },
+    );
+  }
 
   try {
     const bars = await listBars({ symbol, interval, from, to, limit });
