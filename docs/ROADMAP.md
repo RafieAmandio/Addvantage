@@ -90,7 +90,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Rotate Supabase service role key** — currently visible in `apps/worker/.env`; verify git history is clean
 - [ ] **Add `.env` to `.gitignore` audit** — confirm no secrets ever committed
 - [x] **Add `app/error.tsx` and `app/global-error.tsx`** — web app has no error boundaries
-- [ ] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
+- [x] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
 
 ### High priority
 - [ ] **Error tracking** — Sentry on both apps (web + worker), DSN via env
