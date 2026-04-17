@@ -6,26 +6,18 @@ import { useAppState } from "@/lib/state";
 import {
   search,
   groupResults,
-  KIND_META,
   type SearchResult,
-  type ResultKind,
 } from "@/features/search/search";
 import { getRecentVisits, type RecentVisit } from "@/lib/visits";
-import { Highlight } from "@/components/ui/Highlight";
-import { cn } from "@/lib/cn";
-
-const RECENT_KEY = "ants-domain-recent-searches";
-const MAX_RECENT = 6;
-
-const SUGGESTIONS = [
-  "fed",
-  "btc",
-  "BBCA",
-  "loss aversion",
-  "drawdown",
-  "USDIDR",
-  "developing-edge",
-];
+import {
+  loadRecentSearches,
+  pushRecentSearch,
+  saveRecentSearches,
+} from "@/features/search/lib/recent-searches";
+import { SearchPaletteHeader } from "./SearchPaletteHeader";
+import { SearchPaletteEmpty } from "./SearchPaletteEmpty";
+import { SearchPaletteNoResults } from "./SearchPaletteNoResults";
+import { SearchPaletteGroup } from "./SearchPaletteGroup";
 
 export function SearchPalette() {
   const { searchOpen, setSearchOpen } = useAppState();
@@ -39,10 +31,7 @@ export function SearchPalette() {
 
   // Hydrate recents
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(RECENT_KEY);
-      if (raw) setRecent(JSON.parse(raw));
-    } catch {}
+    setRecent(loadRecentSearches());
   }, []);
 
   // Refresh visit list whenever the palette opens
@@ -79,20 +68,15 @@ export function SearchPalette() {
   useEffect(() => {
     if (!listRef.current) return;
     const el = listRef.current.querySelector<HTMLElement>(
-      `[data-result-index="${active}"]`
+      `[data-result-index="${active}"]`,
     );
     el?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
   const commit = (r: SearchResult) => {
-    // Add to recents
-    const next = [query.trim(), ...recent.filter((q) => q !== query.trim())]
-      .filter(Boolean)
-      .slice(0, MAX_RECENT);
+    const next = pushRecentSearch(recent, query);
     setRecent(next);
-    try {
-      localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-    } catch {}
+    saveRecentSearches(next);
     setSearchOpen(false);
     router.push(r.href);
   };
@@ -114,9 +98,13 @@ export function SearchPalette() {
     }
   };
 
-  if (!searchOpen) return null;
+  const pickQuery = (q: string) => {
+    setQuery(q);
+    setActive(0);
+    inputRef.current?.focus();
+  };
 
-  let runningIndex = -1;
+  if (!searchOpen) return null;
 
   return (
     <div
@@ -136,54 +124,26 @@ export function SearchPalette() {
         {/* Classification stripe */}
         <div className="classification-stripe h-1" />
 
-        {/* Header / input */}
-        <div className="border-b border-ink-3 bg-ink-2/80">
-          <div className="flex items-center gap-3 px-5 py-4">
-            <SearchIcon />
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setActive(0);
-              }}
-              onKeyDown={onKeyDown}
-              placeholder="Search news, plans, primers, channels, hashtags…"
-              className="flex-1 bg-transparent font-display text-2xl text-paper placeholder:text-paper/30 outline-none"
-            />
-            <button
-              onClick={() => setSearchOpen(false)}
-              aria-label="Close search"
-              className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-lime hover:text-lime"
-            >
-              esc
-            </button>
-          </div>
-          <div className="flex items-center justify-between border-t border-ink-3 px-5 py-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            <span>
-              {query
-                ? `${results.length} ${results.length === 1 ? "result" : "results"} across ${grouped.length} ${grouped.length === 1 ? "channel" : "channels"}`
-                : "● TRANSMISSION SEARCH · OPERATOR EYES ONLY"}
-            </span>
-            <span className="hidden sm:flex items-center gap-3">
-              <span>↑↓ navigate</span>
-              <span>↵ open</span>
-              <span>esc close</span>
-            </span>
-          </div>
-        </div>
+        <SearchPaletteHeader
+          ref={inputRef}
+          query={query}
+          onQueryChange={(v) => {
+            setQuery(v);
+            setActive(0);
+          }}
+          onKeyDown={onKeyDown}
+          onClose={() => setSearchOpen(false)}
+          resultCount={results.length}
+          channelCount={grouped.length}
+        />
 
         {/* Body */}
         <div ref={listRef} className="max-h-[60vh] overflow-y-auto">
           {!query && (
-            <EmptyState
+            <SearchPaletteEmpty
               recent={recent}
               visits={visits}
-              onPick={(q) => {
-                setQuery(q);
-                setActive(0);
-                inputRef.current?.focus();
-              }}
+              onPick={pickQuery}
               onJump={(href) => {
                 setSearchOpen(false);
                 router.push(href);
@@ -192,312 +152,35 @@ export function SearchPalette() {
           )}
 
           {query && results.length === 0 && (
-            <div className="p-10 text-center">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
-                ● NULL TRANSMISSION
-              </div>
-              <div className="mt-3 font-display text-2xl text-paper">
-                Nothing matches "{query}".
-              </div>
-              <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-                The desk doesn't fabricate results to fill a screen.
-              </div>
-
-              <div className="mx-auto mt-8 max-w-md border-t border-ink-3 pt-6">
-                <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                  ● Try one of these instead
-                </div>
-                <div className="mt-3 flex flex-wrap justify-center gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => {
-                        setQuery(s);
-                        setActive(0);
-                        inputRef.current?.focus();
-                      }}
-                      className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-                {recent.length > 0 && (
-                  <>
-                    <div className="mt-6 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                      ● Or your recent searches
-                    </div>
-                    <div className="mt-3 flex flex-wrap justify-center gap-2">
-                      {recent.map((q) => (
-                        <button
-                          key={q}
-                          onClick={() => {
-                            setQuery(q);
-                            setActive(0);
-                            inputRef.current?.focus();
-                          }}
-                          className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+            <SearchPaletteNoResults
+              query={query}
+              recent={recent}
+              onPick={pickQuery}
+            />
           )}
 
           {query &&
-            grouped.map(([kind, items]) => (
-              <div key={kind} className="border-b border-ink-3 last:border-b-0">
-                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ink-3 bg-ink-2/95 px-5 py-2 backdrop-blur">
-                  <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                    <span>{KIND_META[kind].code}</span>
-                    <span className="h-px w-6 bg-lime/40" />
-                    <span>{KIND_META[kind].label}</span>
-                  </div>
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                    {items.length}
-                  </span>
-                </div>
-                {items.map((r) => {
-                  runningIndex += 1;
-                  const idx = runningIndex;
-                  return (
-                    <ResultRow
-                      key={`${r.kind}-${r.id}`}
-                      result={r}
-                      kind={kind}
-                      index={idx}
-                      active={idx === active}
-                      query={query}
-                      onHover={() => setActive(idx)}
-                      onClick={() => commit(r)}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+            (() => {
+              let startIndex = 0;
+              return grouped.map(([kind, items]) => {
+                const node = (
+                  <SearchPaletteGroup
+                    key={kind}
+                    kind={kind}
+                    items={items}
+                    startIndex={startIndex}
+                    activeIndex={active}
+                    query={query}
+                    onHover={setActive}
+                    onCommit={commit}
+                  />
+                );
+                startIndex += items.length;
+                return node;
+              });
+            })()}
         </div>
       </div>
     </div>
-  );
-}
-
-function EmptyState({
-  recent,
-  visits,
-  onPick,
-  onJump,
-}: {
-  recent: string[];
-  visits: RecentVisit[];
-  onPick: (q: string) => void;
-  onJump: (href: string) => void;
-}) {
-  return (
-    <div className="p-6">
-      {visits.length > 0 && (
-        <section className="mb-6">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            ● Where you were
-          </div>
-          <div className="mt-3 grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
-            {visits.map((v) => (
-              <button
-                key={v.href}
-                onClick={() => onJump(v.href)}
-                className="group flex items-center justify-between bg-ink p-3 text-left transition-colors hover:bg-ink-2"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
-                    {v.kind}
-                  </div>
-                  <div className="mt-0.5 truncate text-sm text-paper transition-colors group-hover:text-lime">
-                    {v.label}
-                  </div>
-                </div>
-                <span className="ml-3 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 group-hover:text-lime">
-                  →
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {recent.length > 0 && (
-        <section className="mb-6">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            ● Recent transmissions
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {recent.map((q) => (
-              <button
-                key={q}
-                onClick={() => onPick(q)}
-                className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-          ● Try
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {SUGGESTIONS.map((q) => (
-            <button
-              key={q}
-              onClick={() => onPick(q)}
-              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <div className="mt-8 grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
-        <Tip
-          chord="Cmd K"
-          alt="Ctrl K"
-          label="Open this palette from anywhere"
-        />
-        <Tip chord="/" label="Same — single key" />
-        <Tip chord="↑ ↓" label="Move between results" />
-        <Tip chord="↵" label="Open the highlighted result" />
-        <Tip chord="esc" label="Close" />
-        <Tip chord="?" label="See all keyboard shortcuts" />
-      </div>
-    </div>
-  );
-}
-
-function Tip({
-  chord,
-  alt,
-  label,
-}: {
-  chord: string;
-  alt?: string;
-  label: string;
-}) {
-  return (
-    <div className="flex items-center justify-between bg-ink p-3">
-      <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
-        {label}
-      </span>
-      <span className="flex items-center gap-1">
-        {alt && (
-          <>
-            <kbd className="border border-lime/30 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">
-              {alt}
-            </kbd>
-            <span className="text-paper/30">/</span>
-          </>
-        )}
-        {chord.split(" ").map((k, i) => (
-          <kbd
-            key={i}
-            className="border border-lime/40 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
-          >
-            {k}
-          </kbd>
-        ))}
-      </span>
-    </div>
-  );
-}
-
-function ResultRow({
-  result,
-  kind,
-  index,
-  active,
-  query,
-  onHover,
-  onClick,
-}: {
-  result: SearchResult;
-  kind: ResultKind;
-  index: number;
-  active: boolean;
-  query: string;
-  onHover: () => void;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      data-result-index={index}
-      onMouseEnter={onHover}
-      onClick={onClick}
-      className={cn(
-        "block w-full border-b border-ink-3 px-5 py-4 text-left transition-colors",
-        active
-          ? "border-l-2 border-l-lime bg-lime/10"
-          : "border-l-2 border-l-transparent bg-ink hover:bg-ink-2"
-      )}
-    >
-      <div className="flex items-baseline justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
-              {result.id}
-            </span>
-            {result.author && (
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                · BY {result.author.toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div className="mt-1 truncate font-display text-lg text-paper">
-            <Highlight text={result.title} query={query} />
-          </div>
-          <div className="mt-1 line-clamp-2 text-sm text-paper/60">
-            <Highlight text={result.snippet} query={query} />
-          </div>
-          {result.tags && result.tags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {result.tags.slice(0, 4).map((t) => (
-                <span
-                  key={t}
-                  className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
-                >
-                  #{t}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="hidden shrink-0 text-right font-mono text-[9px] uppercase tracking-widest2 text-paper/40 sm:block">
-          <div>{KIND_META[kind].label}</div>
-          {result.meta && <div className="mt-1">{result.meta}</div>}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      className="text-lime"
-      aria-hidden
-    >
-      <circle cx="9" cy="9" r="6" />
-      <path d="M14 14l4 4" strokeLinecap="round" />
-    </svg>
   );
 }
