@@ -77,6 +77,8 @@ function View({ items }: { items: NewsListItem[] }) {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [query, hideSeen, pathname, router]);
 
+  const seenSet = useMemo(() => new Set(seenIds), [seenIds]);
+
   const filtered = useMemo(() => {
     return items.filter((n) => {
       if (filter !== "all") {
@@ -87,14 +89,16 @@ function View({ items }: { items: NewsListItem[] }) {
         }
       }
       if (!matchesQuery(n, query)) return false;
-      if (hideSeen && seenHydrated && seenIds.includes(n.id)) return false;
+      if (hideSeen && seenHydrated && seenSet.has(n.id)) return false;
       return true;
     });
-  }, [items, filter, query, hideSeen, seenHydrated, seenIds]);
+  }, [items, filter, query, hideSeen, seenHydrated, seenSet]);
 
-  const seenCount = seenHydrated
-    ? items.filter((n) => seenIds.includes(n.id)).length
-    : 0;
+  const seenCount = useMemo(
+    () =>
+      seenHydrated ? items.filter((n) => seenSet.has(n.id)).length : 0,
+    [items, seenSet, seenHydrated],
+  );
 
   return (
     <div className="bg-grid-fine">
