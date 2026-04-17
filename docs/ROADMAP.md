@@ -163,7 +163,7 @@ Click a marker → popover with headline + analysis + bias tag. Click "jump to n
 
 ### Architecture plan
 
-**Data layer (new tables in `packages/db/migrations/0005_timeline.sql`):**
+**Data layer (new tables in `packages/db/migrations/0007_timeline.sql` — current highest is 0006):**
 ```sql
 -- OHLCV candles cached from market data provider
 create table instrument_bars (
@@ -231,7 +231,7 @@ create index on timeline_events (occurred_at desc);
 ### Rollout phases
 
 **Phase A — Skeleton (2-3 days):**
-- Migration 0005
+- Migration 0007 (next available; current highest is 0006)
 - Stub `/app/chart/[symbol]` with hardcoded SPX + mock bars
 - Wire existing `news_items` as timeline events (join query, no backfill yet)
 - Lightweight Charts integration
@@ -269,7 +269,7 @@ create index on timeline_events (occurred_at desc);
 3. Create `apps/web/lib/config.ts` for env validation
 4. Fix `docker-compose.yml` + `Dockerfile`
 5. Set up GitHub Actions CI workflow
-6. Write migration 0005 + scaffold `/app/chart/[symbol]` route
+6. Write migration 0007 + scaffold `/app/chart/[symbol]` route (apply via Supabase MCP `apply_migration`, regenerate types)
 7. Pick market data provider and sign up
 
 Once those land, Phase A of the timeline chart can start.

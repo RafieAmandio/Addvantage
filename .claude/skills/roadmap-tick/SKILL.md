@@ -61,11 +61,61 @@ Durable lessons from prior ticks. Read at start of every tick. Append one at the
 To keep the `/loop` driver's context small across ticks:
 
 - **Delegate the heavy work to a sub-agent** using the `Agent` tool with `subagent_type: "general-purpose"`. The main loop session should only orchestrate and surface the sub-agent's final report, not perform the code reading/writing itself.
-- Pass the sub-agent a **self-contained brief**: the item picked, the relevant file paths, and a pointer to `docs/ROADMAP.md` Section 0 for engineering principles. The sub-agent reads, edits, verifies, and commits.
-- The main session should perform only these tool calls directly: the initial orient reads (ROADMAP + `git log` + `git status`), spawning the Agent, and writing the final report.
+- Pass the sub-agent a **self-contained brief**: the item picked, the relevant file paths, a pointer to `docs/ROADMAP.md` Section 0 for engineering principles, **and the verbatim contents of `LEARNINGS.md`**. The sub-agent reads, edits, verifies, and commits.
+- The main session should perform only these tool calls directly: the initial orient reads (ROADMAP + LEARNINGS + `git log` + `git status`), spawning agents, and writing the final report.
 - If the tick is tiny (e.g. just flipping a checkbox for work already done in a prior tick, or adding a one-line fix), you may do it inline without a sub-agent. Anything touching more than ~3 files → sub-agent.
 
 This way, each tick adds minimal bytes to the driving conversation. The sub-agent's context is naturally discarded when it finishes.
+
+### Parallelism — fan out independent work
+
+Some ticks pick items whose internal sub-tasks are independent (no shared file edits, no ordering dependency). In that case, **spawn multiple sub-agents in a single message** so they run concurrently. The main session waits for all to return, then assembles the report.
+
+**Always do this in parallel when applicable:**
+- Research while implementing — one sub-agent does the implementation, another fetches up-to-date library docs via context7 (see "Library docs via context7" below) and returns a brief
+- Multi-feature reads — when the item requires understanding 3+ disparate areas (e.g. timeline chart Phase A touches DB schema, web routes, and shared schemas), spawn one explore agent per area in parallel before any implementation begins
+- Verification fan-out — once the implementation commit lands, spawn `pnpm typecheck`, `pnpm build`, and the UI curl gate as parallel `Bash` calls in one message (not sub-agents — just parallel tool calls)
+
+**Do NOT parallelize when:**
+- Two sub-agents would edit the same files (race condition + bad merges)
+- One sub-agent's output is required input to the next (sequence them)
+- The total work is < ~10 minutes wall time (overhead > savings)
+
+**Spawning pattern:** issue all `Agent` calls in **one assistant message** with multiple tool-use blocks. Each agent gets a self-contained brief, distinct file scopes, and instructions to **not commit** (the orchestrator commits after all agents return so commits stay atomic and ordered).
+
+### Library docs via context7
+
+Before writing code that touches an external library (Next.js, Supabase, Lightweight Charts, grammY, Zod, OpenAI SDK, Tailwind, etc.), look up current docs via the context7 MCP. Training data drifts; context7 is current.
+
+**When to use:**
+- Adding/upgrading a library — check breaking changes, current API
+- Using a library feature you haven't written in this project before
+- Debugging library behavior that contradicts what you expect
+
+**Pattern (always two calls):**
+1. `mcp__context7__resolve-library-id` with the library name (e.g. `Next.js`, `Supabase`, `Lightweight Charts`) — returns a `/org/project` ID
+2. `mcp__context7__query-docs` with that ID + a specific question (e.g. "App Router error.tsx vs global-error.tsx semantics", "createServerClient cookie handling", "addLineSeries vs addCandlestickSeries options")
+
+Do these as a **parallel sub-agent** alongside the implementation agent when the item is non-trivial — pattern shown in the Parallelism section. Do not call context7 inline from the main loop session for big lookups; route through a sub-agent so the main context stays small.
+
+### Database work via Supabase MCP
+
+Supabase MCP is connected. Project ID: **`qawrdgttfpslyelocfmx`** (region ap-southeast-1, Postgres 17). Use these tools for any DB work — they're faster and safer than shelling out to the CLI:
+
+- `mcp__supabase__list_tables` / `list_migrations` — survey current schema before designing changes
+- `mcp__supabase__execute_sql` — read-only queries, advisor checks, sanity diffs (do NOT use for DDL)
+- `mcp__supabase__apply_migration` — apply a new migration **after** writing it as a numbered file under `packages/db/migrations/`. Pass the same SQL.
+- `mcp__supabase__generate_typescript_types` — regenerate types after a migration. Write the result to `packages/db/src/types.ts` and commit alongside the migration.
+- `mcp__supabase__get_advisors` (`type: "security"` and `type: "performance"`) — run after any DDL to surface RLS gaps and missing indexes. Treat any HIGH-severity advisor as a blocker for the tick.
+- `mcp__supabase__get_logs` — when debugging a runtime DB issue (`service: "postgres"` for SQL errors, `service: "api"` for PostgREST)
+
+**Migration workflow per tick:**
+1. `list_migrations` → confirm next available number (currently 0006 is the highest, so the next is **0007**, not 0005)
+2. Write the SQL file `packages/db/migrations/0007_<name>.sql`
+3. `apply_migration` with the same SQL (this also records the migration in Supabase's history)
+4. `generate_typescript_types` → overwrite `packages/db/src/types.ts`
+5. `get_advisors` security + performance → fix any HIGH issues before committing
+6. Commit migration file + regenerated types + any fixes in one commit
 
 ## Procedure
 
@@ -107,18 +157,23 @@ The sub-agent must follow **Section 0 — Engineering Principles** without excep
 
 Keep the change small and self-contained. One iteration = one item. If the item is large (e.g. "Timeline Chart Phase A"), break it into visible sub-steps within the ROADMAP first, tick one, and leave the rest for the next iteration.
 
-### 4. Verify (all three gates)
+### 4. Verify (all three gates — run in parallel)
 
-#### 4a. Static checks
-From repo root:
+#### 4a. Static checks (parallel `Bash` calls in one message)
+From repo root, issue these in a single assistant message so they run concurrently:
 ```bash
 pnpm typecheck
 pnpm build
-```
-Both must pass. For worker-only changes additionally:
-```bash
+# and if worker code changed:
 pnpm --filter @tradevantage/worker build
 ```
+All must pass.
+
+If a DB migration was applied this tick, **also** run in parallel:
+- `mcp__supabase__get_advisors` with `type: "security"`
+- `mcp__supabase__get_advisors` with `type: "performance"`
+
+Any HIGH-severity advisor finding is a blocker — fix and re-verify before committing.
 
 #### 4b. Interface check (for any change touching `apps/web/`)
 
@@ -220,7 +275,8 @@ Format:
 - Did: <one sentence>
 - Commits: <list of short sha + subject>
 - Files: <comma-separated paths>
-- Verify: typecheck ✓ / build ✓ / ui-curl ✓ (routes: /x, /y) / ui-playwright ✗ (not installed)
+- Parallelism used: <e.g. "2 agents (impl + context7 lookup)" or "none">
+- Verify: typecheck ✓ / build ✓ / ui-curl ✓ (routes: /x, /y) / ui-playwright ✗ (not installed) / db-advisors ✓ (or n/a)
 - Improvement logged: <title or "none">
 - Learning logged: <title or "none">
 - Next up: <next unchecked item from ROADMAP>
