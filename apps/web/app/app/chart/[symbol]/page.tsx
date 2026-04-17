@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
+import { SymbolNav } from "@/features/chart/components/SymbolNav";
 import { generateMockBars } from "@/features/chart/mock";
 import { listBars } from "@/features/chart/queries/bars";
 import {
@@ -86,22 +86,7 @@ export default async function ChartPage({
             {usingMock ? "mock OHLC" : `real OHLC · ${DEFAULT_INTERVAL}`} · {bars.length} bars · {events.length} events
           </div>
         </div>
-        <nav className="flex gap-2 font-mono text-[10px] uppercase tracking-widest2">
-          {[...SUPPORTED_SYMBOLS].map((s) => (
-            <Link
-              key={s}
-              href={`/app/chart/${s}`}
-              className={
-                "border px-2 py-1 transition-colors " +
-                (s === symbol
-                  ? "border-lime bg-lime text-ink"
-                  : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime")
-              }
-            >
-              {s}
-            </Link>
-          ))}
-        </nav>
+        <SymbolNav symbols={SUPPORTED_SYMBOLS} current={symbol} />
       </div>
 
       <div className="grid grid-cols-12 gap-6">
