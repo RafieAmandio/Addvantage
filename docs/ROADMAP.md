@@ -262,11 +262,12 @@ create index on timeline_events (occurred_at desc);
 - Dot rendering + drawer UI
 
 **Phase D — Polish (ongoing):**
-- Symbol search
-- User pins (auth required)
-- Realtime updates
-- More macro sources (FOMC, CPI from calendar)
-- Mobile layout
+- [ ] **D1.** Symbol search — `features/chart/components/SymbolSearch.tsx` combobox over `SUPPORTED_SYMBOLS`; URL-routes on select (`/app/chart/[symbol]`). Keyboard: `/` focus, ArrowUp/Down, Enter. Reuses `PageSearchInput` primitive if shapes align. Unblocked.
+- [ ] **D2.** IntervalPicker — `features/chart/components/IntervalPicker.tsx` over `1m/5m/1h/1d`; chart route reads `?interval=` search param, defaults to `1h`. Pairs with B3 `listBars` interval arg. Unblocked.
+- [ ] **D3.** Realtime updates — subscribe to Supabase `postgres_changes` on `timeline_events` filtered by symbols; append new rows into `EventFeed` client-side. Needs `useTimelineEvents` hook (`features/timeline/hooks/`). Unblocked.
+- [ ] **D4.** User pins — `kind='user_pin'` insert flow, auth-gated. **Blocked** until real-auth (Section 2 Medium) lands.
+- [ ] **D5.** More macro sources — FOMC / CPI ingested into `timeline_events`. **Blocked** until economic-calendar provider is picked (Section 3).
+- [ ] **D6.** Mobile layout — responsive chart page (< lg breakpoint already stacks; audit tooltips, drawer, nav). Unblocked.
 
 ### Open questions
 - Market data provider: Polygon ($29/mo, good), Alpaca (free, US only), Tiingo (free, limited)? Pick one early.
