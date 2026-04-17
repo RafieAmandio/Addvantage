@@ -36,8 +36,8 @@ export default function TagsPage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             DECODING TAG INDEX
           </div>
         </div>
@@ -132,7 +132,7 @@ function TagsView() {
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Index · Cross-cut</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
-            Hashtag <span className="italic text-amber">Explorer</span>
+            Hashtag <span className="italic text-lime">Explorer</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
             The connective tissue of the DOMAIN. Pull every primer, post,
@@ -184,7 +184,7 @@ function TagsView() {
                   className={cn(
                     "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                     sortMode === opt.v
-                      ? "bg-amber text-ink"
+                      ? "bg-lime text-ink"
                       : "bg-ink-2 text-paper/60 hover:text-paper"
                   )}
                 >
@@ -205,7 +205,7 @@ function TagsView() {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ✕ Clear search
             </button>
@@ -225,17 +225,17 @@ function TagsView() {
               >
                 {/* Density bar — bottom edge, scaled to count */}
                 <div
-                  className="absolute bottom-0 left-0 h-0.5 bg-amber/70 transition-all group-hover:h-1"
+                  className="absolute bottom-0 left-0 h-0.5 bg-lime/70 transition-all group-hover:h-1"
                   style={{ width: `${Math.max(4, density * 100)}%` }}
                 />
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {isHot && (
-                      <span className="inline-flex items-center gap-1 border border-amber/60 bg-amber/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber">
-                        <span className="led amber" />
+                      <span className="inline-flex items-center gap-1 border border-lime/60 bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                        <span className="led lime" />
                         TRENDING
                       </span>
                     )}
@@ -245,10 +245,10 @@ function TagsView() {
                   </div>
                 </div>
                 <div className="mt-3 font-display text-2xl text-paper">
-                  <span className="text-amber">#</span>
+                  <span className="text-lime">#</span>
                   <Highlight text={tag} query={query} />
                 </div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-amber/60">
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-lime/60">
                   <Highlight text={meta.label} query={query} />
                 </div>
                 <p className="mt-3 text-sm text-paper/60">

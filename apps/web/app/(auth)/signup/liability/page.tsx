@@ -39,22 +39,22 @@ export default function LiabilityPage() {
 
   return (
     <main className="relative mx-auto max-w-5xl px-6 py-16">
-      <div className="border border-amber/60 bg-ink-2/40 p-8 sm:p-12">
-        <div className="flex items-center justify-between border-b border-amber/40 pb-4">
+      <div className="border border-lime/60 bg-ink-2/40 p-8 sm:p-12">
+        <div className="flex items-center justify-between border-b border-lime/40 pb-4">
           <div>
             <DataLabel>Document W-001 · Final form</DataLabel>
             <div className="mt-1 font-display text-3xl text-paper">
               Liability Release & Waiver
             </div>
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             <div>VERSION 1.0</div>
             <div>2026 REVISION</div>
           </div>
         </div>
 
         <div className="mt-8 space-y-5 text-sm leading-relaxed text-paper/80">
-          <p className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+          <p className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             READ EVERY LINE. THIS DOCUMENT IS BINDING.
           </p>
           <p>
@@ -64,9 +64,9 @@ export default function LiabilityPage() {
             (Directional Outlook & Macro Alpha Intelligence) (collectively,
             the "Platform"):
           </p>
-          <ol className="space-y-4 border-l border-amber/40 pl-6">
+          <ol className="space-y-4 border-l border-lime/40 pl-6">
             <li>
-              <strong className="font-display italic text-amber">
+              <strong className="font-display italic text-lime">
                 01. Not investment advice.
               </strong>{" "}
               All content delivered through the Platform — including news,
@@ -76,7 +76,7 @@ export default function LiabilityPage() {
               tax advice.
             </li>
             <li>
-              <strong className="font-display italic text-amber">
+              <strong className="font-display italic text-lime">
                 02. No fiduciary duty.
               </strong>{" "}
               ANTS does not act as a financial advisor, broker, or fiduciary.
@@ -84,7 +84,7 @@ export default function LiabilityPage() {
               behalf.
             </li>
             <li>
-              <strong className="font-display italic text-amber">
+              <strong className="font-display italic text-lime">
                 03. Trading risk acknowledgement.
               </strong>{" "}
               You understand that trading and investing carry substantial
@@ -92,7 +92,7 @@ export default function LiabilityPage() {
               performance is not indicative of future results.
             </li>
             <li>
-              <strong className="font-display italic text-amber">
+              <strong className="font-display italic text-lime">
                 04. Sole responsibility.
               </strong>{" "}
               You are solely responsible for any decision to act, or refrain
@@ -101,7 +101,7 @@ export default function LiabilityPage() {
               liability for any losses, damages, or expenses you may incur.
             </li>
             <li>
-              <strong className="font-display italic text-amber">
+              <strong className="font-display italic text-lime">
                 05. Operator self-classification.
               </strong>{" "}
               You attest that you are an experienced market participant. You
@@ -133,7 +133,7 @@ export default function LiabilityPage() {
           ].map((a) => (
             <label
               key={a.k}
-              className="flex cursor-pointer items-start gap-3 border border-ink-3 bg-ink p-4 transition-colors hover:border-amber/40"
+              className="flex cursor-pointer items-start gap-3 border border-ink-3 bg-ink p-4 transition-colors hover:border-lime/40"
             >
               <input
                 type="checkbox"
@@ -141,7 +141,7 @@ export default function LiabilityPage() {
                 onChange={(e) =>
                   setAcks({ ...acks, [a.k]: e.target.checked })
                 }
-                className="mt-1 h-4 w-4 accent-amber"
+                className="mt-1 h-4 w-4 accent-lime"
               />
               <span className="font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
                 {a.label}
@@ -163,7 +163,7 @@ export default function LiabilityPage() {
                 ? "border-blood text-blood"
                 : looksLikeFullName
                 ? "border-moss text-moss"
-                : "border-amber/40 text-amber focus:border-amber")
+                : "border-lime/40 text-lime focus:border-lime")
             }
           />
           {signatureError && (

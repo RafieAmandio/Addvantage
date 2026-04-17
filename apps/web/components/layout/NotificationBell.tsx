@@ -35,9 +35,9 @@ const KIND_LABEL: Record<NotificationKind, string> = {
 
 const KIND_COLOR: Record<NotificationKind, string> = {
   alert: "text-blood",
-  plan: "text-amber",
+  plan: "text-lime",
   consult: "text-moss",
-  education: "text-amber",
+  education: "text-lime",
   system: "text-paper/60",
 };
 
@@ -205,8 +205,8 @@ export function NotificationBell() {
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={open}
         className={cn(
-          "relative border bg-ink-2 px-2.5 py-1.5 text-paper/60 transition-colors hover:border-amber hover:text-amber",
-          open ? "border-amber text-amber" : "border-ink-3"
+          "relative border bg-ink-2 px-2.5 py-1.5 text-paper/60 transition-colors hover:border-lime hover:text-lime",
+          open ? "border-lime text-lime" : "border-ink-3"
         )}
       >
         <BellIcon />
@@ -225,13 +225,13 @@ export function NotificationBell() {
           ref={panelRef}
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-full z-50 mt-2 w-[min(92vw,420px)] border border-amber bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]"
+          className="absolute right-0 top-full z-50 mt-2 w-[min(92vw,420px)] border border-lime bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]"
         >
           <div className="classification-stripe h-1" />
 
           <div className="flex items-center justify-between border-b border-ink-3 bg-ink-2/80 px-4 py-3">
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 ● TRANSMISSION INBOX
               </div>
               <div className="font-display text-base text-paper">
@@ -247,7 +247,7 @@ export function NotificationBell() {
                 "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2",
                 unreadCount === 0
                   ? "cursor-default border-ink-3 text-paper/30"
-                  : "border-amber/60 text-amber hover:bg-amber hover:text-ink"
+                  : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
               )}
             >
               Mark all read
@@ -273,7 +273,7 @@ export function NotificationBell() {
                 className={cn(
                   "whitespace-nowrap px-2.5 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                   filter === f.v
-                    ? "bg-amber text-ink"
+                    ? "bg-lime text-ink"
                     : "bg-ink text-paper/60 hover:text-paper"
                 )}
               >
@@ -290,7 +290,7 @@ export function NotificationBell() {
                 </div>
                 <button
                   onClick={() => setFilter("all")}
-                  className="mt-3 border border-amber/60 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                  className="mt-3 border border-lime/60 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                 >
                   ← Show all
                 </button>
@@ -310,7 +310,7 @@ export function NotificationBell() {
                   data-notif-idx={i}
                   className={cn(
                     "group relative",
-                    isActive && "outline outline-1 outline-amber -outline-offset-1"
+                    isActive && "outline outline-1 outline-lime -outline-offset-1"
                   )}
                 >
                   {bucketChanged && (
@@ -330,7 +330,7 @@ export function NotificationBell() {
                     }}
                     aria-label={isRead ? "Mark as unread" : "Mark as read"}
                     title={isRead ? "Mark as unread" : "Mark as read"}
-                    className="absolute right-2 top-2 z-10 border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 transition-opacity hover:border-amber hover:text-amber opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+                    className="absolute right-2 top-2 z-10 border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 transition-opacity hover:border-lime hover:text-lime opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                   >
                     {isRead ? "↶ UNREAD" : "✓ READ"}
                   </button>
@@ -343,7 +343,7 @@ export function NotificationBell() {
                     className={cn(
                       "group block border-b border-ink-3 px-4 py-3 transition-colors last:border-b-0",
                       pinMatch && !isRead
-                        ? "border-l-2 border-l-amber bg-amber/5 hover:bg-amber/10"
+                        ? "border-l-2 border-l-lime bg-lime/5 hover:bg-lime/10"
                         : isRead
                         ? "bg-ink hover:bg-ink-2"
                         : "bg-ink-2/40 hover:bg-ink-2"
@@ -353,7 +353,7 @@ export function NotificationBell() {
                     <div className="mt-1 shrink-0">
                       {!isRead && (
                         <span
-                          className="block h-2 w-2 rounded-full bg-amber shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                          className="block h-2 w-2 rounded-full bg-lime shadow-[0_0_8px_rgba(245,158,11,0.6)]"
                           aria-label="Unread"
                         />
                       )}
@@ -372,7 +372,7 @@ export function NotificationBell() {
                           ● {KIND_LABEL[n.kind]}
                         </span>
                         {pinMatch && (
-                          <span className="inline-flex items-center border border-amber bg-amber/10 px-1 py-0 font-mono text-[8px] uppercase tracking-widest2 text-amber">
+                          <span className="inline-flex items-center border border-lime bg-lime/10 px-1 py-0 font-mono text-[8px] uppercase tracking-widest2 text-lime">
                             ★ PIN · {pinMatch}
                           </span>
                         )}
@@ -385,7 +385,7 @@ export function NotificationBell() {
                           "mt-1 font-display text-base leading-snug",
                           isRead
                             ? "text-paper/60"
-                            : "text-paper group-hover:text-amber"
+                            : "text-paper group-hover:text-lime"
                         )}
                       >
                         {n.title}
@@ -413,7 +413,7 @@ export function NotificationBell() {
 function BucketLabel({ bucket }: { bucket: 0 | 1 | 2 }) {
   const meta =
     bucket === 0
-      ? { label: "★ ON YOUR WATCHLIST", color: "text-amber", border: "border-amber/40" }
+      ? { label: "★ ON YOUR WATCHLIST", color: "text-lime", border: "border-lime/40" }
       : bucket === 1
       ? { label: "● UNREAD", color: "text-paper/60", border: "border-ink-3" }
       : { label: "○ READ", color: "text-paper/30", border: "border-ink-3" };

@@ -122,10 +122,10 @@ const TONE_STYLES: Record<
   { border: string; bar: string; led: string; text: string }
 > = {
   info: {
-    border: "border-amber/50",
-    bar: "bg-amber",
-    led: "amber",
-    text: "text-amber",
+    border: "border-lime/50",
+    bar: "bg-lime",
+    led: "lime",
+    text: "text-lime",
   },
   success: {
     border: "border-moss/60",
@@ -134,10 +134,10 @@ const TONE_STYLES: Record<
     text: "text-moss",
   },
   warn: {
-    border: "border-amber",
-    bar: "bg-amber-dim",
-    led: "amber",
-    text: "text-amber",
+    border: "border-lime",
+    bar: "bg-lime-dim",
+    led: "lime",
+    text: "text-lime",
   },
   error: {
     border: "border-blood/70",
@@ -183,7 +183,7 @@ function ToastCard({
                 toast.action!.onClick();
                 onDismiss();
               }}
-              className="mt-2 border border-amber/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-2 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               {toast.action.label}
             </button>
@@ -192,7 +192,7 @@ function ToastCard({
         <button
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="border border-ink-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-amber hover:text-amber"
+          className="border border-ink-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-lime hover:text-lime"
         >
           ✕
         </button>

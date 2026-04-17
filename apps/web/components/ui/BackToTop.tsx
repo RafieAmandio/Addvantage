@@ -35,11 +35,11 @@ export function BackToTop({
       aria-label="Back to top"
       title="Back to top"
       className={cn(
-        "fixed bottom-6 left-6 z-[55] flex items-center gap-2 border border-amber/60 bg-ink-2 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-amber shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all",
+        "fixed bottom-6 left-6 z-[55] flex items-center gap-2 border border-lime/60 bg-ink-2 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.15)] transition-all",
         visible
           ? "opacity-100 translate-y-0"
           : "pointer-events-none opacity-0 translate-y-2",
-        "hover:bg-amber hover:text-ink"
+        "hover:bg-lime hover:text-ink"
       )}
     >
       <span aria-hidden>↑</span>

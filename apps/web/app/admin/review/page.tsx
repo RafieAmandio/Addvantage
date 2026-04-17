@@ -11,7 +11,7 @@ export default async function AdminReviewQueuePage() {
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-6 flex items-baseline justify-between">
         <h1 className="font-display text-4xl text-paper">
-          Review <span className="italic text-amber">queue</span>
+          Review <span className="italic text-lime">queue</span>
         </h1>
         <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
           {items.length} pending
@@ -32,20 +32,20 @@ export default async function AdminReviewQueuePage() {
             className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-ink-2"
           >
             <div className="col-span-12 lg:col-span-2">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 [{n.source_code}]
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
                 {new Date(n.fetched_at).toISOString().slice(0, 16).replace("T", " ")}
               </div>
               <div className="mt-2 flex gap-2 font-mono text-[9px] uppercase tracking-widest2">
-                <span className="text-amber">{n.impact}</span>
+                <span className="text-lime">{n.impact}</span>
                 <span className="text-paper/50">·</span>
                 <span className="text-paper/70">{n.bias}</span>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-10">
-              <div className="font-display text-xl text-paper transition-colors group-hover:text-amber">
+              <div className="font-display text-xl text-paper transition-colors group-hover:text-lime">
                 {n.headline}
               </div>
               <p className="mt-2 line-clamp-2 text-sm text-paper/70">{n.analysis}</p>
@@ -61,7 +61,7 @@ export default async function AdminReviewQueuePage() {
                 {n.tags.map((t: string) => (
                   <span
                     key={t}
-                    className="border border-amber/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber"
+                    className="border border-lime/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
                   >
                     #{t}
                   </span>

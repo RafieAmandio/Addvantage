@@ -60,7 +60,7 @@ export function TopBar() {
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
-            className="border border-ink-3 p-2 text-paper/70 hover:border-amber hover:text-amber lg:hidden"
+            className="border border-ink-3 p-2 text-paper/70 hover:border-lime hover:text-lime lg:hidden"
           >
             <svg
               width="14"
@@ -80,7 +80,7 @@ export function TopBar() {
               onClick={() => setSidebarCollapsed(false)}
               aria-label="Expand sidebar"
               title="Expand sidebar · \\"
-              className="hidden items-center gap-1 border border-ink-3 p-2 text-paper/70 hover:border-amber hover:text-amber lg:flex"
+              className="hidden items-center gap-1 border border-ink-3 p-2 text-paper/70 hover:border-lime hover:text-lime lg:flex"
             >
               <svg
                 width="14"
@@ -102,14 +102,14 @@ export function TopBar() {
             </button>
           )}
 
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             ● <span className="hidden sm:inline">TRANSMISSION </span>LIVE
           </div>
           <div className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40 sm:flex">
             <span>NODE 04</span>
-            <span className="text-amber/40">/</span>
+            <span className="text-lime/40">/</span>
             <span>BRIEF 088</span>
-            <span className="text-amber/40">/</span>
+            <span className="text-lime/40">/</span>
             <span suppressHydrationWarning>{stamp || "—"}</span>
           </div>
         </div>
@@ -122,7 +122,7 @@ export function TopBar() {
               className={cn(
                 "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                 !paid
-                  ? "bg-amber text-ink"
+                  ? "bg-lime text-ink"
                   : "text-paper/40 hover:text-paper"
               )}
             >
@@ -133,7 +133,7 @@ export function TopBar() {
               className={cn(
                 "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                 paid
-                  ? "bg-amber text-ink"
+                  ? "bg-lime text-ink"
                   : "text-paper/40 hover:text-paper"
               )}
             >
@@ -145,7 +145,7 @@ export function TopBar() {
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Search the DOMAIN"
-            className="group flex items-center gap-2 border border-ink-3 bg-ink-2 px-3 py-1.5 text-paper/50 transition-colors hover:border-amber hover:text-amber sm:gap-3"
+            className="group flex items-center gap-2 border border-ink-3 bg-ink-2 px-3 py-1.5 text-paper/50 transition-colors hover:border-lime hover:text-lime sm:gap-3"
           >
             <svg
               width="13"
@@ -180,14 +180,14 @@ export function TopBar() {
             }
             aria-label="Show keyboard shortcuts and help"
             title="Press ? for keyboard shortcuts"
-            className="border border-ink-3 bg-ink-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-amber hover:text-amber"
+            className="border border-ink-3 bg-ink-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-lime hover:text-lime"
           >
             ?
           </button>
 
           <Link
             href="/app/subscription"
-            className="hidden border border-amber/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink sm:block"
+            className="hidden border border-lime/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink sm:block"
           >
             {paid ? "Manage tier" : "Upgrade →"}
           </Link>

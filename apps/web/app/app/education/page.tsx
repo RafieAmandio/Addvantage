@@ -18,8 +18,8 @@ export default function EducationPage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             DECODING LIBRARY
           </div>
         </div>
@@ -100,7 +100,7 @@ function EducationView() {
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-05</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
-            Education <span className="italic text-amber">Library</span>
+            Education <span className="italic text-lime">Library</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
             Process. Psychology. Risk. System design. No price-action snake
@@ -140,13 +140,13 @@ function EducationView() {
               <div className="min-w-[160px]">
                 <div className="flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
                   <span>Progress</span>
-                  <span className="text-amber">
+                  <span className="text-lime">
                     {readCount} / {accessible.length} · {pct}%
                   </span>
                 </div>
                 <div className="mt-1 h-1 w-full bg-ink-3">
                   <div
-                    className="h-full bg-amber transition-all"
+                    className="h-full bg-lime transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -173,7 +173,7 @@ function EducationView() {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ✕ Clear search
             </button>
@@ -197,7 +197,7 @@ function EducationView() {
                   </div>
                 )}
                 <div className="flex items-start justify-between">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     <Highlight text={p.id} query={query} />
                   </div>
                   <div
@@ -217,7 +217,7 @@ function EducationView() {
                 >
                   <Highlight text={p.title} query={query} />
                 </h3>
-                <div className="mt-1 font-mono text-[10px] italic uppercase tracking-widest2 text-amber/70">
+                <div className="mt-1 font-mono text-[10px] italic uppercase tracking-widest2 text-lime/70">
                   <Highlight text={p.framework} query={query} />
                 </div>
                 <p className="mt-4 text-sm text-paper/70">
@@ -228,7 +228,7 @@ function EducationView() {
                     {p.tags.slice(0, 2).map((t) => (
                       <span
                         key={t}
-                        className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+                        className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
                       >
                         #<Highlight text={t} query={query} />
                       </span>

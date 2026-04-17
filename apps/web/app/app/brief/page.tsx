@@ -42,7 +42,7 @@ export default function BriefPage() {
             <div>
               <DataLabel>Brief 088 · {formatDate(news[0].ts)}</DataLabel>
               <h1 className="mt-2 font-display text-5xl leading-none text-paper lg:text-6xl">
-                Today's <span className="italic text-amber">DOMAIN</span>
+                Today's <span className="italic text-lime">DOMAIN</span>
               </h1>
             </div>
             <div className="hidden text-right font-mono text-[10px] uppercase tracking-widest2 text-paper/40 sm:block">
@@ -65,8 +65,8 @@ export default function BriefPage() {
                 className={
                   "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
                   (hideSeen
-                    ? "border-amber bg-amber/10 text-amber"
-                    : "border-ink-3 text-paper/60 hover:border-amber hover:text-amber")
+                    ? "border-lime bg-lime/10 text-lime"
+                    : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime")
                 }
               >
                 {hideSeen ? `✓ HIDING ${seenInTop} SEEN` : `HIDE ${seenInTop} SEEN`}
@@ -86,7 +86,7 @@ export default function BriefPage() {
                 }
               >
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {n.id}
                   </span>
                   <ImpactPill level={n.impact} />
@@ -102,7 +102,7 @@ export default function BriefPage() {
                 </div>
                 <h3
                   className={
-                    "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-amber " +
+                    "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-lime " +
                     (seen ? "text-paper/70" : "text-paper")
                   }
                 >
@@ -125,7 +125,7 @@ export default function BriefPage() {
           </div>
           <Link
             href="/app/news"
-            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
           >
             FULL FEED →
           </Link>
@@ -134,7 +134,7 @@ export default function BriefPage() {
         {/* Right column */}
         <aside className="col-span-12 space-y-8 lg:col-span-4">
           {/* Trading plan teaser */}
-          <div className="border border-amber/40 bg-ink-2/30 p-5 scanline">
+          <div className="border border-lime/40 bg-ink-2/30 p-5 scanline">
             <div className="flex items-center justify-between">
               <DataLabel>Trading Plan · TX-03</DataLabel>
               {paid ? (
@@ -162,7 +162,7 @@ export default function BriefPage() {
                   <div
                     className={
                       "font-display text-sm " +
-                      (s.direction === "long" ? "text-moss" : "text-amber")
+                      (s.direction === "long" ? "text-moss" : "text-lime")
                     }
                   >
                     {s.direction === "long" ? "LONG" : "SHORT"}
@@ -172,7 +172,7 @@ export default function BriefPage() {
             </div>
             <Link
               href="/app/plan"
-              className="mt-4 block border border-amber/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-4 block border border-lime/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               {paid ? "Open plan →" : "Unlock plan →"}
             </Link>
@@ -192,7 +192,7 @@ export default function BriefPage() {
           <div>
             <SectionNumber n="03 /" label="MY CHANNEL" />
             <div className="mt-4 border border-ink-3 bg-ink p-4">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                 {channelPosts[0].id} · {formatTime(channelPosts[0].ts)}Z
               </div>
               <p className="mt-2 text-sm text-paper/80">
@@ -200,7 +200,7 @@ export default function BriefPage() {
               </p>
               <Link
                 href="/app/channel"
-                className="mt-3 inline-block font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+                className="mt-3 inline-block font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
               >
                 MORE FROM CHANNEL →
               </Link>

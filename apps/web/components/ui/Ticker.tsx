@@ -16,12 +16,12 @@ export function MarketTicker() {
             <span className="text-paper">{it.val}</span>
             <span
               className={
-                it.dir === "up" ? "text-moss" : "text-amber"
+                it.dir === "up" ? "text-moss" : "text-lime"
               }
             >
               {it.dir === "up" ? "▲" : "▼"} {it.chg}
             </span>
-            <span className="text-amber/30">|</span>
+            <span className="text-lime/30">|</span>
           </span>
         ))}
       </div>

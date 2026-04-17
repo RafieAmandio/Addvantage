@@ -96,7 +96,7 @@ export default function HomePage() {
     <div className="bg-grid">
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden border-b border-ink-3 bg-ink-2/30">
-        <div className="absolute -right-24 -top-24 h-[24rem] w-[24rem] rounded-full bg-amber/10 blur-[120px]" />
+        <div className="absolute -right-24 -top-24 h-[24rem] w-[24rem] rounded-full bg-lime/10 blur-[120px]" />
         <div className="relative mx-auto max-w-7xl px-6 py-12 lg:py-16">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-8">
@@ -104,7 +104,7 @@ export default function HomePage() {
               <h1 className="mt-3 font-display text-5xl leading-[0.95] text-paper sm:text-6xl lg:text-7xl">
                 <span suppressHydrationWarning>{greet}</span>,
                 <br />
-                <span className="italic text-amber">{operatorName}</span>.
+                <span className="italic text-lime">{operatorName}</span>.
               </h1>
               <p className="mt-6 max-w-xl font-display text-xl text-paper/60">
                 The DOMAIN has been transmitting overnight.{" "}
@@ -118,7 +118,7 @@ export default function HomePage() {
               {/* Big search bar */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-amber/40 bg-ink-2/60 px-5 py-4 text-left transition-colors hover:border-amber"
+                className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-lime/40 bg-ink-2/60 px-5 py-4 text-left transition-colors hover:border-lime"
               >
                 <svg
                   width="20"
@@ -127,7 +127,7 @@ export default function HomePage() {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
-                  className="shrink-0 text-amber"
+                  className="shrink-0 text-lime"
                   aria-hidden
                 >
                   <circle cx="9" cy="9" r="6" />
@@ -137,10 +137,10 @@ export default function HomePage() {
                   Search news, plans, primers, channels…
                 </span>
                 <span className="hidden items-center gap-1 sm:flex">
-                  <kbd className="border border-amber/30 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                  <kbd className="border border-lime/30 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime">
                     {isMac ? "⌘" : "Ctrl"}
                   </kbd>
-                  <kbd className="border border-amber/30 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                  <kbd className="border border-lime/30 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime">
                     K
                   </kbd>
                 </span>
@@ -153,7 +153,7 @@ export default function HomePage() {
                     <button
                       key={s}
                       onClick={() => setSearchOpen(true)}
-                      className="border-b border-transparent text-paper/60 hover:border-amber hover:text-amber"
+                      className="border-b border-transparent text-paper/60 hover:border-lime hover:text-lime"
                     >
                       {s}
                     </button>
@@ -189,13 +189,13 @@ export default function HomePage() {
 
                 <Link
                   href="/app/brief"
-                  className="mt-5 block border border-amber/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                  className="mt-5 block border border-lime/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                 >
                   Open today's full brief →
                 </Link>
                 <Link
                   href="/app/subscription"
-                  className="mt-2 block py-1 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-amber"
+                  className="mt-2 block py-1 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
                 >
                   {paid ? "Manage subscription" : "Upgrade access"}
                 </Link>
@@ -260,7 +260,7 @@ export default function HomePage() {
                 {tickers.map((t) => (
                   <span
                     key={t}
-                    className="inline-flex items-center gap-1.5 border border-amber/40 bg-amber/5 py-0.5 pl-2 pr-1 font-mono text-[10px] uppercase tracking-widest2 text-amber"
+                    className="inline-flex items-center gap-1.5 border border-lime/40 bg-lime/5 py-0.5 pl-2 pr-1 font-mono text-[10px] uppercase tracking-widest2 text-lime"
                   >
                     {t}
                     <WatchPin ticker={t} />
@@ -268,7 +268,7 @@ export default function HomePage() {
                 ))}
                 <Link
                   href="/app/watchlist"
-                  className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+                  className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
                 >
                   Manage all →
                 </Link>
@@ -283,7 +283,7 @@ export default function HomePage() {
                   <div className="mt-3 border border-ink-3 bg-ink p-5 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
                     ● Nothing in today's wire mentions{" "}
                     {tickers.map((t, i) => (
-                      <span key={t} className="text-amber">
+                      <span key={t} className="text-lime">
                         {i > 0 ? " · " : ""}
                         {t}
                       </span>
@@ -301,7 +301,7 @@ export default function HomePage() {
                           className="group block bg-ink p-4 transition-colors hover:bg-ink-2"
                         >
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                            <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                               {n.id}
                             </span>
                             <ImpactPill level={n.impact} />
@@ -310,14 +310,14 @@ export default function HomePage() {
                               {hits.map((h) => (
                                 <span
                                   key={h}
-                                  className="border border-amber bg-amber/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber"
+                                  className="border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
                                 >
                                   ★ {h}
                                 </span>
                               ))}
                             </span>
                           </div>
-                          <div className="mt-2 font-display text-lg leading-snug text-paper transition-colors group-hover:text-amber">
+                          <div className="mt-2 font-display text-lg leading-snug text-paper transition-colors group-hover:text-lime">
                             {n.headline}
                           </div>
                         </Link>
@@ -343,13 +343,13 @@ export default function HomePage() {
                         className="group block bg-ink p-4 transition-colors hover:bg-ink-2"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                          <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                             {s.id}
                           </span>
                           <span
                             className={
                               "font-mono text-[10px] uppercase tracking-widest2 " +
-                              (s.direction === "long" ? "text-moss" : "text-amber")
+                              (s.direction === "long" ? "text-moss" : "text-lime")
                             }
                           >
                             ★ {s.instrument} · {s.direction}
@@ -389,7 +389,7 @@ export default function HomePage() {
                                       "font-mono text-[10px] uppercase tracking-widest2 " +
                                       (s.direction === "long"
                                         ? "text-moss"
-                                        : "text-amber")
+                                        : "text-lime")
                                     }
                                   >
                                     ★ {s.instrument}
@@ -435,7 +435,7 @@ export default function HomePage() {
               <Header n="01 /" label="Top of the wire" right="3 most-impact items">
                 <Link
                   href="/app/news"
-                  className="font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+                  className="font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
                 >
                   Full feed →
                 </Link>
@@ -453,7 +453,7 @@ export default function HomePage() {
                     }
                   >
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                         {n.id}
                       </span>
                       <ImpactPill level={n.impact} />
@@ -469,7 +469,7 @@ export default function HomePage() {
                     </div>
                     <h3
                       className={
-                        "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-amber " +
+                        "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-lime " +
                         (seen ? "text-paper/70" : "text-paper")
                       }
                     >
@@ -487,7 +487,7 @@ export default function HomePage() {
             {/* Right rail */}
             <aside className="col-span-12 space-y-8 lg:col-span-4">
               {/* Plan */}
-              <div className="border border-amber/40 bg-ink-2/30 p-5 scanline">
+              <div className="border border-lime/40 bg-ink-2/30 p-5 scanline">
                 <div className="flex items-center justify-between">
                   <DataLabel>Trading Plan · TX-03</DataLabel>
                   {paid ? (
@@ -514,7 +514,7 @@ export default function HomePage() {
                       <div
                         className={
                           "font-display text-sm " +
-                          (s.direction === "long" ? "text-moss" : "text-amber")
+                          (s.direction === "long" ? "text-moss" : "text-lime")
                         }
                       >
                         {s.direction === "long" ? "LONG" : "SHORT"}
@@ -524,7 +524,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/app/plan"
-                  className="mt-4 block border border-amber/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                  className="mt-4 block border border-lime/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                 >
                   {paid ? "Open plan →" : "Unlock plan →"}
                 </Link>
@@ -535,7 +535,7 @@ export default function HomePage() {
                 <Header n="02 /" label="Calendar · 48h">
                   <Link
                     href="/app/calendar"
-                    className="font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+                    className="font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
                   >
                     Full →
                   </Link>
@@ -560,15 +560,15 @@ export default function HomePage() {
               <Header n="03 /" label="Primer of the day" />
               <Link
                 href={`/app/education/${featuredPrimer.id}`}
-                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-amber/40 hover:bg-ink-2"
+                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-lime/40 hover:bg-ink-2"
               >
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                   {featuredPrimer.id} · {featuredPrimer.readingMin} min
                 </div>
                 <h3 className="mt-3 font-display text-3xl leading-tight text-paper">
                   {featuredPrimer.title}
                 </h3>
-                <div className="mt-1 font-mono text-[10px] italic text-amber/70">
+                <div className="mt-1 font-mono text-[10px] italic text-lime/70">
                   {featuredPrimer.framework}
                 </div>
                 <p className="mt-4 text-sm text-paper/70">
@@ -585,9 +585,9 @@ export default function HomePage() {
               <Header n="04 /" label="Last consultation" />
               <Link
                 href="/app/consult"
-                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-amber/40 hover:bg-ink-2"
+                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-lime/40 hover:bg-ink-2"
               >
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                   {recentSession.id} · {recentSession.messages.length} messages
                 </div>
                 <h3 className="mt-3 font-display text-2xl leading-snug text-paper">
@@ -597,7 +597,7 @@ export default function HomePage() {
                   {recentSession.tags.slice(0, 3).map((t) => (
                     <span
                       key={t}
-                      className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+                      className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
                     >
                       #{t}
                     </span>
@@ -618,16 +618,16 @@ export default function HomePage() {
               <Header n="05 /" label="From the channel">
                 <Link
                   href="/app/channel"
-                  className="font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+                  className="font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
                 >
                   All →
                 </Link>
               </Header>
               <Link
                 href="/app/channel"
-                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-amber/40 hover:bg-ink-2"
+                className="mt-4 block border border-ink-3 bg-ink p-6 transition-colors hover:border-lime/40 hover:bg-ink-2"
               >
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                   {channelTop.id} · BY {channelTop.author.toUpperCase()}
                 </div>
                 <p className="mt-4 font-display text-lg leading-snug text-paper">
@@ -679,7 +679,7 @@ function NameField() {
             setEditing(false);
           }
         }}
-        className="mt-2 w-full border-b-2 border-amber bg-transparent font-display text-2xl text-amber outline-none"
+        className="mt-2 w-full border-b-2 border-lime bg-transparent font-display text-2xl text-lime outline-none"
       />
     );
   }
@@ -688,7 +688,7 @@ function NameField() {
     <button
       onClick={() => setEditing(true)}
       title="Click to rename"
-      className="group mt-2 block w-full text-left font-display text-2xl text-paper transition-colors hover:text-amber"
+      className="group mt-2 block w-full text-left font-display text-2xl text-paper transition-colors hover:text-lime"
     >
       {operatorName}
       <span className="ml-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 opacity-0 transition-opacity group-hover:opacity-100">
@@ -701,7 +701,7 @@ function NameField() {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="bg-ink p-3 text-center">
-      <div className="font-display text-3xl text-amber">{value}</div>
+      <div className="font-display text-3xl text-lime">{value}</div>
       <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
         {label}
       </div>
@@ -728,10 +728,10 @@ function PillarTile({
       className="group flex items-center justify-between bg-ink p-4 transition-colors hover:bg-ink-2"
     >
       <div>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
           {code}
         </div>
-        <div className="mt-1 font-display text-lg text-paper transition-colors group-hover:text-amber">
+        <div className="mt-1 font-display text-lg text-paper transition-colors group-hover:text-lime">
           {label}
         </div>
       </div>
@@ -762,9 +762,9 @@ function Header({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <div className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+      <div className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
         <span>{n}</span>
-        <span className="h-px w-6 bg-amber/30" />
+        <span className="h-px w-6 bg-lime/30" />
         <span className="text-paper/60">{label}</span>
         {right && <span className="text-paper/30">· {right}</span>}
       </div>

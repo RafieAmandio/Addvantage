@@ -12,7 +12,7 @@ export function PaywallOverlay({
   return (
     <div className="relative">
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-ink/0 via-ink/85 to-ink" />
-      <div className="absolute inset-x-0 top-1/2 z-20 mx-auto max-w-xl -translate-y-1/2 border border-amber bg-ink-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.15)]">
+      <div className="absolute inset-x-0 top-1/2 z-20 mx-auto max-w-xl -translate-y-1/2 border border-lime bg-ink-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.15)]">
         <DataLabel>Tier 01 required</DataLabel>
         <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-blood">
           ● LOCKED · OPERATOR EYES ONLY

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700;800;900&family=Intel+One+Mono:wght@300;400;500;600;700&display=swap");
 
 :root {
   color-scheme: dark;
@@ -10,31 +10,31 @@
 }
 
 html, body {
-  background-color: #0A0908;
-  color: #F5F1E8;
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  background-color: #202832;
+  color: #EEEEEE;
+  font-family: "Inter", system-ui, sans-serif;
   font-feature-settings: "ss01", "ss02", "cv11";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: #F59E0B;
-  color: #0A0908;
+  background: #61C933;
+  color: #202832;
 }
 
 /* Grid background utility */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(245, 158, 11, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(245, 158, 11, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(97, 201, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(97, 201, 51, 0.06) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
 .bg-grid-fine {
   background-image:
-    linear-gradient(to right, rgba(245, 241, 232, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(245, 241, 232, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(238, 238, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(238, 238, 238, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -54,10 +54,10 @@ html, body {
 .classification-stripe {
   background: repeating-linear-gradient(
     -45deg,
-    #F59E0B 0,
-    #F59E0B 12px,
-    #0A0908 12px,
-    #0A0908 24px
+    #61C933 0,
+    #61C933 12px,
+    #202832 12px,
+    #202832 24px
   );
 }
 
@@ -94,16 +94,16 @@ html, body {
   background: #DC2626;
   box-shadow: 0 0 6px #DC2626, 0 0 12px rgba(220, 38, 38, 0.5);
 }
-.led.amber {
-  background: #F59E0B;
-  box-shadow: 0 0 6px #F59E0B, 0 0 12px rgba(245, 158, 11, 0.5);
+.led.lime {
+  background: #61C933;
+  box-shadow: 0 0 6px #61C933, 0 0 12px rgba(97, 201, 51, 0.5);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #14110F; }
-::-webkit-scrollbar-thumb { background: #2A231C; border: 2px solid #14110F; }
-::-webkit-scrollbar-thumb:hover { background: #B45309; }
+::-webkit-scrollbar-track { background: #202832; }
+::-webkit-scrollbar-thumb { background: #383E47; border: 2px solid #202832; }
+::-webkit-scrollbar-thumb:hover { background: #4FA826; }
 
 /* Toast progress bar */
 @keyframes toastBar {

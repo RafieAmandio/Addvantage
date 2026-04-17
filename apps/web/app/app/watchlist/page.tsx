@@ -139,7 +139,7 @@ export default function WatchlistPage() {
             <div>
               <DataLabel>Operator · Watchlist</DataLabel>
               <h1 className="mt-2 font-display text-5xl text-paper">
-                Your <span className="italic text-amber">pins</span>
+                Your <span className="italic text-lime">pins</span>
               </h1>
               <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
                 Instruments you've pinned for close monitoring. Every news
@@ -163,7 +163,7 @@ export default function WatchlistPage() {
         {/* Empty state */}
         {hydrated && tickers.length === 0 && (
           <div className="border border-ink-3 bg-ink-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
               ● WATCHLIST EMPTY
             </div>
             <div className="mt-3 font-display text-3xl text-paper">
@@ -171,20 +171,20 @@ export default function WatchlistPage() {
             </div>
             <p className="mt-3 max-w-md mx-auto font-display text-base text-paper/60">
               Pin an instrument from any news item's{" "}
-              <span className="text-amber">Affects</span> list or from the{" "}
-              <span className="text-amber">Trading Plan</span> setup cards. It
+              <span className="text-lime">Affects</span> list or from the{" "}
+              <span className="text-lime">Trading Plan</span> setup cards. It
               will show up here with its history, live setups, and news mentions.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <Link
                 href="/app/news"
-                className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
               >
                 Browse news →
               </Link>
               <Link
                 href="/app/plan"
-                className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
               >
                 Open live plan →
               </Link>
@@ -200,7 +200,7 @@ export default function WatchlistPage() {
                 <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
                   Pinned
                 </div>
-                <div className="mt-1 font-display text-3xl text-amber">
+                <div className="mt-1 font-display text-3xl text-lime">
                   {tickers.length}
                 </div>
                 <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -288,7 +288,7 @@ export default function WatchlistPage() {
                       className={cn(
                         "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                         sortMode === opt.v
-                          ? "bg-amber text-ink"
+                          ? "bg-lime text-ink"
                           : "bg-ink-2 text-paper/60 hover:text-paper"
                       )}
                     >
@@ -346,7 +346,7 @@ function TickerCard({
         <div className="flex items-center gap-3">
           <WatchPin ticker={ticker} size="md" />
           <div>
-            <div className="font-display text-4xl italic text-amber">
+            <div className="font-display text-4xl italic text-lime">
               {ticker}
             </div>
             <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -403,7 +403,7 @@ function TickerCard({
                   className="group block bg-ink p-3 transition-colors hover:bg-ink-2"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                       {n.id}
                     </span>
                     <ImpactPill level={n.impact} />
@@ -412,7 +412,7 @@ function TickerCard({
                       {formatDate(n.ts)} · {formatTime(n.ts)}Z
                     </span>
                   </div>
-                  <div className="mt-1 font-display text-base leading-snug text-paper transition-colors group-hover:text-amber">
+                  <div className="mt-1 font-display text-base leading-snug text-paper transition-colors group-hover:text-lime">
                     {n.headline}
                   </div>
                 </Link>
@@ -434,18 +434,18 @@ function TickerCard({
                     className="group block bg-ink p-3 transition-colors hover:bg-ink-2"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                         {p.id} · {s.id}
                       </span>
                       <span
                         className={
                           "font-mono text-[9px] uppercase tracking-widest2 " +
-                          (s.direction === "long" ? "text-moss" : "text-amber")
+                          (s.direction === "long" ? "text-moss" : "text-lime")
                         }
                       >
                         {s.direction}
                       </span>
-                      <span className="ml-auto border border-amber bg-amber/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                      <span className="ml-auto border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
                         ● LIVE
                       </span>
                     </div>
@@ -484,7 +484,7 @@ function TickerCard({
                             "font-mono text-[9px] uppercase tracking-widest2 " +
                             (s.direction === "long"
                               ? "text-moss"
-                              : "text-amber")
+                              : "text-lime")
                           }
                         >
                           {s.direction}
@@ -539,7 +539,7 @@ function TickerCard({
                     className="group block bg-ink p-3 transition-colors hover:bg-ink-2"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                         {e.id}
                       </span>
                       <span
@@ -548,7 +548,7 @@ function TickerCard({
                           (e.impact === "high"
                             ? "text-blood"
                             : e.impact === "medium"
-                            ? "text-amber"
+                            ? "text-lime"
                             : "text-moss")
                         }
                       >
@@ -558,7 +558,7 @@ function TickerCard({
                         {formatDate(e.ts)} · {formatTime(e.ts)}Z
                       </span>
                     </div>
-                    <div className="mt-1 font-display text-sm text-paper transition-colors group-hover:text-amber">
+                    <div className="mt-1 font-display text-sm text-paper transition-colors group-hover:text-lime">
                       {e.title}
                     </div>
                   </Link>

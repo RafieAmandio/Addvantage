@@ -26,14 +26,14 @@ export default async function AdminSourcesPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <h1 className="mb-6 font-display text-4xl text-paper">
-        Source <span className="italic text-amber">registry</span>
+        Source <span className="italic text-lime">registry</span>
       </h1>
 
       <div className="space-y-px bg-ink-3">
         {rows.map((s) => (
           <div key={s.code} className="grid grid-cols-12 gap-6 bg-ink p-5">
             <div className="col-span-12 md:col-span-2">
-              <div className="font-mono text-[11px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[11px] uppercase tracking-widest2 text-lime">
                 [{s.code}]
               </div>
               <div
@@ -51,7 +51,7 @@ export default async function AdminSourcesPage() {
                 href={s.url}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-amber"
+                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
               >
                 {s.url}
               </a>

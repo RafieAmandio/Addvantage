@@ -132,7 +132,7 @@ export function SearchPalette() {
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-3xl border border-amber bg-ink-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
+      <div className="relative w-full max-w-3xl border border-lime bg-ink-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
         {/* Classification stripe */}
         <div className="classification-stripe h-1" />
 
@@ -154,7 +154,7 @@ export function SearchPalette() {
             <button
               onClick={() => setSearchOpen(false)}
               aria-label="Close search"
-              className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-amber hover:text-amber"
+              className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-lime hover:text-lime"
             >
               esc
             </button>
@@ -216,7 +216,7 @@ export function SearchPalette() {
                         setActive(0);
                         inputRef.current?.focus();
                       }}
-                      className="border border-amber/30 bg-amber/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                      className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                     >
                       {s}
                     </button>
@@ -236,7 +236,7 @@ export function SearchPalette() {
                             setActive(0);
                             inputRef.current?.focus();
                           }}
-                          className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-amber hover:text-amber"
+                          className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
                         >
                           {q}
                         </button>
@@ -252,9 +252,9 @@ export function SearchPalette() {
             grouped.map(([kind, items]) => (
               <div key={kind} className="border-b border-ink-3 last:border-b-0">
                 <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ink-3 bg-ink-2/95 px-5 py-2 backdrop-blur">
-                  <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     <span>{KIND_META[kind].code}</span>
-                    <span className="h-px w-6 bg-amber/40" />
+                    <span className="h-px w-6 bg-lime/40" />
                     <span>{KIND_META[kind].label}</span>
                   </div>
                   <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -311,14 +311,14 @@ function EmptyState({
                 className="group flex items-center justify-between bg-ink p-3 text-left transition-colors hover:bg-ink-2"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                     {v.kind}
                   </div>
-                  <div className="mt-0.5 truncate text-sm text-paper transition-colors group-hover:text-amber">
+                  <div className="mt-0.5 truncate text-sm text-paper transition-colors group-hover:text-lime">
                     {v.label}
                   </div>
                 </div>
-                <span className="ml-3 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 group-hover:text-amber">
+                <span className="ml-3 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 group-hover:text-lime">
                   →
                 </span>
               </button>
@@ -337,7 +337,7 @@ function EmptyState({
               <button
                 key={q}
                 onClick={() => onPick(q)}
-                className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-amber hover:text-amber"
+                className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
               >
                 {q}
               </button>
@@ -355,7 +355,7 @@ function EmptyState({
             <button
               key={q}
               onClick={() => onPick(q)}
-              className="border border-amber/30 bg-amber/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               {q}
             </button>
@@ -396,7 +396,7 @@ function Tip({
       <span className="flex items-center gap-1">
         {alt && (
           <>
-            <kbd className="border border-amber/30 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">
+            <kbd className="border border-lime/30 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">
               {alt}
             </kbd>
             <span className="text-paper/30">/</span>
@@ -405,7 +405,7 @@ function Tip({
         {chord.split(" ").map((k, i) => (
           <kbd
             key={i}
-            className="border border-amber/40 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber"
+            className="border border-lime/40 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
           >
             {k}
           </kbd>
@@ -440,14 +440,14 @@ function ResultRow({
       className={cn(
         "block w-full border-b border-ink-3 px-5 py-4 text-left transition-colors",
         active
-          ? "border-l-2 border-l-amber bg-amber/10"
+          ? "border-l-2 border-l-lime bg-lime/10"
           : "border-l-2 border-l-transparent bg-ink hover:bg-ink-2"
       )}
     >
       <div className="flex items-baseline justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
               {result.id}
             </span>
             {result.author && (
@@ -467,7 +467,7 @@ function ResultRow({
               {result.tags.slice(0, 4).map((t) => (
                 <span
                   key={t}
-                  className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+                  className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
                 >
                   #{t}
                 </span>
@@ -493,7 +493,7 @@ function SearchIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
-      className="text-amber"
+      className="text-lime"
       aria-hidden
     >
       <circle cx="9" cy="9" r="6" />

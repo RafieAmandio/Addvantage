@@ -206,7 +206,7 @@ export function Shortcuts() {
     <>
       {/* Floating hint pill */}
       {hint && (
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-amber bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-amber shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-lime bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.3)]">
           {hint}
         </div>
       )}
@@ -219,21 +219,21 @@ export function Shortcuts() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl border border-amber bg-ink-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)]"
+            className="relative w-full max-w-2xl border border-lime bg-ink-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)]"
           >
             <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
-            <div className="flex items-center justify-between border-b border-amber/40 pb-3">
+            <div className="flex items-center justify-between border-b border-lime/40 pb-3">
               <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                   REFERENCE / OPERATOR INPUT
                 </div>
                 <div className="font-display text-3xl text-paper">
-                  Keyboard <span className="italic text-amber">commands</span>
+                  Keyboard <span className="italic text-lime">commands</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowHelp(false)}
-                className="border border-ink-3 p-2 text-paper/60 hover:border-amber hover:text-amber"
+                className="border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime"
                 aria-label="Close"
               >
                 <svg
@@ -334,10 +334,10 @@ function Section({
   return (
     <section>
       <div className="mb-2 flex items-center gap-3">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
           ● {label}
         </span>
-        <span className="h-px flex-1 bg-amber/20" />
+        <span className="h-px flex-1 bg-lime/20" />
       </div>
       {children}
     </section>
@@ -354,7 +354,7 @@ function Row({ keys, label }: { keys: string; label: string }) {
         {keys.split(" ").map((k, i) => (
           <kbd
             key={i}
-            className="border border-amber/40 bg-ink-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-amber"
+            className="border border-lime/40 bg-ink-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-lime"
           >
             {k}
           </kbd>

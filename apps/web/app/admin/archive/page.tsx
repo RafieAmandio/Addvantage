@@ -10,7 +10,7 @@ export default async function AdminArchivePage() {
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-6 flex items-baseline justify-between">
         <h1 className="font-display text-4xl text-paper">
-          Rejected <span className="italic text-amber">archive</span>
+          Rejected <span className="italic text-lime">archive</span>
         </h1>
         <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
           {items.length} rejected

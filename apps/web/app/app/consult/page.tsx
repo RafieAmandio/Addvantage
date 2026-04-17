@@ -152,8 +152,8 @@ export default function ConsultPage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             OPENING CHANNEL
           </div>
         </div>
@@ -516,7 +516,7 @@ function ConsultPageView() {
       {modeHint && (
         <div
           aria-hidden
-          className="pointer-events-none fixed left-1/2 z-[60] -translate-x-1/2 border border-amber bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-amber shadow-[0_0_30px_rgba(245,158,11,0.3)] top-6 sm:bottom-6 sm:top-auto"
+          className="pointer-events-none fixed left-1/2 z-[60] -translate-x-1/2 border border-lime bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.3)] top-6 sm:bottom-6 sm:top-auto"
         >
           ● {modeHint}
         </div>
@@ -537,7 +537,7 @@ function ConsultPageView() {
             <div>
               <DataLabel>Transmission TX-04 · Restricted</DataLabel>
               <h1 className="mt-2 font-display text-5xl text-paper">
-                1v1 <span className="italic text-amber">Consultation</span>
+                1v1 <span className="italic text-lime">Consultation</span>
               </h1>
               <p className="mt-2 max-w-2xl font-display text-base text-paper/60">
                 Private chat with the AI and the desk. Trade reviews. Second
@@ -652,7 +652,7 @@ function ScrollableConversation({
           }}
           aria-label="Scroll to top of conversation"
           title="Back to top"
-          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-amber/60 bg-ink-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-amber hover:text-ink"
+          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-lime/60 bg-ink-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-lime hover:text-ink"
         >
           <span aria-hidden>↑</span>
           TOP
@@ -731,7 +731,7 @@ function ConsultLayout({
         </div>
         <button
           onClick={onNewSession}
-          className="mt-3 flex w-full items-center justify-center gap-2 border border-amber bg-amber/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+          className="mt-3 flex w-full items-center justify-center gap-2 border border-lime bg-lime/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
         >
           <span className="text-base leading-none">+</span>
           New session
@@ -746,7 +746,7 @@ function ConsultLayout({
             </div>
             <button
               onClick={() => setSessionQuery("")}
-              className="mt-3 border border-amber/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-3 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ✕ Clear
             </button>
@@ -763,7 +763,7 @@ function ConsultLayout({
                 key={s.id}
                 className={cn(
                   "group relative bg-ink transition-colors hover:bg-ink-2",
-                  s.id === activeId && "border-l-2 border-amber bg-ink-2"
+                  s.id === activeId && "border-l-2 border-lime bg-ink-2"
                 )}
               >
                 <button
@@ -771,7 +771,7 @@ function ConsultLayout({
                   className="block w-full p-3 text-left"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                       {s.id}
                     </div>
                     {isLocal && (
@@ -799,7 +799,7 @@ function ConsultLayout({
                         }
                         if (e.key === "Escape") setRenamingId(null);
                       }}
-                      className="mt-1 w-full border-b border-amber bg-transparent py-0.5 font-display text-sm text-amber outline-none"
+                      className="mt-1 w-full border-b border-lime bg-transparent py-0.5 font-display text-sm text-lime outline-none"
                     />
                   ) : (
                     <div className="mt-1 text-sm text-paper">{s.title}</div>
@@ -811,7 +811,7 @@ function ConsultLayout({
                     {s.tags.slice(0, 2).map((t) => (
                       <span
                         key={t}
-                        className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+                        className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
                       >
                         #{t}
                       </span>
@@ -827,7 +827,7 @@ function ConsultLayout({
                         setRenamingId(s.id);
                       }}
                       title="Rename session"
-                      className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-amber hover:text-amber"
+                      className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-lime hover:text-lime"
                     >
                       ✎
                     </button>
@@ -854,7 +854,7 @@ function ConsultLayout({
         <div className="border-b border-ink-3 bg-ink-2/40 px-5 py-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 {active.id}
               </div>
               <div className="mt-1 font-display text-lg text-paper">
@@ -864,7 +864,7 @@ function ConsultLayout({
                 {active.tags.map((t) => (
                   <span
                     key={t}
-                    className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+                    className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
                   >
                     #{t}
                   </span>
@@ -875,7 +875,7 @@ function ConsultLayout({
               onClick={onExportSession}
               title="Copy this session as markdown"
               aria-label="Export session as markdown"
-              className="shrink-0 border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+              className="shrink-0 border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
             >
               ⇩ EXPORT MD
             </button>
@@ -889,7 +889,7 @@ function ConsultLayout({
         >
           {messages.length === 0 && !typing && (
             <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 ● SESSION OPEN · AWAITING FIRST TRANSMISSION
               </div>
               <div className="mt-4 max-w-sm font-display text-xl italic text-paper/70">
@@ -929,11 +929,11 @@ function ConsultLayout({
               }}
               rows={2}
               placeholder="Describe your situation. Include position size, entry, stop, and what you're feeling about it…  (press i to focus, esc to blur)"
-              className="flex-1 resize-none border border-ink-3 bg-ink p-3 font-mono text-sm text-paper placeholder:text-paper/30 outline-none focus:border-amber"
+              className="flex-1 resize-none border border-ink-3 bg-ink p-3 font-mono text-sm text-paper placeholder:text-paper/30 outline-none focus:border-lime"
             />
             <button
               onClick={send}
-              className="bg-amber px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-amber-dim hover:text-paper"
+              className="bg-lime px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-lime-dim hover:text-paper"
             >
               Transmit →
             </button>
@@ -976,15 +976,15 @@ function Bubble({ msg }: { msg: ConsultMessage }) {
   const isAi = msg.role === "ai";
   const align = isUser ? "items-end" : "items-start";
   const tagColor = isUser
-    ? "text-amber"
+    ? "text-lime"
     : isAi
     ? "text-moss"
     : "text-paper";
   const bg = isUser
-    ? "bg-amber/10 border-amber/40"
+    ? "bg-lime/10 border-lime/40"
     : isAi
     ? "bg-ink-2 border-ink-3"
-    : "bg-ink-2 border-amber/40";
+    : "bg-ink-2 border-lime/40";
 
   return (
     <div className={`flex flex-col ${align}`}>
@@ -1008,7 +1008,7 @@ function Bubble({ msg }: { msg: ConsultMessage }) {
           {msg.tags.map((t) => (
             <span
               key={t}
-              className="font-mono text-[9px] uppercase tracking-widest2 text-amber/60"
+              className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
             >
               #{t}
             </span>

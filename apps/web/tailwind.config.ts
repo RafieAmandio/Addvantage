@@ -9,35 +9,36 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Warm near-black ink
+        // Slate ink — page + surfaces
         ink: {
-          DEFAULT: "#0A0908",
-          2: "#14110F",
-          3: "#1F1A15",
-          4: "#2A231C",
+          DEFAULT: "#202832",
+          2: "#383E47",
+          3: "#4A5160",
+          4: "#5A6273",
         },
-        // Warm cream paper
+        // Paper — light text
         paper: {
-          DEFAULT: "#F5F1E8",
-          2: "#E8E2D0",
-          3: "#D4CCB4",
+          DEFAULT: "#EEEEEE",
+          2: "#D6D6D6",
+          3: "#B8B8B8",
         },
-        // Amber — DOMAIN flag color
-        amber: {
-          DEFAULT: "#F59E0B",
-          dim: "#B45309",
-          deep: "#7C2D12",
+        // Lime — DOMAIN brand accent (hero CTAs, logo, ALL highlights)
+        lime: {
+          DEFAULT: "#61C933",
+          dim: "#4FA826",
+          deep: "#357019",
         },
         // Status
         blood: "#991B1B",
         moss: "#65A30D",
         steel: "#6B7280",
-        wire: "#1F1A15",
+        wire: "#383E47",
       },
       fontFamily: {
-        display: ['"Fraunces"', "Georgia", "serif"],
-        sans: ['"IBM Plex Sans"', "system-ui", "sans-serif"],
-        mono: ['"IBM Plex Mono"', "ui-monospace", "monospace"],
+        display: ['"Inter"', "system-ui", "sans-serif"],
+        sans: ['"Inter"', "system-ui", "sans-serif"],
+        mono: ['"Intel One Mono"', "ui-monospace", "monospace"],
+        serif: ['"Fraunces"', "Georgia", "serif"],
       },
       letterSpacing: {
         tightest: "-0.04em",

@@ -12,12 +12,12 @@ export function SectionNumber({
   return (
     <div
       className={cn(
-        "flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber",
+        "flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime",
         className
       )}
     >
-      <span className="text-amber">{n}</span>
-      <span className="h-px flex-1 bg-amber/30" />
+      <span className="text-lime">{n}</span>
+      <span className="h-px flex-1 bg-lime/30" />
       <span className="text-paper/60">{label}</span>
     </div>
   );
@@ -48,7 +48,7 @@ export function ImpactPill({
   level: "high" | "medium" | "low";
 }) {
   const styles = {
-    high: "border-amber/60 text-amber bg-amber/5",
+    high: "border-lime/60 text-lime bg-lime/5",
     medium: "border-paper/30 text-paper/70 bg-paper/5",
     low: "border-steel/40 text-steel bg-transparent",
   } as const;
@@ -59,7 +59,7 @@ export function ImpactPill({
         styles[level]
       )}
     >
-      {level === "high" && <span className="led amber" />}
+      {level === "high" && <span className="led lime" />}
       {level} impact
     </span>
   );
@@ -72,7 +72,7 @@ export function BiasBadge({
 }) {
   const styles = {
     bullish: "text-moss border-moss/40",
-    bearish: "text-amber border-amber/60",
+    bearish: "text-lime border-lime/60",
     neutral: "text-paper/50 border-paper/20",
   } as const;
   const arrow = { bullish: "▲", bearish: "▼", neutral: "•" } as const;

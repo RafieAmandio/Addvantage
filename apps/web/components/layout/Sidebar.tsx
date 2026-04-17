@@ -88,7 +88,7 @@ export function Sidebar() {
       <div className="flex items-center justify-between border-b border-ink-3 px-6 py-6">
         <div>
           <Link href="/" className="font-display text-3xl text-paper">
-            ANTS<span className="text-amber">.</span>
+            ANTS<span className="text-lime">.</span>
           </Link>
           <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
             DOMAIN // OPERATOR
@@ -99,7 +99,7 @@ export function Sidebar() {
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
             title="Collapse sidebar · \\"
-            className="hidden border border-ink-3 p-2 text-paper/60 hover:border-amber hover:text-amber lg:block"
+            className="hidden border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime lg:block"
           >
             <svg
               width="14"
@@ -120,7 +120,7 @@ export function Sidebar() {
           <button
             onClick={() => setNavOpen(false)}
             aria-label="Close navigation"
-            className="border border-ink-3 p-2 text-paper/60 hover:border-amber hover:text-amber lg:hidden"
+            className="border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime lg:hidden"
           >
             <svg
               width="14"
@@ -176,9 +176,9 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-ink-3 p-4">
-        <div className="border border-amber/30 bg-amber/5 p-3">
+        <div className="border border-lime/30 bg-lime/5 p-3">
           <div className="flex items-baseline justify-between">
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+            <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
               ● TIER {paid ? "01" : "00"}
             </div>
             <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -194,7 +194,7 @@ export function Sidebar() {
           {!paid && (
             <Link
               href="/app/subscription"
-              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-paper/60 underline decoration-amber/40 hover:text-amber"
+              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-paper/60 underline decoration-lime/40 hover:text-lime"
             >
               Upgrade access →
             </Link>
@@ -235,7 +235,7 @@ export function Sidebar() {
           aria-modal="true"
           aria-label="Navigation"
           className={cn(
-            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-amber/40 bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.15)] transition-transform duration-300",
+            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-lime/40 bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.15)] transition-transform duration-300",
             navOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -285,8 +285,8 @@ function NavItem({
       className={cn(
         "group flex items-center justify-between px-3 py-2 transition-colors",
         active
-          ? "border-l-2 border-amber bg-amber/10 text-amber"
-          : "border-l-2 border-transparent text-paper/60 hover:border-amber/40 hover:bg-ink-2 hover:text-paper"
+          ? "border-l-2 border-lime bg-lime/10 text-lime"
+          : "border-l-2 border-transparent text-paper/60 hover:border-lime/40 hover:bg-ink-2 hover:text-paper"
       )}
     >
       <span className="flex items-center gap-3">

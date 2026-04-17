@@ -37,14 +37,14 @@ export default function SubscriptionPage() {
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Operator account · Tier control</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
-            Subscription <span className="italic text-amber">& Access</span>
+            Subscription <span className="italic text-lime">& Access</span>
           </h1>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* Status panel */}
-        <section className="border border-amber/40 bg-ink-2/30 p-8">
+        <section className="border border-lime/40 bg-ink-2/30 p-8">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-4">
               <DataLabel>Current tier</DataLabel>
@@ -97,7 +97,7 @@ export default function SubscriptionPage() {
                   className={cn(
                     "col-span-12 border bg-ink p-8 lg:col-span-6",
                     p.highlight
-                      ? "border-amber"
+                      ? "border-lime"
                       : "border-ink-3"
                   )}
                 >
@@ -120,7 +120,7 @@ export default function SubscriptionPage() {
                     <div
                       className={
                         "font-display text-5xl " +
-                        (p.highlight ? "text-amber" : "text-paper")
+                        (p.highlight ? "text-lime" : "text-paper")
                       }
                     >
                       IDR {p.priceIDR === 0 ? "0" : formatIDR(p.priceIDR)}
@@ -132,7 +132,7 @@ export default function SubscriptionPage() {
                   <ul className="mt-8 space-y-2 text-sm text-paper/80">
                     {p.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <span className="font-mono text-amber">+</span>
+                        <span className="font-mono text-lime">+</span>
                         <span>{f}</span>
                       </li>
                     ))}
@@ -222,7 +222,7 @@ export default function SubscriptionPage() {
                       i % 2 === 0 ? "bg-ink" : "bg-ink-2/30"
                     )}
                   >
-                    <td className="px-4 py-3 text-amber">{row.id}</td>
+                    <td className="px-4 py-3 text-lime">{row.id}</td>
                     <td className="px-4 py-3 text-paper/80">{row.date}</td>
                     <td className="px-4 py-3 text-paper/80">{row.method}</td>
                     <td className="px-4 py-3 text-paper/80">{row.pkg}</td>

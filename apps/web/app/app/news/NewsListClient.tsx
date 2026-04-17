@@ -41,8 +41,8 @@ export function NewsListClient({ items }: { items: NewsListItem[] }) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             DECODING NEWS FEED
           </div>
         </div>
@@ -121,7 +121,7 @@ function View({ items }: { items: NewsListItem[] }) {
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-01 · Free pillar</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
-            Live <span className="italic text-amber">News</span>
+            Live <span className="italic text-lime">News</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
             Raw market-moving news, annotated with what it actually means for
@@ -155,8 +155,8 @@ function View({ items }: { items: NewsListItem[] }) {
               className={
                 "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
                 (hideSeen
-                  ? "border-amber bg-amber/10 text-amber"
-                  : "border-ink-3 text-paper/60 hover:border-amber hover:text-amber")
+                  ? "border-lime bg-lime/10 text-lime"
+                  : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime")
               }
             >
               {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}
@@ -189,7 +189,7 @@ function View({ items }: { items: NewsListItem[] }) {
                 className={
                   "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (filter === f
-                    ? "bg-amber text-ink"
+                    ? "bg-lime text-ink"
                     : "bg-ink-2 text-paper/60 hover:bg-ink-2 hover:text-paper")
                 }
               >
@@ -229,7 +229,7 @@ function View({ items }: { items: NewsListItem[] }) {
               >
                 <div className="col-span-12 lg:col-span-2">
                   <div className="flex items-center gap-2">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       [{n.source_code}]
                     </div>
                     {isSeen && (
@@ -241,7 +241,7 @@ function View({ items }: { items: NewsListItem[] }) {
                   <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
                     {formatTime(ts)}Z
                   </div>
-                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     BY <Highlight text={n.author.toUpperCase()} query={query.toUpperCase()} />
                   </div>
                   <div className="mt-3 space-y-1.5">
@@ -254,7 +254,7 @@ function View({ items }: { items: NewsListItem[] }) {
                 <div className="col-span-12 lg:col-span-10">
                   <h3
                     className={
-                      "font-display text-2xl leading-snug transition-colors group-hover:text-amber " +
+                      "font-display text-2xl leading-snug transition-colors group-hover:text-lime " +
                       (isSeen ? "text-paper/70" : "text-paper")
                     }
                   >

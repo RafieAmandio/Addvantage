@@ -65,7 +65,7 @@ export function ConfirmDialog({
       <div
         className={cn(
           "relative w-full max-w-md border bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]",
-          destructive ? "border-blood" : "border-amber"
+          destructive ? "border-blood" : "border-lime"
         )}
       >
         <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
@@ -73,7 +73,7 @@ export function ConfirmDialog({
           <div
             className={cn(
               "font-mono text-[10px] uppercase tracking-widest2",
-              destructive ? "text-blood" : "text-amber"
+              destructive ? "text-blood" : "text-lime"
             )}
           >
             ● {destructive ? "DESTRUCTIVE · CONFIRM REQUIRED" : "CONFIRM REQUIRED"}
@@ -92,7 +92,7 @@ export function ConfirmDialog({
         <div className="flex items-center justify-between gap-3 p-5">
           <button
             onClick={onCancel}
-            className="border border-ink-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+            className="border border-ink-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
           >
             {cancelLabel} · esc
           </button>
@@ -102,7 +102,7 @@ export function ConfirmDialog({
               "border px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
               destructive
                 ? "border-blood bg-blood/10 text-[#fda4af] hover:bg-blood hover:text-paper"
-                : "border-amber bg-amber text-ink hover:bg-amber-dim hover:text-paper"
+                : "border-lime bg-lime text-ink hover:bg-lime-dim hover:text-paper"
             )}
           >
             {confirmLabel} →

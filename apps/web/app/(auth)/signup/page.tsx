@@ -34,7 +34,7 @@ export default function SignupPage() {
         <h1 className="mt-8 font-display text-6xl leading-[0.9] text-paper">
           This is a
           <br />
-          <span className="italic text-amber">filter,</span>
+          <span className="italic text-lime">filter,</span>
           <br />
           not a funnel.
         </h1>
@@ -56,7 +56,7 @@ export default function SignupPage() {
               className={
                 "flex items-center gap-3 " +
                 (i === step
-                  ? "text-amber"
+                  ? "text-lime"
                   : s.done
                   ? "text-paper/70"
                   : "text-paper/30")
@@ -65,7 +65,7 @@ export default function SignupPage() {
               <span>{s.n}</span>
               <span className="h-px flex-1 bg-current opacity-30" />
               <span>{s.label}</span>
-              {i === step && <span className="led amber" />}
+              {i === step && <span className="led lime" />}
               {s.done && <span className="text-moss">✓</span>}
             </div>
           ))}
@@ -90,7 +90,7 @@ export default function SignupPage() {
                   setForm({ ...form, email: e.target.value })
                 }
                 placeholder="operator@domain.local"
-                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-amber"
+                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-lime"
               />
             </div>
             <div>
@@ -104,7 +104,7 @@ export default function SignupPage() {
                   setForm({ ...form, handle: e.target.value })
                 }
                 placeholder="operator-00417"
-                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-amber"
+                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-lime"
               />
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function SignupPage() {
             <h2 className="font-display text-3xl text-paper">
               How long have you been in markets?
             </h2>
-            <p className="font-mono text-[11px] uppercase tracking-widest2 text-amber">
+            <p className="font-mono text-[11px] uppercase tracking-widest2 text-lime">
               ANTS is not for beginners. We will hold you to this answer.
             </p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -134,8 +134,8 @@ export default function SignupPage() {
                   className={
                     "border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                     (form.experience === opt
-                      ? "border-amber bg-amber/10 text-amber"
-                      : "border-ink-3 text-paper/60 hover:border-amber/40 hover:text-paper")
+                      ? "border-lime bg-lime/10 text-lime"
+                      : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
                   }
                 >
                   {opt}
@@ -151,8 +151,8 @@ export default function SignupPage() {
             <h2 className="font-display text-3xl text-paper">
               Final confirmation.
             </h2>
-            <div className="border border-amber/40 bg-amber/5 p-6 font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
-              <div className="mb-3 text-amber">YOU ARE ABOUT TO ATTEST:</div>
+            <div className="border border-lime/40 bg-lime/5 p-6 font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
+              <div className="mb-3 text-lime">YOU ARE ABOUT TO ATTEST:</div>
               <ul className="space-y-2">
                 <li>· You are not a beginner.</li>
                 <li>· You are not gambling.</li>
@@ -173,7 +173,7 @@ export default function SignupPage() {
           <button
             onClick={() => step > 0 && setStep(step - 1)}
             disabled={step === 0}
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-amber disabled:opacity-30"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime disabled:opacity-30"
           >
             ← Back
           </button>
@@ -183,7 +183,7 @@ export default function SignupPage() {
         </div>
         <div className="mt-8 border-t border-ink-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
           Already enrolled?{" "}
-          <Link href="/login" className="text-paper/60 hover:text-amber">
+          <Link href="/login" className="text-paper/60 hover:text-lime">
             Operator login →
           </Link>
         </div>

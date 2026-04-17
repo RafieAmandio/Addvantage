@@ -141,7 +141,7 @@ export default function ProfilePage() {
           Tailoring
           <br />
           your{" "}
-          <span className="italic text-amber">terminal.</span>
+          <span className="italic text-lime">terminal.</span>
         </h1>
         <p className="mt-8 max-w-sm font-display text-lg text-paper/60">
           Five questions. Your answers shape how the platform thinks about you —
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                 className={
                   "h-2.5 w-2.5 rounded-full transition-all " +
                   (i === step
-                    ? "bg-amber scale-125"
+                    ? "bg-lime scale-125"
                     : i < step
                     ? "bg-moss"
                     : "bg-paper/20")
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                 className={
                   "font-mono text-[9px] uppercase tracking-widest2 " +
                   (i === step
-                    ? "text-amber"
+                    ? "text-lime"
                     : i < step
                     ? "text-paper/50"
                     : "text-paper/20")
@@ -208,8 +208,8 @@ export default function ProfilePage() {
                     className={
                       "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                       (form.tradingLength === opt.value
-                        ? "border-amber bg-amber/10 text-amber"
-                        : "border-ink-3 text-paper/60 hover:border-amber/40 hover:text-paper")
+                        ? "border-lime bg-lime/10 text-lime"
+                        : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
                     }
                   >
                     <span className="absolute right-3 top-3 text-[9px] text-paper/20">
@@ -236,8 +236,8 @@ export default function ProfilePage() {
                     className={
                       "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                       (form.longestProfitable === opt.value
-                        ? "border-amber bg-amber/10 text-amber"
-                        : "border-ink-3 text-paper/60 hover:border-amber/40 hover:text-paper")
+                        ? "border-lime bg-lime/10 text-lime"
+                        : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
                     }
                   >
                     <span className="absolute right-3 top-3 text-[9px] text-paper/20">
@@ -259,7 +259,7 @@ export default function ProfilePage() {
               <h2 className="font-display text-3xl text-paper">
                 Which markets do you trade?
               </h2>
-              <p className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <p className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 SELECT ALL THAT APPLY
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -272,8 +272,8 @@ export default function ProfilePage() {
                       className={
                         "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                         (selected
-                          ? "border-amber bg-amber/10 text-amber"
-                          : "border-ink-3 text-paper/60 hover:border-amber/40 hover:text-paper")
+                          ? "border-lime bg-lime/10 text-lime"
+                          : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
                       }
                     >
                       <span className="absolute right-3 top-3 text-[9px] text-paper/20">
@@ -284,7 +284,7 @@ export default function ProfilePage() {
                           className={
                             "flex h-4 w-4 items-center justify-center border text-[10px] " +
                             (selected
-                              ? "border-amber bg-amber text-ink"
+                              ? "border-lime bg-lime text-ink"
                               : "border-paper/30")
                           }
                         >
@@ -313,7 +313,7 @@ export default function ProfilePage() {
                   setForm({ ...form, yearlyGoal: e.target.value })
                 }
                 placeholder="e.g. 30% annual return, consistent 2R average, survive the year without blowing up"
-                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-amber"
+                className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-lime"
               />
             </div>
           </div>
@@ -326,7 +326,7 @@ export default function ProfilePage() {
             <h2 className="font-display text-3xl text-paper">
               The accountability question.
             </h2>
-            <div className="border border-amber/40 bg-amber/5 p-6">
+            <div className="border border-lime/40 bg-lime/5 p-6">
               <p className="font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
                 If analyst Vantage gives trade ideas and you take the same trade
                 and lose — whose fault is it?
@@ -346,8 +346,8 @@ export default function ProfilePage() {
                   className={
                     "relative w-full border p-5 text-left transition-all " +
                     (form.faultAttribution === opt.value
-                      ? "border-amber bg-amber/10"
-                      : "border-ink-3 hover:border-amber/40")
+                      ? "border-lime bg-lime/10"
+                      : "border-ink-3 hover:border-lime/40")
                   }
                 >
                   <span className="absolute right-4 top-4 font-mono text-[9px] text-paper/20">
@@ -368,7 +368,7 @@ export default function ProfilePage() {
           <button
             onClick={() => step > 0 && setStep(step - 1)}
             disabled={step === 0}
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-amber disabled:opacity-30"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime disabled:opacity-30"
           >
             ← Back
           </button>

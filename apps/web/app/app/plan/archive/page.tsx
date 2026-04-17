@@ -102,8 +102,8 @@ export default function PlanArchivePage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             DECODING ARCHIVE
           </div>
         </div>
@@ -238,7 +238,7 @@ function PlanArchiveView() {
             <div>
               <DataLabel>Transmission TX-03 · Archive</DataLabel>
               <h1 className="mt-2 font-display text-5xl text-paper">
-                Plan <span className="italic text-amber">Archive</span>
+                Plan <span className="italic text-lime">Archive</span>
               </h1>
               <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
                 Every trading plan the desk has shipped. Historical plans are
@@ -250,20 +250,20 @@ function PlanArchiveView() {
               <Link
                 href="/app/plan/compare"
                 title="Put two plans side by side"
-                className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+                className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
               >
                 ⇌ COMPARE
               </Link>
               <button
                 onClick={exportDigest}
                 title="Copy archive as markdown digest"
-                className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+                className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
               >
                 ⇩ EXPORT DIGEST
               </button>
               <Link
                 href="/app/plan"
-                className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
               >
                 ← Current plan
               </Link>
@@ -334,8 +334,8 @@ function PlanArchiveView() {
                           className="group relative flex h-full flex-1 items-center"
                         >
                           {live ? (
-                            // Hollow amber bar spanning both halves
-                            <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-amber/70 bg-amber/5 group-hover:bg-amber/10" />
+                            // Hollow lime bar spanning both halves
+                            <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-lime/70 bg-lime/5 group-hover:bg-lime/10" />
                           ) : (
                             <div
                               className={cn(
@@ -353,7 +353,7 @@ function PlanArchiveView() {
                               "absolute z-20 whitespace-nowrap border bg-ink-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 opacity-0 shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-opacity group-hover:opacity-100",
                               tipAlign,
                               live
-                                ? "border-amber/60 text-amber"
+                                ? "border-lime/60 text-lime"
                                 : positive
                                 ? "border-moss/60 text-moss"
                                 : "border-blood/60 text-[#fda4af]",
@@ -379,7 +379,7 @@ function PlanArchiveView() {
             <div className="mt-2 flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
               <span>{formatDate([...allClosed].sort((a, b) => a.date.localeCompare(b.date))[0].date)}</span>
               <span className="text-paper/40">hover for R · dashed = live</span>
-              <span className="text-amber">{formatDate(latest.date)}</span>
+              <span className="text-lime">{formatDate(latest.date)}</span>
             </div>
           </div>
         )}
@@ -398,7 +398,7 @@ function PlanArchiveView() {
             <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
               Latest
             </div>
-            <div className="mt-1 font-display text-3xl text-amber">
+            <div className="mt-1 font-display text-3xl text-lime">
               {latest.id.replace(/^TP-/, "")}
             </div>
             <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -456,7 +456,7 @@ function PlanArchiveView() {
             {horizonFilter !== "all" && (
               <button
                 onClick={() => setHorizonFilter("all")}
-                className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+                className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
               >
                 ✕ Clear
               </button>
@@ -468,11 +468,11 @@ function PlanArchiveView() {
               className={cn(
                 "bg-ink p-4 text-left transition-colors",
                 horizonFilter === "all"
-                  ? "border-l-2 border-amber bg-ink-2"
+                  ? "border-l-2 border-lime bg-ink-2"
                   : "hover:bg-ink-2"
               )}
             >
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                 ALL
               </div>
               <div
@@ -506,13 +506,13 @@ function PlanArchiveView() {
                   className={cn(
                     "bg-ink p-4 text-left transition-colors",
                     horizonFilter === h
-                      ? "border-l-2 border-amber bg-ink-2"
+                      ? "border-l-2 border-lime bg-ink-2"
                       : noData
                       ? "cursor-default opacity-60"
                       : "hover:bg-ink-2"
                   )}
                 >
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                     {h}
                   </div>
                   <div
@@ -567,7 +567,7 @@ function PlanArchiveView() {
             </div>
             <button
               onClick={() => setHorizonFilter("all")}
-              className="mt-6 border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ✕ Show all plans
             </button>
@@ -580,9 +580,9 @@ function PlanArchiveView() {
             const closedInMonth = group.plans.filter((p) => p.id !== latest.id).length;
             return (
               <section key={group.ym}>
-                <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-amber/30 pb-2">
+                <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-lime/30 pb-2">
                   <div className="flex items-baseline gap-3">
-                    <div className="font-display text-3xl italic text-amber">
+                    <div className="font-display text-3xl italic text-lime">
                       {group.label}
                     </div>
                     <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
@@ -624,11 +624,11 @@ function PlanArchiveView() {
                 {/* Meta column */}
                 <div className="col-span-12 lg:col-span-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       <Highlight text={p.id} query={query} />
                     </span>
                     {isLatest && (
-                      <span className="border border-amber bg-amber/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-amber">
+                      <span className="border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-lime">
                         ● LATEST
                       </span>
                     )}
@@ -644,7 +644,7 @@ function PlanArchiveView() {
                       ▲ {longs} long
                     </span>
                     <span className="text-paper/30">·</span>
-                    <span className="text-amber">
+                    <span className="text-lime">
                       ▼ {shorts} short
                     </span>
                   </div>
@@ -670,7 +670,7 @@ function PlanArchiveView() {
                     </div>
                   )}
                   {isLatest && (
-                    <div className="mt-3 border-t border-ink-3 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                    <div className="mt-3 border-t border-ink-3 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       ● LIVE · no outcome yet
                     </div>
                   )}
@@ -692,7 +692,7 @@ function PlanArchiveView() {
                                   "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 " +
                                   (s.direction === "long"
                                     ? "border-moss/50 text-moss"
-                                    : "border-amber/50 text-amber")
+                                    : "border-lime/50 text-lime")
                                 }
                               >
                                 {s.direction === "long" ? "▲" : "▼"}{" "}

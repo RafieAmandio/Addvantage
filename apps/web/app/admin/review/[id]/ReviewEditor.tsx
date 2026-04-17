@@ -23,7 +23,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
   const statusChip = {
-    pending: "bg-amber/10 border-amber text-amber",
+    pending: "bg-lime/10 border-lime text-lime",
     approved: "bg-emerald-600/10 border-emerald-500 text-emerald-400",
     rejected: "bg-blood/10 border-blood text-blood",
   }[item.status] ?? "bg-ink-2 border-ink-3 text-paper/60";
@@ -54,14 +54,14 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/review"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-amber"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-lime"
           >
             ← Queue
           </Link>
           <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/30">
             /
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+          <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             [{item.source_code}]
           </span>
           <span
@@ -83,7 +83,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             type="button"
             onClick={onSave}
             disabled={pending}
-            className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/80 hover:border-amber hover:text-amber disabled:opacity-40"
+            className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/80 hover:border-lime hover:text-lime disabled:opacity-40"
           >
             Save draft
           </button>
@@ -91,7 +91,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             type="button"
             onClick={onApprove}
             disabled={pending || item.status !== "pending"}
-            className="border border-amber bg-amber px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-paper disabled:opacity-40"
+            className="border border-lime bg-lime px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-paper disabled:opacity-40"
           >
             ✓ Approve & publish
           </button>
@@ -115,7 +115,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               href={item.source_url}
               target="_blank"
               rel="noreferrer"
-              className="block truncate border border-ink-3 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="block truncate border border-ink-3 bg-ink px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ↗ {item.source_url}
             </a>
@@ -126,8 +126,8 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         </div>
 
         {/* Right: editable rephrase */}
-        <div className="border border-amber/40 bg-ink p-6">
-          <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+        <div className="border border-lime/40 bg-ink p-6">
+          <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-lime">
             REPHRASED · EDITABLE
           </div>
 
@@ -135,7 +135,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             <input
               value={draft.headline}
               onChange={(e) => setDraft((d) => ({ ...d, headline: e.target.value }))}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-display text-xl text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-display text-xl text-paper focus:border-lime focus:outline-none"
             />
           </Field>
 
@@ -144,7 +144,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               rows={5}
               value={draft.rephrased}
               onChange={(e) => setDraft((d) => ({ ...d, rephrased: e.target.value }))}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-lime focus:outline-none"
             />
           </Field>
 
@@ -153,7 +153,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               rows={4}
               value={draft.analysis}
               onChange={(e) => setDraft((d) => ({ ...d, analysis: e.target.value }))}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-lime focus:outline-none"
             />
           </Field>
 
@@ -164,7 +164,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, impact: e.target.value as typeof draft.impact }))
                 }
-                className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-amber focus:outline-none"
+                className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
               >
                 {IMPACT_LEVELS.map((v) => (
                   <option key={v} value={v}>
@@ -179,7 +179,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, bias: e.target.value as typeof draft.bias }))
                 }
-                className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-amber focus:outline-none"
+                className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
               >
                 {BIAS_LEVELS.map((v) => (
                   <option key={v} value={v}>
@@ -195,7 +195,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               value={draft.affects}
               onChange={(e) => setDraft((d) => ({ ...d, affects: e.target.value }))}
               placeholder="SPX, DXY, US10Y"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             />
           </Field>
 
@@ -204,7 +204,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               value={draft.tags}
               onChange={(e) => setDraft((d) => ({ ...d, tags: e.target.value }))}
               placeholder="risk-management, mean-reversion"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             />
             <div className="mt-1 flex flex-wrap gap-1 font-mono text-[8px] uppercase tracking-widest2 text-paper/40">
               {HASHTAGS.map((h) => (
@@ -216,7 +216,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
                     if (current.includes(h)) return;
                     setDraft((d) => ({ ...d, tags: [...current, h].join(", ") }));
                   }}
-                  className="border border-ink-3 px-1.5 py-0.5 hover:border-amber hover:text-amber"
+                  className="border border-ink-3 px-1.5 py-0.5 hover:border-lime hover:text-lime"
                 >
                   +{h}
                 </button>
@@ -228,7 +228,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             <input
               value={draft.author}
               onChange={(e) => setDraft((d) => ({ ...d, author: e.target.value }))}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-amber focus:outline-none"
+              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             />
           </Field>
         </div>

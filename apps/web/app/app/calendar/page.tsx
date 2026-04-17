@@ -231,7 +231,7 @@ const IMPACT_LABEL: Record<Impact, string> = {
 
 const IMPACT_STYLE: Record<Impact, string> = {
   high: "border-blood/60 bg-blood/20 text-[#fda4af]",
-  medium: "border-amber/60 bg-amber/10 text-amber",
+  medium: "border-lime/60 bg-lime/10 text-lime",
   low: "border-moss/60 bg-moss/10 text-moss",
 };
 
@@ -280,8 +280,8 @@ export default function CalendarPage() {
 function CalendarFallback() {
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
-      <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-        <span className="led amber" />
+      <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+        <span className="led lime" />
         DECODING CALENDAR
       </div>
     </div>
@@ -405,7 +405,7 @@ function CalendarView() {
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-02 · Free pillar</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
-            Economic <span className="italic text-amber">Calendar</span>
+            Economic <span className="italic text-lime">Calendar</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
             Every high-impact release that moves global and IDX markets.
@@ -429,7 +429,7 @@ function CalendarView() {
                 className={cn(
                   "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
                   view === v
-                    ? "bg-amber text-ink"
+                    ? "bg-lime text-ink"
                     : "bg-ink-2 text-paper/60 hover:bg-ink-2 hover:text-paper"
                 )}
               >
@@ -443,11 +443,11 @@ function CalendarView() {
             <button
               onClick={() => setAnchor(stepAnchor(view, anchor, -1))}
               aria-label={`Previous ${view}`}
-              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
             >
               ←
             </button>
-            <div className="min-w-[180px] border border-amber/40 bg-ink-2/40 px-4 py-2 text-center">
+            <div className="min-w-[180px] border border-lime/40 bg-ink-2/40 px-4 py-2 text-center">
               <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
                 {view === "day"
                   ? "Day"
@@ -455,14 +455,14 @@ function CalendarView() {
                   ? "Week"
                   : "Month"}
               </div>
-              <div className="font-display text-base text-amber">
+              <div className="font-display text-base text-lime">
                 {rangeLabel(view, anchor)}
               </div>
             </div>
             <button
               onClick={() => setAnchor(stepAnchor(view, anchor, 1))}
               aria-label={`Next ${view}`}
-              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
             >
               →
             </button>
@@ -473,7 +473,7 @@ function CalendarView() {
                 "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
                 anchor === DEMO_TODAY_YMD
                   ? "cursor-default border-ink-3 text-paper/30"
-                  : "border-amber/60 text-amber hover:bg-amber hover:text-ink"
+                  : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
               )}
             >
               Today
@@ -482,7 +482,7 @@ function CalendarView() {
 
           {/* Counts */}
           <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            <span className="text-amber">{filtered.length}</span>
+            <span className="text-lime">{filtered.length}</span>
             <span>events in view</span>
           </div>
         </div>
@@ -544,7 +544,7 @@ function CalendarView() {
             />
             {filtered.length === 0 && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                <div className="pointer-events-auto max-w-md border border-amber bg-ink-2/95 p-6 text-center shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
+                <div className="pointer-events-auto max-w-md border border-lime bg-ink-2/95 p-6 text-center shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
                     ● NULL TRANSMISSION
                   </div>
@@ -560,7 +560,7 @@ function CalendarView() {
                     {nearestEventDate.backward && (
                       <button
                         onClick={() => jumpToNearest(-1)}
-                        className="border border-amber/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                        className="border border-lime/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                       >
                         ← Prev event
                       </button>
@@ -572,7 +572,7 @@ function CalendarView() {
                         "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2",
                         anchor === DEMO_TODAY_YMD
                           ? "cursor-default border-ink-3 text-paper/30"
-                          : "border-amber/60 text-amber hover:bg-amber hover:text-ink"
+                          : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
                       )}
                     >
                       Today
@@ -580,7 +580,7 @@ function CalendarView() {
                     {nearestEventDate.forward && (
                       <button
                         onClick={() => jumpToNearest(1)}
-                        className="border border-amber/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                        className="border border-lime/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                       >
                         Next event →
                       </button>
@@ -588,7 +588,7 @@ function CalendarView() {
                     {filtersActive && (
                       <button
                         onClick={resetFilters}
-                        className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+                        className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
                       >
                         ✕ Reset filters
                       </button>
@@ -604,7 +604,7 @@ function CalendarView() {
         {view !== "month" && (
         <div className="overflow-x-auto border border-ink-3">
           <div className="min-w-[780px]">
-            <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-amber/40 bg-ink-2/95 px-3 py-2 backdrop-blur">
+            <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-lime/40 bg-ink-2/95 px-3 py-2 backdrop-blur">
               <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
                 Event
               </div>
@@ -617,7 +617,7 @@ function CalendarView() {
               {CURRENCIES.map((c) => (
                 <div
                   key={c}
-                  className="text-center font-mono text-[10px] uppercase tracking-widest2 text-amber"
+                  className="text-center font-mono text-[10px] uppercase tracking-widest2 text-lime"
                 >
                   {c}
                 </div>
@@ -641,7 +641,7 @@ function CalendarView() {
                   {nearestEventDate.backward && (
                     <button
                       onClick={() => jumpToNearest(-1)}
-                      className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                      className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                     >
                       ← Prev event · {formatDayHeader(nearestEventDate.backward)}
                     </button>
@@ -653,7 +653,7 @@ function CalendarView() {
                       "border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2",
                       anchor === DEMO_TODAY_YMD
                         ? "cursor-default border-ink-3 text-paper/30"
-                        : "border-amber/60 text-amber hover:bg-amber hover:text-ink"
+                        : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
                     )}
                   >
                     Today
@@ -661,7 +661,7 @@ function CalendarView() {
                   {nearestEventDate.forward && (
                     <button
                       onClick={() => jumpToNearest(1)}
-                      className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                      className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                     >
                       Next event · {formatDayHeader(nearestEventDate.forward)} →
                     </button>
@@ -669,7 +669,7 @@ function CalendarView() {
                   {filtersActive && (
                     <button
                       onClick={resetFilters}
-                      className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+                      className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
                     >
                       ✕ Reset filters
                     </button>
@@ -684,10 +684,10 @@ function CalendarView() {
                 <section key={ymd}>
                   <div className="border-y border-ink-3 bg-ink-2/60 px-3 py-2.5">
                     <div className="flex items-baseline gap-3">
-                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                         {formatDayHeader(ymd)}
                       </span>
-                      <span className="h-px flex-1 bg-amber/20" />
+                      <span className="h-px flex-1 bg-lime/20" />
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
                         — {summary}
                       </span>
@@ -715,7 +715,7 @@ function CalendarView() {
           </div>
           <div className="mt-3 grid grid-cols-1 gap-4 text-sm text-paper/70 sm:grid-cols-3">
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 Impact pill
               </div>
               <div className="mt-1 text-xs text-paper/60">
@@ -724,7 +724,7 @@ function CalendarView() {
               </div>
             </div>
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 Currency scores
               </div>
               <div className="mt-1 text-xs text-paper/60">
@@ -733,7 +733,7 @@ function CalendarView() {
               </div>
             </div>
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 Time format
               </div>
               <div className="mt-1 text-xs text-paper/60">
@@ -770,7 +770,7 @@ function FilterChips({
           className={cn(
             "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
             value === opt.value
-              ? "bg-amber text-ink"
+              ? "bg-lime text-ink"
               : "bg-ink-2 text-paper/60 hover:text-paper"
           )}
         >
@@ -798,14 +798,14 @@ function EventRow({
     <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-ink-3 bg-ink px-3 py-3 transition-colors hover:bg-ink-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
-          <div className="font-display text-base leading-tight text-paper group-hover:text-amber">
+          <div className="font-display text-base leading-tight text-paper group-hover:text-lime">
             {event.title}
           </div>
           {related && (
             <Link
               href={`/app/news/${related.id}`}
               title={related.headline}
-              className="border border-amber/40 bg-amber/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="border border-lime/40 bg-lime/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ↗ {related.id}
             </Link>
@@ -860,7 +860,7 @@ function ScoreCell({ value }: { value: number }) {
 
 const IMPACT_DOT: Record<Impact, string> = {
   high: "bg-[#991b1b] border-[#fda4af]",
-  medium: "bg-amber border-amber",
+  medium: "bg-lime border-lime",
   low: "bg-moss border-moss",
 };
 
@@ -899,11 +899,11 @@ function MonthGrid({
   return (
     <div className="border border-ink-3">
       {/* Weekday header row */}
-      <div className="grid grid-cols-7 border-b-2 border-amber/40 bg-ink-2/95">
+      <div className="grid grid-cols-7 border-b-2 border-lime/40 bg-ink-2/95">
         {weekdayHeaders.map((w) => (
           <div
             key={w}
-            className="px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-amber"
+            className="px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime"
           >
             {w}
           </div>
@@ -934,13 +934,13 @@ function MonthGrid({
                 inMonth
                   ? "bg-ink hover:bg-ink-2"
                   : "bg-ink-2/30 hover:bg-ink-2/60",
-                // Non-anchor hover gets a faint amber preview outline
-                !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-amber/30",
-                // Anchor (keyboard cursor) — inset amber border, overridden
+                // Non-anchor hover gets a faint lime preview outline
+                !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-lime/30",
+                // Anchor (keyboard cursor) — inset lime border, overridden
                 // visually by the today ring below when they coincide.
-                isAnchor && !isToday && "bg-amber/5 ring-2 ring-inset ring-amber/60",
-                isToday && "ring-1 ring-inset ring-amber",
-                isAnchor && isToday && "ring-2 ring-amber bg-amber/10"
+                isAnchor && !isToday && "bg-lime/5 ring-2 ring-inset ring-lime/60",
+                isToday && "ring-1 ring-inset ring-lime",
+                isAnchor && isToday && "ring-2 ring-lime bg-lime/10"
               )}
             >
               {/* Day number */}
@@ -949,9 +949,9 @@ function MonthGrid({
                   className={cn(
                     "font-mono text-[11px] font-semibold tracking-widest2",
                     isToday
-                      ? "text-amber"
+                      ? "text-lime"
                       : isAnchor
-                      ? "text-amber"
+                      ? "text-lime"
                       : inMonth
                       ? "text-paper/80"
                       : "text-paper/25",
@@ -961,12 +961,12 @@ function MonthGrid({
                   {String(day).padStart(2, "0")}
                 </span>
                 {isToday && (
-                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-amber">
+                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-lime">
                     TODAY
                   </span>
                 )}
                 {!isToday && isAnchor && (
-                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-amber">
+                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-lime">
                     ● ANCHOR
                   </span>
                 )}
@@ -997,7 +997,7 @@ function MonthGrid({
                   </div>
                 ))}
                 {overflow > 0 && (
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-amber/70">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime/70">
                     +{overflow} more
                   </div>
                 )}

@@ -39,16 +39,16 @@ export default function TagPage({
         <div className="mx-auto max-w-7xl px-6 py-10">
           <Link
             href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-amber"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
           >
             ← All hashtags
           </Link>
           <DataLabel className="mt-6">Hashtag · cross-cut</DataLabel>
           <h1 className="mt-2 font-display text-6xl leading-none text-paper">
-            <span className="text-amber">#</span>
+            <span className="text-lime">#</span>
             {tag}
           </h1>
-          <div className="mt-2 font-mono text-xs italic uppercase tracking-widest2 text-amber/80">
+          <div className="mt-2 font-mono text-xs italic uppercase tracking-widest2 text-lime/80">
             {meta.label}
           </div>
           <p className="mt-3 max-w-2xl text-paper/70">{meta.description}</p>
@@ -70,13 +70,13 @@ export default function TagPage({
                   href={`/app/education/${p.id}`}
                   className="bg-ink p-5 hover:bg-ink-2"
                 >
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {p.id}
                   </div>
                   <div className="mt-2 font-display text-xl text-paper">
                     {p.title}
                   </div>
-                  <div className="mt-1 font-mono text-[10px] italic text-amber/60">
+                  <div className="mt-1 font-mono text-[10px] italic text-lime/60">
                     {p.framework}
                   </div>
                   <p className="mt-3 text-sm text-paper/60">{p.summary}</p>
@@ -91,7 +91,7 @@ export default function TagPage({
             <div className="space-y-px bg-ink-3">
               {matchedNews.map((n) => (
                 <div key={n.id} className="bg-ink p-4 hover:bg-ink-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {n.id}
                   </div>
                   <div className="mt-1 font-display text-lg text-paper">
@@ -110,7 +110,7 @@ export default function TagPage({
               {matchedSessions.map((s) => (
                 <div key={s.id} className="bg-ink p-4 hover:bg-ink-2">
                   <div className="flex items-baseline justify-between">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       {s.id}
                     </div>
                     <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -134,7 +134,7 @@ export default function TagPage({
             <div className="space-y-px bg-ink-3">
               {matchedChannel.map((p) => (
                 <div key={p.id} className="bg-ink p-4 hover:bg-ink-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {p.id} · {formatDate(p.ts)}
                   </div>
                   <p className="mt-2 text-sm text-paper/80">{p.body}</p>

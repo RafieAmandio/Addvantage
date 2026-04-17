@@ -22,8 +22,8 @@ export default function PlanComparePage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
-            <span className="led amber" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="led lime" />
             PREPARING COMPARE
           </div>
         </div>
@@ -79,7 +79,7 @@ function PlanCompareView() {
             <div>
               <DataLabel>Transmission TX-03 · Compare</DataLabel>
               <h1 className="mt-2 font-display text-5xl text-paper">
-                Plan <span className="italic text-amber">comparison</span>
+                Plan <span className="italic text-lime">comparison</span>
               </h1>
               <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
                 Put two trading plans side by side. Common instruments
@@ -88,7 +88,7 @@ function PlanCompareView() {
             </div>
             <Link
               href="/app/plan/archive"
-              className="border border-amber/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+              className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
             >
               ← Archive
             </Link>
@@ -118,7 +118,7 @@ function PlanCompareView() {
               disabled={!a || !b}
               title="Swap A and B"
               aria-label="Swap plans"
-              className="flex items-center gap-2 border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber disabled:cursor-default disabled:opacity-30"
+              className="flex items-center gap-2 border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime disabled:cursor-default disabled:opacity-30"
             >
               <span className="text-base leading-none">⇄</span>
               <span className="sm:hidden">Swap</span>
@@ -136,7 +136,7 @@ function PlanCompareView() {
 
         {!a || !b ? (
           <div className="border border-ink-3 bg-ink-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-amber">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
               ● PICK TWO PLANS
             </div>
             <div className="mt-3 font-display text-2xl text-paper">
@@ -194,7 +194,7 @@ function PlanCompareView() {
                     ? String(commonInstruments.length)
                     : "—"
                 }
-                valueTone={commonInstruments.length > 0 ? "amber" : "muted"}
+                valueTone={commonInstruments.length > 0 ? "lime" : "muted"}
                 sub={
                   commonInstruments.length > 0
                     ? commonInstruments.join(" · ")
@@ -215,7 +215,7 @@ function PlanCompareView() {
                 {commonInstruments.map((i) => (
                   <span
                     key={i}
-                    className="border border-amber bg-amber/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-amber"
+                    className="border border-lime bg-lime/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-lime"
                   >
                     ★ {i}
                   </span>
@@ -251,7 +251,7 @@ function SummaryCell({
 }: {
   label: string;
   value: string;
-  valueTone: "moss" | "blood" | "amber" | "paper" | "muted";
+  valueTone: "moss" | "blood" | "lime" | "paper" | "muted";
   sub: string;
 }) {
   const toneClass =
@@ -259,8 +259,8 @@ function SummaryCell({
       ? "text-moss"
       : valueTone === "blood"
       ? "text-blood"
-      : valueTone === "amber"
-      ? "text-amber"
+      : valueTone === "lime"
+      ? "text-lime"
       : valueTone === "paper"
       ? "text-paper"
       : "text-paper/30";
@@ -302,7 +302,7 @@ function PlanPicker({
       <select
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="mt-1 w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-sm text-paper outline-none focus:border-amber"
+        className="mt-1 w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-sm text-paper outline-none focus:border-lime"
       >
         <option value="">— pick a plan —</option>
         {plans.map((p) => {
@@ -342,12 +342,12 @@ function PlanColumn({
           <div className="flex items-center gap-2">
             <Link
               href={`/app/plan/${plan.id}`}
-              className="font-mono text-[10px] uppercase tracking-widest2 text-amber hover:underline"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
             >
               {plan.id}
             </Link>
             {isLatest ? (
-              <span className="border border-amber bg-amber/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-amber">
+              <span className="border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
                 ● LATEST
               </span>
             ) : (
@@ -376,11 +376,11 @@ function PlanColumn({
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
           <span>{plan.horizon}</span>
-          <span className="text-amber/40">·</span>
+          <span className="text-lime/40">·</span>
           <span>by {plan.authoredBy}</span>
-          <span className="text-amber/40">·</span>
+          <span className="text-lime/40">·</span>
           <span className="text-moss">▲ {longs}</span>
-          <span className="text-amber">▼ {shorts}</span>
+          <span className="text-lime">▼ {shorts}</span>
         </div>
       </div>
 
@@ -446,14 +446,14 @@ function CompactSetup({
       className={cn(
         "block border p-3 transition-colors",
         highlighted
-          ? "border-amber bg-amber/5 hover:bg-amber/10"
+          ? "border-lime bg-lime/5 hover:bg-lime/10"
           : "border-ink-3 bg-ink hover:bg-ink-2"
       )}
     >
       <div className="flex items-baseline justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-amber">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
               {s.id}
             </span>
             <span className="font-display text-base text-paper">
@@ -463,7 +463,7 @@ function CompactSetup({
             <span
               className={cn(
                 "font-mono text-[9px] uppercase tracking-widest2",
-                s.direction === "long" ? "text-moss" : "text-amber"
+                s.direction === "long" ? "text-moss" : "text-lime"
               )}
             >
               {s.direction}

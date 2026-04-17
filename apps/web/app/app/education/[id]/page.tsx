@@ -49,7 +49,7 @@ export default function PrimerPage({
               <h1 className="mt-2 font-display text-5xl leading-tight text-paper">
                 {primer.title}
               </h1>
-              <div className="mt-2 font-mono text-xs italic text-amber">
+              <div className="mt-2 font-mono text-xs italic text-lime">
                 {primer.framework}
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function PrimerPage({
                   "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (isRead
                     ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-blood"
-                    : "border-amber/60 text-amber hover:bg-amber hover:text-ink")
+                    : "border-lime/60 text-lime hover:bg-lime hover:text-ink")
                 }
               >
                 {isRead ? "✓ READ · MARK UNREAD" : "MARK AS READ →"}
@@ -106,7 +106,7 @@ export default function PrimerPage({
           />
         )}
         <div className={locked ? "pointer-events-none select-none blur-sm" : ""}>
-          <p className="border-l-4 border-amber bg-ink-2/40 p-6 font-display text-2xl italic leading-relaxed text-paper/90">
+          <p className="border-l-4 border-lime bg-ink-2/40 p-6 font-display text-2xl italic leading-relaxed text-paper/90">
             {primer.summary}
           </p>
 
@@ -117,7 +117,7 @@ export default function PrimerPage({
                 key={i}
                 className="text-base leading-relaxed text-paper/85"
               >
-                <span className="mr-3 font-mono text-[10px] uppercase tracking-widest2 text-amber">
+                <span className="mr-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
                   ¶ {String(i + 1).padStart(2, "0")}
                 </span>
                 {para}
@@ -132,7 +132,7 @@ export default function PrimerPage({
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-amber hover:bg-amber hover:text-ink"
+                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
                 >
                   #{t}
                 </Link>

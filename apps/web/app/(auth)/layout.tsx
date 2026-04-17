@@ -14,7 +14,7 @@ export default function AuthLayout({
         <header className="border-b border-ink-3 bg-ink-2/50">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
             <Link href="/" className="font-display text-2xl text-paper">
-              ANTS<span className="text-amber">.</span>
+              ANTS<span className="text-lime">.</span>
             </Link>
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
               ← Return to brief

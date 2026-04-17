@@ -72,7 +72,7 @@ export function PageSearchInput({
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          className="shrink-0 text-amber"
+          className="shrink-0 text-lime"
           aria-hidden
         >
           <circle cx="9" cy="9" r="6" />
@@ -98,14 +98,14 @@ export function PageSearchInput({
             onClick={() => onChange("")}
             title="Clear search"
             aria-label="Clear search"
-            className="border border-ink-3 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-amber hover:text-amber"
+            className="border border-ink-3 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
           >
             ✕
           </button>
         )}
       </div>
       {matchLabel && value && (
-        <div className="border-t border-ink-3 bg-ink/60 px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-amber">
+        <div className="border-t border-ink-3 bg-ink/60 px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
           ● {matchLabel}
         </div>
       )}

@@ -1,25 +1,25 @@
 import { cn } from "@/lib/cn";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "amber" | "outline" | "ghost";
+  variant?: "lime" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
 }
 
 export function Button({
   className,
-  variant = "amber",
+  variant = "lime",
   size = "md",
   ...props
 }: Props) {
   const base =
     "group relative inline-flex items-center justify-center gap-2 font-mono uppercase tracking-widest2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40";
   const variants = {
-    amber:
-      "bg-amber text-ink hover:bg-amber-dim hover:text-paper border border-amber",
+    lime:
+      "bg-lime text-ink hover:bg-lime-dim hover:text-paper border border-lime",
     outline:
-      "border border-amber/60 text-amber hover:bg-amber hover:text-ink",
+      "border border-lime/60 text-lime hover:bg-lime hover:text-ink",
     ghost:
-      "text-paper/70 hover:text-amber border border-transparent hover:border-amber/40",
+      "text-paper/70 hover:text-lime border border-transparent hover:border-lime/40",
   } as const;
   const sizes = {
     sm: "h-8 px-3 text-[10px]",
