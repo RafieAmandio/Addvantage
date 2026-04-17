@@ -17,8 +17,10 @@ import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { useToast } from "@/lib/toast";
-import { formatDate, formatTime, cn } from "@/lib/cn";
+import { formatDate, cn } from "@/lib/cn";
 import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
+import { Bubble } from "@/features/consult/components/Bubble";
+import { TypingIndicator } from "@/features/consult/components/TypingIndicator";
 
 export default function ConsultPage() {
   return (
@@ -821,73 +823,3 @@ function ConsultLayout({
   );
 }
 
-function TypingIndicator() {
-  return (
-    <div className="flex flex-col items-start">
-      <div className="flex items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
-          ● ANTS · AI
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
-          PROCESSING…
-        </span>
-      </div>
-      <div className="mt-1 inline-flex items-center gap-2 border border-ink-3 bg-ink-2 px-4 py-3">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:0ms]" />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:200ms]" />
-        <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:400ms]" />
-        <span className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
-          DESK · TYPING
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function Bubble({ msg }: { msg: ConsultMessage }) {
-  const isUser = msg.role === "user";
-  const isAi = msg.role === "ai";
-  const align = isUser ? "items-end" : "items-start";
-  const tagColor = isUser
-    ? "text-lime"
-    : isAi
-    ? "text-moss"
-    : "text-paper";
-  const bg = isUser
-    ? "bg-lime/10 border-lime/40"
-    : isAi
-    ? "bg-ink-2 border-ink-3"
-    : "bg-ink-2 border-lime/40";
-
-  return (
-    <div className={`flex flex-col ${align}`}>
-      <div className="flex items-center gap-2">
-        <span
-          className={`font-mono text-[9px] uppercase tracking-widest2 ${tagColor}`}
-        >
-          ● {isUser ? "OPERATOR" : isAi ? "ANTS · AI" : `DESK · ${msg.author ?? "TEAM"}`}
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
-          {formatTime(msg.ts)}Z
-        </span>
-      </div>
-      <div
-        className={`mt-1 max-w-[80%] whitespace-pre-line border ${bg} p-4 text-sm leading-relaxed text-paper/90`}
-      >
-        {msg.body}
-      </div>
-      {msg.tags.length > 0 && (
-        <div className="mt-1 flex gap-2">
-          {msg.tags.map((t) => (
-            <span
-              key={t}
-              className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
-            >
-              #{t}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}

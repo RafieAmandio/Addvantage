@@ -114,9 +114,9 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ### Low priority
 - [x] Admin routes: redirect instead of rendering "FORBIDDEN"
 - [ ] Pin Node version in Vercel project settings
-- [ ] Split `/app/consult/page.tsx` (was 1021 LOC; now 893 after C1)
+- [ ] Split `/app/consult/page.tsx` (was 1021 LOC; now 825 after C2)
   - [x] **C1.** Extract pure helpers — `sessionMatchesQuery`, `pickReply`+`CANNED_REPLIES`, `sessionToMarkdown`, types — into `features/consult/lib/{search,replies,export}.ts` and `features/consult/types.ts`
-  - [ ] **C2.** Extract message/bubble components (`Bubble`, `TypingIndicator`) into `features/consult/components/`
+  - [x] **C2.** Extract message/bubble components (`Bubble`, `TypingIndicator`) into `features/consult/components/`
   - [ ] **C3.** Extract `ScrollableConversation` and `ConsultLayout` into `features/consult/components/`
   - [ ] **C4.** `ConsultPageView` body becomes a thin composition; route file shrinks to <100 LOC
 - [x] Migration rollback strategy (currently append-only) — documented in `packages/db/README.md` (forward-only convention, how to revert via new migration, pre-flight checks)
