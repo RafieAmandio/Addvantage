@@ -211,13 +211,13 @@ create index on timeline_events (occurred_at desc);
 
 **New worker adapters:**
 - [ ] **Trump tweet adapter** — Truth Social RSS or scraper; run every 5 min
-- [ ] **Market data adapter** — Polygon.io, Alpaca, or Tiingo free tier → `instrument_bars`
+- [x] **Market data adapter** — Polygon.io, Alpaca, or Tiingo free tier → `instrument_bars` _(done Phase B1 — `apps/worker/src/adapters/bars/` with `TwelveDataAdapter`; switch providers by adding another adapter behind the same interface)_
 - [x] **Backfill job** — migrate existing `news_items` into `timeline_events` with `kind='news'` _(done tick 74 — migration 0014 unique-index + backfill + auto-mirror trigger; timeline query now reads timeline_events as single source)_
 
 **Web app:**
-- [ ] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated (page is thin, just composes reusable components)
-- [ ] Library: **Lightweight Charts** by TradingView (open source, free, MIT)
-- [ ] API route: `GET /api/bars?symbol=SPX&interval=1h&from=...&to=...`
+- [x] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated (page is thin, just composes reusable components) _(done Phase A4 — `apps/web/app/app/chart/[symbol]/page.tsx`)_
+- [x] Library: **Lightweight Charts** by TradingView (open source, free, MIT) _(done Phase A3 — dep in `apps/web/package.json`, wrapped by `features/chart/components/PriceChart.tsx`)_
+- [x] API route: `GET /api/bars?symbol=SPX&interval=1h&from=...&to=...` _(done Phase B3 — `apps/web/app/api/bars/route.ts` + `features/chart/queries/bars.ts`)_
 - [x] API route: `GET /api/events?symbols[]=SPX&from=...&to=...` _(done tick 75 — `apps/web/app/api/events/route.ts` wraps `listTimelineEvents` with IP rate limit 60/min, CDN `s-maxage=60 stale-while-revalidate=300`, accepts both `symbols=A,B` and `symbols[]=A&symbols[]=B`)_
 - [ ] Realtime: Supabase realtime channel on `timeline_events` for live pin drops
 
