@@ -76,21 +76,25 @@ export default async function ChartPage({
   const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-6 flex items-baseline justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             INSTRUMENT · TIMELINE
           </div>
-          <h1 className="mt-1 font-display text-5xl text-paper">
+          <h1 className="mt-1 font-display text-4xl text-paper sm:text-5xl">
             {symbol} <span className="italic text-lime">chart</span>
           </h1>
           <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
             {usingMock ? "mock OHLC" : `real OHLC · ${interval}`} · {bars.length} bars · {events.length} events
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <SymbolNav symbols={SUPPORTED_SYMBOLS} current={symbol} />
+        <div className="flex flex-col gap-2 sm:items-end">
+          <SymbolNav
+            symbols={SUPPORTED_SYMBOLS}
+            current={symbol}
+            className="flex-wrap"
+          />
           <IntervalPicker
             current={interval}
             hrefFor={(i) =>
@@ -98,6 +102,7 @@ export default async function ChartPage({
                 ? `/app/chart/${symbol}`
                 : `/app/chart/${symbol}?interval=${i}`
             }
+            className="flex-wrap"
           />
         </div>
       </div>

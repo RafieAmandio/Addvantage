@@ -267,7 +267,7 @@ create index on timeline_events (occurred_at desc);
 - [ ] **D3.** Realtime updates — subscribe to Supabase `postgres_changes` on `timeline_events` filtered by symbols; append new rows into `EventFeed` client-side. Needs `useTimelineEvents` hook (`features/timeline/hooks/`). Unblocked.
 - [ ] **D4.** User pins — `kind='user_pin'` insert flow, auth-gated. **Blocked** until real-auth (Section 2 Medium) lands.
 - [ ] **D5.** More macro sources — FOMC / CPI ingested into `timeline_events`. **Blocked** until economic-calendar provider is picked (Section 3).
-- [ ] **D6.** Mobile layout — responsive chart page (< lg breakpoint already stacks; audit tooltips, drawer, nav). Unblocked.
+- [x] **D6.** Mobile layout — responsive chart page (< lg breakpoint already stacks; audit tooltips, drawer, nav). _(done tick 89 — header stacks `flex-col sm:flex-row`, heading shrinks to `text-4xl` on mobile, SymbolNav + IntervalPicker get `flex-wrap` so the 5/4-item rows don't overflow narrow viewports)_
 
 ### Open questions
 - Market data provider: Polygon ($29/mo, good), Alpaca (free, US only), Tiingo (free, limited)? Pick one early.
