@@ -22,7 +22,8 @@
     "EMAIL_PROVIDER",
     "BREVO_API_KEY",
     "EMAIL_SENDER_EMAIL",
-    "EMAIL_SENDER_NAME"
+    "EMAIL_SENDER_NAME",
+    "RENEWAL_TEMPLATE_ID"
   ],
   "tasks": {
     "build": {

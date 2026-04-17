@@ -107,6 +107,11 @@ const EnvSchema = z.object({
     emptyToUndef,
     z.string().min(1).optional()
   ).transform((v) => v ?? "TradeVantage"),
+
+  /** Brevo numeric templateId used by the E3 renewal-reminder scheduler task.
+   *  Optional — when unset, the daily renewal cron is not registered and the
+   *  worker boots with no email traffic. */
+  RENEWAL_TEMPLATE_ID: z.coerce.number().int().positive().optional(),
 })
 .refine(
   (env) =>
