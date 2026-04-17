@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
 import { SymbolNav } from "@/features/chart/components/SymbolNav";
+import { SymbolSearch } from "@/features/chart/components/SymbolSearch";
 import {
   IntervalPicker,
   isChartInterval,
@@ -94,6 +95,15 @@ export default async function ChartPage({
             symbols={SUPPORTED_SYMBOLS}
             current={symbol}
             className="flex-wrap"
+          />
+          <SymbolSearch
+            symbols={SUPPORTED_SYMBOLS}
+            current={symbol}
+            hrefFor={(s) =>
+              interval === DEFAULT_INTERVAL
+                ? `/app/chart/${s}`
+                : `/app/chart/${s}?interval=${interval}`
+            }
           />
           <IntervalPicker
             current={interval}
