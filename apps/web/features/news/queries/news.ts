@@ -30,9 +30,32 @@ const NewsListItemSchema = NewsListRowSchema.omit({ status: true });
 export type NewsListItem = z.infer<typeof NewsListItemSchema>;
 
 /**
- * Full news_items row used by the admin review queues. Keep in sync with the
- * DB columns; new columns must be added here too or `listPendingNews` /
- * `listRejectedNews` will reject them.
+ * Narrow projection for the admin review/archive list pages. The detail page
+ * (`/admin/review/[id]`) still loads the full row via `getNewsItemById`.
+ */
+const NewsAdminListRowSchema = z.object({
+  id: z.string(),
+  source_code: z.string(),
+  headline: z.string(),
+  analysis: z.string(),
+  impact: ImpactSchema,
+  bias: BiasSchema,
+  affects: z.array(z.string()),
+  tags: z.array(z.string()),
+  fetched_at: z.string(),
+  reviewed_at: z.string().nullable(),
+});
+export type NewsAdminListItem = z.infer<typeof NewsAdminListRowSchema>;
+
+const NEWS_ADMIN_LIST_COLUMNS =
+  "id,source_code,headline,analysis,impact,bias,affects,tags,fetched_at,reviewed_at";
+
+const DEFAULT_ADMIN_LIST_LIMIT = 100;
+
+/**
+ * Full news_items row used by the admin review *detail* page. Keep in sync
+ * with the DB columns; new columns must be added here too or `getNewsItemById`
+ * will reject them.
  */
 const NewsRowSchema = z.object({
   id: z.string(),
@@ -114,27 +137,43 @@ export async function getApprovedNewsById(id: string): Promise<NewsListItem | nu
   return toListItem(parsed.data);
 }
 
-/** Admin: pending review queue, oldest first. */
-export async function listPendingNews(): Promise<NewsRow[]> {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("news_items")
-    .select("*")
-    .eq("status", "pending")
-    .order("fetched_at", { ascending: true });
-  if (error) throw error;
-  return NewsRowSchema.array().parse(data ?? []);
+export interface AdminListPage {
+  limit?: number;
+  offset?: number;
 }
 
-export async function listRejectedNews(): Promise<NewsRow[]> {
+/** Admin: pending review queue, oldest first. Paginated, narrow projection. */
+export async function listPendingNews(
+  page: AdminListPage = {},
+): Promise<NewsAdminListItem[]> {
+  const limit = page.limit ?? DEFAULT_ADMIN_LIST_LIMIT;
+  const offset = page.offset ?? 0;
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from("news_items")
-    .select("*")
-    .eq("status", "rejected")
-    .order("reviewed_at", { ascending: false });
+    .select(NEWS_ADMIN_LIST_COLUMNS)
+    .eq("status", "pending")
+    .order("fetched_at", { ascending: true })
+    .range(offset, offset + limit - 1);
   if (error) throw error;
-  return NewsRowSchema.array().parse(data ?? []);
+  return NewsAdminListRowSchema.array().parse(data ?? []);
+}
+
+/** Admin: rejected archive, newest first. Paginated, narrow projection. */
+export async function listRejectedNews(
+  page: AdminListPage = {},
+): Promise<NewsAdminListItem[]> {
+  const limit = page.limit ?? DEFAULT_ADMIN_LIST_LIMIT;
+  const offset = page.offset ?? 0;
+  const supabase = supabaseServer();
+  const { data, error } = await supabase
+    .from("news_items")
+    .select(NEWS_ADMIN_LIST_COLUMNS)
+    .eq("status", "rejected")
+    .order("reviewed_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+  if (error) throw error;
+  return NewsAdminListRowSchema.array().parse(data ?? []);
 }
 
 export async function getNewsItemById(id: string): Promise<NewsRow | null> {
