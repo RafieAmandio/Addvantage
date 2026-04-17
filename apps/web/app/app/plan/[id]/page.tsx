@@ -8,6 +8,7 @@ import {
 } from "@/features/plan/mock";
 import { PlanDetail } from "@/features/plan/components/PlanDetail";
 import { PlanSiblingKeys } from "@/features/plan/components/PlanSiblingKeys";
+import { NewsMentioningPlan } from "@/features/plan/components/NewsMentioningPlan";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 /**
@@ -74,6 +75,8 @@ export default function PlanDetailPage({
           </div>
         }
       />
+
+      <NewsMentioningPlan planId={plan.id} />
 
       {/* Prev / next siblings */}
       <div className="mx-auto max-w-7xl px-6 pb-12">

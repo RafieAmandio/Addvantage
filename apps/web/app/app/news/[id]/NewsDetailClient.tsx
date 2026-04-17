@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/Marker";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
+import { RelatedPlansChips } from "@/features/news/components/RelatedPlansChips";
 import { formatDate, formatTime } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
@@ -159,6 +160,11 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             </dl>
           </div>
         </div>
+
+        <RelatedPlansChips
+          planIds={item.related_plan_ids}
+          className="mt-12"
+        />
 
         {item.tags.length > 0 && (
           <div className="mt-12">

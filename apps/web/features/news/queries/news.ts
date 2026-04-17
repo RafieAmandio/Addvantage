@@ -24,6 +24,7 @@ const NewsListRowSchema = z.object({
   published_at: z.string().nullable(),
   fetched_at: z.string(),
   status: z.string(),
+  related_plan_ids: z.array(z.string()).nullable(),
 });
 
 const NewsListItemSchema = NewsListRowSchema.omit({ status: true });
@@ -83,7 +84,7 @@ const NewsRowSchema = z.object({
 export type NewsRow = z.infer<typeof NewsRowSchema>;
 
 const NEWS_LIST_COLUMNS =
-  "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status";
+  "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
 
 function toListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
   // Drop status from the public projection.

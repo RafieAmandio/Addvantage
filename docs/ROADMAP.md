@@ -143,7 +143,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ### Trading plan system
 - [ ] Real plan authoring flow for admins (not mock)
 - [ ] Setup outcome tracking (win/loss/R) tied to market close prices
-- [ ] Plan → news cross-links (via `news_items.related_plan_ids` — column exists, unused)
+- [x] Plan → news cross-links (via `news_items.related_plan_ids` — column exists, unused) _(done tick 56 — news_items.related_plan_ids surfaced both directions; column not yet populated, admin tooling for that is a future tick)_
 
 ### Consultation
 - [ ] Real LLM-backed chat (replace canned keyword replies)
