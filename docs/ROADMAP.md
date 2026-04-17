@@ -131,7 +131,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ## 3. Feature Backlog (non-infrastructure)
 
 ### Payment integration
-- [ ] **Provider-agnostic `PaymentAdapter` interface** — `apps/worker/src/adapters/payment/base.ts` (or similar) with `createCheckoutSession`, `verifyWebhook`, `mapStatus`. Mirror the BarsAdapter pattern from B1. (Decided tick 36.)
+- [x] **Provider-agnostic `PaymentAdapter` interface** — `apps/worker/src/adapters/payment/base.ts` (or similar) with `createCheckoutSession`, `verifyWebhook`, `mapStatus`. Mirror the BarsAdapter pattern from B1. (Decided tick 36.)
 - [ ] **`XenditAdapter` implementation** — first concrete adapter. Stripe / midtrans can plug in later behind the same interface. Envs: `XENDIT_SECRET_KEY`, `XENDIT_WEBHOOK_TOKEN`.
 - [ ] Webhook handler for tier upgrades/downgrades → update `profiles.tier`
 - [ ] Renewal + dunning emails
