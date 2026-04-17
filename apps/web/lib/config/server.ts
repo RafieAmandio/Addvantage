@@ -23,6 +23,13 @@ const ServerEnvSchema = z.object({
     emptyToUndef,
     z.string().min(1).optional()
   ),
+  // Xendit webhook static token (see apps/worker/src/adapters/payment/xendit.ts).
+  // Optional so web can boot without payment integration wired; the webhook
+  // route returns 503 when unset rather than 500-crashing.
+  XENDIT_WEBHOOK_TOKEN: z.preprocess(
+    emptyToUndef,
+    z.string().min(1).optional()
+  ),
 });
 
 const parsed = ServerEnvSchema.safeParse(process.env);
