@@ -58,6 +58,39 @@ export type Database = {
           },
         ]
       }
+      instrument_bars: {
+        Row: {
+          close: number | null
+          high: number | null
+          interval: string
+          low: number | null
+          open: number | null
+          symbol: string
+          ts: string
+          volume: number | null
+        }
+        Insert: {
+          close?: number | null
+          high?: number | null
+          interval: string
+          low?: number | null
+          open?: number | null
+          symbol: string
+          ts: string
+          volume?: number | null
+        }
+        Update: {
+          close?: number | null
+          high?: number | null
+          interval?: string
+          low?: number | null
+          open?: number | null
+          symbol?: string
+          ts?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       news_items: {
         Row: {
           affects: string[]
@@ -261,15 +294,78 @@ export type Database = {
           },
         ]
       }
+      timeline_events: {
+        Row: {
+          bias: string | null
+          body: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          impact: string | null
+          kind: string
+          metadata: Json | null
+          news_item_id: string | null
+          occurred_at: string
+          source_code: string | null
+          symbols: string[]
+          title: string
+          url: string | null
+        }
+        Insert: {
+          bias?: string | null
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string | null
+          kind: string
+          metadata?: Json | null
+          news_item_id?: string | null
+          occurred_at: string
+          source_code?: string | null
+          symbols?: string[]
+          title: string
+          url?: string | null
+        }
+        Update: {
+          bias?: string | null
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string | null
+          kind?: string
+          metadata?: Json | null
+          news_item_id?: string | null
+          occurred_at?: string
+          source_code?: string | null
+          symbols?: string[]
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_news_item_id_fkey"
+            columns: ["news_item_id"]
+            isOneToOne: false
+            referencedRelation: "news_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -361,6 +457,40 @@ export type TablesUpdate<
       }
       ? U
       : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {

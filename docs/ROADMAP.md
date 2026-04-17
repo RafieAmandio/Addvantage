@@ -232,10 +232,10 @@ create index on timeline_events (occurred_at desc);
 ### Rollout phases
 
 **Phase A — Skeleton (2-3 days):**
-- Migration 0007 (next available; current highest is 0006)
-- Stub `/app/chart/[symbol]` with hardcoded SPX + mock bars
-- Wire existing `news_items` as timeline events (join query, no backfill yet)
-- Lightweight Charts integration
+- [x] **A1.** Migration 0007 — `instrument_bars` + `timeline_events` tables, RLS, indexes
+- [ ] **A2.** Wire existing `news_items` as `timeline_events` via a feature query (`features/timeline/queries/timeline.ts`) — join, no backfill yet
+- [ ] **A3.** Add `lightweight-charts` dep + `features/chart/components/PriceChart.tsx` dumb wrapper
+- [ ] **A4.** Stub `/app/chart/[symbol]` route — composes `PriceChart` with hardcoded SPX mock bars + the timeline query from A2
 
 **Phase B — Real data (3-5 days):**
 - Market data adapter in worker
@@ -281,3 +281,5 @@ Once those land, Phase A of the timeline chart can start.
 
 - [ ] **[performance] Admin news queries select `*` and are unpaginated** — `listPendingNews` / `listRejectedNews` fetch every row of `news_items` with every column; as the queue grows, this gets slow and bloats the payload. Narrow the column list (match `listApprovedNews` at line 60) and add `.range()` pagination. _(found tick 1, apps/web/features/news/queries/news.ts:69-89)_
 - [ ] **[observability] Search query silently swallows errors** — `catch { return []; }` discards the error, so a broken search looks like "no results" with no signal in logs. Replace with `logger.warn("search failed", { error: err })` (logger already exists at `lib/logger.ts`) before returning `[]`. _(found tick 5, apps/web/features/search/search.ts:97)_
+- [ ] **[performance] timeline_events RLS policies use raw `auth.uid()`** — Supabase advisor `auth_rls_initplan` flags the `owner read user_pin` policy; `auth.uid()` is re-evaluated per row at scale. Wrap as `(select auth.uid())` in a follow-up migration. _(found tick 11, packages/db/migrations/0007_timeline.sql RLS section)_
+- [ ] **[performance] timeline_events_created_by_fkey lacks a covering index** — Supabase advisor `unindexed_foreign_keys`. Add `create index timeline_events_created_by_idx on public.timeline_events (created_by) where created_by is not null;` in a follow-up migration. _(found tick 11)_
