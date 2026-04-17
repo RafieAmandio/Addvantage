@@ -1,13 +1,31 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PriceChart } from "@/features/chart/components/PriceChart";
+import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
 import { generateMockBars } from "@/features/chart/mock";
+import { listBars } from "@/features/chart/queries/bars";
+import {
+  routeSymbolToCanonical,
+  type RouteSymbol,
+} from "@/features/chart/lib/symbols";
 import { listTimelineEvents, type TimelineEvent } from "@/features/timeline/queries/timeline";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const SUPPORTED_SYMBOLS = new Set(["SPX", "BTC", "ETH", "DXY", "GOLD"]);
+const SUPPORTED_SYMBOLS: readonly RouteSymbol[] = [
+  "SPX",
+  "BTC",
+  "ETH",
+  "DXY",
+  "GOLD",
+];
+
+function isSupportedSymbol(s: string): s is RouteSymbol {
+  return (SUPPORTED_SYMBOLS as readonly string[]).includes(s);
+}
+
+const DEFAULT_WINDOW_DAYS = 30;
+const DEFAULT_INTERVAL = "1h" as const;
 
 function formatTime(iso: string): string {
   return iso.slice(0, 16).replace("T", " ");
@@ -34,9 +52,37 @@ export default async function ChartPage({
   params: { symbol: string };
 }) {
   const symbol = params.symbol.toUpperCase();
-  if (!SUPPORTED_SYMBOLS.has(symbol)) notFound();
+  if (!isSupportedSymbol(symbol)) notFound();
 
-  const bars = generateMockBars(symbol);
+  const to = new Date();
+  const from = new Date(to.getTime() - DEFAULT_WINDOW_DAYS * 24 * 3600 * 1000);
+  const canonical = routeSymbolToCanonical(symbol);
+  const realBars = await listBars({
+    symbol: canonical,
+    interval: DEFAULT_INTERVAL,
+    from,
+    to,
+  });
+
+  // Drop rows with null OHLC (DB columns are nullable) — PriceChart needs numbers.
+  const chartBars: ChartBar[] = realBars.flatMap((b) => {
+    if (b.open === null || b.high === null || b.low === null || b.close === null) {
+      return [];
+    }
+    return [
+      {
+        time: b.ts,
+        open: b.open,
+        high: b.high,
+        low: b.low,
+        close: b.close,
+        volume: b.volume ?? undefined,
+      },
+    ];
+  });
+
+  const usingMock = chartBars.length === 0;
+  const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
   const sinceIso = bars[0]?.time;
   const events = await listTimelineEvents({
     symbols: [symbol],
@@ -55,7 +101,7 @@ export default async function ChartPage({
             {symbol} <span className="italic text-lime">chart</span>
           </h1>
           <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-            mock OHLC · phase A skeleton · {bars.length} bars · {events.length} events
+            {usingMock ? "mock OHLC" : `real OHLC · ${DEFAULT_INTERVAL}`} · {bars.length} bars · {events.length} events
           </div>
         </div>
         <nav className="flex gap-2 font-mono text-[10px] uppercase tracking-widest2">
@@ -78,6 +124,11 @@ export default async function ChartPage({
 
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-8">
+          {usingMock && (
+            <div className="mb-3 border border-amber-400/40 bg-amber-400/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-amber-400">
+              [mock data — instrument_bars empty]
+            </div>
+          )}
           <div className="border border-ink-3 bg-ink-2 p-3">
             <PriceChart bars={bars} seriesType="candlestick" height={520} />
           </div>
