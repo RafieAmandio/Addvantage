@@ -1,0 +1,35 @@
+import Link from "next/link";
+import { LogoMark, Wordmark } from "@/features/marketing/components/icons";
+
+export function MarketingFooter() {
+  return (
+    <footer className="mt-[140px] flex flex-wrap items-start justify-between gap-10 bg-ink-2 p-12 md:p-[140px]">
+      <div className="flex w-full max-w-[310px] flex-col gap-[42px]">
+        <div className="flex items-center gap-3">
+          <LogoMark size={45} />
+          <Wordmark size={36} />
+        </div>
+        <p className="font-mono text-base font-light leading-[1.4] text-paper">
+          +Vantage does not manage funds. ANTS accepts no liability for
+          trading decisions made by recipients. Liability waiver enforced at
+          signup.
+        </p>
+      </div>
+      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-paper">
+        <p className="font-bold">Surface</p>
+        <p>Telegram (free pillars)</p>
+        <p>DOMAIN web (paid)</p>
+        <p>1v1 Consult</p>
+      </div>
+      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-paper">
+        <p className="font-bold">Operator</p>
+        <Link href="/login" className="hover:text-lime">
+          Login
+        </Link>
+        <Link href="/signup" className="hover:text-lime">
+          Request Access
+        </Link>
+      </div>
+    </footer>
+  );
+}
