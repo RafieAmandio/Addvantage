@@ -106,7 +106,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ### Medium priority
 - [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only)
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
-- [ ] **Retry/backoff** on Supabase + OpenAI calls (HTTP already has retries)
+- [x] **Retry/backoff** on Supabase + OpenAI calls — generic helper at `apps/worker/src/lib/retry.ts`; wraps OpenAI rephrase + Supabase persist insert/loadExistingHashes
 - [x] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`
 - [x] **Zod validation at query boundaries** — replace `as NewsRow` casts with schema parses; admin/sources page lifted into `features/sources/queries/`
 - [ ] **Deploy pipeline for worker** — GHCR image build + SSH deploy to VPS on main push

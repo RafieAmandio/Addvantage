@@ -1,6 +1,7 @@
 import { openai as getOpenai } from "../lib/openai";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
+import { retry } from "../lib/retry";
 import {
   HASHTAGS,
   BIAS_LEVELS,
@@ -64,22 +65,35 @@ ${rawText}
 
 Return the rewritten item as structured JSON matching the schema.`;
 
-  const res = await getOpenai().chat.completions.create({
-    model: config.OPENAI_MODEL,
-    temperature: 0.4,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: user },
-    ],
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "news_item",
-        strict: true,
-        schema: RESPONSE_SCHEMA,
+  const res = await retry(
+    () =>
+      getOpenai().chat.completions.create({
+        model: config.OPENAI_MODEL,
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: user },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "news_item",
+            strict: true,
+            schema: RESPONSE_SCHEMA,
+          },
+        },
+      }),
+    {
+      label: "openai.rephrase",
+      attempts: 3,
+      // Don't retry user-error responses (4xx); only transient infra issues.
+      shouldRetry: (err) => {
+        const status = (err as { status?: number } | null)?.status;
+        if (typeof status === "number") return status >= 500 || status === 429;
+        return true;
       },
-    },
-  });
+    }
+  );
 
   const text = res.choices[0]?.message?.content;
   if (!text) throw new Error("openai: empty response");

@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { contentHash } from "../lib/hash";
 import { logger } from "../lib/logger";
+import { retry } from "../lib/retry";
 import { rephrase } from "./rephrase";
 import type { Candidate } from "../adapters/base";
 
@@ -51,26 +52,30 @@ export async function persistCandidates(
       continue;
     }
 
-    const { data, error } = await supabase()
-      .from("news_items")
-      .insert({
-        source_code: sourceCode,
-        source_url: c.sourceUrl,
-        content_hash: hash,
-        fetched_at: new Date().toISOString(),
-        raw_text: c.rawText,
-        headline: rephrased.headline,
-        rephrased: rephrased.rephrased,
-        analysis: rephrased.analysis,
-        impact: rephrased.impact,
-        bias: rephrased.bias,
-        affects: rephrased.affects,
-        tags: rephrased.tags,
-        author: `[${sourceCode}]`,
-        status: "pending",
-      })
-      .select("id")
-      .single();
+    const { data, error } = await retry(
+      async () =>
+        supabase()
+          .from("news_items")
+          .insert({
+            source_code: sourceCode,
+            source_url: c.sourceUrl,
+            content_hash: hash,
+            fetched_at: new Date().toISOString(),
+            raw_text: c.rawText,
+            headline: rephrased.headline,
+            rephrased: rephrased.rephrased,
+            analysis: rephrased.analysis,
+            impact: rephrased.impact,
+            bias: rephrased.bias,
+            affects: rephrased.affects,
+            tags: rephrased.tags,
+            author: `[${sourceCode}]`,
+            status: "pending",
+          })
+          .select("id")
+          .single(),
+      { label: "supabase.news_items.insert", attempts: 3 }
+    );
 
     if (error || !data) {
       logger.error({ err: error?.message, externalId: c.externalId }, "insert failed");
@@ -89,10 +94,14 @@ export async function persistCandidates(
  * dedupe without one round-trip per candidate.
  */
 export async function loadExistingHashes(sourceCode: string): Promise<Set<string>> {
-  const { data, error } = await supabase()
-    .from("news_items")
-    .select("content_hash")
-    .eq("source_code", sourceCode);
+  const { data, error } = await retry(
+    async () =>
+      supabase()
+        .from("news_items")
+        .select("content_hash")
+        .eq("source_code", sourceCode),
+    { label: "supabase.news_items.loadHashes", attempts: 3 }
+  );
   if (error) {
     logger.error({ err: error.message, sourceCode }, "loadExistingHashes failed");
     return new Set();
