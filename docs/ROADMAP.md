@@ -89,7 +89,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ### Critical (must fix before real users)
 - [ ] **Rotate Supabase service role key** — currently visible in `apps/worker/.env`; verify git history is clean
 - [ ] **Add `.env` to `.gitignore` audit** — confirm no secrets ever committed
-- [ ] **Add `app/error.tsx` and `app/global-error.tsx`** — web app has no error boundaries
+- [x] **Add `app/error.tsx` and `app/global-error.tsx`** — web app has no error boundaries
 - [ ] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
 
 ### High priority
@@ -273,3 +273,9 @@ create index on timeline_events (occurred_at desc);
 7. Pick market data provider and sign up
 
 Once those land, Phase A of the timeline chart can start.
+
+---
+
+## 6. Improvement Backlog (auto-discovered)
+
+- [ ] **[performance] Admin news queries select `*` and are unpaginated** — `listPendingNews` / `listRejectedNews` fetch every row of `news_items` with every column; as the queue grows, this gets slow and bloats the payload. Narrow the column list (match `listApprovedNews` at line 60) and add `.range()` pagination. _(found tick 1, apps/web/features/news/queries/news.ts:69-89)_
