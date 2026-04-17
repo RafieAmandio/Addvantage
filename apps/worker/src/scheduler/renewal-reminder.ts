@@ -7,7 +7,7 @@ import { getEmailAdapter, EMAIL_ADAPTERS } from "../adapters/email";
 /**
  * E3: Renewal reminder job.
  *
- * Runs daily. Finds profiles whose `tier_renewal_at` falls in a one-day window
+ * Runs daily. Finds profiles whose `renews_at` falls in a one-day window
  * (6 to 7 days out) and sends a Brevo transactional template. Every successful
  * send is recorded in `email_log` with kind='renewal_reminder' so re-runs
  * within a 7-day window don't double-send.
@@ -46,15 +46,15 @@ export async function runRenewalReminders(): Promise<void> {
     now.getTime() - 7 * 24 * 60 * 60 * 1000
   ).toISOString();
 
-  // Fetch candidate profiles in the renewal window. Bound to tier_renewal_at
+  // Fetch candidate profiles in the renewal window. Bound to renews_at
   // partial index, so this stays cheap even as profiles grows.
   const { data: profiles, error: profilesErr } = await retry(
     async () =>
       supabase()
         .from("profiles")
-        .select("id,email,handle,tier,tier_renewal_at")
-        .gte("tier_renewal_at", windowStart.toISOString())
-        .lt("tier_renewal_at", windowEnd.toISOString()),
+        .select("id,email,handle,tier,renews_at")
+        .gte("renews_at", windowStart.toISOString())
+        .lt("renews_at", windowEnd.toISOString()),
     { label: "supabase.profiles.renewalWindow", attempts: 3 }
   );
 
@@ -124,7 +124,7 @@ export async function runRenewalReminders(): Promise<void> {
             },
             templateId: config.RENEWAL_TEMPLATE_ID as number,
             params: {
-              tier_renewal_at: p.tier_renewal_at,
+              renews_at: p.renews_at,
               tier: p.tier,
             },
           }),

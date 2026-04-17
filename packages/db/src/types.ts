@@ -231,7 +231,6 @@ export type Database = {
           renews_at: string | null
           signed_liability: boolean
           tier: string
-          tier_renewal_at: string | null
           updated_at: string
         }
         Insert: {
@@ -245,7 +244,6 @@ export type Database = {
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
-          tier_renewal_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -259,7 +257,6 @@ export type Database = {
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
-          tier_renewal_at?: string | null
           updated_at?: string
         }
         Relationships: []
