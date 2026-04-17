@@ -11,6 +11,7 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "run:once": "tsx src/cli/run-once.ts",
+    "run:bars": "tsx src/cli/run-bars.ts",
     "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
