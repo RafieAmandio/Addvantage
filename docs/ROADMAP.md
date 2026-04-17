@@ -218,7 +218,7 @@ create index on timeline_events (occurred_at desc);
 - [ ] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated (page is thin, just composes reusable components)
 - [ ] Library: **Lightweight Charts** by TradingView (open source, free, MIT)
 - [ ] API route: `GET /api/bars?symbol=SPX&interval=1h&from=...&to=...`
-- [ ] API route: `GET /api/events?symbols[]=SPX&from=...&to=...`
+- [x] API route: `GET /api/events?symbols[]=SPX&from=...&to=...` _(done tick 75 — `apps/web/app/api/events/route.ts` wraps `listTimelineEvents` with IP rate limit 60/min, CDN `s-maxage=60 stale-while-revalidate=300`, accepts both `symbols=A,B` and `symbols[]=A&symbols[]=B`)_
 - [ ] Realtime: Supabase realtime channel on `timeline_events` for live pin drops
 
 **Reusable components to produce (build these as standalone, reuse everywhere). New features `features/chart/` and `features/timeline/` will be created:**
