@@ -87,7 +87,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ## 2. Production Readiness Gaps
 
 ### Critical (must fix before real users)
-- [ ] **Rotate Supabase service role key** — currently visible in `apps/worker/.env`; verify git history is clean
+- [x] **Rotate Supabase service role key** — currently visible in `apps/worker/.env`; verify git history is clean _(skipped — user decision tick 36; current key remains in use)_
 - [x] **Add `.env` to `.gitignore` audit** — confirm no secrets ever committed
 - [x] **Add `app/error.tsx` and `app/global-error.tsx`** — web app has no error boundaries
 - [x] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
@@ -95,10 +95,10 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ### High priority
 - [ ] **Error tracking** — Sentry on both apps (web + worker), DSN via env
 - [x] **Structured logging on web** — currently only `console.error` in one place
-- [ ] **Ship worker logs off-box** — pino → Axiom / Better Stack / Loki
+- [ ] **Ship worker logs off-box (Better Stack / Logtail)** — pino → `@logtail/pino` transport. Free tier 1GB/mo + 3-day retention. Env: `LOGTAIL_SOURCE_TOKEN` (optional — when unset, worker logs stdout only, never crashes). (Decided tick 36.)
 - [x] **Health check endpoint (web)** — `/api/health` returns 200/503 with Supabase ping
 - [x] **Heartbeat pings from worker** — provider-agnostic outbound POST every `HEARTBEAT_INTERVAL_MIN` minutes (default 5) to `HEARTBEAT_URL`; works with healthchecks.io, BetterStack, etc. Disabled when env unset.
-- [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
+- [ ] **Rate limiting (Upstash Redis)** — `@upstash/ratelimit` token bucket on admin endpoints, server actions, and OpenAI-touching paths. Same Upstash credentials reused for response caching (`/api/bars` etc.). Envs: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. (Decided tick 36.)
 - [x] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14
 - [x] **GitHub Actions CI** — typecheck + lint + build on every PR
@@ -127,7 +127,8 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 ## 3. Feature Backlog (non-infrastructure)
 
 ### Payment integration
-- [ ] Real subscription billing — Stripe or midtrans (IDR). Currently mock ledger
+- [ ] **Provider-agnostic `PaymentAdapter` interface** — `apps/worker/src/adapters/payment/base.ts` (or similar) with `createCheckoutSession`, `verifyWebhook`, `mapStatus`. Mirror the BarsAdapter pattern from B1. (Decided tick 36.)
+- [ ] **`XenditAdapter` implementation** — first concrete adapter. Stripe / midtrans can plug in later behind the same interface. Envs: `XENDIT_SECRET_KEY`, `XENDIT_WEBHOOK_TOKEN`.
 - [ ] Webhook handler for tier upgrades/downgrades → update `profiles.tier`
 - [ ] Renewal + dunning emails
 
