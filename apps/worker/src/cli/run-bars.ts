@@ -19,8 +19,9 @@
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
+import { singleflight } from "../lib/singleflight";
 import { supabase } from "../lib/supabase";
-import { getBarsAdapter, type Interval } from "../adapters/bars";
+import { getBarsAdapter, type Bar, type Interval } from "../adapters/bars";
 
 const VALID_INTERVALS: readonly Interval[] = ["1m", "5m", "1h", "1d"];
 
@@ -75,7 +76,13 @@ async function main() {
     "run:bars: fetching"
   );
 
-  const bars = await adapter.fetchBars({ symbol, interval, from, to });
+  // Coalesce concurrent invocations with the same (provider, symbol,
+   // interval, window) onto a single Twelve Data call. Ten-second request
+   // bursts from parallel CLI runs or retries thus share one upstream hit.
+   const sfKey = `bars:${adapter.code}:${symbol}:${interval}:${from.toISOString()}:${to.toISOString()}`;
+   const bars = await singleflight<Bar[]>(sfKey, 30, () =>
+     adapter.fetchBars({ symbol, interval, from, to }),
+   );
 
   logger.info(
     { symbol, interval, count: bars.length },
