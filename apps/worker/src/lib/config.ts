@@ -76,6 +76,16 @@ const EnvSchema = z.object({
     emptyToUndef,
     z.string().min(1).optional()
   ),
+
+  /** Xendit payment provider. Both envs optional — when either is unset the
+   *  XenditAdapter will not self-register in `adapters/payment/index.ts`,
+   *  and `getPaymentAdapter('xendit')` will throw the standard
+   *  "unknown adapter" error. */
+  XENDIT_SECRET_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  XENDIT_WEBHOOK_TOKEN: z.preprocess(
+    emptyToUndef,
+    z.string().min(1).optional()
+  ),
 })
 .refine(
   (env) =>
