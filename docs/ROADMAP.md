@@ -117,7 +117,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 
 ### Low priority
 - [x] Admin routes: redirect instead of rendering "FORBIDDEN"
-- [ ] Pin Node version in Vercel project settings
+- [x] Pin Node version in Vercel project settings _(done tick 57 — `.nvmrc=20` + root `engines.node>=20.0.0` + `apps/web/package.json` `engines.node="20.x"`; Vercel reads .nvmrc and apps/web engines automatically.)_
 - [x] Split `/app/consult/page.tsx` (was 1021 LOC; now 19 after C4)
   - [x] **C1.** Extract pure helpers — `sessionMatchesQuery`, `pickReply`+`CANNED_REPLIES`, `sessionToMarkdown`, types — into `features/consult/lib/{search,replies,export}.ts` and `features/consult/types.ts`
   - [x] **C2.** Extract message/bubble components (`Bubble`, `TypingIndicator`) into `features/consult/components/`
