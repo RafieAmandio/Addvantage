@@ -1,19 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { calendar, CURRENCIES } from "@/features/calendar/mock";
-import { DataLabel } from "@/components/ui/Marker";
-import { cn } from "@/lib/cn";
+import { calendar } from "@/features/calendar/mock";
 import {
   DEMO_TODAY_YMD,
-  REGIONS,
   type ImpactFilter,
   type RegionFilter,
   type ViewMode,
 } from "@/features/calendar/types";
-import { addDays, wibYmd } from "@/features/calendar/lib/date";
-import { formatDayHeader } from "@/features/calendar/lib/format";
+import { wibYmd } from "@/features/calendar/lib/date";
 import {
   parseAnchor,
   parseImpact,
@@ -21,12 +17,16 @@ import {
   parseViewMode,
   rangeForView,
   rangeLabel,
-  stepAnchor,
 } from "@/features/calendar/lib/view";
-import { deriveSummary, groupByDay } from "@/features/calendar/lib/group";
-import { FilterChips } from "@/features/calendar/components/FilterChips";
-import { EventRow } from "@/features/calendar/components/EventRow";
+import { groupByDay } from "@/features/calendar/lib/group";
 import { MonthGrid } from "@/features/calendar/components/MonthGrid";
+import { CalendarHero } from "@/features/calendar/components/CalendarHero";
+import { CalendarToolbar } from "@/features/calendar/components/CalendarToolbar";
+import { CalendarFilterBar } from "@/features/calendar/components/CalendarFilterBar";
+import { CalendarEmptyState } from "@/features/calendar/components/CalendarEmptyState";
+import { CalendarDayWeekTable } from "@/features/calendar/components/CalendarDayWeekTable";
+import { CalendarLegend } from "@/features/calendar/components/CalendarLegend";
+import { useCalendarKeyboard } from "@/features/calendar/hooks/useCalendarKeyboard";
 
 export function CalendarPageView() {
   const router = useRouter();
@@ -57,27 +57,8 @@ export function CalendarPageView() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [view, anchor, impactFilter, regionFilter, pathname, router]);
 
-  // Keyboard shortcuts: [ / ] view-step, j / k day-step, t today.
-  // Dispatched from the global Shortcuts component via CustomEvents.
-  useEffect(() => {
-    const onStep = (e: Event) => {
-      const dir = (e as CustomEvent<number>).detail === -1 ? -1 : 1;
-      setAnchor((a) => stepAnchor(view, a, dir as 1 | -1));
-    };
-    const onDayStep = (e: Event) => {
-      const dir = (e as CustomEvent<number>).detail === -1 ? -1 : 1;
-      setAnchor((a) => addDays(a, dir));
-    };
-    const onToday = () => setAnchor(DEMO_TODAY_YMD);
-    window.addEventListener("ants:calendar-step", onStep);
-    window.addEventListener("ants:calendar-day-step", onDayStep);
-    window.addEventListener("ants:calendar-today", onToday);
-    return () => {
-      window.removeEventListener("ants:calendar-step", onStep);
-      window.removeEventListener("ants:calendar-day-step", onDayStep);
-      window.removeEventListener("ants:calendar-today", onToday);
-    };
-  }, [view]);
+  const setAnchorAbsolute = useCallback((ymd: string) => setAnchor(ymd), []);
+  useCalendarKeyboard(view, setAnchor, setAnchorAbsolute);
 
   const { start, end } = useMemo(() => rangeForView(view, anchor), [view, anchor]);
 
@@ -95,10 +76,10 @@ export function CalendarPageView() {
 
   const filtersActive = impactFilter !== "all" || regionFilter !== "all";
 
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setImpactFilter("all");
     setRegionFilter("all");
-  };
+  }, []);
 
   /**
    * Find the nearest event matching current filters (ignoring date range).
@@ -113,16 +94,13 @@ export function CalendarPageView() {
     });
     if (matching.length === 0) return { forward: null, backward: null };
 
-    const rangeEnd = end;
-    const rangeStart = start;
-
     const forwardEvents = matching
       .map((e) => wibYmd(e.ts))
-      .filter((ymd) => ymd > rangeEnd)
+      .filter((ymd) => ymd > end)
       .sort();
     const backwardEvents = matching
       .map((e) => wibYmd(e.ts))
-      .filter((ymd) => ymd < rangeStart)
+      .filter((ymd) => ymd < start)
       .sort()
       .reverse();
 
@@ -132,146 +110,39 @@ export function CalendarPageView() {
     };
   }, [start, end, impactFilter, regionFilter]);
 
-  const jumpToNearest = (dir: 1 | -1) => {
-    const target =
-      dir === 1 ? nearestEventDate.forward : nearestEventDate.backward;
-    if (target) setAnchor(target);
-  };
+  const jumpToNearest = useCallback(
+    (dir: 1 | -1) => {
+      const target =
+        dir === 1 ? nearestEventDate.forward : nearestEventDate.backward;
+      if (target) setAnchor(target);
+    },
+    [nearestEventDate]
+  );
+
+  const goToday = useCallback(() => setAnchor(DEMO_TODAY_YMD), []);
 
   return (
     <div>
-      {/* ─── HERO ─── */}
-      <div className="border-b border-ink-3 bg-ink-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          <DataLabel>Transmission TX-02 · Free pillar</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-paper">
-            Economic <span className="italic text-lime">Calendar</span>
-          </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
-            Every high-impact release that moves global and IDX markets.
-            Per-currency impact scoring, curated day summaries, and the
-            desk's note on what actually matters — not the wire blurb.
-          </p>
-        </div>
-      </div>
+      <CalendarHero />
 
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        {/* ─── CONTROLS ROW ─── */}
-        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          {/* View selector */}
-          <div className="flex gap-px bg-ink-3" role="tablist" aria-label="Calendar view">
-            {(["day", "week", "month"] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                role="tab"
-                aria-selected={view === v}
-                className={cn(
-                  "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
-                  view === v
-                    ? "bg-lime text-ink"
-                    : "bg-ink-2 text-paper/60 hover:bg-ink-2 hover:text-paper"
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+        <CalendarToolbar
+          view={view}
+          anchor={anchor}
+          eventCount={filtered.length}
+          onViewChange={setView}
+          onAnchorChange={setAnchor}
+        />
 
-          {/* Date stepper */}
-          <div className="flex items-center justify-center gap-2 lg:gap-3">
-            <button
-              onClick={() => setAnchor(stepAnchor(view, anchor, -1))}
-              aria-label={`Previous ${view}`}
-              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
-            >
-              ←
-            </button>
-            <div className="min-w-[180px] border border-lime/40 bg-ink-2/40 px-4 py-2 text-center">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                {view === "day"
-                  ? "Day"
-                  : view === "week"
-                  ? "Week"
-                  : "Month"}
-              </div>
-              <div className="font-display text-base text-lime">
-                {rangeLabel(view, anchor)}
-              </div>
-            </div>
-            <button
-              onClick={() => setAnchor(stepAnchor(view, anchor, 1))}
-              aria-label={`Next ${view}`}
-              className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
-            >
-              →
-            </button>
-            <button
-              onClick={() => setAnchor(DEMO_TODAY_YMD)}
-              disabled={anchor === DEMO_TODAY_YMD}
-              className={cn(
-                "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
-                anchor === DEMO_TODAY_YMD
-                  ? "cursor-default border-ink-3 text-paper/30"
-                  : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
-              )}
-            >
-              Today
-            </button>
-          </div>
+        <CalendarFilterBar
+          impactFilter={impactFilter}
+          regionFilter={regionFilter}
+          filtersActive={filtersActive}
+          onImpactChange={setImpactFilter}
+          onRegionChange={setRegionFilter}
+          onReset={resetFilters}
+        />
 
-          {/* Counts */}
-          <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            <span className="text-lime">{filtered.length}</span>
-            <span>events in view</span>
-          </div>
-        </div>
-
-        {/* ─── FILTER CHIPS ─── */}
-        <div className="mb-6 grid grid-cols-1 gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-              Impact
-            </span>
-            <FilterChips
-              options={[
-                { value: "all", label: "All" },
-                { value: "high", label: "High" },
-                { value: "medium", label: "Mod" },
-                { value: "low", label: "Low" },
-              ]}
-              value={impactFilter}
-              onChange={(v) => setImpactFilter(v as ImpactFilter)}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-              Region
-            </span>
-            <FilterChips
-              options={[
-                { value: "all", label: "All" },
-                ...REGIONS.map((r) => ({ value: r, label: r })),
-              ]}
-              value={regionFilter}
-              onChange={(v) => setRegionFilter(v as RegionFilter)}
-            />
-          </div>
-
-          <div className="flex justify-end">
-            {filtersActive && (
-              <button
-                onClick={resetFilters}
-                className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
-              >
-                ✕ Reset filters
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* ─── MONTH GRID ─── */}
         {view === "month" && (
           <div className="relative">
             <MonthGrid
@@ -284,205 +155,45 @@ export function CalendarPageView() {
             />
             {filtered.length === 0 && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                <div className="pointer-events-auto max-w-md border border-lime bg-ink-2/95 p-6 text-center shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
-                    ● NULL TRANSMISSION
-                  </div>
-                  <div className="mt-3 font-display text-2xl text-paper">
-                    No events in {rangeLabel("month", anchor)}.
-                  </div>
-                  <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-                    {filtersActive
-                      ? "Filters are excluding everything in this month."
-                      : "The desk hasn't published anything in this window."}
-                  </div>
-                  <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    {nearestEventDate.backward && (
-                      <button
-                        onClick={() => jumpToNearest(-1)}
-                        className="border border-lime/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-                      >
-                        ← Prev event
-                      </button>
-                    )}
-                    <button
-                      onClick={() => setAnchor(DEMO_TODAY_YMD)}
-                      disabled={anchor === DEMO_TODAY_YMD}
-                      className={cn(
-                        "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2",
-                        anchor === DEMO_TODAY_YMD
-                          ? "cursor-default border-ink-3 text-paper/30"
-                          : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
-                      )}
-                    >
-                      Today
-                    </button>
-                    {nearestEventDate.forward && (
-                      <button
-                        onClick={() => jumpToNearest(1)}
-                        className="border border-lime/60 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-                      >
-                        Next event →
-                      </button>
-                    )}
-                    {filtersActive && (
-                      <button
-                        onClick={resetFilters}
-                        className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
-                      >
-                        ✕ Reset filters
-                      </button>
-                    )}
-                  </div>
+                <div className="pointer-events-auto border border-lime bg-ink-2/95 p-6 shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
+                  <CalendarEmptyState
+                    variant="month"
+                    title={`No events in ${rangeLabel("month", anchor)}.`}
+                    filtersActive={filtersActive}
+                    nearestBackward={nearestEventDate.backward}
+                    nearestForward={nearestEventDate.forward}
+                    anchor={anchor}
+                    onJumpToNearest={jumpToNearest}
+                    onToday={goToday}
+                    onResetFilters={resetFilters}
+                  />
                 </div>
               </div>
             )}
           </div>
         )}
 
-        {/* ─── DAY / WEEK TABLE ─── */}
         {view !== "month" && (
-        <div className="overflow-x-auto border border-ink-3">
-          <div className="min-w-[780px]">
-            <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-lime/40 bg-ink-2/95 px-3 py-2 backdrop-blur">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
-                Event
-              </div>
-              <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
-                Time
-              </div>
-              <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
-                Impact
-              </div>
-              {CURRENCIES.map((c) => (
-                <div
-                  key={c}
-                  className="text-center font-mono text-[10px] uppercase tracking-widest2 text-lime"
-                >
-                  {c}
-                </div>
-              ))}
-            </div>
-
-            {groups.length === 0 && (
-              <div className="border-y border-ink-3 bg-ink-2/40 p-12 text-center">
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
-                  ● NULL TRANSMISSION
-                </div>
-                <div className="mt-3 font-display text-2xl text-paper">
-                  No events in this {view}.
-                </div>
-                <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-                  {filtersActive
-                    ? "Filters are excluding everything in this range."
-                    : "Try a different range — the desk doesn't fabricate releases to fill a screen."}
-                </div>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  {nearestEventDate.backward && (
-                    <button
-                      onClick={() => jumpToNearest(-1)}
-                      className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-                    >
-                      ← Prev event · {formatDayHeader(nearestEventDate.backward)}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setAnchor(DEMO_TODAY_YMD)}
-                    disabled={anchor === DEMO_TODAY_YMD}
-                    className={cn(
-                      "border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2",
-                      anchor === DEMO_TODAY_YMD
-                        ? "cursor-default border-ink-3 text-paper/30"
-                        : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
-                    )}
-                  >
-                    Today
-                  </button>
-                  {nearestEventDate.forward && (
-                    <button
-                      onClick={() => jumpToNearest(1)}
-                      className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
-                    >
-                      Next event · {formatDayHeader(nearestEventDate.forward)} →
-                    </button>
-                  )}
-                  {filtersActive && (
-                    <button
-                      onClick={resetFilters}
-                      className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
-                    >
-                      ✕ Reset filters
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {groups.map(({ ymd, events }) => {
-              const summary = deriveSummary(events);
-              return (
-                <section key={ymd}>
-                  <div className="border-y border-ink-3 bg-ink-2/60 px-3 py-2.5">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                        {formatDayHeader(ymd)}
-                      </span>
-                      <span className="h-px flex-1 bg-lime/20" />
-                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
-                        — {summary}
-                      </span>
-                    </div>
-                  </div>
-                  {events.map((e) => (
-                    <EventRow
-                      key={e.id}
-                      event={e}
-                      anchorYmd={ymd}
-                      showTimeOffset={view !== "day"}
-                    />
-                  ))}
-                </section>
-              );
-            })}
-          </div>
-        </div>
+          <CalendarDayWeekTable
+            view={view}
+            groups={groups}
+            emptyState={
+              <CalendarEmptyState
+                variant="table"
+                title={`No events in this ${view}.`}
+                filtersActive={filtersActive}
+                nearestBackward={nearestEventDate.backward}
+                nearestForward={nearestEventDate.forward}
+                anchor={anchor}
+                onJumpToNearest={jumpToNearest}
+                onToday={goToday}
+                onResetFilters={resetFilters}
+              />
+            }
+          />
         )}
 
-        {/* ─── LEGEND ─── */}
-        <div className="mt-8 border border-ink-3 bg-ink-2/30 p-4">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-            ● Reading the table
-          </div>
-          <div className="mt-3 grid grid-cols-1 gap-4 text-sm text-paper/70 sm:grid-cols-3">
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                Impact pill
-              </div>
-              <div className="mt-1 text-xs text-paper/60">
-                Overall market impact — High / Mod / Low. Applies to rates,
-                equities, and FX in general.
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                Currency scores
-              </div>
-              <div className="mt-1 text-xs text-paper/60">
-                Per-currency reaction scoring, 0 – 9. Higher = more expected
-                movement in that currency vs. all others.
-              </div>
-            </div>
-            <div>
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                Time format
-              </div>
-              <div className="mt-1 text-xs text-paper/60">
-                HHMM in WIB (UTC+7). The "+N" suffix is the day offset from
-                that day's section header.
-              </div>
-            </div>
-          </div>
-        </div>
+        <CalendarLegend />
       </div>
     </div>
   );
