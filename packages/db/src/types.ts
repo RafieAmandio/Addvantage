@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_log: {
+        Row: {
+          external_message_id: string | null
+          id: string
+          kind: string
+          payload: Json | null
+          profile_id: string | null
+          provider: string
+          sent_at: string | null
+          template_id: string | null
+        }
+        Insert: {
+          external_message_id?: string | null
+          id?: string
+          kind: string
+          payload?: Json | null
+          profile_id?: string | null
+          provider: string
+          sent_at?: string | null
+          template_id?: string | null
+        }
+        Update: {
+          external_message_id?: string | null
+          id?: string
+          kind?: string
+          payload?: Json | null
+          profile_id?: string | null
+          provider?: string
+          sent_at?: string | null
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_log_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingestion_runs: {
         Row: {
           error: string | null
@@ -190,6 +231,7 @@ export type Database = {
           renews_at: string | null
           signed_liability: boolean
           tier: string
+          tier_renewal_at: string | null
           updated_at: string
         }
         Insert: {
@@ -203,6 +245,7 @@ export type Database = {
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
+          tier_renewal_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -216,6 +259,7 @@ export type Database = {
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
+          tier_renewal_at?: string | null
           updated_at?: string
         }
         Relationships: []
