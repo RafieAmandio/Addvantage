@@ -40,22 +40,27 @@ export default async function ChartPage({
   const to = new Date();
   const from = new Date(to.getTime() - DEFAULT_WINDOW_DAYS * 24 * 3600 * 1000);
   const canonical = routeSymbolToCanonical(symbol);
-  const realBars = await listBars({
-    symbol: canonical,
-    interval: DEFAULT_INTERVAL,
-    from,
-    to,
-  });
+  // Bars + timeline are independent reads — fan out so total wait = max(t1, t2)
+  // instead of t1 + t2. Both scope to the same window so the page tells one
+  // consistent story.
+  const [realBars, events] = await Promise.all([
+    listBars({
+      symbol: canonical,
+      interval: DEFAULT_INTERVAL,
+      from,
+      to,
+    }),
+    listTimelineEvents({
+      symbols: [symbol],
+      from: from.toISOString(),
+      to: to.toISOString(),
+      limit: 50,
+    }),
+  ]);
 
   const chartBars = toChartBars(realBars);
   const usingMock = chartBars.length === 0;
   const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
-  const sinceIso = bars[0]?.time;
-  const events = await listTimelineEvents({
-    symbols: [symbol],
-    from: sinceIso,
-    limit: 50,
-  });
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
