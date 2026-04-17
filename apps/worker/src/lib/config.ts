@@ -86,6 +86,27 @@ const EnvSchema = z.object({
     emptyToUndef,
     z.string().min(1).optional()
   ),
+
+  /** Brevo (formerly Sendinblue) transactional email provider. When
+   *  BREVO_API_KEY is unset the BrevoAdapter will not self-register in
+   *  `adapters/email/index.ts`, and `getEmailAdapter('brevo')` will throw
+   *  the standard "unknown adapter" error. EMAIL_PROVIDER is reserved for
+   *  the scheduler/webhook wiring (E3/E4) to pick a default sender. */
+  EMAIL_PROVIDER: z.preprocess(emptyToUndef, z.enum(["brevo"]).optional()),
+  BREVO_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  /** Verified-sender identity used by every outbound email. Brevo (and most
+   *  transactional providers) will reject sends from any address that isn't
+   *  verified in the provider dashboard. TODO: override these in prod env
+   *  before going live — the defaults below are placeholders so dev boots
+   *  cleanly. */
+  EMAIL_SENDER_EMAIL: z.preprocess(
+    emptyToUndef,
+    z.string().email().optional()
+  ).transform((v) => v ?? "noreply@tradevantage.app"),
+  EMAIL_SENDER_NAME: z.preprocess(
+    emptyToUndef,
+    z.string().min(1).optional()
+  ).transform((v) => v ?? "TradeVantage"),
 })
 .refine(
   (env) =>
