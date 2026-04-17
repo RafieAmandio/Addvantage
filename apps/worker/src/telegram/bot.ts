@@ -71,3 +71,13 @@ export async function startBot(): Promise<void> {
     onStart: (info) => logger.info({ username: info.username }, "telegram bot started"),
   });
 }
+
+/**
+ * Stop the long-poll loop if the bot was instantiated. Safe to call when the
+ * bot never started (e.g. TELEGRAM_BOT_TOKEN unset).
+ */
+export async function stopBot(): Promise<void> {
+  if (!_bot) return;
+  await _bot.stop();
+  _bot = null;
+}

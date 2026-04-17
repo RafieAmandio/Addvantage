@@ -107,7 +107,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only)
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
 - [ ] **Retry/backoff** on Supabase + OpenAI calls (HTTP already has retries)
-- [ ] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`
+- [x] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`
 - [ ] **Zod validation at query boundaries** — replace `as NewsRow` casts with schema parses
 - [ ] **Deploy pipeline for worker** — GHCR image build + SSH deploy to VPS on main push
 

@@ -1,12 +1,14 @@
 import { logger } from "./lib/logger";
 import { config } from "./lib/config";
-import { startBot } from "./telegram/bot";
-import { startScheduler } from "./scheduler";
+import { startBot, stopBot } from "./telegram/bot";
+import { startScheduler, stopScheduler } from "./scheduler";
 
 /**
  * Worker entrypoint — boots the Telegram bot and the hourly scheduler in the
- * same process. Both are long-lived. A SIGTERM handler ensures graceful exit
- * under docker-compose.
+ * same process. Both are long-lived. SIGTERM/SIGINT trigger an async shutdown
+ * that stops the bot's long-poll loop and waits for any in-flight scheduler
+ * tick before exiting, with a hard timeout so a stuck adapter can't hang the
+ * container forever.
  */
 async function main(): Promise<void> {
   logger.info(
@@ -25,14 +27,35 @@ async function main(): Promise<void> {
   logger.info("scheduler started (hourly)");
 }
 
-process.on("SIGTERM", () => {
-  logger.info("SIGTERM — shutting down");
-  process.exit(0);
-});
-process.on("SIGINT", () => {
-  logger.info("SIGINT — shutting down");
-  process.exit(0);
-});
+const SHUTDOWN_TIMEOUT_MS = 10_000;
+let shuttingDown = false;
+
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  logger.info({ signal }, "shutdown: starting graceful exit");
+
+  const hardExit = setTimeout(() => {
+    logger.warn(
+      { timeoutMs: SHUTDOWN_TIMEOUT_MS },
+      "shutdown: timeout reached, forcing exit"
+    );
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS);
+  hardExit.unref();
+
+  try {
+    await Promise.allSettled([stopBot(), stopScheduler()]);
+    logger.info("shutdown: complete");
+    process.exit(0);
+  } catch (err) {
+    logger.error({ err: String(err) }, "shutdown: error during shutdown");
+    process.exit(1);
+  }
+}
+
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));
 process.on("unhandledRejection", (reason) => {
   logger.error({ reason: String(reason) }, "unhandledRejection");
 });
