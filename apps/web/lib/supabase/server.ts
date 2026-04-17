@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@tradevantage/db";
+import { publicConfig } from "@/lib/config/public";
 
 /**
  * Server-side Supabase client — reads the session cookie from next/headers.
@@ -10,8 +11,8 @@ import type { Database } from "@tradevantage/db";
 export function supabaseServer(): SupabaseClient<Database> {
   const cookieStore = cookies();
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    publicConfig.NEXT_PUBLIC_SUPABASE_URL,
+    publicConfig.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
