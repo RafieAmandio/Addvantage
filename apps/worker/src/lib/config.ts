@@ -54,6 +54,12 @@ const EnvSchema = z.object({
         .map((s) => s.trim().toUpperCase())
         .filter(Boolean)
     ),
+
+  /** Optional outbound liveness ping target (healthchecks.io, BetterStack
+   *  heartbeat URL, custom endpoint, etc.). The worker POSTs to this URL on
+   *  boot and every HEARTBEAT_INTERVAL_MIN minutes. Unset = disabled. */
+  HEARTBEAT_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  HEARTBEAT_INTERVAL_MIN: z.coerce.number().int().min(1).max(60).default(5),
 });
 
 const parsed = EnvSchema.safeParse(process.env);

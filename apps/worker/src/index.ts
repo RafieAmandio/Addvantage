@@ -2,6 +2,7 @@ import { logger } from "./lib/logger";
 import { config } from "./lib/config";
 import { startBot, stopBot } from "./telegram/bot";
 import { startScheduler, stopScheduler } from "./scheduler";
+import { startHeartbeat, stopHeartbeat } from "./lib/heartbeat";
 
 /**
  * Worker entrypoint — boots the Telegram bot and the hourly scheduler in the
@@ -25,6 +26,8 @@ async function main(): Promise<void> {
 
   startScheduler();
   logger.info("scheduler started (hourly)");
+
+  startHeartbeat();
 }
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
@@ -45,7 +48,7 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
   hardExit.unref();
 
   try {
-    await Promise.allSettled([stopBot(), stopScheduler()]);
+    await Promise.allSettled([stopBot(), stopScheduler(), stopHeartbeat()]);
     logger.info("shutdown: complete");
     process.exit(0);
   } catch (err) {

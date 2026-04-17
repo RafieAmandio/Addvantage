@@ -97,7 +97,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] **Structured logging on web** — currently only `console.error` in one place
 - [ ] **Ship worker logs off-box** — pino → Axiom / Better Stack / Loki
 - [x] **Health check endpoint (web)** — `/api/health` returns 200/503 with Supabase ping
-- [ ] **Heartbeat pings from worker** — worker pushes periodic liveness signal (uptime monitor target TBD)
+- [x] **Heartbeat pings from worker** — provider-agnostic outbound POST every `HEARTBEAT_INTERVAL_MIN` minutes (default 5) to `HEARTBEAT_URL`; works with healthchecks.io, BetterStack, etc. Disabled when env unset.
 - [ ] **Rate limiting** — admin endpoints, server actions, especially anything hitting OpenAI
 - [x] **Fix `docker-compose.yml`** — remove `web` service (Vercel handles it), add `healthcheck`, add resource limits
 - [x] **Fix `Dockerfile`** — remove `|| pnpm install` fallback on line 14

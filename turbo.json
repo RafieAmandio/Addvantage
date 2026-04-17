@@ -10,7 +10,9 @@
     "TELEGRAM_BOT_TOKEN",
     "TELEGRAM_ADMIN_CHAT_IDS",
     "FRED_API_KEY",
-    "NEXT_PUBLIC_SITE_URL"
+    "NEXT_PUBLIC_SITE_URL",
+    "HEARTBEAT_URL",
+    "HEARTBEAT_INTERVAL_MIN"
   ],
   "tasks": {
     "build": {
