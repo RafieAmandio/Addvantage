@@ -1,4 +1,5 @@
 import { supabaseServer } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import type { Database } from "@tradevantage/db";
 
 type NewsRow = Database["public"]["Tables"]["news_items"]["Row"];
@@ -46,7 +47,7 @@ export async function listApprovedNews(): Promise<NewsListItem[]> {
     .order("fetched_at", { ascending: false })
     .limit(200);
   if (error) {
-    console.error("listApprovedNews error", error);
+    logger.error("listApprovedNews failed", { error, scope: "news.listApprovedNews" });
     return [];
   }
   return (data ?? []).map((r) => toListItem(r as NewsRow));
