@@ -242,7 +242,7 @@ create index on timeline_events (occurred_at desc);
 - [x] **A4.** Stub `/app/chart/[symbol]` route — composes `PriceChart` with hardcoded SPX mock bars + the timeline query from A2
 
 **Phase B — Real data (3-5 days):**
-- [ ] **B1.** Provider-agnostic `BarsAdapter` interface (`apps/worker/src/adapters/bars/base.ts`) + `TwelveDataAdapter` implementation + worker config envs `MARKET_DATA_PROVIDER` and `MARKET_DATA_API_KEY`. Registry in `apps/worker/src/adapters/bars/index.ts`.
+- [x] **B1.** Provider-agnostic `BarsAdapter` interface (`apps/worker/src/adapters/bars/base.ts`) + `TwelveDataAdapter` implementation + worker config envs `MARKET_DATA_PROVIDER` and `MARKET_DATA_API_KEY`. Registry in `apps/worker/src/adapters/bars/index.ts`.
 - [ ] **B2.** Worker one-shot CLI `pnpm --filter @tradevantage/worker run:bars <SYMBOL>` that fetches via the adapter and upserts into `instrument_bars`.
 - [ ] **B3.** `/api/bars?symbol=SPX&interval=1h&from=…&to=…` route + `apps/web/features/chart/queries/bars.ts` Zod-validated read.
 - [ ] **B4.** Replace the deterministic mulberry32 mock in `/app/chart/[symbol]` with the real query (B3) and confirm renders.

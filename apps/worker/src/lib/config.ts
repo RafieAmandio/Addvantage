@@ -60,7 +60,25 @@ const EnvSchema = z.object({
    *  boot and every HEARTBEAT_INTERVAL_MIN minutes. Unset = disabled. */
   HEARTBEAT_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
   HEARTBEAT_INTERVAL_MIN: z.coerce.number().int().min(1).max(60).default(5),
-});
+
+  /** Market-data provider for the bars pipeline (Phase B). Keep as an enum so
+   *  adding a new provider requires a code change (intentional — forces the
+   *  author to also register the adapter). Phase B is not yet deployed, so
+   *  both envs are optional; see refine() below for the coupling check. */
+  MARKET_DATA_PROVIDER: z
+    .preprocess(emptyToUndef, z.enum(["twelvedata"]).optional()),
+  MARKET_DATA_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+})
+.refine(
+  (env) =>
+    (env.MARKET_DATA_PROVIDER === undefined) ===
+    (env.MARKET_DATA_API_KEY === undefined),
+  {
+    message:
+      "MARKET_DATA_PROVIDER and MARKET_DATA_API_KEY must be set together (or both unset).",
+    path: ["MARKET_DATA_API_KEY"],
+  }
+);
 
 const parsed = EnvSchema.safeParse(process.env);
 

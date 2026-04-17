@@ -12,7 +12,9 @@
     "FRED_API_KEY",
     "NEXT_PUBLIC_SITE_URL",
     "HEARTBEAT_URL",
-    "HEARTBEAT_INTERVAL_MIN"
+    "HEARTBEAT_INTERVAL_MIN",
+    "MARKET_DATA_PROVIDER",
+    "MARKET_DATA_API_KEY"
   ],
   "tasks": {
     "build": {
