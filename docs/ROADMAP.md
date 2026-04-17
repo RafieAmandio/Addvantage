@@ -4,6 +4,47 @@ Status snapshot as of 2026-04-17. Living document — update as work lands.
 
 ---
 
+## 0. Engineering Principles (apply to every change)
+
+### Reusability is non-negotiable
+Every new component, hook, query, or adapter must be built for reuse from day one. Before writing anything new, check if something existing covers it.
+
+**Component rules:**
+- Live in `apps/web/components/ui/` (primitives) or `apps/web/components/<domain>/` (domain-specific, e.g. `components/chart/`, `components/timeline/`). **Never** inline a reusable piece inside a `page.tsx`.
+- Accept props, not hardcoded data. Any fetching happens in the page/server component, not the UI component.
+- No direct Supabase calls inside display components — pass data in. Queries live in `apps/web/lib/queries/`.
+- Expose a `className` prop and use `cn()` so callers can restyle without forking.
+- If a component takes more than ~3 responsibilities, split it. Target: one component, one job.
+- Storybook-style "dumb" components beat clever all-in-one components.
+
+**Hook rules:**
+- Anything touching `localStorage`, `window`, realtime subscriptions, or polling → custom hook in `apps/web/lib/hooks/`.
+- Examples of hooks that should already exist and be reused: `useWatchlist`, `useSeenNews`, `useReadPrimers`. Do not reimplement localStorage logic inline.
+
+**Query rules:**
+- All Supabase reads go through `apps/web/lib/queries/<domain>.ts` (e.g. `queries/news.ts`, future `queries/timeline.ts`, `queries/bars.ts`).
+- Validate shape with Zod at the query boundary — do not `as SomeType` cast.
+- Queries return plain serializable objects, not Supabase response wrappers.
+
+**Worker rules:**
+- New ingestion sources implement `SourceAdapter` from `apps/worker/src/adapters/base.ts`. Never fork the pipeline for a "special" source.
+- Shared helpers (HTTP fetch with retry, rephrase, persist, notify) live in `apps/worker/src/lib/` or `apps/worker/src/pipeline/` — adapters only fetch + map to `Candidate[]`.
+- Tweets, news, macro events all funnel into the same `timeline_events` table via the same pipeline. No parallel universes.
+
+**Schema rules:**
+- Enums (impact, bias, hashtags, event kinds) live in `packages/shared/src/constants/`. Update there first, then the DB constraint, then the JSON schema. In that order.
+- Types flow: DB → `supabase gen types` → `@tradevantage/db` → consumed by both apps.
+
+### Before adding a new file, ask:
+1. Does a component/hook/query already do this? (grep first)
+2. Can I extend an existing one with a prop instead of forking?
+3. Will someone else reuse this within 3 months? If yes, put it in a shared folder with a clear name.
+
+### Refactor-as-you-go
+When touching a page that inlines UI or duplicates logic from another page, lift the shared piece into `components/` or `lib/hooks/` in the same PR. Don't leave breadcrumbs for later.
+
+---
+
 ## 1. Current State
 
 ### Backend (apps/worker) — **Production-ready pipeline**
@@ -149,12 +190,23 @@ create index on timeline_events (occurred_at desc);
 - [ ] **Backfill job** — migrate existing `news_items` into `timeline_events` with `kind='news'`
 
 **Web app:**
-- [ ] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated
-- [ ] Library: **Lightweight Charts** by TradingView (open source, free, MIT) or **Recharts** for simpler case
-- [ ] Component: `<TimelineChart symbol="SPX" interval="1h" />`
+- [ ] `/app/chart` (or `/app/chart/[symbol]`) — new route, TIER 01 gated (page is thin, just composes reusable components)
+- [ ] Library: **Lightweight Charts** by TradingView (open source, free, MIT)
 - [ ] API route: `GET /api/bars?symbol=SPX&interval=1h&from=...&to=...`
 - [ ] API route: `GET /api/events?symbols[]=SPX&from=...&to=...`
 - [ ] Realtime: Supabase realtime channel on `timeline_events` for live pin drops
+
+**Reusable components to produce (build these as standalone, reuse everywhere):**
+- `components/chart/PriceChart.tsx` — dumb wrapper over Lightweight Charts. Props: `bars[]`, `interval`, `onCrosshairMove`. No data fetching.
+- `components/chart/TimelineMarkers.tsx` — renders event dots on a time axis. Props: `events[]`, `onHover`, `onClick`. Works standalone (useful on `/app/news` too as a mini-timeline).
+- `components/chart/EventDrawer.tsx` — side drawer showing event body + source. Reuse for news detail, tweet detail, macro detail.
+- `components/chart/SymbolSearch.tsx` — combobox for instrument lookup. Reuse anywhere a user picks a symbol (watchlist add, plan authoring).
+- `components/chart/IntervalPicker.tsx` — 1m/5m/1h/1d toggle. Small, but reused.
+- `components/timeline/EventFeed.tsx` — vertical list of timeline events. Reuse on chart page, news page, and plan detail page.
+- `components/timeline/EventCard.tsx` — single event row (icon by kind, title, time, bias pill). Reuse inside `EventFeed` and in the drawer.
+- `lib/hooks/useBars.ts` — fetches + caches candles. SWR-style.
+- `lib/hooks/useTimelineEvents.ts` — fetches + subscribes to realtime events for given symbols + range.
+- `lib/queries/bars.ts` + `lib/queries/timeline.ts` — Supabase reads, Zod-validated.
 
 **UX sketch:**
 - Top: symbol search + interval picker (1m/5m/1h/1d)
