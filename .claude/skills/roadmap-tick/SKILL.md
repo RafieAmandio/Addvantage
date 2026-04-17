@@ -1,6 +1,6 @@
 ---
 name: roadmap-tick
-description: Execute one iteration of TradeVantage roadmap work. Treat each invocation as a fresh session — read docs/ROADMAP.md, pick the next unchecked item by priority, implement it, verify, commit, and report. Designed to be driven by /loop so the project advances one concrete step per tick.
+description: Execute one iteration of TradeVantage roadmap work. Treat each invocation as a fresh session — read docs/ROADMAP.md, pick the next unchecked item by priority, implement it, verify (including the UI), commit, and report. Designed to be driven by /loop so the project advances one concrete step per tick with minimal context carryover.
 ---
 
 # roadmap-tick
@@ -9,14 +9,25 @@ You are starting a fresh session. You have **no memory** of previous iterations.
 
 ## Goal of this iteration
 
-Move the TradeVantage project forward by **exactly one concrete, committed unit of work**, then stop and report.
+Move the TradeVantage project forward by **at least one concrete, committed unit of work**, then stop and report.
+
+## Context hygiene (important — read first)
+
+To keep the `/loop` driver's context small across ticks:
+
+- **Delegate the heavy work to a sub-agent** using the `Agent` tool with `subagent_type: "general-purpose"`. The main loop session should only orchestrate and surface the sub-agent's final report, not perform the code reading/writing itself.
+- Pass the sub-agent a **self-contained brief**: the item picked, the relevant file paths, and a pointer to `docs/ROADMAP.md` Section 0 for engineering principles. The sub-agent reads, edits, verifies, and commits.
+- The main session should perform only these tool calls directly: the initial orient reads (ROADMAP + `git log` + `git status`), spawning the Agent, and writing the final report.
+- If the tick is tiny (e.g. just flipping a checkbox for work already done in a prior tick, or adding a one-line fix), you may do it inline without a sub-agent. Anything touching more than ~3 files → sub-agent.
+
+This way, each tick adds minimal bytes to the driving conversation. The sub-agent's context is naturally discarded when it finishes.
 
 ## Procedure
 
-### 1. Orient (always do this first)
-- Read `docs/ROADMAP.md` in full. It contains the current state, engineering principles (Section 0), production gaps checklist, feature backlog, and the Timeline Chart feature plan.
-- Run `git log --oneline -15` to see what was already done in prior iterations. If an item is committed but not yet checked off in ROADMAP, check it off as part of this iteration's commit.
-- Run `git status` to ensure a clean working tree. If there are uncommitted changes from a prior aborted iteration, stop and report — do not clobber them.
+### 1. Orient (always do this first, inline)
+- Read `docs/ROADMAP.md` in full. It contains the current state, engineering principles (Section 0), production gaps checklist, feature backlog, the Timeline Chart feature plan, and the auto-discovered Improvement Backlog.
+- Run `git log --oneline -15` to see what was already done. If an item is committed but not yet ticked in ROADMAP, flip the checkbox as this iteration's work.
+- Run `git status` to confirm a clean working tree. If there are uncommitted changes from a prior aborted iteration, **stop and report** — do not clobber them.
 
 ### 2. Pick the next item (strict priority)
 
@@ -37,9 +48,9 @@ Walk the ROADMAP checkboxes in this order and take the **first unchecked item** 
 
 If an item needs a choice (e.g. "pick market data provider"), stop and ask the user — do not guess.
 
-### 3. Implement
+### 3. Implement (delegate to sub-agent when work > ~3 files)
 
-Follow **Section 0 — Engineering Principles** without exception:
+The sub-agent must follow **Section 0 — Engineering Principles** without exception:
 - Reusable components in `apps/web/components/<domain>/`, never inline in `page.tsx`
 - Hooks in `apps/web/lib/hooks/`
 - Queries in `apps/web/lib/queries/<domain>.ts` with Zod validation — no `as Type` casts
@@ -49,34 +60,70 @@ Follow **Section 0 — Engineering Principles** without exception:
 
 Keep the change small and self-contained. One iteration = one item. If the item is large (e.g. "Timeline Chart Phase A"), break it into visible sub-steps within the ROADMAP first, tick one, and leave the rest for the next iteration.
 
-### 4. Verify
+### 4. Verify (all three gates)
 
-From repo root, run:
+#### 4a. Static checks
+From repo root:
 ```bash
 pnpm typecheck
 pnpm build
 ```
-
-If either fails, fix it before committing. Do not commit broken code. If you cannot fix it within this iteration, revert your changes and report the blocker.
-
-For worker-only changes you may additionally run:
+Both must pass. For worker-only changes additionally:
 ```bash
 pnpm --filter @tradevantage/worker build
 ```
 
-UI changes: state explicitly in your report that you did **not** visually verify in a browser (this skill doesn't run a dev server).
+#### 4b. Interface check (for any change touching `apps/web/`)
 
-### 5. Commit and tick the box
+UI bugs hide behind green typecheck and build logs — always do this gate when web files changed.
 
-In the same commit:
-- The implementation changes
-- The `[ ]` → `[x]` flip in `docs/ROADMAP.md` for the item you just completed
+1. **Start the dev server in the background** (if not already up):
+   ```bash
+   pnpm dev:web
+   ```
+   Launch with `run_in_background: true` and capture the background task id. Wait ~8 seconds for the first compile.
 
-Commit message format:
+2. **Identify the routes your change touches.** Examples:
+   - Edited `apps/web/app/app/news/page.tsx` → `/app/news`
+   - Edited `apps/web/components/ui/Button.tsx` → pick 2 pages that use it
+   - New route `apps/web/app/chart/[symbol]/page.tsx` → `/chart/SPX`
+
+3. **For each touched route, fetch it:**
+   ```bash
+   curl -sSI http://localhost:3000/<route>    # expect HTTP 200 or intended 3xx
+   curl -s  http://localhost:3000/<route> | head -200
+   ```
+   Grep the HTML for these red flags:
+   - `Application error` / `Server Error` / `500`
+   - `Unhandled Runtime Error`
+   - `Hydration failed`
+   - A `<pre>` tag inside an Error boundary fallback
+   - Missing expected text from the component you edited
+   
+   Also tail the dev server's stdout (`BashOutput` on the background task) and grep for `error`, `warn`, `Failed to compile`.
+
+4. **Playwright (optional, preferred when installed).** If `@playwright/test` is present in `apps/web/package.json`, run a quick smoke script that visits each touched route and asserts no console errors. If not installed, the curl check is the floor — do not install Playwright in a tick unless the ROADMAP item is "set up Playwright."
+
+5. **Stop the dev server** at the end of the tick: `KillShell` on the background task id so the next tick starts clean.
+
+If the UI check fails, fix the cause inside this tick. If you cannot fix it, revert and report the blocker.
+
+### 5. Commit (one or more atomic commits)
+
+Prefer **multiple small commits over one giant commit** when the work has natural seams. Examples of good splits:
+
+- `refactor(web): extract PriceChart from inline page code` → `feat(web): add /chart/[symbol] route` → `docs(roadmap): tick Timeline Phase A skeleton`
+- `fix(web): add error boundary` → `chore(roadmap): tick error-boundary item`
+
+Every commit must be green (typecheck + build pass at that commit). Use `git add -p` if needed to split staged changes.
+
+**The final commit of the tick must flip the `[ ]` → `[x]` in `docs/ROADMAP.md`** for the item you completed. Any improvement backlog appends from step 6 also go in that final commit.
+
+Commit message format (one or many):
 ```
 <area>: <what changed in imperative mood>
 
-<1–2 lines on why / which ROADMAP item this closes>
+<1–2 lines on why / which ROADMAP item this closes or progresses>
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
@@ -85,7 +132,7 @@ Do **not** push. The user controls pushes.
 
 ### 6. Scan for improvements (always do this, even if you skipped step 3)
 
-After the implementation commit (or after deciding to skip), spend a **small, bounded** amount of effort looking for one concrete improvement opportunity the project didn't already know about. Do not rewrite anything here — you are only **logging findings** so a future tick can pick them up.
+After the last commit (or after deciding to skip the item), spend a **small, bounded** amount of effort looking for one concrete improvement opportunity the project didn't already know about. Do not rewrite anything here — you are only **logging findings** so a future tick can pick them up.
 
 Rotate the focus each tick so coverage broadens over time. Pick the category based on `date +%s % 6`:
 
@@ -112,22 +159,23 @@ Rules:
 - If you find nothing worth logging, write nothing. Empty ticks are fine
 - Improvement items become eligible for future ticks after all Critical + High items are done, but **before** Feature Backlog
 
-Include the backlog append (if any) in the same commit as step 5.
+Include the backlog append (if any) in the final commit of the tick.
 
-### 7. Report (under 100 words)
+### 7. Report (under 120 words)
 
 Format:
 ```
 **Tick N — <item name>**
 - Did: <one sentence>
+- Commits: <list of short sha + subject>
 - Files: <comma-separated paths>
-- Verify: typecheck ✓ / build ✓ / ui-visual ✗ (not tested)
+- Verify: typecheck ✓ / build ✓ / ui-curl ✓ (routes: /x, /y) / ui-playwright ✗ (not installed)
 - Improvement logged: <title or "none">
 - Next up: <next unchecked item from ROADMAP>
 - Blockers (if any): <list>
 ```
 
-### 7. Stopping conditions
+### 8. Stopping conditions
 
 The loop should stop (do **not** schedule another wakeup) when any of these is true:
 
@@ -145,3 +193,4 @@ When stopping, clearly say **"LOOP STOPPING"** in your report with the reason.
 - **If the ROADMAP is ambiguous**, update the ROADMAP first (with a commit), then stop and let the next iteration pick it up with the clarified wording.
 - **Never** edit a committed migration. Always add a new numbered migration file under `packages/db/migrations/`.
 - **Never** touch `.env` files or read secret values into chat.
+- **Kill the dev server at the end of every tick** — background processes must not leak across ticks.
