@@ -7,7 +7,8 @@ import {
   routeSymbolToCanonical,
   type RouteSymbol,
 } from "@/features/chart/lib/symbols";
-import { listTimelineEvents, type TimelineEvent } from "@/features/timeline/queries/timeline";
+import { listTimelineEvents } from "@/features/timeline/queries/timeline";
+import { EventFeed } from "@/features/timeline/components/EventFeed";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,25 +27,6 @@ function isSupportedSymbol(s: string): s is RouteSymbol {
 
 const DEFAULT_WINDOW_DAYS = 30;
 const DEFAULT_INTERVAL = "1h" as const;
-
-function formatTime(iso: string): string {
-  return iso.slice(0, 16).replace("T", " ");
-}
-
-function kindBadge(kind: TimelineEvent["kind"]): string {
-  switch (kind) {
-    case "news":
-      return "bg-lime/15 text-lime";
-    case "tweet":
-      return "bg-amber-400/15 text-amber-400";
-    case "macro":
-      return "bg-blood/15 text-blood";
-    case "earnings":
-      return "bg-cyan-400/15 text-cyan-400";
-    case "user_pin":
-      return "bg-paper/15 text-paper/70";
-  }
-}
 
 export default async function ChartPage({
   params,
@@ -135,60 +117,11 @@ export default async function ChartPage({
         </div>
 
         <aside className="col-span-12 lg:col-span-4">
-          <div className="border border-ink-3 bg-ink-2">
-            <div className="border-b border-ink-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
-              Timeline · {events.length} events
-            </div>
-            {events.length === 0 ? (
-              <div className="px-4 py-8 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-                No events for {symbol} in window.
-              </div>
-            ) : (
-              <ul className="divide-y divide-ink-3 max-h-[520px] overflow-y-auto">
-                {events.map((e) => {
-                  const href = e.news_item_id
-                    ? `/app/news/${e.news_item_id}`
-                    : e.url ?? null;
-                  const inner = (
-                    <div className="px-4 py-3 hover:bg-ink-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={
-                            "px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 " +
-                            kindBadge(e.kind)
-                          }
-                        >
-                          {e.kind}
-                        </span>
-                        {e.source_code && (
-                          <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
-                            [{e.source_code}]
-                          </span>
-                        )}
-                        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                          {formatTime(e.occurred_at)}
-                        </span>
-                      </div>
-                      <div className="mt-1.5 text-sm leading-snug text-paper">
-                        {e.title}
-                      </div>
-                    </div>
-                  );
-                  return (
-                    <li key={e.id}>
-                      {href ? (
-                        <Link href={href} className="block">
-                          {inner}
-                        </Link>
-                      ) : (
-                        inner
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+          <EventFeed
+            events={events}
+            heading={`Timeline · ${events.length} events`}
+            emptyMessage={`No events for ${symbol} in window.`}
+          />
         </aside>
       </div>
     </div>
