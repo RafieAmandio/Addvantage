@@ -1,35 +1,14 @@
-import { z } from "zod";
-import { IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
+import {
+  TIMELINE_KINDS,
+  TimelineEventSchema,
+  type TimelineEvent,
+  type TimelineKind,
+} from "@/features/timeline/types";
 
-export const TIMELINE_KINDS = ["news", "tweet", "macro", "earnings", "user_pin"] as const;
-export type TimelineKind = (typeof TIMELINE_KINDS)[number];
-
-const ImpactSchema = z.enum(IMPACT_LEVELS);
-const BiasSchema = z.enum(BIAS_LEVELS);
-
-/**
- * Public-facing shape rendered by `TimelineMarkers` / `EventDrawer`. Stable
- * across all event kinds — `timeline_events` is the single source of truth
- * since Phase C; approved `news_items` rows are mirrored into it by the
- * `news_items_mirror_to_timeline` trigger (see migration 0014).
- */
-const TimelineEventSchema = z.object({
-  id: z.string(),
-  kind: z.enum(TIMELINE_KINDS),
-  source_code: z.string().nullable(),
-  occurred_at: z.string(),
-  symbols: z.array(z.string()),
-  title: z.string(),
-  body: z.string().nullable(),
-  url: z.string().nullable(),
-  bias: BiasSchema.nullable(),
-  impact: ImpactSchema.nullable(),
-  /** Backlink for kind='news' so a click can deeplink to /app/news/[id]. */
-  news_item_id: z.string().nullable(),
-});
-export type TimelineEvent = z.infer<typeof TimelineEventSchema>;
+export { TIMELINE_KINDS };
+export type { TimelineEvent, TimelineKind };
 
 const TIMELINE_EVENT_COLUMNS =
   "id,kind,source_code,occurred_at,symbols,title,body,url,bias,impact,news_item_id";

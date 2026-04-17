@@ -15,7 +15,7 @@ import {
   type RouteSymbol,
 } from "@/features/chart/lib/symbols";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";
-import { EventFeed } from "@/features/timeline/components/EventFeed";
+import { LiveEventFeed } from "@/features/timeline/components/LiveEventFeed";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -130,8 +130,11 @@ export default async function ChartPage({
         </div>
 
         <aside className="col-span-12 lg:col-span-4">
-          <EventFeed
-            events={events}
+          <LiveEventFeed
+            initialEvents={events}
+            symbols={[symbol]}
+            from={from.toISOString()}
+            to={to.toISOString()}
             heading={`Timeline · ${events.length} events`}
             emptyMessage={`No events for ${symbol} in window.`}
           />
