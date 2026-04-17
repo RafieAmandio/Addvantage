@@ -14,6 +14,7 @@
  */
 import { Redis } from "@upstash/redis";
 import { config } from "./config";
+import { logger } from "./logger";
 
 const POLL_INTERVAL_MS = 200;
 
@@ -47,7 +48,10 @@ async function readCache<T>(redis: Redis, cacheKey: string): Promise<T | null> {
 
   try {
     return JSON.parse(raw) as T;
-  } catch {
+  } catch (error) {
+    logger.warn({ err: error, scope: "singleflight.readCache", cacheKey },
+      "singleflight cache payload failed to parse",
+    );
     return null;
   }
 }
