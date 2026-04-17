@@ -15,6 +15,7 @@ export function LiveEventFeed({
   from,
   to,
   heading,
+  renderHeading,
   emptyMessage,
   maxHeightClass,
   className,
@@ -24,6 +25,7 @@ export function LiveEventFeed({
   from?: string;
   to?: string;
   heading?: string;
+  renderHeading?: (count: number) => string;
   emptyMessage?: string;
   maxHeightClass?: string;
   className?: string;
@@ -32,7 +34,7 @@ export function LiveEventFeed({
   return (
     <EventFeed
       events={events}
-      heading={heading}
+      heading={renderHeading ? renderHeading(events.length) : heading}
       emptyMessage={emptyMessage}
       maxHeightClass={maxHeightClass}
       className={className}
