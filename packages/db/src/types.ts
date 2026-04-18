@@ -626,6 +626,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_consult_daily_tokens_used: { Args: never; Returns: number }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
