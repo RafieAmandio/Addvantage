@@ -1,4 +1,5 @@
 import cron, { type ScheduledTask } from "node-cron";
+import * as Sentry from "@sentry/node";
 import { logger } from "../lib/logger";
 import { config } from "../lib/config";
 import { supabase } from "../lib/supabase";
@@ -30,20 +31,26 @@ export function startScheduler(): void {
   // configured. We also kick once at boot to mirror the source-poller pattern.
   if (config.EMAIL_PROVIDER) {
     renewalTask = cron.schedule("0 9 * * *", () => {
-      runRenewalReminders().catch((err) =>
+      runRenewalReminders().catch((err) => {
+        Sentry.captureException(err, {
+          tags: { scope: "renewal-reminder.cron" },
+        });
         logger.error(
           { err: String(err) },
           "renewal-reminder: scheduled run failed"
-        )
-      );
+        );
+      });
     });
 
-    runRenewalReminders().catch((err) =>
+    runRenewalReminders().catch((err) => {
+      Sentry.captureException(err, {
+        tags: { scope: "renewal-reminder.boot" },
+      });
       logger.error(
         { err: String(err) },
         "renewal-reminder: boot run failed"
-      )
-    );
+      );
+    });
   }
 }
 
