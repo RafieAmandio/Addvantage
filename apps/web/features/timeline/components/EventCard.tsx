@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { TimelineEvent } from "@/features/timeline/queries/timeline";
@@ -26,7 +27,7 @@ export function eventHref(e: TimelineEvent): string | null {
   return e.url ?? null;
 }
 
-export function EventCard({
+function EventCardInner({
   event,
   className,
 }: {
@@ -64,3 +65,9 @@ export function EventCard({
     </Link>
   );
 }
+
+// Memoized so that when EventFeed re-renders on a realtime INSERT,
+// only the newly-prepended card renders — the other up-to-499 cards
+// bail out via referential-equality on the event object (rows come
+// straight from useTimelineEvents state, never rebuilt).
+export const EventCard = memo(EventCardInner);
