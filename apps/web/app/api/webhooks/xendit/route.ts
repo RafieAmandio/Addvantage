@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { serverConfig } from "@/lib/config/server";
 import { sendBrevoTemplate } from "@/lib/email/brevo";
+import { enforceIpRateLimit } from "@/lib/ip-ratelimit";
 import { logger } from "@/lib/logger";
 import { verifyXenditWebhook } from "@/lib/payment/verify-xendit";
-import { rateLimit } from "@/lib/ratelimit";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 /**
@@ -30,25 +30,26 @@ export async function POST(request: Request) {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  const rl = await rateLimit({
-    key: `webhooks:xendit:${ip}`,
-    limit: 60,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    const retryAfter = rl.reset
-      ? Math.max(1, Math.ceil((rl.reset - Date.now()) / 1000))
-      : 60;
-    return NextResponse.json(
-      { error: "rate_limited" },
-      {
-        status: 429,
-        headers: {
-          "Retry-After": String(retryAfter),
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+  try {
+    await enforceIpRateLimit(ip, "webhooks:xendit", {
+      limit: 60,
+      windowSec: 60,
+      scope: "api.webhooks.xendit",
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "rate_limited") {
+      return NextResponse.json(
+        { error: "rate_limited" },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+            "Cache-Control": "no-store",
+          },
+        }
+      );
+    }
+    throw err;
   }
 
   const rawBody = await request.text();

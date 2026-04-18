@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
-import { rateLimit } from "@/lib/ratelimit";
 import { supabaseServer } from "@/lib/supabase/server";
+import { enforceUserRateLimit } from "@/lib/user-ratelimit";
 
 /**
  * User-pin create action. Auth-gated (middleware already blocks unauthenticated
@@ -40,12 +40,19 @@ export async function createUserPin(
 
   const ip =
     headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rl = await rateLimit({
-    key: `timeline:pin:${user.id}:${ip}`,
-    limit: 10,
-    windowSec: 60,
-  });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  try {
+    await enforceUserRateLimit(user.id, "timeline:pin", {
+      limit: 10,
+      windowSec: 60,
+      scope: "timeline.createUserPin",
+      keySuffix: ip,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "rate_limited") {
+      return { ok: false, error: "rate_limited" };
+    }
+    throw err;
+  }
 
   const bodyRaw = formData.get("body");
   const parsed = UserPinSchema.safeParse({

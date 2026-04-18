@@ -12,24 +12,36 @@ import { logger } from "@/lib/logger";
  *
  * Graceful no-op when Upstash env is unset (inherited from `rateLimit`).
  *
- * NOTE: this helper is for flat per-user limits only. Tier-aware gating
- * (free/vip buckets) lives in `lib/ratelimit-tier.ts` — do not collapse
- * the two. IP-keyed and compound-key gates also remain direct callers
- * of `rateLimit(...)`.
+ * Tier-aware gating (free/vip buckets) lives in `lib/ratelimit-tier.ts`
+ * — do not collapse the two. Pure IP-keyed gates use the sibling
+ * `enforceIpRateLimit` in `lib/ip-ratelimit.ts`. Compound user+ip keys
+ * go through this helper with `keySuffix: ip`.
  */
 export async function enforceUserRateLimit(
   userId: string,
   action: string,
-  opts: { limit?: number; windowSec?: number; scope?: string } = {},
+  opts: {
+    limit?: number;
+    windowSec?: number;
+    scope?: string;
+    keySuffix?: string;
+  } = {},
 ): Promise<void> {
   const scope = opts.scope ?? action;
+  const base = `user:${userId}:${action}`;
+  const key = opts.keySuffix ? `${base}:${opts.keySuffix}` : base;
   const rl = await rateLimit({
-    key: `user:${userId}:${action}`,
+    key,
     limit: opts.limit ?? 10,
     windowSec: opts.windowSec ?? 60,
   });
   if (!rl.success) {
-    logger.warn("user rate-limited", { userId, action, scope });
+    logger.warn("user rate-limited", {
+      userId,
+      action,
+      scope,
+      keySuffix: opts.keySuffix,
+    });
     throw new Error("rate_limited");
   }
 }
