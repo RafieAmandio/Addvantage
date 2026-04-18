@@ -11,7 +11,7 @@ const BiasSchema = z.enum(BIAS_LEVELS);
  * `listApprovedNews` / `getApprovedNewsById`. Validated at the query boundary
  * — if the DB schema drifts, parse fails fast instead of corrupting the view.
  */
-const NewsListRowSchema = z.object({
+export const NewsListRowSchema = z.object({
   id: z.string(),
   source_code: z.string(),
   headline: z.string(),
@@ -83,7 +83,7 @@ const NewsRowSchema = z.object({
 });
 export type NewsRow = z.infer<typeof NewsRowSchema>;
 
-const NEWS_LIST_COLUMNS =
+export const NEWS_LIST_COLUMNS =
   "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
 
 // Full detail projection consumed by /admin/review/[id]. Explicit list (never
@@ -91,7 +91,7 @@ const NEWS_LIST_COLUMNS =
 const NEWS_DETAIL_COLUMNS =
   "id,source_code,source_url,raw_text,content_hash,fetched_at,published_at,status,headline,rephrased,analysis,impact,bias,affects,tags,author,reviewed_at,reviewed_by,related_plan_ids,created_at,updated_at";
 
-function toListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
+export function toNewsListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
   // Drop status from the public projection.
   const { status: _status, ...rest } = row;
   return rest;
@@ -119,7 +119,7 @@ export async function listApprovedNews(): Promise<NewsListItem[]> {
     });
     return [];
   }
-  return parsed.data.map(toListItem);
+  return parsed.data.map(toNewsListItem);
 }
 
 export async function getApprovedNewsById(id: string): Promise<NewsListItem | null> {
@@ -140,7 +140,7 @@ export async function getApprovedNewsById(id: string): Promise<NewsListItem | nu
     });
     return null;
   }
-  return toListItem(parsed.data);
+  return toNewsListItem(parsed.data);
 }
 
 export interface AdminListPage {
