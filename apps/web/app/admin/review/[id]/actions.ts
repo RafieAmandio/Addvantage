@@ -17,6 +17,11 @@ async function enforceAdminRateLimit(adminId: string, action: string) {
     windowSec: 60,
   });
   if (!rl.success) {
+    logger.warn("admin rate-limited", {
+      adminId,
+      action,
+      scope: "admin.review",
+    });
     throw new Error("rate_limited");
   }
 }
