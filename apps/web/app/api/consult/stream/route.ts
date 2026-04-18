@@ -99,7 +99,12 @@ export async function POST(req: Request): Promise<Response> {
   let raw: unknown;
   try {
     raw = await req.json();
-  } catch {
+  } catch (err) {
+    logger.warn("consult.stream: invalid JSON body", {
+      scope: "consult.stream",
+      userId: user.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
     return jsonError(400, "invalid_json");
   }
   const parsed = BodySchema.safeParse(raw);
