@@ -6,6 +6,7 @@ import {
   type Bar as ChartBar,
   type ChartMarker,
 } from "@/features/chart/components/PriceChart";
+import { AddPinButton } from "@/features/timeline/components/AddPinButton";
 import { EventDrawer } from "@/features/timeline/components/EventDrawer";
 import type { TimelineEvent } from "@/features/timeline/types";
 
@@ -13,6 +14,8 @@ export interface ChartInteractiveProps {
   bars: ChartBar[];
   events: TimelineEvent[];
   markers: ChartMarker[];
+  /** Current chart symbol — used to pre-fill user-pin inserts. */
+  symbol: string;
   seriesType?: "candlestick" | "area";
   height?: number;
 }
@@ -26,6 +29,7 @@ export function ChartInteractive({
   bars,
   events,
   markers,
+  symbol,
   seriesType = "candlestick",
   height = 520,
 }: ChartInteractiveProps) {
@@ -50,6 +54,9 @@ export function ChartInteractive({
   return (
     <>
       <div className="border border-ink-3 bg-ink-2 p-3">
+        <div className="mb-3 flex items-center justify-end">
+          <AddPinButton symbol={symbol} />
+        </div>
         <PriceChart
           bars={bars}
           seriesType={seriesType}

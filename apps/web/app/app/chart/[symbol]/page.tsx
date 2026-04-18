@@ -141,6 +141,7 @@ export default async function ChartPage({
             bars={bars}
             events={events}
             markers={markers}
+            symbol={symbol}
             seriesType="candlestick"
             height={520}
           />
