@@ -150,7 +150,11 @@ When touching a page that inlines UI or duplicates logic from another page, lift
   - [x] **E4.** Dunning on `payment_failed` webhook event — wire `verifyWebhook` → `kind === 'payment_failed'` branch in `/api/webhooks/xendit` to enqueue a dunning email via `EmailAdapter` (call directly from web; both apps will need the email lib accessible — likely lift to `packages/email/` when adding the second consumer).
 
 ### Trading plan system
-- [ ] Real plan authoring flow for admins (not mock)
+- [ ] **Real plan authoring flow for admins (not mock)** — unblocks Section 2 M3 `/app/plans`. Carved into sub-items tick 145.
+  - [ ] **P1.** Schema — migration `0021_plans.sql`: `trading_plans` (id, symbol, thesis, direction, entry/stop/target numerics, r_multiple, tier, status draft|published|closed, author_id, created_at, published_at, closed_at), `plan_setups` (optional — keep as JSONB `setups` on plans for v1 to avoid table sprawl), RLS (public read where status='published', admin write). Reuse `public.is_admin()` helper.
+  - [ ] **P2.** Feature query + types — `apps/web/features/plan/queries/plans.ts` (Zod-validated `listPublishedPlans`, `getPlanById`, `listMyDraftPlans` for admins), `features/plan/types.ts` with shared schemas.
+  - [ ] **P3.** Admin authoring UI — `/admin/plans` list + `/admin/plans/[id]` editor with server actions (create/update/publish/close), zod-validated, rate-limited, Sentry+logger. Reuse existing `features/plan/components/` shapes where they fit the new data model.
+  - [ ] **P4.** Wire `/app/plans` (list) + `/app/plans/[id]` (detail) + `/app/plans/archive` + `/app/plans/compare` to the published-plans query; close Section 2 M3.
 - [ ] Setup outcome tracking (win/loss/R) tied to market close prices
 - [x] Plan → news cross-links (via `news_items.related_plan_ids` — column exists, unused) _(done tick 56 — news_items.related_plan_ids surfaced both directions; column not yet populated, admin tooling for that is a future tick)_
 
