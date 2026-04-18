@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { saveTraderProfile } from "@/features/auth/actions";
 import { useAppState } from "@/lib/state";
 import {
@@ -71,11 +72,16 @@ export function useProfileWizard() {
     void saveTraderProfile({ ok: false }, fd)
       .then((res) => {
         if (!res.ok) {
-          console.warn("saveTraderProfile failed", res.error);
+          Sentry.captureMessage("saveTraderProfile failed", {
+            level: "warning",
+            extra: { error: res.error },
+          });
         }
       })
       .catch((err: unknown) => {
-        console.warn("saveTraderProfile threw", err);
+        Sentry.captureException(err, {
+          tags: { scope: "signup.saveTraderProfile" },
+        });
       });
 
     router.push("/app");
