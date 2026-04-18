@@ -45,6 +45,13 @@ export const SOURCES = [
     adapter: "truth-social",
     pollMinutes: 60,
   },
+  {
+    code: "FF",
+    name: "ForexFactory Economic Calendar",
+    url: "https://nfs.faireconomy.media/ff_calendar_thisweek.xml",
+    adapter: "forexfactory",
+    pollMinutes: 360,
+  },
 ] as const;
 
 export type SourceCode = (typeof SOURCES)[number]["code"];
