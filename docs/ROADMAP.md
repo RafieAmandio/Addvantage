@@ -108,7 +108,11 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] **GitHub Actions CI** — typecheck + lint + build on every PR
 
 ### Medium priority
-- [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only)
+- [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only). Provider: Supabase email magic-link OTP (decided tick 120).
+  - [x] **A1.** `/login` OTP send + `/auth/callback` session exchange — replace mock form submit with server action calling `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${SITE_URL}/auth/callback` }})`, show "check your email" confirmation state, and add `app/auth/callback/route.ts` that calls `exchangeCodeForSession(code)` and redirects to `/app`.
+  - [ ] **A2.** `/signup` wizard — on final step, call the same `signInWithOtp` (Supabase auto-creates the user on first OTP), keep the liability + profile wizard post-exchange.
+  - [ ] **A3.** Logout — server action + header/sidebar button calling `supabase.auth.signOut()` and redirecting to `/`.
+  - [ ] **A4.** Gate `/app/*` and `/admin/*` via middleware or layout redirects when session is missing (verify existing middleware covers it).
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
 - [x] **Retry/backoff** on Supabase + OpenAI calls — generic helper at `apps/worker/src/lib/retry.ts`; wraps OpenAI rephrase + Supabase persist insert/loadExistingHashes
 - [x] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`

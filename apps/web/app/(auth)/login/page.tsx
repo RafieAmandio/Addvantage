@@ -1,27 +1,7 @@
-"use client";
-
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
-import { useAppState } from "@/lib/state";
+import { SectionNumber } from "@/components/ui/Marker";
+import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { liabilitySigned } = useAppState();
-  const [email, setEmail] = useState("operator@domain.local");
-  const [pw, setPw] = useState("●●●●●●●●");
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (liabilitySigned) {
-      router.push("/app");
-    } else {
-      router.push("/signup/liability");
-    }
-  };
-
   return (
     <main className="relative mx-auto grid max-w-7xl grid-cols-12 gap-6 px-6 py-20">
       <div className="col-span-12 lg:col-span-5">
@@ -41,51 +21,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <form
-        onSubmit={submit}
-        className="col-span-12 border border-ink-3 bg-ink-2/40 p-10 lg:col-span-7"
-      >
-        <DataLabel>Credential entry · 02 fields</DataLabel>
-        <div className="mt-6 space-y-6">
-          <div>
-            <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-              Operator handle / email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper outline-none transition-colors focus:border-lime"
-            />
-          </div>
-          <div>
-            <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
-              Authentication key
-            </label>
-            <input
-              type="text"
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg tracking-[0.3em] text-paper outline-none transition-colors focus:border-lime"
-            />
-          </div>
-        </div>
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-          <Button type="submit" size="lg">
-            AUTHENTICATE →
-          </Button>
-          <Link
-            href="/signup"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-lime"
-          >
-            No clearance? Request access →
-          </Link>
-        </div>
-        <div className="mt-12 border-t border-ink-3 pt-6 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
-          By authenticating you re-affirm the liability waiver signed at
-          enrollment. ANTS retains no fiduciary duty.
-        </div>
-      </form>
+      <LoginForm />
     </main>
   );
 }
