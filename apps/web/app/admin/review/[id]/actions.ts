@@ -94,7 +94,10 @@ export async function approveItem(id: string): Promise<void> {
     .from("news_items")
     .update(update)
     .eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) {
+    logger.error("approveItem failed", { id, error, scope: "admin.approveItem" });
+    throw new Error(error.message);
+  }
   revalidatePath("/admin/review");
   revalidatePath("/app/news");
   redirect("/admin/review");
@@ -114,7 +117,10 @@ export async function rejectItem(id: string): Promise<void> {
     .from("news_items")
     .update(update)
     .eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) {
+    logger.error("rejectItem failed", { id, error, scope: "admin.rejectItem" });
+    throw new Error(error.message);
+  }
   revalidatePath("/admin/review");
   revalidatePath("/admin/archive");
   redirect("/admin/review");
