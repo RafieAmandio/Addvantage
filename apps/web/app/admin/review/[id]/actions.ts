@@ -5,26 +5,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/session";
-import { rateLimit } from "@/lib/ratelimit";
+import { enforceAdminRateLimit } from "@/lib/admin-ratelimit";
 import { logger } from "@/lib/logger";
 import { NewsItemEditSchema } from "@tradevantage/shared";
 import type { TablesUpdate } from "@tradevantage/db";
 
-async function enforceAdminRateLimit(adminId: string, action: string) {
-  const rl = await rateLimit({
-    key: `admin:${adminId}:${action}`,
-    limit: 30,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("admin rate-limited", {
-      adminId,
-      action,
-      scope: "admin.review",
-    });
-    throw new Error("rate_limited");
-  }
-}
+const ADMIN_SCOPE = "admin.review";
 
 type NewsUpdate = TablesUpdate<"news_items">;
 
@@ -47,7 +33,7 @@ export async function saveDraft(
 ): Promise<FormState> {
   const admin = await requireAdmin();
   try {
-    await enforceAdminRateLimit(admin.id, "saveDraft");
+    await enforceAdminRateLimit(admin.id, "saveDraft", ADMIN_SCOPE);
   } catch {
     return { ok: false, error: "rate_limited" };
   }
@@ -92,7 +78,7 @@ export async function saveDraft(
 
 export async function approveItem(id: string): Promise<void> {
   const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "approveItem");
+  await enforceAdminRateLimit(admin.id, "approveItem", ADMIN_SCOPE);
   const update: NewsUpdate = {
     status: "approved",
     reviewed_by: admin.id,
@@ -119,7 +105,7 @@ export async function approveItem(id: string): Promise<void> {
 
 export async function rejectItem(id: string): Promise<void> {
   const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "rejectItem");
+  await enforceAdminRateLimit(admin.id, "rejectItem", ADMIN_SCOPE);
   const update: NewsUpdate = {
     status: "rejected",
     reviewed_by: admin.id,

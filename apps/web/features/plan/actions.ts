@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/session";
-import { rateLimit } from "@/lib/ratelimit";
+import { enforceAdminRateLimit } from "@/lib/admin-ratelimit";
 import { logger } from "@/lib/logger";
 import type { Json, TablesInsert, TablesUpdate } from "@tradevantage/db";
 import {
@@ -16,21 +16,7 @@ import {
   PlanTierSchema,
 } from "@/features/plan/types";
 
-async function enforceAdminRateLimit(adminId: string, action: string) {
-  const rl = await rateLimit({
-    key: `admin:${adminId}:${action}`,
-    limit: 30,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("admin rate-limited", {
-      adminId,
-      action,
-      scope: "admin.plan",
-    });
-    throw new Error("rate_limited");
-  }
-}
+const ADMIN_SCOPE = "admin.plan";
 
 export interface PlanActionState {
   ok: boolean;
@@ -131,7 +117,7 @@ export async function createPlan(
 ): Promise<PlanActionState> {
   const admin = await requireAdmin();
   try {
-    await enforceAdminRateLimit(admin.id, "createPlan");
+    await enforceAdminRateLimit(admin.id, "createPlan", ADMIN_SCOPE);
   } catch {
     return { ok: false, error: "rate_limited" };
   }
@@ -188,7 +174,7 @@ export async function updatePlan(
 ): Promise<PlanActionState> {
   const admin = await requireAdmin();
   try {
-    await enforceAdminRateLimit(admin.id, "updatePlan");
+    await enforceAdminRateLimit(admin.id, "updatePlan", ADMIN_SCOPE);
   } catch {
     return { ok: false, error: "rate_limited" };
   }
@@ -236,7 +222,7 @@ export async function updatePlan(
 
 export async function publishPlan(id: string): Promise<void> {
   const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "publishPlan");
+  await enforceAdminRateLimit(admin.id, "publishPlan", ADMIN_SCOPE);
 
   const now = new Date().toISOString();
   const update: TablesUpdate<"trading_plans"> = {
@@ -271,7 +257,7 @@ export async function publishPlan(id: string): Promise<void> {
 
 export async function closePlan(id: string, formData: FormData): Promise<void> {
   const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "closePlan");
+  await enforceAdminRateLimit(admin.id, "closePlan", ADMIN_SCOPE);
 
   const parse = PlanCloseInputSchema.safeParse({
     outcome: formData.get("outcome"),
@@ -314,7 +300,7 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
 
 export async function deletePlan(id: string): Promise<void> {
   const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "deletePlan");
+  await enforceAdminRateLimit(admin.id, "deletePlan", ADMIN_SCOPE);
 
   const supabase = supabaseServer();
   const { error } = await supabase.from("trading_plans").delete().eq("id", id);
