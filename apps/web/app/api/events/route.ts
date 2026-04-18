@@ -104,7 +104,12 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+          // `timeline_events` RLS returns per-user rows (user_pin kind is
+          // filtered to `created_by = auth.uid()`), so a shared-cache
+          // (`public, s-maxage`) entry could leak one caller's pins to
+          // another. Keep the caching private to the caller's browser.
+          "Cache-Control":
+            "private, max-age=60, stale-while-revalidate=300",
         },
       },
     );
