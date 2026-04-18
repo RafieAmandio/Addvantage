@@ -33,6 +33,22 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Gate authenticated surfaces. Admin is also gated at the layout level via
+  // getProfile()/requireAdmin; this is defense-in-depth so an unauthenticated
+  // request never reaches a Server Component that might read PII.
+  const { pathname } = request.nextUrl;
+  const isProtected =
+    pathname.startsWith("/app") || pathname.startsWith("/admin");
+  if (isProtected && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = `?next=${encodeURIComponent(pathname)}`;
+    return NextResponse.redirect(url);
+  }
+
   return response;
 }

@@ -113,7 +113,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
   - [x] **A2.** `/signup` wizard — on final step, call the same `signInWithOtp` (Supabase auto-creates the user on first OTP), keep the liability + profile wizard post-exchange.
     - [ ] **A2b.** Persist operator handle + experience into `profiles` on post-exchange landing (currently handle lives only in `localStorage`).
   - [x] **A3.** Logout — server action + header/sidebar button calling `supabase.auth.signOut()` and redirecting to `/`.
-  - [ ] **A4.** Gate `/app/*` and `/admin/*` via middleware or layout redirects when session is missing (verify existing middleware covers it).
+  - [x] **A4.** Gate `/app/*` and `/admin/*` via middleware or layout redirects when session is missing (verify existing middleware covers it).
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
 - [x] **Retry/backoff** on Supabase + OpenAI calls — generic helper at `apps/worker/src/lib/retry.ts`; wraps OpenAI rephrase + Supabase persist insert/loadExistingHashes
 - [x] **Graceful Telegram bot shutdown** — call `bot.stop()` before `process.exit(0)`
