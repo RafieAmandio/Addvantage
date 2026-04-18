@@ -547,6 +547,7 @@ export type Database = {
       trading_plans: {
         Row: {
           author_id: string | null
+          close_price: number | null
           closed_at: string | null
           created_at: string
           direction: string
@@ -555,6 +556,7 @@ export type Database = {
           outcome: string | null
           published_at: string | null
           r_multiple: number | null
+          realized_r: number | null
           setups: Json
           status: string
           stop: number | null
@@ -567,6 +569,7 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
+          close_price?: number | null
           closed_at?: string | null
           created_at?: string
           direction: string
@@ -575,6 +578,7 @@ export type Database = {
           outcome?: string | null
           published_at?: string | null
           r_multiple?: number | null
+          realized_r?: number | null
           setups?: Json
           status?: string
           stop?: number | null
@@ -587,6 +591,7 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
+          close_price?: number | null
           closed_at?: string | null
           created_at?: string
           direction?: string
@@ -595,6 +600,7 @@ export type Database = {
           outcome?: string | null
           published_at?: string | null
           r_multiple?: number | null
+          realized_r?: number | null
           setups?: Json
           status?: string
           stop?: number | null
