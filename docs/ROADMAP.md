@@ -263,7 +263,7 @@ create index on timeline_events (occurred_at desc);
 
 **Phase C — Tweet source (2-3 days):**
 - [x] **C1.** Trump tweet adapter (Truth Social RSS) + scheduler registration + migration 0015 routing `source_code='TRUMP'` to `timeline_events.kind='tweet'` via the mirror trigger. _(done — `apps/worker/src/adapters/truth-social.ts`, `packages/db/migrations/0015_trump_source_and_tweet_kind.sql`)_
-- [ ] **C2.** Dot rendering on the chart — distinct marker style for `kind='tweet'` in `features/chart/components/PriceChart.tsx` (or via a new overlay layer), so tweets visually separate from news dots.
+- [x] **C2.** Dot rendering on the chart — distinct marker style for `kind='tweet'` in `features/chart/components/PriceChart.tsx` (or via a new overlay layer), so tweets visually separate from news dots. _(done tick — `PriceChart` gains an optional `markers: ChartMarker[]` prop wired through v5's `createSeriesMarkers` plugin; per-kind style table (news=blue circle, tweet=orange arrowDown, macro=red circle, earnings=purple square, user_pin=grey belowBar); `/app/chart/[symbol]` projects already-fetched timeline events onto the chart)_
 - [ ] **C3.** Drawer UI — clicking a tweet marker opens a drawer showing the rephrased body, the original Truth Social link, and affected symbols. Reuse existing event drawer shell if present.
 
 **Phase D — Polish (ongoing):**
