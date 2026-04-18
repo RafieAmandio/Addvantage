@@ -5,6 +5,7 @@ import { SpdjiAdapter } from "./spdji";
 import { YardeniAdapter } from "./yardeni";
 import { RbcAdapter } from "./rbc";
 import { TruthSocialAdapter } from "./truth-social";
+import { ForexFactoryAdapter } from "./forexfactory";
 
 /** Ordered registry. The scheduler iterates this list on each tick. */
 export const ADAPTERS: SourceAdapter[] = [
@@ -14,6 +15,7 @@ export const ADAPTERS: SourceAdapter[] = [
   new YardeniAdapter(),
   new RbcAdapter(),
   new TruthSocialAdapter(),
+  new ForexFactoryAdapter(),
 ];
 
 export function getAdapter(code: string): SourceAdapter | undefined {

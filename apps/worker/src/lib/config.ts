@@ -49,6 +49,12 @@ const EnvSchema = z.object({
    *  rotates hosts or we point at a self-hosted cache. */
   TRUTH_SOCIAL_RSS_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
 
+  /** Override for the ForexFactory weekly calendar RSS URL. Unset = use the
+   *  adapter's hardcoded default
+   *  (`https://nfs.faireconomy.media/ff_calendar_thisweek.xml`). Useful if
+   *  the upstream mirror rotates hosts or we point at a self-hosted cache. */
+  FOREXFACTORY_RSS_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+
   /** Comma-separated adapter codes, e.g. "FRED,SC". Empty = all enabled in DB. */
   ENABLED_SOURCES: z
     .string()
