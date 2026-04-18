@@ -1,3 +1,9 @@
+// Sentry must load before any other side-effectful imports so OpenTelemetry
+// auto-instrumentation can wrap them. `initSentry()` itself is a no-op when
+// SENTRY_DSN is unset (graceful-noop pattern, like Upstash/Brevo/Logtail).
+import { initSentry } from "./lib/sentry";
+initSentry();
+
 import { logger } from "./lib/logger";
 import { config } from "./lib/config";
 import { startBot, stopBot } from "./telegram/bot";

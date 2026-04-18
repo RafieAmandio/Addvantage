@@ -49,6 +49,10 @@ const ServerEnvSchema = z.object({
     emptyToUndef,
     z.coerce.number().int().positive().optional()
   ),
+  // Sentry server-side DSN. Optional — when unset, sentry.server.config.ts
+  // and sentry.edge.config.ts early-return without calling Sentry.init().
+  // Mirrors the graceful-noop pattern used elsewhere (Upstash/Brevo/etc.).
+  SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 });
 
 const parsed = ServerEnvSchema.safeParse(process.env);

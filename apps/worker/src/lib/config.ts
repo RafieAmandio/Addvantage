@@ -122,6 +122,17 @@ const EnvSchema = z.object({
    *  (https://in.logs.betterstack.com). */
   LOGTAIL_SOURCE_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   LOGTAIL_ENDPOINT: z.preprocess(emptyToUndef, z.string().url().optional()),
+
+  /** Sentry error tracking. When SENTRY_DSN is set, the worker calls
+   *  `Sentry.init()` at boot via `lib/sentry.ts` and unhandled errors are
+   *  reported. Unset = no init, no throw, no extra startup log — matches the
+   *  graceful-noop pattern used by Upstash/Brevo/Heartbeat/Logtail.
+   *  SENTRY_ENVIRONMENT defaults to NODE_ENV. SENTRY_TRACES_SAMPLE_RATE is
+   *  reserved for future perf tuning; default 0 ships zero performance
+   *  traffic until explicitly turned up. */
+  SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
+  SENTRY_ENVIRONMENT: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
 })
 .refine(
   (env) =>

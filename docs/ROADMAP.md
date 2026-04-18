@@ -93,7 +93,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] **Add web env validation** — mirror `apps/worker/src/lib/config.ts` pattern for `NEXT_PUBLIC_*` and server vars
 
 ### High priority
-- [ ] **Error tracking** — Sentry on both apps (web + worker), DSN via env
+- [x] **Error tracking** — Sentry on both apps (web + worker), DSN via env _(done tick 100 — @sentry/nextjs for web (client/server/edge config files with DSN gate, wired via instrumentation.ts), @sentry/node for worker (apps/worker/src/lib/sentry.ts with initSentry() no-op when SENTRY_DSN unset). Source map upload / release tagging deliberately deferred — that needs SENTRY_AUTH_TOKEN + a Sentry account, which is a separate tick.)_
 - [x] **Structured logging on web** — currently only `console.error` in one place
 - [x] **Ship worker logs off-box (Better Stack / Logtail)** — pino → `@logtail/pino` transport. Free tier 1GB/mo + 3-day retention. Env: `LOGTAIL_SOURCE_TOKEN` (optional — when unset, worker logs stdout only, never crashes). (Decided tick 36.) _(done tick 99 — `@logtail/pino@0.5.8` wired; `apps/worker/src/lib/logger.ts` now uses `pino.transport({ targets })` with stdout always-on and Logtail attached only when `LOGTAIL_SOURCE_TOKEN` is set — unset = stdout-only, no throw, matches the graceful-noop pattern used by Upstash/Brevo/Heartbeat. Optional `LOGTAIL_ENDPOINT` for region-specific ingest hosts.)_
 - [x] **Health check endpoint (web)** — `/api/health` returns 200/503 with Supabase ping

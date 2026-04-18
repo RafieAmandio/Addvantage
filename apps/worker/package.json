@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@logtail/pino": "^0.5.8",
+    "@sentry/node": "^10.49.0",
     "@supabase/supabase-js": "^2.45.4",
     "@tradevantage/db": "workspace:*",
     "@tradevantage/shared": "workspace:*",

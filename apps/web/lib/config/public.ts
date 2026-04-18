@@ -20,6 +20,14 @@ const PublicEnvSchema = z.object({
     emptyToUndef,
     z.string().url().default("http://localhost:3000")
   ),
+  // Sentry client DSN. Optional — when unset, sentry.client.config.ts
+  // early-returns without calling Sentry.init(). Separate from server-side
+  // SENTRY_DSN because NEXT_PUBLIC_* is the only way to ship a value to the
+  // browser bundle.
+  NEXT_PUBLIC_SENTRY_DSN: z.preprocess(
+    emptyToUndef,
+    z.string().url().optional()
+  ),
 });
 
 // NEXT_PUBLIC_* are inlined at build time. We pick them explicitly so
@@ -28,6 +36,7 @@ const parsed = PublicEnvSchema.safeParse({
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
 });
 
 if (!parsed.success) {
