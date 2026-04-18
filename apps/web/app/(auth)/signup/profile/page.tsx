@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/Button";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
+import { saveTraderProfile } from "@/features/auth/actions";
 import { useAppState } from "@/lib/state";
 
 const TRADING_LENGTHS = [
@@ -47,7 +48,7 @@ const FAULT_OPTIONS = [
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { setTraderProfile } = useAppState();
+  const { setTraderProfile, operatorName } = useAppState();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     tradingLength: "",
@@ -76,16 +77,40 @@ export default function ProfilePage() {
   const next = () => {
     if (step < 2) {
       setStep(step + 1);
-    } else {
-      setTraderProfile({
-        tradingLength: form.tradingLength,
-        longestProfitable: form.longestProfitable,
-        markets: form.markets,
-        yearlyGoal: form.yearlyGoal.trim(),
-        faultAttribution: form.faultAttribution,
-      });
-      router.push("/app");
+      return;
     }
+    const trimmedGoal = form.yearlyGoal.trim();
+    setTraderProfile({
+      tradingLength: form.tradingLength,
+      longestProfitable: form.longestProfitable,
+      markets: form.markets,
+      yearlyGoal: trimmedGoal,
+      faultAttribution: form.faultAttribution,
+    });
+
+    // Fire-and-route: persist to Supabase in the background; localStorage is
+    // our fallback so a transient server error shouldn't block entry.
+    const fd = new FormData();
+    if (operatorName && operatorName !== "Operator") {
+      fd.set("handle", operatorName);
+    }
+    fd.set("tradingLength", form.tradingLength);
+    fd.set("longestProfitable", form.longestProfitable);
+    for (const m of form.markets) fd.append("markets", m);
+    fd.set("yearlyGoal", trimmedGoal);
+    fd.set("faultAttribution", form.faultAttribution);
+
+    void saveTraderProfile({ ok: false }, fd)
+      .then((res) => {
+        if (!res.ok) {
+          console.warn("saveTraderProfile failed", res.error);
+        }
+      })
+      .catch((err: unknown) => {
+        console.warn("saveTraderProfile threw", err);
+      });
+
+    router.push("/app");
   };
 
   const skip = () => {
