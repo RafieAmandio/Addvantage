@@ -81,3 +81,41 @@ export async function listTimelineEvents(
 
   return parsed.data;
 }
+
+/**
+ * Single timeline_events row by id. Same narrow projection as
+ * `listTimelineEvents` so the detail view speaks the identical schema.
+ * Returns `null` on not-found, shape mismatch, or network error (matching
+ * the feature's fail-soft convention — callers fall through to `notFound()`).
+ */
+export async function getTimelineEventById(
+  id: string
+): Promise<TimelineEvent | null> {
+  const supabase = supabaseServer();
+  const { data, error } = await supabase
+    .from("timeline_events")
+    .select(TIMELINE_EVENT_COLUMNS)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    logger.error("getTimelineEventById: timeline_events read failed", {
+      id,
+      error,
+      scope: "timeline.getTimelineEventById",
+    });
+    return null;
+  }
+  if (!data) return null;
+
+  const parsed = TimelineEventSchema.safeParse(data);
+  if (!parsed.success) {
+    logger.error("getTimelineEventById: timeline_events shape mismatch", {
+      id,
+      issues: parsed.error.issues,
+      scope: "timeline.getTimelineEventById",
+    });
+    return null;
+  }
+  return parsed.data;
+}

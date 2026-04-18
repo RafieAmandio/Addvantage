@@ -22,9 +22,12 @@ export function EventRow({
     <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-ink-3 bg-ink px-3 py-3 transition-colors hover:bg-ink-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
-          <div className="font-display text-base leading-tight text-paper group-hover:text-lime">
+          <Link
+            href={`/app/calendar/${event.id}`}
+            className="font-display text-base leading-tight text-paper group-hover:text-lime hover:text-lime hover:underline"
+          >
             {event.title}
-          </div>
+          </Link>
           {related && (
             <Link
               href={`/app/news/${related.id}`}
