@@ -88,6 +88,57 @@ export type Database = {
           },
         ]
       }
+      education_primers: {
+        Row: {
+          author: string
+          body: string[]
+          created_at: string
+          framework: string | null
+          id: string
+          locked: boolean
+          published: boolean
+          reading_min: number
+          slug: string
+          sort_order: number
+          summary: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          body?: string[]
+          created_at?: string
+          framework?: string | null
+          id?: string
+          locked?: boolean
+          published?: boolean
+          reading_min?: number
+          slug: string
+          sort_order?: number
+          summary?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          body?: string[]
+          created_at?: string
+          framework?: string | null
+          id?: string
+          locked?: boolean
+          published?: boolean
+          reading_min?: number
+          slug?: string
+          sort_order?: number
+          summary?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_log: {
         Row: {
           external_message_id: string | null
