@@ -1,0 +1,15 @@
+# Production overrides. Used on the VPS only, layered on top of docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# The IMAGE_TAG env var is injected by the deploy workflow (set to the
+# commit sha). Defaults to "latest" for manual pulls.
+#
+# Note: the base docker-compose.yml declares a `build:` block. Compose merges
+# overrides key-by-key; when `image:` is set on both and `pull_policy: always`
+# is present, compose prefers pulling over building. The `build:` key from the
+# base file remains but is effectively ignored on this code path.
+services:
+  worker:
+    image: ghcr.io/${GITHUB_REPOSITORY:-rafiamandio/tradevantage}/worker:${IMAGE_TAG:-latest}
+    pull_policy: always

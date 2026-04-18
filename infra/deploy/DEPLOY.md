@@ -202,3 +202,33 @@ Caddy will auto-provision TLS on first request. If you use Cloudflare orange-clo
 - **Scraping legality.** FRED is a public-domain US govt API — safe. SlickCharts factual data is low risk. SPDJI / Yardeni / RBC each have ToS; the rephrase step rewrites wording, but you should store `source_url` and keep audit trails in case a takedown request arrives. You may want to add a visible "Source: external research" footer on any item from those three.
 - **Telegram long-polling** on the worker keeps a single connection open. If you scale to multiple worker replicas, switch to webhook mode and front the bot on a Next.js route handler instead (`app/api/telegram/route.ts`).
 - **Supabase free tier** auto-pauses after 7 days of inactivity. For a production deploy upgrade to the Pro plan ($25/mo) before going live.
+
+## 11. Automated deploy via GHCR + SSH
+
+Once the VPS is bootstrapped manually (Section 3), subsequent worker deploys run automatically from CI:
+
+1. Push to `main` with changes under `apps/worker/**`, `packages/shared/**`, `packages/db/**`, or any of the infra/Dockerfile paths listed in `.github/workflows/deploy-worker.yml`.
+2. CI builds the worker image with the Dockerfile at `apps/worker/Dockerfile` and pushes to GHCR under `ghcr.io/<org>/<repo>/worker:<sha>` + `:latest`.
+3. CI SSHes to the VPS, `git fetch` + `reset --hard origin/main` to sync the compose files, then pulls the new image and runs `docker compose up -d worker`. The `IMAGE_TAG` env var pins the exact sha so the container runs the same commit as the workflow run.
+
+### Required repo secrets (Settings → Secrets and variables → Actions)
+
+- `VPS_HOST` — IP or hostname
+- `VPS_USER` — SSH user (the one with docker group membership)
+- `VPS_SSH_KEY` — PEM-formatted private key. Generate with `ssh-keygen -t ed25519 -f deploy_key -C github-actions`; copy the public key to the VPS user's `~/.ssh/authorized_keys`; paste the private key into this secret.
+- `VPS_DEPLOY_PATH` — absolute path to the repo clone on the VPS, e.g. `/srv/tradevantage`. The VPS must have this path already checked out (manual first deploy per Section 3).
+
+### Manual rollback
+
+SSH to the VPS, then:
+
+```bash
+cd $VPS_DEPLOY_PATH/infra
+IMAGE_TAG=<previous-sha> docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d worker
+```
+
+GHCR keeps every sha tag — `latest` just trails the most recent deploy.
+
+### GHCR package visibility
+
+By default the GitHub Actions token can push private packages. If the worker package stays private, add a `GHCR_PULL_TOKEN` (classic PAT with `read:packages`) as a VPS env var and `docker login ghcr.io` on the VPS once. For public packages, no auth is needed on the VPS — simpler.
