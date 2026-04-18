@@ -15,6 +15,7 @@
     "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
+    "@logtail/pino": "^0.5.8",
     "@supabase/supabase-js": "^2.45.4",
     "@tradevantage/db": "workspace:*",
     "@tradevantage/shared": "workspace:*",

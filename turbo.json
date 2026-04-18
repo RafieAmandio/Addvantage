@@ -29,7 +29,9 @@
     "EMAIL_SENDER_EMAIL",
     "EMAIL_SENDER_NAME",
     "RENEWAL_TEMPLATE_ID",
-    "DUNNING_TEMPLATE_ID"
+    "DUNNING_TEMPLATE_ID",
+    "LOGTAIL_SOURCE_TOKEN",
+    "LOGTAIL_ENDPOINT"
   ],
   "tasks": {
     "build": {

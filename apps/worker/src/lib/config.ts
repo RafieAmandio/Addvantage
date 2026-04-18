@@ -112,6 +112,16 @@ const EnvSchema = z.object({
    *  Optional — when unset, the daily renewal cron is not registered and the
    *  worker boots with no email traffic. */
   RENEWAL_TEMPLATE_ID: z.coerce.number().int().positive().optional(),
+
+  /** Better Stack (Logtail) log ingestion. When LOGTAIL_SOURCE_TOKEN is set,
+   *  the worker's pino logger dual-writes to stdout + Better Stack via the
+   *  `@logtail/pino` transport. When unset, the logger is untouched (stdout
+   *  only) — the worker never crashes because this env is missing.
+   *  LOGTAIL_ENDPOINT is optional and lets you override the ingest host for
+   *  region-specific Better Stack sources; the default matches `@logtail/node`
+   *  (https://in.logs.betterstack.com). */
+  LOGTAIL_SOURCE_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  LOGTAIL_ENDPOINT: z.preprocess(emptyToUndef, z.string().url().optional()),
 })
 .refine(
   (env) =>
