@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import type { CalendarEvent } from "@/lib/mock/types";
 import {
   DEMO_TODAY_YMD,
@@ -39,8 +40,6 @@ export interface CalendarPageViewProps {
 
 export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   const calendar = events;
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [view, setView] = useState<ViewMode>(() =>
@@ -57,15 +56,12 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   );
 
   // Push state to URL (replace, not push — no history pollution when stepping)
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (view !== "week") sp.set("view", view);
-    if (anchor !== DEMO_TODAY_YMD) sp.set("d", anchor);
-    if (impactFilter !== "all") sp.set("impact", impactFilter);
-    if (regionFilter !== "all") sp.set("region", regionFilter);
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [view, anchor, impactFilter, regionFilter, pathname, router]);
+  useUrlSyncedState({
+    view: view !== "week" ? view : null,
+    d: anchor !== DEMO_TODAY_YMD ? anchor : null,
+    impact: impactFilter !== "all" ? impactFilter : null,
+    region: regionFilter !== "all" ? regionFilter : null,
+  });
 
   const setAnchorAbsolute = useCallback((ymd: string) => setAnchor(ymd), []);
   useCalendarKeyboard(view, setAnchor, setAnchorAbsolute);

@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import type { TradingPlan } from "@/lib/mock/types";
 import {
   commonInstruments as getCommonInstruments,
@@ -60,20 +61,12 @@ function PlanCompareViewInner({
   planA: initialA,
   planB: initialB,
 }: PlanCompareViewProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [a, setA] = useState<string | null>(() => searchParams.get("a"));
   const [b, setB] = useState<string | null>(() => searchParams.get("b"));
 
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (a) sp.set("a", a);
-    if (b) sp.set("b", b);
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [a, b, pathname, router]);
+  useUrlSyncedState({ a, b });
 
   // Prefer the server-fetched + adapted plans (covers cases where a plan is
   // outside the in-memory `allPlans` picker window). Fall back to picker list.

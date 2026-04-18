@@ -1,7 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import { SectionNumber } from "@/components/ui/Marker";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
@@ -53,8 +54,6 @@ export function PlanArchiveView(props: PlanArchiveViewProps) {
 }
 
 function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const toast = useToast();
 
@@ -65,13 +64,10 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
     parseHorizon(searchParams.get("h")),
   );
 
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (horizonFilter !== "all") sp.set("h", horizonFilter);
-    if (query) sp.set("q", query);
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [horizonFilter, query, pathname, router]);
+  useUrlSyncedState({
+    h: horizonFilter !== "all" ? horizonFilter : null,
+    q: query || null,
+  });
 
   const plans = useMemo(() => {
     let filtered =

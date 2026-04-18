@@ -1,8 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import {
   SectionNumber,
   DataLabel,
@@ -54,8 +55,6 @@ export function NewsListClient({ items }: { items: NewsListItem[] }) {
 }
 
 function View({ items }: { items: NewsListItem[] }) {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { ids: seenIds, hydrated: seenHydrated, reset: resetSeen } =
     useSeenNews();
@@ -69,13 +68,10 @@ function View({ items }: { items: NewsListItem[] }) {
   );
   const [confirmingResetSeen, setConfirmingResetSeen] = useState(false);
 
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (query) sp.set("q", query);
-    if (hideSeen) sp.set("hideseen", "1");
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [query, hideSeen, pathname, router]);
+  useUrlSyncedState({
+    q: query || null,
+    hideseen: hideSeen ? "1" : null,
+  });
 
   const seenSet = useMemo(() => new Set(seenIds), [seenIds]);
 

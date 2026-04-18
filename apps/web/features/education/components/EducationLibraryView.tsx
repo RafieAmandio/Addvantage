@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import { useAppState, isPaid } from "@/lib/state";
 import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
@@ -49,21 +50,13 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
   const { tier } = useAppState();
   const paid = isPaid(tier);
   const { ids: readIds, hydrated, reset } = useReadPrimers();
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [query, setQuery] = useState<string>(
     () => searchParams.get("q")?.trim() ?? ""
   );
 
-  // Sync URL on query changes
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (query) sp.set("q", query);
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [query, pathname, router]);
+  useUrlSyncedState({ q: query || null });
 
   // Only count primers the user can actually access
   const accessible = primers.filter((p) => !(p.locked && !paid));

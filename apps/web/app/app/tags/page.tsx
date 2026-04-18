@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import { allHashtags, hashtagMeta } from "@/features/tags/mock";
 import { primers } from "@/features/education/mock";
 import { news } from "@/features/news/mock";
@@ -49,8 +50,6 @@ export default function TagsPage() {
 }
 
 function TagsView() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState<string>(
     () => searchParams.get("q")?.trim() ?? ""
@@ -80,13 +79,10 @@ function TagsView() {
   };
 
   // Sync URL on query / sort changes
-  useEffect(() => {
-    const sp = new URLSearchParams();
-    if (query) sp.set("q", query);
-    if (sortMode !== "density") sp.set("sort", sortMode);
-    const qs = sp.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [query, sortMode, pathname, router]);
+  useUrlSyncedState({
+    q: query || null,
+    sort: sortMode !== "density" ? sortMode : null,
+  });
 
   const countsRaw = useMemo(
     () =>
