@@ -48,7 +48,14 @@ export async function createConsultSession(
     limit: 20,
     windowSec: 60,
   });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  if (!rl.success) {
+    logger.warn("consult rate-limited", {
+      userId: user.id,
+      action: "create",
+      scope: "consult.createConsultSession",
+    });
+    return { ok: false, error: "rate_limited" };
+  }
 
   const parsed = CreateSessionSchema.safeParse({ title });
   if (!parsed.success) return { ok: false, error: "invalid_input" };
@@ -104,7 +111,14 @@ export async function appendConsultMessage(input: {
     limit: 30,
     windowSec: 60,
   });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  if (!rl.success) {
+    logger.warn("consult rate-limited", {
+      userId: user.id,
+      action: "append",
+      scope: "consult.appendConsultMessage",
+    });
+    return { ok: false, error: "rate_limited" };
+  }
 
   const parsed = AppendMessageSchema.safeParse(input);
   if (!parsed.success) {
@@ -166,7 +180,14 @@ export async function renameConsultSession(input: {
     limit: 30,
     windowSec: 60,
   });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  if (!rl.success) {
+    logger.warn("consult rate-limited", {
+      userId: user.id,
+      action: "rename",
+      scope: "consult.renameConsultSession",
+    });
+    return { ok: false, error: "rate_limited" };
+  }
 
   const parsed = RenameSessionSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid_input" };
@@ -410,7 +431,14 @@ export async function deleteConsultSession(
     limit: 30,
     windowSec: 60,
   });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  if (!rl.success) {
+    logger.warn("consult rate-limited", {
+      userId: user.id,
+      action: "delete",
+      scope: "consult.deleteConsultSession",
+    });
+    return { ok: false, error: "rate_limited" };
+  }
 
   const parsed = DeleteSessionSchema.safeParse({ sessionId });
   if (!parsed.success) return { ok: false, error: "invalid_input" };
