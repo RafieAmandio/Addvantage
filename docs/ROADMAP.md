@@ -115,7 +115,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
   - [x] **A3.** Logout — server action + header/sidebar button calling `supabase.auth.signOut()` and redirecting to `/`.
   - [x] **A4.** Gate `/app/*` and `/admin/*` via middleware or layout redirects when session is missing (verify existing middleware covers it).
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
-  - [ ] **M1.** `/app/calendar` — swap mock calendar events for real `timeline_events WHERE kind='macro'` (FF adapter already seeds these via migration 0016)
+  - [x] **M1.** `/app/calendar` — swap mock calendar events for real `timeline_events WHERE kind='macro'` (FF adapter already seeds these via migration 0016) _(done tick 141 — /app/calendar now reads timeline_events WHERE kind='macro' via listTimelineEvents({kinds:['macro']}); mapper at features/calendar/lib/fromTimeline.ts; mock.ts retained for offline dev/tests but no longer imported by the page. Chose to extend the existing timeline query over a new calendar-queries file because calendar events are a projection, not a separate domain.)_
   - [ ] **M2.** `/app/consult` — migrate to Supabase via the message-persistence feature-backlog item (paired with Section 3 "Message persistence")
   - [ ] **M3.** `/app/plans` — blocked on Section 3 "Real plan authoring flow" (plan schema must land first)
   - [ ] **M4.** `/app/education` — carve into its own tick; primers are content-authored, likely lowest priority
