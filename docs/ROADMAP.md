@@ -108,7 +108,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 - [x] **GitHub Actions CI** — typecheck + lint + build on every PR
 
 ### Medium priority
-- [ ] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only). Provider: Supabase email magic-link OTP (decided tick 120).
+- [x] **Real auth** — wire Supabase auth into `/login` and `/signup` (currently UI only). Provider: Supabase email magic-link OTP (decided tick 120). _(done tick 142 — all children A1/A2/A2b/A3/A4 landed; parent flipped as bookkeeping)_
   - [x] **A1.** `/login` OTP send + `/auth/callback` session exchange — replace mock form submit with server action calling `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: `${SITE_URL}/auth/callback` }})`, show "check your email" confirmation state, and add `app/auth/callback/route.ts` that calls `exchangeCodeForSession(code)` and redirects to `/app`.
   - [x] **A2.** `/signup` wizard — on final step, call the same `signInWithOtp` (Supabase auto-creates the user on first OTP), keep the liability + profile wizard post-exchange.
     - [x] **A2b.** Persist operator handle + experience into `profiles` on post-exchange landing (currently handle lives only in `localStorage`). _(done tick 140 — migration 0018 adds trading_length / longest_profitable / markets / yearly_goal / fault_attribution columns with check constraints; handle updated from operatorName; new `saveTraderProfile` server action (zod-validated, 5/60s rate-limited, non-blocking client-side call from /signup/profile final step); localStorage fallback retained so the existing AppStateProvider still hydrates client-side state.)_
