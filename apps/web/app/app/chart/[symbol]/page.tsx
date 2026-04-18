@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import {
-  PriceChart,
   type Bar as ChartBar,
   type ChartMarker,
 } from "@/features/chart/components/PriceChart";
+import { ChartInteractive } from "@/features/chart/components/ChartInteractive";
 import { SymbolNav } from "@/features/chart/components/SymbolNav";
 import { SymbolSearch } from "@/features/chart/components/SymbolSearch";
 import {
@@ -137,14 +137,13 @@ export default async function ChartPage({
               [mock data — instrument_bars empty]
             </div>
           )}
-          <div className="border border-ink-3 bg-ink-2 p-3">
-            <PriceChart
-              bars={bars}
-              seriesType="candlestick"
-              height={520}
-              markers={markers}
-            />
-          </div>
+          <ChartInteractive
+            bars={bars}
+            events={events}
+            markers={markers}
+            seriesType="candlestick"
+            height={520}
+          />
         </div>
 
         <aside className="col-span-12 lg:col-span-4">

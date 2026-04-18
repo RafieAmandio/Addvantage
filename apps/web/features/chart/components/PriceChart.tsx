@@ -34,12 +34,13 @@ export interface Bar {
  * viewer can distinguish a tweet from a news item at a glance without a legend.
  */
 export interface ChartMarker {
+  /** Stable id — used by onMarkerClick to deref the source event. */
+  id: string;
   /** ISO timestamp — converted via toChartTime() to the series time type. */
   time: string;
   kind: "news" | "tweet" | "macro" | "earnings" | "user_pin";
   /** Shown in the marker's hover tooltip (maps to SeriesMarker.text). */
   title?: string;
-  id?: string;
 }
 
 export interface PriceChartProps {
@@ -52,6 +53,8 @@ export interface PriceChartProps {
   className?: string;
   /** Optional timeline-event dots rendered over the series. */
   markers?: ChartMarker[];
+  /** Fires with the clicked marker's id when a marker dot is clicked. */
+  onMarkerClick?: (id: string) => void;
 }
 
 /**
@@ -99,8 +102,15 @@ export function PriceChart({
   height = 480,
   className,
   markers,
+  onMarkerClick,
 }: PriceChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Keep the handler in a ref so the main effect doesn't have to re-run
+  // (and rebuild the whole chart) when the parent re-creates the callback.
+  const onMarkerClickRef = useRef<typeof onMarkerClick>(onMarkerClick);
+  useEffect(() => {
+    onMarkerClickRef.current = onMarkerClick;
+  }, [onMarkerClick]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -173,9 +183,21 @@ export function PriceChart({
     const markersPlugin =
       mappedMarkers.length > 0 ? createSeriesMarkers(series, mappedMarkers) : null;
 
+    // Marker click wiring. v5's plugin doesn't expose a per-marker click; the
+    // documented path is chart.subscribeClick + MouseEventParams.hoveredObjectId,
+    // which the createSeriesMarkers plugin populates with the marker's `id`.
+    const clickHandler = (param: { hoveredObjectId?: unknown }) => {
+      const cb = onMarkerClickRef.current;
+      if (!cb) return;
+      const id = param.hoveredObjectId;
+      if (typeof id === "string" && id.length > 0) cb(id);
+    };
+    chart.subscribeClick(clickHandler);
+
     chart.timeScale().fitContent();
 
     return () => {
+      chart.unsubscribeClick(clickHandler);
       markersPlugin?.detach();
       chart.remove();
     };
