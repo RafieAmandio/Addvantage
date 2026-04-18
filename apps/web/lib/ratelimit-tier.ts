@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { rateLimit, type RateLimitResult } from "@/lib/ratelimit";
 
 if (typeof window !== "undefined") {
@@ -63,18 +64,30 @@ export type EnforceTierRateLimitInput =
 export async function enforceTierRateLimit(
   input: EnforceTierRateLimitInput,
 ): Promise<RateLimitResult> {
+  let result: RateLimitResult;
   if ("userId" in input) {
     const bucket = TIER_BUCKETS[input.action][input.tier];
-    return rateLimit({
+    result = await rateLimit({
       key: `tier:${input.action}:${input.userId}`,
       limit: bucket.limit,
       windowSec: bucket.windowSec,
     });
+  } else {
+    const bucket = TIER_BUCKETS[input.action].free;
+    result = await rateLimit({
+      key: `tier:${input.action}:ip:${input.ip}`,
+      limit: bucket.limit,
+      windowSec: bucket.windowSec,
+    });
   }
-  const bucket = TIER_BUCKETS[input.action].free;
-  return rateLimit({
-    key: `tier:${input.action}:ip:${input.ip}`,
-    limit: bucket.limit,
-    windowSec: bucket.windowSec,
-  });
+  if (!result.success) {
+    logger.warn("tier rate-limited", {
+      action: input.action,
+      ...("userId" in input
+        ? { userId: input.userId, tier: input.tier }
+        : { ip: input.ip, tier: "free" as const }),
+      scope: `ratelimit.tier.${input.action}`,
+    });
+  }
+  return result;
 }
