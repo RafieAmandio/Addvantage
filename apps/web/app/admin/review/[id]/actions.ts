@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -71,6 +72,10 @@ export async function saveDraft(
     .eq("id", id);
 
   if (error) {
+    Sentry.captureException(error, {
+      tags: { scope: "admin.saveDraft" },
+      extra: { id },
+    });
     logger.error("saveDraft failed", { id, error, scope: "admin.saveDraft" });
     return { ok: false, error: error.message };
   }
@@ -95,6 +100,10 @@ export async function approveItem(id: string): Promise<void> {
     .update(update)
     .eq("id", id);
   if (error) {
+    Sentry.captureException(error, {
+      tags: { scope: "admin.approveItem" },
+      extra: { id },
+    });
     logger.error("approveItem failed", { id, error, scope: "admin.approveItem" });
     throw new Error(error.message);
   }
@@ -118,6 +127,10 @@ export async function rejectItem(id: string): Promise<void> {
     .update(update)
     .eq("id", id);
   if (error) {
+    Sentry.captureException(error, {
+      tags: { scope: "admin.rejectItem" },
+      extra: { id },
+    });
     logger.error("rejectItem failed", { id, error, scope: "admin.rejectItem" });
     throw new Error(error.message);
   }
