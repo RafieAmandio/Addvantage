@@ -50,6 +50,7 @@ export class ForexFactoryAdapter implements SourceAdapter {
 
     const events = extractEvents(xml);
     const out: Candidate[] = [];
+    let skippedLowImpact = 0;
     for (const ev of events) {
       const title = cleanText(ev.title ?? "");
       const country = cleanText(ev.country ?? "");
@@ -63,6 +64,19 @@ export class ForexFactoryAdapter implements SourceAdapter {
       const sourceUrl = cleanText(ev.url ?? "") || url;
 
       const externalId = stableId([title, country, date, time]);
+      const indicatorMatch = matchIndicator(title);
+
+      // D5b: suppress low-impact events from admin queue.
+      // Keep only if: feed impact is High/Medium, OR the title matches a
+      // canonical indicator (FOMC/CPI/NFP/... — always meaningful regardless
+      // of how the feed tagged it). Skip Low / empty / bank-holiday rows.
+      const impactLower = impact.toLowerCase();
+      const isHighOrMedium =
+        impactLower === "high" || impactLower === "medium";
+      if (!indicatorMatch && !isHighOrMedium) {
+        skippedLowImpact++;
+        continue;
+      }
 
       const rawText = [
         `${country} — ${title}`,
@@ -72,7 +86,7 @@ export class ForexFactoryAdapter implements SourceAdapter {
       ].join("\n");
 
       const occurredAt = parseFfDateTime(date, time);
-      const indicator = matchIndicator(title);
+      const indicator = indicatorMatch;
 
       out.push({
         externalId,
@@ -99,7 +113,16 @@ export class ForexFactoryAdapter implements SourceAdapter {
           : {}),
       });
     }
-    return dedupe(out);
+    const deduped = dedupe(out);
+    ctx.logger.debug(
+      {
+        kept: deduped.length,
+        skippedLowImpact,
+        scope: "ff.fetch",
+      },
+      "forexfactory filter summary",
+    );
+    return deduped;
   }
 }
 
