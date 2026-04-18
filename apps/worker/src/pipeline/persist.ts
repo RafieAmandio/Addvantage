@@ -52,6 +52,12 @@ export async function persistCandidates(
       continue;
     }
 
+    // Prefer adapter-level canonical hints (e.g. FF indicator map) over
+    // LLM-derived affects/impact when present — deterministic taxonomy beats
+    // model drift for closed, well-known macro events.
+    const affects = c.canonicalAffects ?? rephrased.affects;
+    const impact = c.canonicalImpact ?? rephrased.impact;
+
     const { data, error } = await retry(
       async () =>
         supabase()
@@ -65,9 +71,9 @@ export async function persistCandidates(
             headline: rephrased.headline,
             rephrased: rephrased.rephrased,
             analysis: rephrased.analysis,
-            impact: rephrased.impact,
+            impact,
             bias: rephrased.bias,
-            affects: rephrased.affects,
+            affects,
             tags: rephrased.tags,
             author: `[${sourceCode}]`,
             status: "pending",

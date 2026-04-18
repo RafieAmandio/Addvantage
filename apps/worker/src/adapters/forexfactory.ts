@@ -1,6 +1,7 @@
 import { config } from "../lib/config";
 import { fetchText } from "../lib/http";
 import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { matchIndicator } from "./forexfactory-indicators";
 
 /**
  * ForexFactory economic calendar adapter. ForexFactory has no official API;
@@ -71,6 +72,7 @@ export class ForexFactoryAdapter implements SourceAdapter {
       ].join("\n");
 
       const occurredAt = parseFfDateTime(date, time);
+      const indicator = matchIndicator(title);
 
       out.push({
         externalId,
@@ -84,8 +86,17 @@ export class ForexFactoryAdapter implements SourceAdapter {
           fxTitle: title,
           fxDate: date,
           fxTime: time,
+          ...(indicator
+            ? { canonicalAffects: indicator.affects.join(",") }
+            : {}),
         },
         occurredAt,
+        ...(indicator
+          ? {
+              canonicalAffects: indicator.affects,
+              canonicalImpact: indicator.impact,
+            }
+          : {}),
       });
     }
     return dedupe(out);

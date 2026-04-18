@@ -1,3 +1,4 @@
+import type { Impact } from "@tradevantage/shared";
 import type { Logger } from "../lib/logger";
 
 /**
@@ -14,6 +15,15 @@ export interface Candidate {
   meta?: Record<string, string | number>;
   /** Source publish timestamp if known, else adapter fetch time. */
   occurredAt?: string;
+  /**
+   * Adapter-level canonical affects[] hint. When set, the persist layer will
+   * override the LLM-derived affects with this value — used by deterministic
+   * indicator maps (e.g. ForexFactory FOMC → ["SPX","DXY","GOLD","BTC"]) so
+   * macro markers filter consistently regardless of the rephrase model's whim.
+   */
+  canonicalAffects?: string[];
+  /** Adapter-level canonical impact hint (overrides LLM when present). */
+  canonicalImpact?: Impact;
 }
 
 export interface AdapterContext {
