@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { supabase } from "../lib/supabase";
 import { logger } from "../lib/logger";
 import { getAdapter } from "../adapters";
@@ -54,6 +55,9 @@ export async function runSource(sourceCode: string): Promise<void> {
       })
       .eq("code", sourceCode);
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { scope: "runSource", sourceCode },
+    });
     logger.error({ err: String(err), sourceCode }, "runSource failed");
     await supabase()
       .from("ingestion_runs")

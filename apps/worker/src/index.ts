@@ -4,6 +4,7 @@
 import { initSentry } from "./lib/sentry";
 initSentry();
 
+import * as Sentry from "@sentry/node";
 import { logger } from "./lib/logger";
 import { config } from "./lib/config";
 import { startBot, stopBot } from "./telegram/bot";
@@ -58,6 +59,7 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
     logger.info("shutdown: complete");
     process.exit(0);
   } catch (err) {
+    Sentry.captureException(err, { tags: { scope: "shutdown" } });
     logger.error({ err: String(err) }, "shutdown: error during shutdown");
     process.exit(1);
   }
@@ -66,10 +68,12 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 process.on("SIGINT", () => void shutdown("SIGINT"));
 process.on("unhandledRejection", (reason) => {
+  Sentry.captureException(reason, { tags: { scope: "unhandledRejection" } });
   logger.error({ reason: String(reason) }, "unhandledRejection");
 });
 
 main().catch((err) => {
+  Sentry.captureException(err, { tags: { scope: "boot" } });
   logger.fatal({ err: String(err) }, "fatal boot error");
   process.exit(1);
 });
