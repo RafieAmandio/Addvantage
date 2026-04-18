@@ -134,15 +134,28 @@ Walk the ROADMAP checkboxes in this order and take the **first unchecked item** 
 3. **Section 6 — Improvement Backlog (auto-discovered)**, oldest first
 4. **Section 3 — Feature Backlog** last
 
-**Skip and list for the user (do not attempt) any item requiring:**
+**Skip (genuinely blocked — cannot be unblocked by a judgment call):**
 - Rotating keys / credential changes
-- Creating external accounts (Stripe, Polygon, Sentry, Axiom, GHCR, etc.)
-- SSH access to the VPS
-- Installing MCP servers or CLIs on the user's machine
-- Making product/design decisions with more than one reasonable answer
+- Creating external accounts (Stripe, Polygon, Sentry, Axiom, GHCR, etc.) — requires the human at a signup form
+- SSH access to the VPS — requires the human at their shell
+- Installing MCP servers or CLIs on the user's machine — requires the human at their shell
 - Destructive git operations (force push, history rewrite)
 
-If an item needs a choice (e.g. "pick market data provider"), stop and ask the user — do not guess.
+**Design & product decisions: decide and proceed. Do not stop and ask.** The user is not hands-on and explicitly wants you to drive. When an item has more than one reasonable approach, pick the one that best serves **maintainability, reusability, and production-readiness** in this order:
+
+1. **Reusability** — prefer patterns that extend an existing primitive, adapter interface, or feature folder over inventing a parallel one. If there's an existing `*Adapter`, `features/<name>/queries/`, or `components/ui/` primitive that covers 80%+ of the need, extend it.
+2. **Maintainability** — prefer boring over clever. Fewer moving parts, one source of truth, clear ownership (feature-local vs cross-cutting per Section 0 layout). Avoid tool/framework sprawl — if the project already uses library X for the general shape, use X, don't introduce Y.
+3. **Production-readiness** — RLS on every new table in the same migration, Zod at every query boundary, `logger.*` + `Sentry.captureException` at every async boundary, graceful no-op when env vars are unset (mirror the Upstash/Heartbeat/Brevo/Logtail patterns in the codebase), rate-limit every user-reachable server action touching DB or a paid upstream.
+4. **Smallest viable scope** — when a backlog item is large, carve it into numbered sub-checkboxes in a docs-only commit *as this tick's work*, then stop; the next tick picks the first sub-item with clear scope. See the LEARNINGS entry on Rate-limit R1..R4 carving. Don't try to do the whole epic in one tick.
+
+**Document the decision.** In the final commit's tick-log line (the `_(done tick N — ...)_` annotation on the ROADMAP checkbox), state the choice and one-line rationale so a future reader understands *why*. Example: `_(done tick 150 — chose JSONB over per-column for message metadata because schema is kind-specific and per-column would force N migrations for N kinds)_`.
+
+**Only stop and ask when:**
+- The choice has material product consequences (e.g. pricing tiers, wording of user-facing copy, which page/feature to prioritize among equals). Infra and architecture calls are yours.
+- External setup is genuinely required (see Skip list above).
+- Two approaches are architecturally equivalent *and* reversing later is expensive (rare — usually one side wins on reusability).
+
+If you did stop-and-ask, exhaust the actionable-but-unchecked items in priority order first: e.g. an improvement-backlog item or a Section 3 feature that *doesn't* need a product call is still better work than a LOOP STOPPING. Only stop when there is truly nothing left you can commit without a product decision.
 
 ### 3. Implement (delegate to sub-agent when work > ~3 files)
 
@@ -287,9 +300,11 @@ Format:
 
 The loop should stop (do **not** schedule another wakeup) when any of these is true:
 
-- All items under "Critical" and "High" in Section 2 are checked **and** Timeline Chart Phase A is fully checked
-- You hit a blocker that requires user input (missing key, design decision, external account)
-- Three consecutive iterations have been skipped because the next-available item requires external setup
+- The ROADMAP has zero actionable unchecked items remaining (all Sections 2/3/4/6 are fully checked, or the only remaining items are on the Skip list from Section 2 — external setup only)
+- You hit a genuinely external blocker (missing credential, external account signup, VPS shell) that no amount of code can unblock
+- Three consecutive iterations have ended with no commit because every candidate item is on the Skip list
+
+**Design decisions are not stopping conditions.** Per Section 2, you decide and proceed with a documented rationale. If you find yourself about to stop because "the item needs a schema choice" or "the item needs a provider choice" — don't. Pick the more maintainable/reusable option, commit, and note the rationale in the ROADMAP tick annotation.
 
 When stopping, clearly say **"LOOP STOPPING"** in your report with the reason.
 
