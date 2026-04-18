@@ -1,15 +1,24 @@
 import Link from "next/link";
 import { listPublishedPlans } from "@/features/plan/queries/plans";
+import { getClosedPlanStats } from "@/features/plan/queries/stats";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { PlanDetail } from "@/features/plan/components/PlanDetail";
+import { PlanStatsBadges } from "@/features/plan/components/PlanStatsBadges";
 
 export default async function PlanPage() {
-  const [latest] = await listPublishedPlans({ limit: 1 });
+  const [plans, stats] = await Promise.all([
+    listPublishedPlans({ limit: 1 }),
+    getClosedPlanStats(),
+  ]);
+  const latest = plans[0];
 
   if (!latest) {
     return (
       <div className="bg-grid-fine">
-        <div className="mx-auto max-w-7xl px-6 py-24">
+        <div className="mx-auto max-w-7xl px-6 pt-6">
+          <PlanStatsBadges stats={stats} />
+        </div>
+        <div className="mx-auto max-w-7xl px-6 pb-24 pt-4">
           <div className="border border-ink-3 bg-ink-2/30 p-8 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
               TRADING PLAN
@@ -36,17 +45,22 @@ export default async function PlanPage() {
   const plan = dbPlanToTradingPlan(latest);
 
   return (
-    <PlanDetail
-      plan={plan}
-      isLatest
-      headerExtra={
-        <Link
-          href="/app/plan/archive"
-          className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
-        >
-          View archive →
-        </Link>
-      }
-    />
+    <div className="bg-grid-fine">
+      <div className="mx-auto max-w-7xl px-6 pt-6">
+        <PlanStatsBadges stats={stats} />
+      </div>
+      <PlanDetail
+        plan={plan}
+        isLatest
+        headerExtra={
+          <Link
+            href="/app/plan/archive"
+            className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+          >
+            View archive →
+          </Link>
+        }
+      />
+    </div>
   );
 }

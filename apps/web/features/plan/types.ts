@@ -93,3 +93,26 @@ export const PlanRowSchema = z.object({
 });
 
 export type Plan = z.infer<typeof PlanRowSchema>;
+
+// ---------------------------------------------------------------------------
+// Aggregated closed-plan stats surface (O3). Safe for client import — pure
+// Zod, no server graph. Consumed by `PlanStatsBadges` + `getClosedPlanStats`.
+// ---------------------------------------------------------------------------
+
+const PlanStatsBucketSchema = z.object({
+  n: z.number(),
+  winRate: z.number().nullable(),
+  avgR: z.number().nullable(),
+});
+
+export const ClosedPlanStatsSchema = z.object({
+  n: z.number(),
+  winRate: z.number().nullable(),
+  avgR: z.number().nullable(),
+  byDirection: z.object({
+    long: PlanStatsBucketSchema,
+    short: PlanStatsBucketSchema,
+  }),
+});
+
+export type ClosedPlanStats = z.infer<typeof ClosedPlanStatsSchema>;
