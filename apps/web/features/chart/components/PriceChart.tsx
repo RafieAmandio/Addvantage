@@ -10,6 +10,9 @@ import {
   type IChartApi,
   type ISeriesApi,
   type SeriesMarker,
+  type SeriesMarkerBar,
+  type SeriesMarkerBarPosition,
+  type SeriesMarkerShape,
   type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
@@ -58,9 +61,9 @@ export interface PriceChartProps {
 const MARKER_STYLE: Record<
   ChartMarker["kind"],
   {
-    shape: SeriesMarker<Time>["shape"];
+    shape: SeriesMarkerShape;
     color: string;
-    position: SeriesMarker<Time>["position"];
+    position: SeriesMarkerBarPosition;
   }
 > = {
   news: { shape: "circle", color: "#4da6ff", position: "aboveBar" },
@@ -151,7 +154,7 @@ export function PriceChart({
     // returns an ISeriesMarkersPluginApi we detach() on teardown. Sorted by
     // time because the plugin requires monotonic ordering.
     const mappedMarkers: SeriesMarker<Time>[] = (markers ?? [])
-      .map((m) => {
+      .map((m): SeriesMarkerBar<Time> => {
         const style = MARKER_STYLE[m.kind];
         return {
           time: toChartTime(m.time),
@@ -160,7 +163,7 @@ export function PriceChart({
           color: style.color,
           ...(m.title ? { text: m.title } : {}),
           ...(m.id ? { id: m.id } : {}),
-        } satisfies SeriesMarker<Time>;
+        };
       })
       .sort((a, b) => {
         const ta = typeof a.time === "number" ? a.time : Date.parse(String(a.time)) / 1000;

@@ -1,5 +1,9 @@
 import { notFound } from "next/navigation";
-import { PriceChart, type Bar as ChartBar } from "@/features/chart/components/PriceChart";
+import {
+  PriceChart,
+  type Bar as ChartBar,
+  type ChartMarker,
+} from "@/features/chart/components/PriceChart";
 import { SymbolNav } from "@/features/chart/components/SymbolNav";
 import { SymbolSearch } from "@/features/chart/components/SymbolSearch";
 import {
@@ -76,6 +80,15 @@ export default async function ChartPage({
   const usingMock = chartBars.length === 0;
   const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
 
+  // Project timeline events onto the chart as kind-styled dots. Show all
+  // kinds — filtering lives in the sidebar feed, not here.
+  const markers: ChartMarker[] = events.map((e) => ({
+    id: e.id,
+    time: e.occurred_at,
+    kind: e.kind,
+    title: e.title,
+  }));
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
@@ -125,7 +138,12 @@ export default async function ChartPage({
             </div>
           )}
           <div className="border border-ink-3 bg-ink-2 p-3">
-            <PriceChart bars={bars} seriesType="candlestick" height={520} />
+            <PriceChart
+              bars={bars}
+              seriesType="candlestick"
+              height={520}
+              markers={markers}
+            />
           </div>
         </div>
 
