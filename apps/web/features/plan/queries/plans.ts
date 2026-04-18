@@ -9,7 +9,7 @@ import { PlanRowSchema, type Plan } from "@/features/plan/types";
  * `PlanRowSchema` in `features/plan/types.ts`.
  */
 const PLAN_COLUMNS =
-  "id,symbol,thesis,direction,entry,stop,target,r_multiple,setups,tags,tier,status,outcome,author_id,created_at,updated_at,published_at,closed_at";
+  "id,symbol,thesis,direction,entry,stop,target,r_multiple,setups,tags,tier,status,outcome,close_price,realized_r,author_id,created_at,updated_at,published_at,closed_at";
 
 const DEFAULT_LIST_LIMIT = 50;
 

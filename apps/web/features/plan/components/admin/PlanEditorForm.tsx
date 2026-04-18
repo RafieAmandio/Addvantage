@@ -238,6 +238,14 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                     </option>
                   ))}
                 </select>
+                <input
+                  name="close_price"
+                  type="number"
+                  step="any"
+                  placeholder="Close price"
+                  aria-label="Close price"
+                  className="w-32 border border-ink-3 bg-ink-2 px-2 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+                />
                 <button
                   type="submit"
                   className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood hover:bg-blood hover:text-ink"

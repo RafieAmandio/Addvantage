@@ -90,7 +90,32 @@ export const PlanUpdateInputSchema = PlanCreateInputSchema.partial();
 
 export const PlanCloseInputSchema = z.object({
   outcome: PlanOutcomeSchema,
+  close_price: nullableNumber,
 });
+
+/**
+ * Compute realized-R from entry/stop risk geometry. Returns null whenever the
+ * inputs are incomplete or the risk leg is degenerate (`entry === stop` would
+ * divide by zero). Longs: profit relative to the one-R risk leg below entry;
+ * shorts: profit relative to the one-R risk leg above entry. Rounded to 2dp
+ * so the DB doesn't store noisy floating-point tails.
+ */
+function computeRealizedR(input: {
+  direction: "long" | "short";
+  entry: number | null;
+  stop: number | null;
+  close_price: number | null;
+}): number | null {
+  const { direction, entry, stop, close_price } = input;
+  if (entry === null || stop === null || close_price === null) return null;
+  if (entry === stop) return null;
+  const raw =
+    direction === "long"
+      ? (close_price - entry) / (entry - stop)
+      : (entry - close_price) / (stop - entry);
+  if (!Number.isFinite(raw)) return null;
+  return Math.round(raw * 100) / 100;
+}
 
 // --- form helpers ---------------------------------------------------------
 
@@ -261,20 +286,53 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
 
   const parse = PlanCloseInputSchema.safeParse({
     outcome: formData.get("outcome"),
+    close_price: formData.get("close_price"),
   });
   if (!parse.success) {
     throw new Error(parse.error.issues[0]?.message ?? "validation failed");
   }
 
+  const supabase = supabaseServer();
+
+  // Load entry/stop/direction so we can derive realized_r server-side. We
+  // never trust the client to send these — the row is the source of truth.
+  const { data: row, error: fetchError } = await supabase
+    .from("trading_plans")
+    .select("direction, entry, stop")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (fetchError || !row) {
+    const err = fetchError ?? new Error("closePlan: plan not found");
+    Sentry.captureException(err, {
+      tags: { scope: "admin.plan.close" },
+      extra: { id },
+    });
+    logger.error("closePlan fetch failed", {
+      id,
+      error: err,
+      scope: "admin.plan.close",
+    });
+    throw new Error(fetchError?.message ?? "plan not found");
+  }
+
+  const realized_r = computeRealizedR({
+    direction: row.direction as "long" | "short",
+    entry: row.entry,
+    stop: row.stop,
+    close_price: parse.data.close_price,
+  });
+
   const now = new Date().toISOString();
   const update: TablesUpdate<"trading_plans"> = {
     status: "closed",
     outcome: parse.data.outcome,
+    close_price: parse.data.close_price,
+    realized_r,
     closed_at: now,
     updated_at: now,
   };
 
-  const supabase = supabaseServer();
   const { error } = await supabase
     .from("trading_plans")
     .update(update)
@@ -295,7 +353,8 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
 
   revalidatePath("/admin/plans");
   revalidatePath(`/admin/plans/${id}`);
-  revalidatePath("/app/plans");
+  revalidatePath("/app/plan");
+  revalidatePath(`/app/plan/${id}`);
 }
 
 export async function deletePlan(id: string): Promise<void> {

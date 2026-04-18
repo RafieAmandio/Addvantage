@@ -83,6 +83,8 @@ export const PlanRowSchema = z.object({
   tier: PlanTierSchema,
   status: PlanStatusSchema,
   outcome: PlanOutcomeSchema.nullable(),
+  close_price: z.number().nullable(),
+  realized_r: z.number().nullable(),
   author_id: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
