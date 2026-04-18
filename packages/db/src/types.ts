@@ -223,41 +223,56 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
+          fault_attribution: string | null
           handle: string | null
           id: string
           is_admin: boolean
           joined_at: string
+          longest_profitable: string | null
+          markets: string[] | null
           package: string | null
           renews_at: string | null
           signed_liability: boolean
           tier: string
+          trading_length: string | null
           updated_at: string
+          yearly_goal: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
+          fault_attribution?: string | null
           handle?: string | null
           id: string
           is_admin?: boolean
           joined_at?: string
+          longest_profitable?: string | null
+          markets?: string[] | null
           package?: string | null
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
+          trading_length?: string | null
           updated_at?: string
+          yearly_goal?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
+          fault_attribution?: string | null
           handle?: string | null
           id?: string
           is_admin?: boolean
           joined_at?: string
+          longest_profitable?: string | null
+          markets?: string[] | null
           package?: string | null
           renews_at?: string | null
           signed_liability?: boolean
           tier?: string
+          trading_length?: string | null
           updated_at?: string
+          yearly_goal?: string | null
         }
         Relationships: []
       }
