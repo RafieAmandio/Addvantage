@@ -4,6 +4,7 @@ import { SlickChartsAdapter } from "./slickcharts";
 import { SpdjiAdapter } from "./spdji";
 import { YardeniAdapter } from "./yardeni";
 import { RbcAdapter } from "./rbc";
+import { TruthSocialAdapter } from "./truth-social";
 
 /** Ordered registry. The scheduler iterates this list on each tick. */
 export const ADAPTERS: SourceAdapter[] = [
@@ -12,6 +13,7 @@ export const ADAPTERS: SourceAdapter[] = [
   new SpdjiAdapter(),
   new YardeniAdapter(),
   new RbcAdapter(),
+  new TruthSocialAdapter(),
 ];
 
 export function getAdapter(code: string): SourceAdapter | undefined {

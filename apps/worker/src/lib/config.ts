@@ -44,6 +44,11 @@ const EnvSchema = z.object({
 
   FRED_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
+  /** Override for the Truth Social RSS mirror URL. Unset = use the adapter's
+   *  hardcoded default (`https://trumpstruth.org/feed`). Useful if the mirror
+   *  rotates hosts or we point at a self-hosted cache. */
+  TRUTH_SOCIAL_RSS_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+
   /** Comma-separated adapter codes, e.g. "FRED,SC". Empty = all enabled in DB. */
   ENABLED_SOURCES: z
     .string()
