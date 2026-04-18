@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getProfile, getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
-import { rateLimit } from "@/lib/ratelimit";
 import { enforceTierRateLimit, type Tier } from "@/lib/ratelimit-tier";
+import { enforceUserRateLimit } from "@/lib/user-ratelimit";
 import { supabaseServer } from "@/lib/supabase/server";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai";
 import { CONSULT_MESSAGE_ROLES } from "@/features/consult/types";
@@ -43,17 +43,12 @@ export async function createConsultSession(
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  const rl = await rateLimit({
-    key: `consult:create:${user.id}`,
-    limit: 20,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("consult rate-limited", {
-      userId: user.id,
-      action: "create",
+  try {
+    await enforceUserRateLimit(user.id, "consult:create", {
+      limit: 20,
       scope: "consult.createConsultSession",
     });
+  } catch {
     return { ok: false, error: "rate_limited" };
   }
 
@@ -106,17 +101,12 @@ export async function appendConsultMessage(input: {
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  const rl = await rateLimit({
-    key: `consult:append:${user.id}`,
-    limit: 30,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("consult rate-limited", {
-      userId: user.id,
-      action: "append",
+  try {
+    await enforceUserRateLimit(user.id, "consult:append", {
+      limit: 30,
       scope: "consult.appendConsultMessage",
     });
+  } catch {
     return { ok: false, error: "rate_limited" };
   }
 
@@ -175,17 +165,12 @@ export async function renameConsultSession(input: {
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  const rl = await rateLimit({
-    key: `consult:rename:${user.id}`,
-    limit: 30,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("consult rate-limited", {
-      userId: user.id,
-      action: "rename",
+  try {
+    await enforceUserRateLimit(user.id, "consult:rename", {
+      limit: 30,
       scope: "consult.renameConsultSession",
     });
+  } catch {
     return { ok: false, error: "rate_limited" };
   }
 
@@ -426,17 +411,12 @@ export async function deleteConsultSession(
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  const rl = await rateLimit({
-    key: `consult:delete:${user.id}`,
-    limit: 30,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    logger.warn("consult rate-limited", {
-      userId: user.id,
-      action: "delete",
+  try {
+    await enforceUserRateLimit(user.id, "consult:delete", {
+      limit: 30,
       scope: "consult.deleteConsultSession",
     });
+  } catch {
     return { ok: false, error: "rate_limited" };
   }
 

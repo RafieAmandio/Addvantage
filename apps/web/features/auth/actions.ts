@@ -9,6 +9,7 @@ import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
 import { supabaseServer } from "@/lib/supabase/server";
+import { enforceUserRateLimit } from "@/lib/user-ratelimit";
 
 const EmailSchema = z.object({ email: z.string().email() });
 
@@ -99,12 +100,12 @@ export async function saveTraderProfile(
     return { ok: false, error: "unauthorized" };
   }
 
-  const rl = await rateLimit({
-    key: `profile:save:${user.id}`,
-    limit: 5,
-    windowSec: 60,
-  });
-  if (!rl.success) {
+  try {
+    await enforceUserRateLimit(user.id, "profile:save", {
+      limit: 5,
+      scope: "auth.saveTraderProfile",
+    });
+  } catch {
     return { ok: false, error: "rate_limited" };
   }
 
