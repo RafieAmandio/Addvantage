@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
@@ -8,9 +7,9 @@ import { useAppState, isPaid } from "@/lib/state";
 import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
+import { PrimerCard } from "@/features/education/components/PrimerCard";
 import type { Primer } from "@/features/education/types";
 
 function primerMatchesQuery(p: Primer, q: string): boolean {
@@ -69,6 +68,12 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
     () => primers.filter((p) => primerMatchesQuery(p, query)),
     [query, primers]
   );
+
+  const indexById = useMemo(() => {
+    const m = new Map<string, number>();
+    primers.forEach((p, i) => m.set(p.id, i));
+    return m;
+  }, [primers]);
 
   return (
     <div>
@@ -172,64 +177,20 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
 
         <div className="mt-6 grid grid-cols-12 gap-px bg-ink-3">
           {visiblePrimers.map((p) => {
-            const i = primers.findIndex((x) => x.id === p.id);
-            const locked = p.locked && !paid;
-            const read = readIds.includes(p.id);
+            const i = indexById.get(p.id) ?? 0;
+            const indexLabel =
+              String(i + 1).padStart(2, "0") +
+              "/" +
+              String(primers.length).padStart(2, "0");
             return (
-              <Link
+              <PrimerCard
                 key={p.id}
-                href={`/app/education/${p.id}`}
-                className="group relative col-span-12 bg-ink p-8 transition-colors hover:bg-ink-2 sm:col-span-6 lg:col-span-4"
-              >
-                {read && !locked && (
-                  <div className="absolute right-0 top-0 bg-moss/15 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
-                    ✓ READ
-                  </div>
-                )}
-                <div className="flex items-start justify-between">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                    <Highlight text={p.id} query={query} />
-                  </div>
-                  <div
-                    className={
-                      "font-mono text-[9px] uppercase tracking-widest2 " +
-                      (locked ? "text-blood" : "text-moss")
-                    }
-                  >
-                    ● {locked ? "LOCKED" : "OPEN"}
-                  </div>
-                </div>
-                <h3
-                  className={
-                    "mt-6 font-display text-3xl leading-tight transition-colors " +
-                    (read && !locked ? "text-paper/60" : "text-paper")
-                  }
-                >
-                  <Highlight text={p.title} query={query} />
-                </h3>
-                <div className="mt-1 font-mono text-[10px] italic uppercase tracking-widest2 text-lime/70">
-                  <Highlight text={p.framework} query={query} />
-                </div>
-                <p className="mt-4 text-sm text-paper/70">
-                  <Highlight text={p.summary} query={query} />
-                </p>
-                <div className="mt-6 flex items-center justify-between border-t border-ink-3 pt-3">
-                  <div className="flex flex-wrap gap-1">
-                    {p.tags.slice(0, 2).map((t) => (
-                      <span
-                        key={t}
-                        className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
-                      >
-                        #<Highlight text={t} query={query} />
-                      </span>
-                    ))}
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-                    {p.readingMin} min · {String(i + 1).padStart(2, "0")}/
-                    {String(primers.length).padStart(2, "0")}
-                  </div>
-                </div>
-              </Link>
+                primer={p}
+                query={query}
+                locked={p.locked && !paid}
+                read={readIds.includes(p.id)}
+                indexLabel={indexLabel}
+              />
             );
           })}
         </div>
