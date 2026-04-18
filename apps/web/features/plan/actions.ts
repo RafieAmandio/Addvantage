@@ -277,7 +277,7 @@ export async function publishPlan(id: string): Promise<void> {
 
   revalidatePath("/admin/plans");
   revalidatePath(`/admin/plans/${id}`);
-  revalidatePath("/app/plans");
+  revalidatePath("/app/plan");
 }
 
 export async function closePlan(id: string, formData: FormData): Promise<void> {
@@ -378,6 +378,6 @@ export async function deletePlan(id: string): Promise<void> {
   }
 
   revalidatePath("/admin/plans");
-  revalidatePath("/app/plans");
+  revalidatePath("/app/plan");
   redirect("/admin/plans");
 }
