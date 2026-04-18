@@ -38,6 +38,13 @@ export const SOURCES = [
     adapter: "rbc",
     pollMinutes: 60,
   },
+  {
+    code: "TRUMP",
+    name: "Donald Trump (Truth Social)",
+    url: "https://trumpstruth.org/feed",
+    adapter: "truth-social",
+    pollMinutes: 60,
+  },
 ] as const;
 
 export type SourceCode = (typeof SOURCES)[number]["code"];
