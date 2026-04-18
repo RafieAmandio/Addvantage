@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 import { ClassificationStripe } from "@/components/ui/Classification";
 import { Button } from "@/components/ui/Button";
 
@@ -13,6 +14,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Sentry.captureException is a no-op when NEXT_PUBLIC_SENTRY_DSN is unset,
+    // matching the graceful-noop pattern used elsewhere (Upstash, Brevo, Logtail).
+    Sentry.captureException(error);
     console.error("[app/error]", error);
   }, [error]);
 
