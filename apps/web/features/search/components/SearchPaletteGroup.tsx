@@ -53,8 +53,8 @@ export function SearchPaletteGroup({
             index={idx}
             active={idx === activeIndex}
             query={query}
-            onHover={() => onHover(idx)}
-            onClick={() => onCommit(r)}
+            onHover={onHover}
+            onCommit={onCommit}
           />
         );
       })}

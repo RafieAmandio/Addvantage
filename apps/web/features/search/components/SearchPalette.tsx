@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/lib/state";
 import {
@@ -73,13 +73,16 @@ export function SearchPalette() {
     el?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
-  const commit = (r: SearchResult) => {
-    const next = pushRecentSearch(recent, query);
-    setRecent(next);
-    saveRecentSearches(next);
-    setSearchOpen(false);
-    router.push(r.href);
-  };
+  const commit = useCallback(
+    (r: SearchResult) => {
+      const next = pushRecentSearch(recent, query);
+      setRecent(next);
+      saveRecentSearches(next);
+      setSearchOpen(false);
+      router.push(r.href);
+    },
+    [recent, query, setSearchOpen, router],
+  );
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {

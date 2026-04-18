@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import {
   KIND_META,
   type SearchResult,
@@ -14,24 +15,24 @@ interface SearchPaletteResultRowProps {
   index: number;
   active: boolean;
   query: string;
-  onHover: () => void;
-  onClick: () => void;
+  onHover: (index: number) => void;
+  onCommit: (result: SearchResult) => void;
 }
 
-export function SearchPaletteResultRow({
+function SearchPaletteResultRowImpl({
   result,
   kind,
   index,
   active,
   query,
   onHover,
-  onClick,
+  onCommit,
 }: SearchPaletteResultRowProps) {
   return (
     <button
       data-result-index={index}
-      onMouseEnter={onHover}
-      onClick={onClick}
+      onMouseEnter={() => onHover(index)}
+      onClick={() => onCommit(result)}
       className={cn(
         "block w-full border-b border-ink-3 px-5 py-4 text-left transition-colors",
         active
@@ -78,3 +79,5 @@ export function SearchPaletteResultRow({
     </button>
   );
 }
+
+export const SearchPaletteResultRow = memo(SearchPaletteResultRowImpl);
