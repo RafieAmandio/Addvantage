@@ -162,16 +162,24 @@ export function useConsultActions({
         });
         if (!res.ok || !res.body) {
           let errCode: string | undefined;
+          let reason: string | undefined;
           try {
-            const j = (await res.json()) as { error?: string };
+            const j = (await res.json()) as {
+              error?: string;
+              reason?: string;
+            };
             errCode = j.error;
+            reason = j.reason;
           } catch {
             /* non-JSON body */
           }
+          // RT3: distinguish daily-cap breaches from per-minute throttles.
           const description =
-            errCode === "rate_limited"
-              ? "Slow down — too many messages per minute."
-              : "Desk didn't respond. Try again.";
+            reason === "daily_token_cap"
+              ? "Daily token cap reached — upgrade for more."
+              : errCode === "rate_limited"
+                ? "Slow down — too many messages per minute."
+                : "Desk didn't respond. Try again.";
           toast.push({
             tone: "error",
             title: "Message not sent",

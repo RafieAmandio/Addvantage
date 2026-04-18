@@ -29,6 +29,10 @@ import { getOpenAI, OPENAI_MODEL } from "@/lib/openai";
 import { DESK_SYSTEM_PROMPT } from "@/features/consult/lib/prompt";
 import { pickReply } from "@/features/consult/lib/replies";
 import { listConsultMessages } from "@/features/consult/queries/messages";
+import {
+  FREE_DAILY_TOKEN_CAP,
+  getDailyTokensUsed,
+} from "@/features/consult/queries/usage";
 import { appendConsultMessage } from "@/features/consult/actions";
 
 export const runtime = "nodejs";
@@ -39,8 +43,14 @@ const BodySchema = z.object({
   body: z.string().trim().min(1).max(10000),
 });
 
-function jsonError(status: number, error: string): Response {
-  return new Response(JSON.stringify({ ok: false, error }), {
+function jsonError(
+  status: number,
+  error: string,
+  reason?: "rate_limited" | "daily_token_cap",
+): Response {
+  const body: Record<string, unknown> = { ok: false, error };
+  if (reason) body.reason = reason;
+  return new Response(JSON.stringify(body), {
     status,
     headers: { "content-type": "application/json" },
   });
@@ -68,7 +78,23 @@ export async function POST(req: Request): Promise<Response> {
     tier,
     action: "consult:send",
   });
-  if (!rl.success) return jsonError(429, "rate_limited");
+  if (!rl.success) return jsonError(429, "rate_limited", "rate_limited");
+
+  // RT3: daily token budget. Free tier gated at FREE_DAILY_TOKEN_CAP per 24h;
+  // VIP unbounded. Uses 429 to mirror the per-minute breach shape so existing
+  // client error handling stays uniform; the `reason` field disambiguates.
+  if (tier === "free") {
+    const used = await getDailyTokensUsed(user.id);
+    if (used >= FREE_DAILY_TOKEN_CAP) {
+      logger.info("consult.stream: daily token cap reached", {
+        scope: "consult.stream",
+        userId: user.id,
+        used,
+        cap: FREE_DAILY_TOKEN_CAP,
+      });
+      return jsonError(429, "rate_limited", "daily_token_cap");
+    }
+  }
 
   let raw: unknown;
   try {

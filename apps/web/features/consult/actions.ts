@@ -13,6 +13,10 @@ import { CONSULT_MESSAGE_ROLES } from "@/features/consult/types";
 import { DESK_SYSTEM_PROMPT } from "@/features/consult/lib/prompt";
 import { pickReply } from "@/features/consult/lib/replies";
 import { listConsultMessages } from "@/features/consult/queries/messages";
+import {
+  FREE_DAILY_TOKEN_CAP,
+  getDailyTokensUsed,
+} from "@/features/consult/queries/usage";
 import type { Json } from "@tradevantage/db";
 
 /**
@@ -197,9 +201,11 @@ const SendConsultMessageSchema = z.object({
   body: z.string().trim().min(1).max(10000),
 });
 
+export type SendConsultReason = "rate_limited" | "daily_token_cap";
+
 export type SendConsultResult =
   | { ok: true; assistantMessageId: string; assistantContent: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; reason?: SendConsultReason };
 
 /**
  * LLM-backed consult turn. Persists the user message, loads recent history,
@@ -234,7 +240,27 @@ export async function sendConsultMessage(input: {
     tier,
     action: "consult:send",
   });
-  if (!rl.success) return { ok: false, error: "rate_limited" };
+  if (!rl.success)
+    return { ok: false, error: "rate_limited", reason: "rate_limited" };
+
+  // RT3: daily token budget. Free tier gated at FREE_DAILY_TOKEN_CAP per 24h;
+  // VIP unbounded. Distinct `reason` lets the UI show a copy-specific toast.
+  if (tier === "free") {
+    const used = await getDailyTokensUsed(user.id);
+    if (used >= FREE_DAILY_TOKEN_CAP) {
+      logger.info("consult.sendConsultMessage: daily token cap reached", {
+        scope: "consult.sendConsultMessage",
+        userId: user.id,
+        used,
+        cap: FREE_DAILY_TOKEN_CAP,
+      });
+      return {
+        ok: false,
+        error: "rate_limited",
+        reason: "daily_token_cap",
+      };
+    }
+  }
 
   const parsed = SendConsultMessageSchema.safeParse(input);
   if (!parsed.success) {
