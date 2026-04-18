@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { serverConfig } from "@/lib/config/server";
 import { sendBrevoTemplate } from "@/lib/email/brevo";
 import { logger } from "@/lib/logger";
@@ -157,6 +158,10 @@ export async function POST(request: Request) {
       { status: 200, headers: { "Cache-Control": "no-store" } }
     );
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { scope: "api.webhooks.xendit" },
+      extra: { externalRef: event.externalRef },
+    });
     logger.error("xendit webhook handler threw", {
       scope: "api.webhooks.xendit",
       externalRef: event.externalRef,

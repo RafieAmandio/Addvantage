@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";
 import { logger } from "@/lib/logger";
@@ -94,6 +95,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (err) {
+    Sentry.captureException(err, { tags: { scope: "api.events" } });
     logger.error("/api/events failed", {
       error: err,
       scope: "api.events",

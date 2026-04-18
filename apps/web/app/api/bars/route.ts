@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { listBars } from "@/features/chart/queries/bars";
 import { logger } from "@/lib/logger";
@@ -72,6 +73,7 @@ export async function GET(request: Request) {
       },
     );
   } catch (err) {
+    Sentry.captureException(err, { tags: { scope: "api.bars" } });
     logger.error("/api/bars failed", {
       error: err,
       scope: "api.bars",
