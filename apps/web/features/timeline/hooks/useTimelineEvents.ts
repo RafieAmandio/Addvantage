@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import {
   TimelineEventSchema,
@@ -68,9 +69,12 @@ export function useTimelineEvents({
         (payload) => {
           const parsed = TimelineEventSchema.safeParse(payload.new);
           if (!parsed.success) {
-            console.warn(
-              "[useTimelineEvents] dropped malformed payload",
-              parsed.error.issues
+            Sentry.captureMessage(
+              "useTimelineEvents: malformed payload",
+              {
+                level: "warning",
+                extra: { issues: parsed.error.issues },
+              }
             );
             return;
           }
