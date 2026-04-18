@@ -2,47 +2,46 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getPlanById,
-  getLatestPlan,
-  getAllPlans,
-  tradingPlans,
-} from "@/features/plan/mock";
+  listPublishedPlans,
+} from "@/features/plan/queries/plans";
+import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { PlanDetail } from "@/features/plan/components/PlanDetail";
 import { PlanSiblingKeys } from "@/features/plan/components/PlanSiblingKeys";
 import { NewsMentioningPlan } from "@/features/plan/components/NewsMentioningPlan";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
-/**
- * Pre-declare all known plan IDs. `dynamicParams = false` tells Next that
- * anything not in this list is a 404 — skips the static-paths worker's
- * introspection pass that's been racing the manifest JSON in dev.
- */
-export function generateStaticParams() {
-  return tradingPlans.map((p) => ({ id: p.id }));
-}
-
-export const dynamicParams = false;
-
-export default function PlanDetailPage({
+export default async function PlanDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const plan = getPlanById(params.id);
-  if (!plan) return notFound();
+  const [row, allRows] = await Promise.all([
+    getPlanById(params.id),
+    listPublishedPlans({ limit: 100 }),
+  ]);
 
-  const isLatest = plan.id === getLatestPlan().id;
-  const all = getAllPlans();
+  if (!row || row.status !== "published") return notFound();
+
+  const plan = dbPlanToTradingPlan(row);
+  const all = allRows.map(dbPlanToTradingPlan);
+
+  const latestId = all[0]?.id ?? plan.id;
+  const isLatest = plan.id === latestId;
   const idx = all.findIndex((p) => p.id === plan.id);
+  // If the requested plan isn't in the recent list (e.g. older than the
+  // 100-row window), leave sibling keys disabled — still fall back to first/last.
   const newer = idx > 0 ? all[idx - 1] : null;
-  const older = idx < all.length - 1 ? all[idx + 1] : null;
+  const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+  const firstId = all[0]?.id ?? plan.id;
+  const lastId = all[all.length - 1]?.id ?? plan.id;
 
   return (
     <div>
       <PlanSiblingKeys
         newerId={newer?.id ?? null}
         olderId={older?.id ?? null}
-        firstId={all[0].id}
-        lastId={all[all.length - 1].id}
+        firstId={firstId}
+        lastId={lastId}
       />
       <PlanDetail
         plan={plan}
@@ -78,7 +77,6 @@ export default function PlanDetailPage({
 
       <NewsMentioningPlan planId={plan.id} />
 
-      {/* Prev / next siblings */}
       <div className="mx-auto max-w-7xl px-6 pb-12">
         <nav className="grid grid-cols-2 gap-px border border-ink-3 bg-ink-3">
           <Link
