@@ -87,6 +87,37 @@ export async function getPlanById(id: string): Promise<Plan | null> {
   return parsed.data;
 }
 
+/**
+ * Admin-only: every plan across all authors and statuses, newest-updated
+ * first. RLS permits admins to SELECT all rows via `is_admin()`. Used by the
+ * `/admin/plans` list view (P3).
+ */
+export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
+  await requireAdmin();
+  const supabase = supabaseServer();
+  const { data, error } = await supabase
+    .from("trading_plans")
+    .select(PLAN_COLUMNS)
+    .order("updated_at", { ascending: false })
+    .range(0, limit - 1);
+  if (error) {
+    logger.error("listAllPlansForAdmin failed", {
+      error,
+      scope: "plan.listAllPlansForAdmin",
+    });
+    return [];
+  }
+  const parsed = PlanRowSchema.array().safeParse(data ?? []);
+  if (!parsed.success) {
+    logger.error("listAllPlansForAdmin shape mismatch", {
+      issues: parsed.error.issues,
+      scope: "plan.listAllPlansForAdmin",
+    });
+    return [];
+  }
+  return parsed.data;
+}
+
 export interface ListMyDraftPlansInput {
   limit?: number;
 }

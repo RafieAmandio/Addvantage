@@ -35,6 +35,9 @@ export default async function AdminLayout({
               <Link href="/admin/archive" className="hover:text-lime">
                 Archive
               </Link>
+              <Link href="/admin/plans" className="hover:text-lime">
+                Plans
+              </Link>
               <Link href="/admin/sources" className="hover:text-lime">
                 Sources
               </Link>
