@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
@@ -6,10 +7,10 @@ import type { TickerRollup } from "@/features/watchlist/types";
 
 interface Props {
   rollup: TickerRollup;
-  onUnpin: () => void;
+  onUnpin: (ticker: string) => void;
 }
 
-export function TickerCard({ rollup, onUnpin }: Props) {
+function TickerCardImpl({ rollup, onUnpin }: Props) {
   const {
     ticker,
     newsItems,
@@ -58,7 +59,7 @@ export function TickerCard({ rollup, onUnpin }: Props) {
             </div>
           )}
           <button
-            onClick={onUnpin}
+            onClick={() => onUnpin(ticker)}
             className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
           >
             ✕ Unpin
@@ -252,3 +253,5 @@ export function TickerCard({ rollup, onUnpin }: Props) {
     </section>
   );
 }
+
+export const TickerCard = memo(TickerCardImpl);

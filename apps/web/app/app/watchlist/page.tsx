@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { tradingPlans } from "@/features/plan/mock";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
@@ -22,7 +22,10 @@ export default function WatchlistPage() {
   const [query, setQuery] = useState("");
   const latestId = tradingPlans[0].id;
 
-  const rollupsRaw = hydrated ? tickers.map((t) => rollupTicker(t, latestId)) : [];
+  const rollupsRaw = useMemo(
+    () => (hydrated ? tickers.map((t) => rollupTicker(t, latestId)) : []),
+    [hydrated, tickers, latestId],
+  );
   const rollupsFiltered = query
     ? rollupsRaw.filter((r) =>
         r.ticker.toLowerCase().includes(query.toLowerCase())
@@ -39,6 +42,22 @@ export default function WatchlistPage() {
   const totalNews = rollups.reduce((acc, r) => acc + r.newsItems.length, 0);
   const totalLive = rollups.reduce((acc, r) => acc + r.liveSetups.length, 0);
   const totalClosed = rollups.reduce((acc, r) => acc + r.closedCount, 0);
+
+  // Stable so memoized TickerCard bails out on unchanged rollups. Takes the
+  // ticker as an arg; the TickerCard's own `onUnpin: () => void` captures its
+  // rollup.ticker at render and calls this.
+  const handleUnpin = useCallback(
+    (ticker: string) => {
+      remove(ticker);
+      toast.push({
+        tone: "info",
+        title: "Unpinned",
+        description: `${ticker} removed from your watchlist.`,
+        duration: 2000,
+      });
+    },
+    [remove, toast],
+  );
 
   return (
     <div className="bg-grid-fine">
@@ -131,15 +150,7 @@ export default function WatchlistPage() {
                 <TickerCard
                   key={r.ticker}
                   rollup={r}
-                  onUnpin={() => {
-                    remove(r.ticker);
-                    toast.push({
-                      tone: "info",
-                      title: "Unpinned",
-                      description: `${r.ticker} removed from your watchlist.`,
-                      duration: 2000,
-                    });
-                  }}
+                  onUnpin={handleUnpin}
                 />
               ))}
             </div>
