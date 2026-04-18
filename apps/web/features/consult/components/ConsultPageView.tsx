@@ -6,7 +6,10 @@ import { sessionMatchesQuery } from "@/features/consult/lib/search";
 import { ConsultLayout } from "@/features/consult/components/ConsultLayout";
 import { ConsultHeroHeader } from "@/features/consult/components/ConsultHeroHeader";
 import { ConsultModeHint } from "@/features/consult/components/ConsultModeHint";
-import { useConsultPersistence } from "@/features/consult/hooks/useConsultPersistence";
+import {
+  useConsultPersistence,
+  type InitialConsultData,
+} from "@/features/consult/hooks/useConsultPersistence";
 import { useConsultKeyboard } from "@/features/consult/hooks/useConsultKeyboard";
 import { useSessionQueryParam } from "@/features/consult/hooks/useSessionQueryParam";
 import { useConsultActions } from "@/features/consult/hooks/useConsultActions";
@@ -15,7 +18,16 @@ import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { ConsultSession } from "@/lib/mock/types";
 
-export function ConsultPageView() {
+export function ConsultPageView({
+  initialData,
+}: {
+  /**
+   * Server-fetched initial snapshot from Supabase. When omitted (tests,
+   * storybook) the component falls back to an empty seed and the user-owned
+   * session list is discovered purely from localStorage.
+   */
+  initialData?: InitialConsultData;
+}) {
   const { tier } = useAppState();
   const paid = isPaid(tier);
 
@@ -26,7 +38,7 @@ export function ConsultPageView() {
     setExtrasBySession,
     activeId,
     setActiveId,
-  } = useConsultPersistence();
+  } = useConsultPersistence(initialData);
 
   const [sessionQuery, setSessionQuery] = useSessionQueryParam();
   const modeHint = useConsultKeyboard();
@@ -68,6 +80,7 @@ export function ConsultPageView() {
     requestDeleteSession,
     confirmDeleteSession,
     exportActiveSession,
+    isUserSession,
   } = useConsultActions({
     active,
     activeId,
@@ -106,6 +119,7 @@ export function ConsultPageView() {
     onRenameSession: renameSession,
     onDeleteSession: requestDeleteSession,
     onExportSession: exportActiveSession,
+    isLocalSession: isUserSession,
   };
 
   return (

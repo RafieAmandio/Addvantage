@@ -10,28 +10,60 @@ import {
 import { useToast } from "@/lib/toast";
 import type { ConsultMessage } from "@/lib/mock/types";
 
+export interface InitialConsultData {
+  /**
+   * Supabase-backed sessions for the current user, newest-first. Seeded
+   * from `listConsultSessions()` at the page/server boundary.
+   */
+  sessions: LocalSession[];
+  /**
+   * Optionally pre-populated messages for one or more sessions (typically
+   * just the active one resolved from `?sq=`). Keyed by session id.
+   */
+  extras: Record<string, ConsultMessage[]>;
+}
+
+const EMPTY_INITIAL: InitialConsultData = { sessions: [], extras: {} };
+
 /**
- * Hydrates + persists consult sessions and message extras to localStorage.
- * Also restores the last active session with a one-shot toast flash.
+ * Hydrates + persists consult sessions. Supabase is the source of truth
+ * when the user is authenticated; localStorage acts as an offline cache +
+ * a soft fallback. The hook merges server-seeded sessions with any
+ * locally-cached ones on mount, giving precedence to Supabase rows (they
+ * are the canonical record).
  */
-export function useConsultPersistence() {
+export function useConsultPersistence(
+  initial: InitialConsultData = EMPTY_INITIAL
+) {
   const toast = useToast();
-  const [localSessions, setLocalSessions] = useState<LocalSession[]>([]);
+  const [localSessions, setLocalSessions] = useState<LocalSession[]>(
+    initial.sessions
+  );
   const [extrasBySession, setExtrasBySession] = useState<
     Record<string, ConsultMessage[]>
-  >({});
-  const [activeId, setActiveId] = useState(mockSessions[0].id);
+  >(initial.extras);
+  const [activeId, setActiveId] = useState(
+    initial.sessions[0]?.id ?? mockSessions[0].id
+  );
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate once on mount
+  // Hydrate from localStorage on mount — merged with server-seeded state.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(CONSULT_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedConsult;
-        if (Array.isArray(parsed.sessions)) setLocalSessions(parsed.sessions);
+
+        // Merge sessions: Supabase rows win, local-only fills in the tail.
+        if (Array.isArray(parsed.sessions)) {
+          setLocalSessions((prev) => {
+            const seen = new Set(prev.map((s) => s.id));
+            const tail = parsed.sessions.filter((s) => !seen.has(s.id));
+            return [...prev, ...tail];
+          });
+        }
         if (parsed.extras && typeof parsed.extras === "object") {
-          setExtrasBySession(parsed.extras);
+          setExtrasBySession((prev) => ({ ...parsed.extras, ...prev }));
         }
         if (parsed.lastActiveId && parsed.lastActiveId !== mockSessions[0].id) {
           const fromMock = mockSessions.find(
@@ -40,7 +72,10 @@ export function useConsultPersistence() {
           const fromLocal = parsed.sessions?.find(
             (s) => s.id === parsed.lastActiveId
           );
-          const resumed = fromMock ?? fromLocal;
+          const fromServer = initial.sessions.find(
+            (s) => s.id === parsed.lastActiveId
+          );
+          const resumed = fromMock ?? fromServer ?? fromLocal;
           if (resumed) {
             setActiveId(parsed.lastActiveId);
             const RESTORE_SHOWN_KEY = "ants-domain-consult-restore-shown";
@@ -70,7 +105,7 @@ export function useConsultPersistence() {
       }
     } catch {}
     setHydrated(true);
-    // toast is stable (noop when unmounted), safe to omit from deps
+    // toast is stable (noop when unmounted); intentional omit from deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

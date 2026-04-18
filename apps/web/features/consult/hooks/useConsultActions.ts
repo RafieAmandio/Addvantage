@@ -4,14 +4,30 @@ import { useState, type Dispatch, type SetStateAction } from "react";
 import { consultSessions as mockSessions } from "@/features/consult/mock";
 import { pickReply } from "@/features/consult/lib/replies";
 import { sessionToMarkdown } from "@/features/consult/lib/export";
+import {
+  createConsultSession,
+  appendConsultMessage,
+  renameConsultSession,
+  deleteConsultSession,
+} from "@/features/consult/actions";
 import type { LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
 import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
 
 /**
  * Encapsulates the write-side of a consult session: new/send/rename/delete/
- * export, plus the pending-delete confirm dialog state. Purely UI state —
- * no persistence (that lives in `useConsultPersistence`).
+ * export, plus the pending-delete confirm dialog state.
+ *
+ * Supabase is the source of truth for user-owned sessions — every mutation
+ * fires the matching server action (see `features/consult/actions.ts`,
+ * migration 0019) in addition to updating the localStorage-backed client
+ * state. New sessions use the server-minted UUID as their local id, so a
+ * subsequent page load re-hydrates the same session from Supabase.
+ *
+ * The localStorage path is retained as an offline-cache + a fallback for
+ * when the user briefly loses connectivity. Mock/desk sessions
+ * (`mockSessions`) are read-only reference material and are never persisted
+ * to the DB.
  */
 export function useConsultActions({
   active,
@@ -38,33 +54,54 @@ export function useConsultActions({
     title: string;
   } | null>(null);
 
-  const startNewSession = () => {
+  const startNewSession = async () => {
     const now = new Date();
     const hhmm =
       String(now.getHours()).padStart(2, "0") +
       String(now.getMinutes()).padStart(2, "0");
-    const id = `CS-LOC-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+    const title = `New session · ${hhmm}`;
+
+    // Server-mint the UUID so the local cache stays consistent with the DB.
+    const res = await createConsultSession(title);
+    if (!res.ok || !res.sessionId) {
+      toast.push({
+        tone: "error",
+        title: "Could not open session",
+        description:
+          res.error === "rate_limited"
+            ? "Too many new sessions — slow down."
+            : "Failed to reach the desk. Try again.",
+      });
+      return;
+    }
+
     const session: LocalSession = {
-      id,
-      title: `New session · ${hhmm}`,
+      id: res.sessionId,
+      title,
       startedAt: now.toISOString(),
       lastAt: now.toISOString(),
       tags: [],
       messages: [],
     };
     setLocalSessions((prev) => [session, ...prev]);
-    setActiveId(id);
+    setActiveId(res.sessionId);
     setDraft("");
     toast.push({
       tone: "success",
       title: "Session opened",
-      description: `${id} · awaiting first transmission. Rename via the ✎ icon.`,
+      description: `Session logged — rename via the ✎ icon.`,
     });
   };
 
   const send = () => {
     if (!draft.trim()) return;
     const sessionId = active.id;
+    // Supabase-backed sessions are user-owned (UUID); mock sessions are not.
+    // Only persist if we're in a user-owned session. The UI prevents starting
+    // a send from a mock session implicitly because `startNewSession` is the
+    // only path to create a new persistable session.
+    const isPersistable = !mockSessions.some((s) => s.id === sessionId);
+
     const nowIso = new Date().toISOString();
     const userMsg: ConsultMessage = {
       id: `M-x${Date.now()}`,
@@ -91,6 +128,25 @@ export function useConsultActions({
     const userBody = draft;
     setDraft("");
     setTyping(true);
+
+    // Persist user message (fire-and-forget; local state already reflects it)
+    if (isPersistable) {
+      appendConsultMessage({
+        sessionId,
+        role: "user",
+        content: userBody,
+      }).catch(() => {
+        // Action already logs/Sentry-captures on the server. Client-side we
+        // surface a subtle toast so the user knows something didn't stick.
+        toast.push({
+          tone: "warn",
+          title: "Message not saved",
+          description: "Sent locally but not persisted. Reconnect to retry.",
+          duration: 3500,
+        });
+      });
+    }
+
     setTimeout(() => {
       const variant = pickReply(userBody, priorUserCount);
       const replyMsg: ConsultMessage = {
@@ -112,6 +168,17 @@ export function useConsultActions({
         )
       );
       setTyping(false);
+
+      // Persist assistant reply. Role mapped 'ai' → 'assistant' per DB check.
+      if (isPersistable) {
+        appendConsultMessage({
+          sessionId,
+          role: "assistant",
+          content: variant.body,
+        }).catch(() => {
+          /* telemetry handled server-side */
+        });
+      }
     }, 1400);
   };
 
@@ -121,6 +188,12 @@ export function useConsultActions({
     setLocalSessions((prev) =>
       prev.map((s) => (s.id === id ? { ...s, title: trimmed } : s))
     );
+    const isPersistable = !mockSessions.some((s) => s.id === id);
+    if (isPersistable) {
+      renameConsultSession({ sessionId: id, title: trimmed }).catch(() => {
+        /* telemetry handled server-side */
+      });
+    }
     toast.push({
       tone: "info",
       title: "Session renamed",
@@ -129,8 +202,11 @@ export function useConsultActions({
     });
   };
 
+  const isUserSession = (id: string): boolean =>
+    !mockSessions.some((s) => s.id === id);
+
   const requestDeleteSession = (id: string, title: string) => {
-    if (!id.startsWith("CS-LOC-")) return;
+    if (!isUserSession(id)) return;
     setPendingDelete({ id, title });
   };
 
@@ -146,6 +222,12 @@ export function useConsultActions({
     });
     if (activeId === id) setActiveId(mockSessions[0].id);
     setPendingDelete(null);
+    // Persist deletion. Mock sessions are never in Supabase so we guard.
+    if (isUserSession(id)) {
+      deleteConsultSession(id).catch(() => {
+        /* telemetry handled server-side */
+      });
+    }
     toast.push({
       tone: "warn",
       title: "Session deleted",
@@ -186,5 +268,6 @@ export function useConsultActions({
     requestDeleteSession,
     confirmDeleteSession,
     exportActiveSession,
+    isUserSession,
   };
 }

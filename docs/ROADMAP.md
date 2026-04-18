@@ -116,7 +116,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
   - [x] **A4.** Gate `/app/*` and `/admin/*` via middleware or layout redirects when session is missing (verify existing middleware covers it).
 - [ ] **Replace mock data** — plans, calendar, education, consult should hit real tables
   - [x] **M1.** `/app/calendar` — swap mock calendar events for real `timeline_events WHERE kind='macro'` (FF adapter already seeds these via migration 0016) _(done tick 141 — /app/calendar now reads timeline_events WHERE kind='macro' via listTimelineEvents({kinds:['macro']}); mapper at features/calendar/lib/fromTimeline.ts; mock.ts retained for offline dev/tests but no longer imported by the page. Chose to extend the existing timeline query over a new calendar-queries file because calendar events are a projection, not a separate domain.)_
-  - [ ] **M2.** `/app/consult` — migrate to Supabase via the message-persistence feature-backlog item (paired with Section 3 "Message persistence")
+  - [x] **M2.** `/app/consult` — migrate to Supabase via the message-persistence feature-backlog item (paired with Section 3 "Message persistence") _(done tick 143 — migration 0019 adds `consult_sessions` + `consult_messages` with owner-only RLS `(select auth.uid())` and an after-insert trigger `touch_consult_session()` that bumps `updated_at` on the parent. Server actions `createConsultSession` / `appendConsultMessage` / `renameConsultSession` / `deleteConsultSession` (zod-validated, per-user rate-limited via `lib/ratelimit.ts`, `logger.error` + `Sentry.captureException` at every error path) live at `features/consult/actions.ts`; reads at `features/consult/queries/messages.ts`. `/app/consult/page.tsx` is now an async server component that seeds `ConsultPageView` with the authenticated user's sessions (and the active session's messages when `?sq=<uuid>`); `useConsultActions` dual-writes every mutation to Supabase while keeping the localStorage cache as offline fallback. New sessions use the server-minted UUID directly, so re-hydration on next page load is lossless. Paired with Section 3 Consultation / Message persistence.)_
   - [ ] **M3.** `/app/plans` — blocked on Section 3 "Real plan authoring flow" (plan schema must land first)
   - [ ] **M4.** `/app/education` — carve into its own tick; primers are content-authored, likely lowest priority
 - [x] **Retry/backoff** on Supabase + OpenAI calls — generic helper at `apps/worker/src/lib/retry.ts`; wraps OpenAI rephrase + Supabase persist insert/loadExistingHashes
@@ -156,7 +156,7 @@ When touching a page that inlines UI or duplicates logic from another page, lift
 
 ### Consultation
 - [ ] Real LLM-backed chat (replace canned keyword replies)
-- [ ] Message persistence in Supabase (currently localStorage only)
+- [x] Message persistence in Supabase (currently localStorage only) _(done tick 143 — see Section 2 M2. Two tables `consult_sessions` + `consult_messages` (migration 0019) with owner-only RLS + after-insert trigger; server actions dual-written alongside the localStorage cache so Supabase is canonical and localStorage becomes an offline fallback.)_
 - [ ] Rate limit per tier
 
 ### Calendar

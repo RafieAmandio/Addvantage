@@ -9,6 +9,16 @@ import { Bubble } from "@/features/consult/components/Bubble";
 import { TypingIndicator } from "@/features/consult/components/TypingIndicator";
 import { ScrollableConversation } from "@/features/consult/components/ScrollableConversation";
 
+/**
+ * Formats a session id for the sidebar header / conversation header. Mock /
+ * desk session ids (e.g. `CS-014`) are short — show as-is. Supabase UUIDs
+ * are shown as the short prefix `CS-LOC-xxxx` so the sidebar stays compact.
+ */
+function shortSessionCode(id: string): string {
+  if (id.length <= 10) return id;
+  return `CS-LOC-${id.slice(0, 4).toUpperCase()}`;
+}
+
 export function ConsultLayout({
   sessions,
   totalSessions,
@@ -28,6 +38,7 @@ export function ConsultLayout({
   onRenameSession,
   onDeleteSession,
   onExportSession,
+  isLocalSession,
 }: {
   sessions: ConsultSession[];
   totalSessions: number;
@@ -47,6 +58,8 @@ export function ConsultLayout({
   onRenameSession: (id: string, newTitle: string) => void;
   onDeleteSession: (id: string, title: string) => void;
   onExportSession: () => void;
+  /** Returns true for user-owned sessions (editable); false for mock/desk. */
+  isLocalSession: (id: string) => boolean;
 }) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   return (
@@ -103,7 +116,7 @@ export function ConsultLayout({
           {sessions.map((s) => {
             const msgCount =
               s.messages.length + (extrasBySession[s.id]?.length ?? 0);
-            const isLocal = s.id.startsWith("CS-LOC-");
+            const isLocal = isLocalSession(s.id);
             const isRenaming = renamingId === s.id;
             return (
               <div
@@ -119,7 +132,7 @@ export function ConsultLayout({
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
-                      {s.id}
+                      {shortSessionCode(s.id)}
                     </div>
                     {isLocal && (
                       <span className="font-mono text-[8px] uppercase tracking-widest2 text-moss">
@@ -202,7 +215,7 @@ export function ConsultLayout({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
-                {active.id}
+                {shortSessionCode(active.id)}
               </div>
               <div className="mt-1 font-display text-lg text-paper">
                 {active.title}
