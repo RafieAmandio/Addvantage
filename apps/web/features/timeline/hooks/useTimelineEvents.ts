@@ -7,6 +7,14 @@ import {
   type TimelineEvent,
 } from "@/features/timeline/types";
 
+/**
+ * Hard cap on the in-memory events list so a long-lived chart session
+ * can't grow the DOM without bound when realtime INSERTs keep streaming.
+ * The EventFeed is scrollable; 500 rows is well past what a user will
+ * scroll through and matches the server-side listTimelineEvents ceiling.
+ */
+const MAX_EVENTS = 500;
+
 export interface UseTimelineEventsParams {
   initialEvents: TimelineEvent[];
   symbols: string[];
@@ -79,7 +87,10 @@ export function useTimelineEvents({
           if (seenRef.current.has(row.id)) return;
           seenRef.current.add(row.id);
 
-          setEvents((prev) => [row, ...prev]);
+          setEvents((prev) => {
+            const next = [row, ...prev];
+            return next.length > MAX_EVENTS ? next.slice(0, MAX_EVENTS) : next;
+          });
         }
       )
       .subscribe();
