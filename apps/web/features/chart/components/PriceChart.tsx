@@ -6,8 +6,10 @@ import {
   CandlestickSeries,
   ColorType,
   createChart,
+  createSeriesMarkers,
   type IChartApi,
   type ISeriesApi,
+  type SeriesMarker,
   type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
@@ -24,6 +26,19 @@ export interface Bar {
   volume?: number;
 }
 
+/**
+ * Timeline-event dot overlaid on the chart. Kind drives shape/color so the
+ * viewer can distinguish a tweet from a news item at a glance without a legend.
+ */
+export interface ChartMarker {
+  /** ISO timestamp — converted via toChartTime() to the series time type. */
+  time: string;
+  kind: "news" | "tweet" | "macro" | "earnings" | "user_pin";
+  /** Shown in the marker's hover tooltip (maps to SeriesMarker.text). */
+  title?: string;
+  id?: string;
+}
+
 export interface PriceChartProps {
   bars: Bar[];
   /** "candlestick" (default) or "area". */
@@ -32,7 +47,28 @@ export interface PriceChartProps {
   height?: number;
   /** Optional className for layout/spacing. */
   className?: string;
+  /** Optional timeline-event dots rendered over the series. */
+  markers?: ChartMarker[];
 }
+
+/**
+ * Per-kind visual style for timeline-event markers. Keep in sync with the
+ * closed `TIMELINE_KINDS` set in `features/timeline/types.ts`.
+ */
+const MARKER_STYLE: Record<
+  ChartMarker["kind"],
+  {
+    shape: SeriesMarker<Time>["shape"];
+    color: string;
+    position: SeriesMarker<Time>["position"];
+  }
+> = {
+  news: { shape: "circle", color: "#4da6ff", position: "aboveBar" },
+  tweet: { shape: "arrowDown", color: "#ff9a3d", position: "aboveBar" },
+  macro: { shape: "circle", color: "#ef5350", position: "aboveBar" },
+  earnings: { shape: "square", color: "#a78bfa", position: "aboveBar" },
+  user_pin: { shape: "circle", color: "#9ca3af", position: "belowBar" },
+};
 
 // Lightweight Charts v5 accepts 'YYYY-MM-DD' strings for daily bars and
 // UTCTimestamp (seconds since epoch) for intraday. Anything with a time
@@ -59,6 +95,7 @@ export function PriceChart({
   seriesType = "candlestick",
   height = 480,
   className,
+  markers,
 }: PriceChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -110,12 +147,36 @@ export function PriceChart({
       );
     }
 
+    // Timeline-event dots. v5 moved markers to a plugin: createSeriesMarkers
+    // returns an ISeriesMarkersPluginApi we detach() on teardown. Sorted by
+    // time because the plugin requires monotonic ordering.
+    const mappedMarkers: SeriesMarker<Time>[] = (markers ?? [])
+      .map((m) => {
+        const style = MARKER_STYLE[m.kind];
+        return {
+          time: toChartTime(m.time),
+          position: style.position,
+          shape: style.shape,
+          color: style.color,
+          ...(m.title ? { text: m.title } : {}),
+          ...(m.id ? { id: m.id } : {}),
+        } satisfies SeriesMarker<Time>;
+      })
+      .sort((a, b) => {
+        const ta = typeof a.time === "number" ? a.time : Date.parse(String(a.time)) / 1000;
+        const tb = typeof b.time === "number" ? b.time : Date.parse(String(b.time)) / 1000;
+        return ta - tb;
+      });
+    const markersPlugin =
+      mappedMarkers.length > 0 ? createSeriesMarkers(series, mappedMarkers) : null;
+
     chart.timeScale().fitContent();
 
     return () => {
+      markersPlugin?.detach();
       chart.remove();
     };
-  }, [bars, seriesType]);
+  }, [bars, seriesType, markers]);
 
   return (
     <div
