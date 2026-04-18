@@ -6,7 +6,7 @@ import { pickReply } from "@/features/consult/lib/replies";
 import { sessionToMarkdown } from "@/features/consult/lib/export";
 import {
   createConsultSession,
-  appendConsultMessage,
+  sendConsultMessage,
   renameConsultSession,
   deleteConsultSession,
 } from "@/features/consult/actions";
@@ -129,32 +129,13 @@ export function useConsultActions({
     setDraft("");
     setTyping(true);
 
-    // Persist user message (fire-and-forget; local state already reflects it)
-    if (isPersistable) {
-      appendConsultMessage({
-        sessionId,
-        role: "user",
-        content: userBody,
-      }).catch(() => {
-        // Action already logs/Sentry-captures on the server. Client-side we
-        // surface a subtle toast so the user knows something didn't stick.
-        toast.push({
-          tone: "warn",
-          title: "Message not saved",
-          description: "Sent locally but not persisted. Reconnect to retry.",
-          duration: 3500,
-        });
-      });
-    }
-
-    setTimeout(() => {
-      const variant = pickReply(userBody, priorUserCount);
+    const appendAssistantLocal = (body: string, tags: ConsultMessage["tags"]) => {
       const replyMsg: ConsultMessage = {
         id: `M-x${Date.now() + 1}`,
         role: "ai",
         ts: new Date().toISOString(),
-        body: variant.body,
-        tags: variant.tags,
+        body,
+        tags,
       };
       setExtrasBySession((prev) => ({
         ...prev,
@@ -167,19 +148,48 @@ export function useConsultActions({
             : s
         )
       );
-      setTyping(false);
+    };
 
-      // Persist assistant reply. Role mapped 'ai' → 'assistant' per DB check.
-      if (isPersistable) {
-        appendConsultMessage({
-          sessionId,
-          role: "assistant",
-          content: variant.body,
-        }).catch(() => {
-          /* telemetry handled server-side */
+    if (isPersistable) {
+      // Real LLM path: server action persists user + assistant turns and
+      // returns the assistant content. Offline/canned fallback is handled
+      // server-side when OPENAI_API_KEY is unset.
+      sendConsultMessage({ sessionId, body: userBody })
+        .then((res) => {
+          setTyping(false);
+          if (res.ok) {
+            appendAssistantLocal(res.assistantContent, []);
+            return;
+          }
+          const description =
+            res.error === "rate_limited"
+              ? "Slow down — too many messages per minute."
+              : "Desk didn't respond. Try again.";
+          toast.push({
+            tone: "error",
+            title: "Message not sent",
+            description,
+            duration: 3500,
+          });
+        })
+        .catch(() => {
+          setTyping(false);
+          toast.push({
+            tone: "error",
+            title: "Message not sent",
+            description: "Network error reaching the desk. Try again.",
+            duration: 3500,
+          });
         });
-      }
-    }, 1400);
+    } else {
+      // Mock/desk read-only sessions: keep the canned reply UX so the demo
+      // content stays interactive without hitting the DB or LLM.
+      setTimeout(() => {
+        const variant = pickReply(userBody, priorUserCount);
+        appendAssistantLocal(variant.body, variant.tags);
+        setTyping(false);
+      }, 1400);
+    }
   };
 
   const renameSession = (id: string, newTitle: string) => {
