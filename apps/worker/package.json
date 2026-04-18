@@ -27,7 +27,6 @@
     "node-cron": "^3.0.3",
     "openai": "^4.67.3",
     "pino": "^9.4.0",
-    "pino-pretty": "^11.2.2",
     "undici": "^6.19.8",
     "zod": "^3.23.8"
   },
@@ -37,6 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "eslint": "^8.57.0",
+    "pino-pretty": "^11.2.2",
     "tsx": "^4.19.1",
     "typescript": "^5.5.3"
   }
