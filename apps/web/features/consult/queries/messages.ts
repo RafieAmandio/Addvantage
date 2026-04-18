@@ -45,19 +45,26 @@ export async function listConsultSessions(
   return parsed.data;
 }
 
+const DEFAULT_MESSAGE_LIMIT = 200;
+
 /**
- * Returns messages for a specific session in chronological order. RLS ensures
- * only the owner can read; unauthenticated / foreign-session reads return [].
+ * Returns the last `limit` messages for a session in chronological order. RLS
+ * ensures only the owner can read; unauthenticated / foreign-session reads
+ * return []. We fetch newest-first then reverse in-memory so long-running
+ * sessions don't balloon the payload or the LLM history window.
  */
 export async function listConsultMessages(
-  sessionId: string
+  sessionId: string,
+  input: { limit?: number } = {}
 ): Promise<ConsultMessageRow[]> {
+  const limit = input.limit ?? DEFAULT_MESSAGE_LIMIT;
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from("consult_messages")
     .select(MESSAGE_COLUMNS)
     .eq("session_id", sessionId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
   if (error) {
     logger.error("listConsultMessages failed", {
@@ -78,5 +85,5 @@ export async function listConsultMessages(
     return [];
   }
 
-  return parsed.data;
+  return parsed.data.slice().reverse();
 }
