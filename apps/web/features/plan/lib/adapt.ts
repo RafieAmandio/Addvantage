@@ -1,5 +1,6 @@
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
 import type { Plan } from "@/features/plan/types";
+import { logger } from "@/lib/logger";
 import type { TradingPlan, TradingSetup, Bias } from "@/lib/mock/types";
 
 /**
@@ -157,8 +158,15 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
         `S-${String(i + 1).padStart(2, "0")}`,
       );
       if (s) richAttempts.push(s);
-    } catch {
+    } catch (error) {
       // Malformed JSONB entry — skip rather than nuke the whole plan render.
+      // Log so writer-side drift doesn't silently degrade plan rendering.
+      logger.warn("plan.adapt: malformed setup JSONB", {
+        planId: plan.id,
+        setupIndex: i,
+        error,
+        scope: "plan.adapt",
+      });
     }
   }
 
