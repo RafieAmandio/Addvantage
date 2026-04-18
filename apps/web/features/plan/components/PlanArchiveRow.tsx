@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import type { TradingPlan } from "@/lib/mock/types";
 import { computePlanOutcome } from "@/features/plan/mock";
@@ -10,7 +11,7 @@ type Props = {
   query: string;
 };
 
-export function PlanArchiveRow({ plan, isLatest, query }: Props) {
+function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
   const longs = plan.setups.filter((s) => s.direction === "long").length;
   const shorts = plan.setups.filter((s) => s.direction === "short").length;
   const outcome = computePlanOutcome(plan);
@@ -99,3 +100,5 @@ export function PlanArchiveRow({ plan, isLatest, query }: Props) {
     </Link>
   );
 }
+
+export const PlanArchiveRow = memo(PlanArchiveRowImpl);

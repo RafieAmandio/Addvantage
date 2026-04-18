@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { PlanMonthGroup } from "@/features/plan/types";
 import { PlanArchiveRow } from "@/features/plan/components/PlanArchiveRow";
 import { monthTotalR } from "@/features/plan/lib/archive-stats";
@@ -8,7 +9,7 @@ type Props = {
   query: string;
 };
 
-export function PlanArchiveMonthGroup({ group, latestId, query }: Props) {
+function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
   const mR = monthTotalR(group.plans, latestId);
   const closedInMonth = group.plans.filter((p) => p.id !== latestId).length;
 
@@ -56,3 +57,5 @@ export function PlanArchiveMonthGroup({ group, latestId, query }: Props) {
     </section>
   );
 }
+
+export const PlanArchiveMonthGroup = memo(PlanArchiveMonthGroupImpl);
