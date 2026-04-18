@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isPaidTier, TIERS, TIER_PRICE_IDR, type Tier } from "@tradevantage/shared";
 import { config } from "../../lib/config";
+import { logger } from "../../lib/logger";
 import { retry } from "../../lib/retry";
 import type {
   CreateCheckoutSessionInput,
@@ -200,7 +201,11 @@ export class XenditAdapter implements PaymentAdapter {
     let json: unknown;
     try {
       json = JSON.parse(input.rawBody);
-    } catch {
+    } catch (err) {
+      logger.warn(
+        { err: String(err), scope: "xendit.verify", reason: "bad_json" },
+        "xendit webhook: bad JSON body"
+      );
       return { valid: false };
     }
 
