@@ -86,6 +86,11 @@ export type NewsRow = z.infer<typeof NewsRowSchema>;
 const NEWS_LIST_COLUMNS =
   "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
 
+// Full detail projection consumed by /admin/review/[id]. Explicit list (never
+// `select('*')`) shields the route from column drift on news_items.
+const NEWS_DETAIL_COLUMNS =
+  "id,source_code,source_url,raw_text,content_hash,fetched_at,published_at,status,headline,rephrased,analysis,impact,bias,affects,tags,author,reviewed_at,reviewed_by,related_plan_ids,created_at,updated_at";
+
 function toListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
   // Drop status from the public projection.
   const { status: _status, ...rest } = row;
@@ -181,7 +186,7 @@ export async function getNewsItemById(id: string): Promise<NewsRow | null> {
   const supabase = supabaseServer();
   const { data } = await supabase
     .from("news_items")
-    .select("*")
+    .select(NEWS_DETAIL_COLUMNS)
     .eq("id", id)
     .maybeSingle();
   if (!data) return null;
