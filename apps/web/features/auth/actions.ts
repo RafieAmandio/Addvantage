@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
@@ -58,6 +59,19 @@ export async function requestLoginOtp(
   }
 
   return { ok: true, sent: true, email };
+}
+
+export async function logoutAction(): Promise<void> {
+  const supabase = supabaseServer();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    Sentry.captureException(error, { tags: { scope: "auth.logout" } });
+    logger.error("logout failed", { error, scope: "auth.logout" });
+    // Fall through — we still redirect so the session cookie at minimum
+    // clears on the client side. If signOut fails server-side, the user
+    // gets a stale client-side state but can retry from /login.
+  }
+  redirect("/");
 }
 
 export interface SignupActionState {

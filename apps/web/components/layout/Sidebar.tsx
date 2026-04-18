@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useAppState, isPaid } from "@/lib/state";
 import { cn } from "@/lib/cn";
+import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
 const nav = [
   { code: "TX-00", label: "Home", href: "/app", group: "live" },
@@ -199,6 +200,9 @@ export function Sidebar() {
               Upgrade access →
             </Link>
           )}
+          <div className="mt-2">
+            <LogoutButton />
+          </div>
         </div>
       </div>
     </div>
