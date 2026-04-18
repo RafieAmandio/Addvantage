@@ -84,18 +84,28 @@ function TagsView() {
     sort: sortMode !== "density" ? sortMode : null,
   });
 
-  const countsRaw = useMemo(
-    () =>
-      allHashtags.map((tag) => {
-        const c =
-          primers.filter((p) => p.tags.includes(tag)).length +
-          news.filter((n) => n.tags.includes(tag)).length +
-          consultSessions.filter((s) => s.tags.includes(tag)).length +
-          channelPosts.filter((c) => c.tags.includes(tag)).length;
-        return { tag, c };
-      }),
-    []
-  );
+  const countsRaw = useMemo(() => {
+    // Single-pass tally. Prior implementation was O(tags × sources × items)
+    // because each tag ran `.filter().length` over all four source arrays.
+    // One pass over each source array, bumping a Map keyed by tag, drops it
+    // to O(items × avg_tags_per_item) regardless of tag count.
+    const tally = new Map<string, number>();
+    for (const tag of allHashtags) tally.set(tag, 0);
+    const bump = (tags: readonly string[]) => {
+      for (const t of tags) {
+        const prev = tally.get(t);
+        // Ignore tags that aren't in `allHashtags` — mock sources occasionally
+        // carry tags outside the declared taxonomy; the old `.includes(tag)`
+        // loop would silently drop them too.
+        if (prev !== undefined) tally.set(t, prev + 1);
+      }
+    };
+    for (const p of primers) bump(p.tags);
+    for (const n of news) bump(n.tags);
+    for (const s of consultSessions) bump(s.tags);
+    for (const c of channelPosts) bump(c.tags);
+    return allHashtags.map((tag) => ({ tag, c: tally.get(tag) ?? 0 }));
+  }, []);
 
   const counts = useMemo(() => {
     const sorted = [...countsRaw];
