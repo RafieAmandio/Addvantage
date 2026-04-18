@@ -44,24 +44,36 @@ export const TIER_BUCKETS: Record<TierAction, Record<Tier, Bucket>> = {
   },
 };
 
-export interface EnforceTierRateLimitInput {
-  userId: string;
-  tier: Tier;
-  action: TierAction;
-}
+export type EnforceTierRateLimitInput =
+  | { userId: string; tier: Tier; action: TierAction }
+  | { ip: string; action: TierAction };
 
 /**
  * Enforce the tier-specific bucket for `action`. The Redis key is namespaced
  * by action + user id so shifting a user between tiers does not reset their
  * existing bucket (the sliding window keeps applying). Window is per-tier
  * so the reset cadence also differs by tier.
+ *
+ * RT4: accepts an anonymous `{ ip, action }` variant for public routes
+ * (/api/bars, /api/events). Anonymous callers get the conservative `free`
+ * bucket under a separate `tier:<action>:ip:<ip>` key — the authed key shape
+ * (`tier:<action>:<userId>`) stays unchanged so existing RT2 sliding windows
+ * don't reset on deploy.
  */
 export async function enforceTierRateLimit(
   input: EnforceTierRateLimitInput,
 ): Promise<RateLimitResult> {
-  const bucket = TIER_BUCKETS[input.action][input.tier];
+  if ("userId" in input) {
+    const bucket = TIER_BUCKETS[input.action][input.tier];
+    return rateLimit({
+      key: `tier:${input.action}:${input.userId}`,
+      limit: bucket.limit,
+      windowSec: bucket.windowSec,
+    });
+  }
+  const bucket = TIER_BUCKETS[input.action].free;
   return rateLimit({
-    key: `tier:${input.action}:${input.userId}`,
+    key: `tier:${input.action}:ip:${input.ip}`,
     limit: bucket.limit,
     windowSec: bucket.windowSec,
   });

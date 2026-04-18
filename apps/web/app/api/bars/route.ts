@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { listBars } from "@/features/chart/queries/bars";
+import { getProfile } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
-import { rateLimit } from "@/lib/ratelimit";
+import { enforceTierRateLimit, type Tier } from "@/lib/ratelimit-tier";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -32,13 +33,27 @@ export async function GET(request: Request) {
   const to = parsed.data.to ?? new Date();
   const from = parsed.data.from ?? new Date(to.getTime() - THIRTY_DAYS_MS);
 
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rl = await rateLimit({
-    key: `bars:${ip}:${symbol}:${interval}`,
-    limit: 60,
-    windowSec: 60,
-  });
+  // RT4: tier-aware bucket for authed callers; anon falls back to IP-keyed
+  // free bucket. getProfile() is a no-op for anon requests (returns null).
+  const profile = await getProfile();
+  let rl;
+  if (profile) {
+    let tier: Tier = "free";
+    if (profile.tier === "vip" || profile.tier === "free") {
+      tier = profile.tier;
+    }
+    rl = await enforceTierRateLimit({
+      userId: profile.id,
+      tier,
+      action: "api:bars",
+    });
+  } else {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "unknown";
+    rl = await enforceTierRateLimit({ ip, action: "api:bars" });
+  }
   if (!rl.success) {
     const retryAfter = rl.reset
       ? Math.max(1, Math.ceil((rl.reset - Date.now()) / 1000))
