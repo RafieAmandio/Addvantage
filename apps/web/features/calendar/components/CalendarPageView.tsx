@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { calendar } from "@/features/calendar/mock";
+import type { CalendarEvent } from "@/lib/mock/types";
 import {
   DEMO_TODAY_YMD,
   type ImpactFilter,
@@ -28,7 +28,17 @@ import { CalendarDayWeekTable } from "@/features/calendar/components/CalendarDay
 import { CalendarLegend } from "@/features/calendar/components/CalendarLegend";
 import { useCalendarKeyboard } from "@/features/calendar/hooks/useCalendarKeyboard";
 
-export function CalendarPageView() {
+export interface CalendarPageViewProps {
+  /**
+   * Real macro events (from `timeline_events WHERE kind='macro'`) projected
+   * into the calendar shape by `features/calendar/lib/fromTimeline`. Server
+   * always passes; default here is a safety net for Storybook/tests.
+   */
+  events?: CalendarEvent[];
+}
+
+export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
+  const calendar = events;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
