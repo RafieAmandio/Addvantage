@@ -6,7 +6,6 @@ import { pickReply } from "@/features/consult/lib/replies";
 import { sessionToMarkdown } from "@/features/consult/lib/export";
 import {
   createConsultSession,
-  sendConsultMessage,
   renameConsultSession,
   deleteConsultSession,
 } from "@/features/consult/actions";
@@ -151,18 +150,26 @@ export function useConsultActions({
     };
 
     if (isPersistable) {
-      // Real LLM path: server action persists user + assistant turns and
-      // returns the assistant content. Offline/canned fallback is handled
-      // server-side when OPENAI_API_KEY is unset.
-      sendConsultMessage({ sessionId, body: userBody })
-        .then((res) => {
-          setTyping(false);
-          if (res.ok) {
-            appendAssistantLocal(res.assistantContent, []);
-            return;
+      // Streaming path (L3): POST to /api/consult/stream and progressively
+      // append tokens into a placeholder assistant bubble. Server persists
+      // the full final message after the stream closes.
+      const bubbleId = `M-x${Date.now() + 1}`;
+      const streamMessage = async () => {
+        const res = await fetch("/api/consult/stream", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessionId, body: userBody }),
+        });
+        if (!res.ok || !res.body) {
+          let errCode: string | undefined;
+          try {
+            const j = (await res.json()) as { error?: string };
+            errCode = j.error;
+          } catch {
+            /* non-JSON body */
           }
           const description =
-            res.error === "rate_limited"
+            errCode === "rate_limited"
               ? "Slow down — too many messages per minute."
               : "Desk didn't respond. Try again.";
           toast.push({
@@ -171,16 +178,84 @@ export function useConsultActions({
             description,
             duration: 3500,
           });
-        })
-        .catch(() => {
+          setTyping(false);
+          return;
+        }
+        // First token arrives → create the bubble and hide the typing dots.
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let acc = "";
+        let bubbleCreated = false;
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const delta = decoder.decode(value, { stream: true });
+          if (!delta) continue;
+          acc += delta;
+          if (!bubbleCreated) {
+            bubbleCreated = true;
+            setTyping(false);
+            const replyMsg: ConsultMessage = {
+              id: bubbleId,
+              role: "ai",
+              ts: new Date().toISOString(),
+              body: acc,
+              tags: [],
+            };
+            setExtrasBySession((prev) => ({
+              ...prev,
+              [sessionId]: [...(prev[sessionId] ?? []), replyMsg],
+            }));
+            setLocalSessions((prev) =>
+              prev.map((s) =>
+                s.id === sessionId
+                  ? { ...s, lastAt: new Date().toISOString() }
+                  : s
+              )
+            );
+          } else {
+            const bodyNow = acc;
+            setExtrasBySession((prev) => ({
+              ...prev,
+              [sessionId]: (prev[sessionId] ?? []).map((m) =>
+                m.id === bubbleId ? { ...m, body: bodyNow } : m
+              ),
+            }));
+          }
+        }
+        // Flush any buffered bytes.
+        const tail = decoder.decode();
+        if (tail) {
+          acc += tail;
+          const bodyNow = acc;
+          setExtrasBySession((prev) => ({
+            ...prev,
+            [sessionId]: (prev[sessionId] ?? []).map((m) =>
+              m.id === bubbleId ? { ...m, body: bodyNow } : m
+            ),
+          }));
+        }
+        if (!bubbleCreated) {
+          // Stream closed with zero bytes — surface as error.
           setTyping(false);
           toast.push({
             tone: "error",
             title: "Message not sent",
-            description: "Network error reaching the desk. Try again.",
+            description: "Desk didn't respond. Try again.",
             duration: 3500,
           });
+        }
+      };
+      streamMessage().catch(() => {
+        setTyping(false);
+        toast.push({
+          tone: "error",
+          title: "Message not sent",
+          description: "Network error reaching the desk. Try again.",
+          duration: 3500,
         });
+      });
     } else {
       // Mock/desk read-only sessions: keep the canned reply UX so the demo
       // content stays interactive without hitting the DB or LLM.
