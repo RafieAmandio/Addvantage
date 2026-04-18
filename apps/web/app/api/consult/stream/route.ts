@@ -22,9 +22,9 @@ import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type OpenAI from "openai";
-import { getSession } from "@/lib/auth/session";
+import { getProfile, getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
-import { rateLimit } from "@/lib/ratelimit";
+import { enforceTierRateLimit, type Tier } from "@/lib/ratelimit-tier";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai";
 import { DESK_SYSTEM_PROMPT } from "@/features/consult/lib/prompt";
 import { pickReply } from "@/features/consult/lib/replies";
@@ -50,10 +50,23 @@ export async function POST(req: Request): Promise<Response> {
   const user = await getSession();
   if (!user) return jsonError(401, "unauthorized");
 
-  const rl = await rateLimit({
-    key: `consult:stream:${user.id}`,
-    limit: 10,
-    windowSec: 60,
+  // RT2: tier-aware bucket (free 5/60s, vip 30/60s). Defaults to "free" on
+  // missing/unexpected tier to avoid accidentally granting VIP budget.
+  const profile = await getProfile();
+  let tier: Tier = "free";
+  if (profile?.tier === "vip" || profile?.tier === "free") {
+    tier = profile.tier;
+  } else {
+    logger.debug("consult.stream: defaulting tier to free", {
+      scope: "consult.stream",
+      userId: user.id,
+      observedTier: profile?.tier ?? null,
+    });
+  }
+  const rl = await enforceTierRateLimit({
+    userId: user.id,
+    tier,
+    action: "consult:send",
   });
   if (!rl.success) return jsonError(429, "rate_limited");
 

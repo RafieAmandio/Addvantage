@@ -3,9 +3,10 @@
 import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getSession } from "@/lib/auth/session";
+import { getProfile, getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
+import { enforceTierRateLimit, type Tier } from "@/lib/ratelimit-tier";
 import { supabaseServer } from "@/lib/supabase/server";
 import { getOpenAI, OPENAI_MODEL } from "@/lib/openai";
 import { CONSULT_MESSAGE_ROLES } from "@/features/consult/types";
@@ -214,10 +215,24 @@ export async function sendConsultMessage(input: {
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  const rl = await rateLimit({
-    key: `consult:send:${user.id}`,
-    limit: 10,
-    windowSec: 60,
+  // RT2: tier-aware bucket (free 5/60s, vip 30/60s). Default to "free" if the
+  // profile row is missing or carries an unexpected tier value — safer than
+  // accidentally granting VIP budget.
+  const profile = await getProfile();
+  let tier: Tier = "free";
+  if (profile?.tier === "vip" || profile?.tier === "free") {
+    tier = profile.tier;
+  } else {
+    logger.debug("sendConsultMessage: defaulting tier to free", {
+      scope: "consult.sendConsultMessage",
+      userId: user.id,
+      observedTier: profile?.tier ?? null,
+    });
+  }
+  const rl = await enforceTierRateLimit({
+    userId: user.id,
+    tier,
+    action: "consult:send",
   });
   if (!rl.success) return { ok: false, error: "rate_limited" };
 
