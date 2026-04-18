@@ -541,6 +541,77 @@ export type Database = {
           },
         ]
       }
+      trading_plans: {
+        Row: {
+          author_id: string | null
+          closed_at: string | null
+          created_at: string
+          direction: string
+          entry: number | null
+          id: string
+          outcome: string | null
+          published_at: string | null
+          r_multiple: number | null
+          setups: Json
+          status: string
+          stop: number | null
+          symbol: string
+          tags: string[]
+          target: number | null
+          thesis: string
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          direction: string
+          entry?: number | null
+          id?: string
+          outcome?: string | null
+          published_at?: string | null
+          r_multiple?: number | null
+          setups?: Json
+          status?: string
+          stop?: number | null
+          symbol: string
+          tags?: string[]
+          target?: number | null
+          thesis: string
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          closed_at?: string | null
+          created_at?: string
+          direction?: string
+          entry?: number | null
+          id?: string
+          outcome?: string | null
+          published_at?: string | null
+          r_multiple?: number | null
+          setups?: Json
+          status?: string
+          stop?: number | null
+          symbol?: string
+          tags?: string[]
+          target?: number | null
+          thesis?: string
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trading_plans_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
