@@ -21,6 +21,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import type OpenAI from "openai";
 import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
@@ -94,6 +95,7 @@ export async function POST(req: Request): Promise<Response> {
       sessionId,
       role: "assistant",
       content: canned,
+      metadata: { model: "fallback.pickReply", streamed: true },
     });
     if (!assistantAppend.ok) {
       return jsonError(500, assistantAppend.error ?? "append_assistant_failed");
@@ -119,11 +121,15 @@ export async function POST(req: Request): Promise<Response> {
     async start(controller) {
       let fullText = "";
       let fellBack = false;
+      let usage: OpenAI.Completions.CompletionUsage | undefined;
       try {
         const completion = await client.chat.completions.create({
           model: OPENAI_MODEL,
           temperature: 0.4,
           stream: true,
+          // include_usage: OpenAI emits a terminal chunk with cumulative usage
+          // totals. Without this flag, chunk.usage is undefined end-to-end.
+          stream_options: { include_usage: true },
           messages: [
             { role: "system", content: DESK_SYSTEM_PROMPT },
             ...history.map((m) => ({
@@ -138,6 +144,7 @@ export async function POST(req: Request): Promise<Response> {
             fullText += delta;
             controller.enqueue(encoder.encode(delta));
           }
+          if (chunk.usage) usage = chunk.usage;
         }
         if (!fullText.trim()) {
           // Empty completion — swap to canned so the bubble isn't blank.
@@ -171,12 +178,48 @@ export async function POST(req: Request): Promise<Response> {
         fellBack = true;
       }
 
+      // Observability: token usage + model snapshot (L4). fellBack path has
+      // no usage numbers; we still record model=fallback.pickReply so cost
+      // dashboards can slice canned vs LLM turns.
+      const metadata: Record<string, unknown> = fellBack
+        ? { model: "fallback.pickReply", streamed: true }
+        : {
+            model: OPENAI_MODEL,
+            prompt_tokens: usage?.prompt_tokens,
+            completion_tokens: usage?.completion_tokens,
+            total_tokens: usage?.total_tokens,
+            streamed: true,
+          };
+      if (!fellBack) {
+        logger.info("consult.llm", {
+          scope: "consult.stream",
+          sessionId,
+          userId,
+          promptTokens: usage?.prompt_tokens,
+          completionTokens: usage?.completion_tokens,
+          totalTokens: usage?.total_tokens,
+          model: OPENAI_MODEL,
+        });
+        Sentry.addBreadcrumb({
+          category: "consult.llm",
+          level: "info",
+          message: `tokens: ${usage?.total_tokens ?? "unknown"}`,
+          data: {
+            sessionId,
+            model: OPENAI_MODEL,
+            promptTokens: usage?.prompt_tokens,
+            completionTokens: usage?.completion_tokens,
+          },
+        });
+      }
+
       // Persist the final assistant turn before closing the stream.
       try {
         const assistantAppend = await appendConsultMessage({
           sessionId,
           role: "assistant",
           content: fullText,
+          metadata,
         });
         if (!assistantAppend.ok) {
           logger.error("consult.stream: assistant persist failed", {

@@ -12,6 +12,7 @@ import { CONSULT_MESSAGE_ROLES } from "@/features/consult/types";
 import { DESK_SYSTEM_PROMPT } from "@/features/consult/lib/prompt";
 import { pickReply } from "@/features/consult/lib/replies";
 import { listConsultMessages } from "@/features/consult/queries/messages";
+import type { Json } from "@tradevantage/db";
 
 /**
  * Consult session / message server actions. Auth-gated — middleware already
@@ -78,12 +79,17 @@ const AppendMessageSchema = z.object({
   sessionId: z.string().uuid(),
   role: z.enum(CONSULT_MESSAGE_ROLES),
   content: z.string().trim().min(1).max(10000),
+  // Optional per-message metadata — currently token usage + model + streamed
+  // flag for assistant turns (L4). Loose shape on purpose so we can add
+  // latency_ms / cached / etc. later without schema churn.
+  metadata: z.record(z.unknown()).optional(),
 });
 
 export async function appendConsultMessage(input: {
   sessionId: string;
   role: "user" | "assistant";
   content: string;
+  metadata?: Record<string, unknown>;
 }): Promise<ActionState> {
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
@@ -104,6 +110,11 @@ export async function appendConsultMessage(input: {
   }
 
   const supabase = supabaseServer();
+  // tick-148 pattern: round-trip through JSON to coerce unknown→Json before
+  // the Supabase client sees it.
+  const metadataJson: Json | null = parsed.data.metadata
+    ? (JSON.parse(JSON.stringify(parsed.data.metadata)) as Json)
+    : null;
   const { data, error } = await supabase
     .from("consult_messages")
     .insert({
@@ -111,6 +122,7 @@ export async function appendConsultMessage(input: {
       user_id: user.id,
       role: parsed.data.role,
       content: parsed.data.content,
+      metadata: metadataJson,
     })
     .select("id")
     .single();
@@ -238,6 +250,14 @@ export async function sendConsultMessage(input: {
   // 3. Decide: LLM or canned fallback.
   const client = getOpenAI();
   let assistantContent: string | null = null;
+  // Metadata written alongside the assistant row so the consult_messages.metadata
+  // jsonb (migration 0022) carries token usage + model for cost dashboards.
+  // Fallback paths record `fallback.pickReply` so usage dashboards can slice
+  // canned vs LLM turns cleanly.
+  let assistantMetadata: Record<string, unknown> = {
+    model: "fallback.pickReply",
+    streamed: false,
+  };
 
   if (!client) {
     const canned = pickReply(body, history.length);
@@ -257,6 +277,7 @@ export async function sendConsultMessage(input: {
         ],
       });
       const text = completion.choices[0]?.message?.content?.trim();
+      const usage = completion.usage;
       if (!text) {
         logger.warn("sendConsultMessage: empty completion, falling back", {
           sessionId,
@@ -264,8 +285,36 @@ export async function sendConsultMessage(input: {
           scope: "consult.sendConsultMessage",
         });
         assistantContent = pickReply(body, history.length).body;
+        // metadata stays at fallback defaults
       } else {
         assistantContent = text;
+        assistantMetadata = {
+          model: OPENAI_MODEL,
+          prompt_tokens: usage?.prompt_tokens,
+          completion_tokens: usage?.completion_tokens,
+          total_tokens: usage?.total_tokens,
+          streamed: false,
+        };
+        logger.info("consult.llm", {
+          scope: "consult.sendConsultMessage",
+          sessionId,
+          userId: user.id,
+          promptTokens: usage?.prompt_tokens,
+          completionTokens: usage?.completion_tokens,
+          totalTokens: usage?.total_tokens,
+          model: OPENAI_MODEL,
+        });
+        Sentry.addBreadcrumb({
+          category: "consult.llm",
+          level: "info",
+          message: `tokens: ${usage?.total_tokens ?? "unknown"}`,
+          data: {
+            sessionId,
+            model: OPENAI_MODEL,
+            promptTokens: usage?.prompt_tokens,
+            completionTokens: usage?.completion_tokens,
+          },
+        });
       }
     } catch (err) {
       Sentry.captureException(err, {
@@ -279,6 +328,7 @@ export async function sendConsultMessage(input: {
         scope: "consult.sendConsultMessage",
       });
       assistantContent = pickReply(body, history.length).body;
+      // metadata stays at fallback defaults
     }
   }
 
@@ -287,6 +337,7 @@ export async function sendConsultMessage(input: {
     sessionId,
     role: "assistant",
     content: assistantContent,
+    metadata: assistantMetadata,
   });
   if (!assistantAppend.ok || !assistantAppend.messageId) {
     return {
