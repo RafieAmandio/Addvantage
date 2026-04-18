@@ -215,7 +215,7 @@ create index on timeline_events (occurred_at desc);
 ```
 
 **New worker adapters:**
-- [ ] **Trump tweet adapter** — Truth Social RSS or scraper; run every 5 min
+- [x] **Trump tweet adapter** — Truth Social RSS or scraper; run every 5 min _(done Phase C1 — `apps/worker/src/adapters/truth-social.ts` polls `trumpstruth.org/feed` via regex RSS extractor; migration 0015 adds TRUMP source row + extends the news→timeline mirror trigger to tag `kind='tweet'` for TRUMP and broadens the partial-unique index to cover both kinds; hourly poll via the default scheduler)_
 - [x] **Market data adapter** — Polygon.io, Alpaca, or Tiingo free tier → `instrument_bars` _(done Phase B1 — `apps/worker/src/adapters/bars/` with `TwelveDataAdapter`; switch providers by adding another adapter behind the same interface)_
 - [x] **Backfill job** — migrate existing `news_items` into `timeline_events` with `kind='news'` _(done tick 74 — migration 0014 unique-index + backfill + auto-mirror trigger; timeline query now reads timeline_events as single source)_
 
@@ -262,9 +262,9 @@ create index on timeline_events (occurred_at desc);
 - [x] **B4.** Replace the deterministic mulberry32 mock in `/app/chart/[symbol]` with the real query (B3) and confirm renders.
 
 **Phase C — Tweet source (2-3 days):**
-- Trump tweet adapter (Truth Social)
-- Add to worker scheduler
-- Dot rendering + drawer UI
+- [x] **C1.** Trump tweet adapter (Truth Social RSS) + scheduler registration + migration 0015 routing `source_code='TRUMP'` to `timeline_events.kind='tweet'` via the mirror trigger. _(done — `apps/worker/src/adapters/truth-social.ts`, `packages/db/migrations/0015_trump_source_and_tweet_kind.sql`)_
+- [ ] **C2.** Dot rendering on the chart — distinct marker style for `kind='tweet'` in `features/chart/components/PriceChart.tsx` (or via a new overlay layer), so tweets visually separate from news dots.
+- [ ] **C3.** Drawer UI — clicking a tweet marker opens a drawer showing the rephrased body, the original Truth Social link, and affected symbols. Reuse existing event drawer shell if present.
 
 **Phase D — Polish (ongoing):**
 - [x] **D1.** Symbol search — `features/chart/components/SymbolSearch.tsx` combobox over `SUPPORTED_SYMBOLS`; URL-routes on select (`/app/chart/[symbol]`). Keyboard: `/` focus, ArrowUp/Down, Enter. Reuses `PageSearchInput` primitive if shapes align. Unblocked. _(done tick 90 — plain `<input>` + filtered list + keydown handlers; wired next to `SymbolNav` in `/app/chart/[symbol]` preserving `?interval=`; did not force reuse of `PageSearchInput` whose shape doesn't expose active-index/Arrow hooks)_
