@@ -69,6 +69,15 @@ export async function POST(request: Request) {
         { status: 503, headers: { "Cache-Control": "no-store" } }
       );
     }
+    if (result.reason === "bad_json") {
+      logger.warn("xendit webhook bad json body", {
+        scope: "api.webhooks.xendit",
+      });
+      return NextResponse.json(
+        { error: "bad_json" },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
+    }
     if (result.reason === "bad_payload") {
       logger.warn("xendit webhook bad payload", {
         scope: "api.webhooks.xendit",

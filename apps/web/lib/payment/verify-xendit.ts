@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { serverConfig } from "@/lib/config/server";
+import { logger } from "@/lib/logger";
 
 /**
  * Xendit webhook verification (web-app copy).
@@ -50,7 +51,10 @@ export interface VerifyWebhookInput {
 
 export type VerifyWebhookResult =
   | { valid: true; event: PaymentEvent }
-  | { valid: false; reason: "not_configured" | "bad_token" | "bad_payload" };
+  | {
+      valid: false;
+      reason: "not_configured" | "bad_token" | "bad_json" | "bad_payload";
+    };
 
 const InvoiceCallbackSchema = z.object({
   id: z.string().min(1),
@@ -129,8 +133,12 @@ export function verifyXenditWebhook(
   let json: unknown;
   try {
     json = JSON.parse(input.rawBody);
-  } catch {
-    return { valid: false, reason: "bad_payload" };
+  } catch (err) {
+    logger.warn("xendit webhook: bad JSON body", {
+      error: err,
+      scope: "payment.xendit.verify",
+    });
+    return { valid: false, reason: "bad_json" };
   }
 
   const parsed = InvoiceCallbackSchema.safeParse(json);
