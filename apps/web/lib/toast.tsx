@@ -71,9 +71,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    // Snapshot the ref at effect-setup time: the ref value could change
+    // before cleanup runs, and the cleanup should only clear the timers
+    // that existed when this effect was registered.
+    const timersMap = timers.current;
     return () => {
-      timers.current.forEach((t) => clearTimeout(t));
-      timers.current.clear();
+      timersMap.forEach((t) => clearTimeout(t));
+      timersMap.clear();
     };
   }, []);
 
