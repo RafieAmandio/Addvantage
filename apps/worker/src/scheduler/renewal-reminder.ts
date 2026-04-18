@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
@@ -152,6 +153,10 @@ export async function runRenewalReminders(): Promise<void> {
       sent++;
     } catch (err) {
       errors++;
+      Sentry.captureException(err, {
+        tags: { scope: "renewal-reminder.send" },
+        extra: { profileId: p.id },
+      });
       logger.error(
         { err: String(err), profileId: p.id },
         "renewal-reminder: send failed"
