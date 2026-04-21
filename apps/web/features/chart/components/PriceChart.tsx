@@ -6,18 +6,15 @@ import {
   CandlestickSeries,
   ColorType,
   createChart,
-  createSeriesMarkers,
   type IChartApi,
   type ISeriesApi,
-  type SeriesMarker,
-  type SeriesMarkerBar,
-  type SeriesMarkerBarPosition,
-  type SeriesMarkerShape,
   type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
 
 import { cn } from "@/lib/cn";
+
+type MarkerPosition = "aboveBar" | "belowBar";
 
 export interface Bar {
   /** ISO timestamp. Daily bars can also be 'YYYY-MM-DD'. */
@@ -71,17 +68,13 @@ export interface PriceChartProps {
  */
 const MARKER_STYLE: Record<
   ChartMarker["kind"],
-  {
-    shape: SeriesMarkerShape;
-    color: string;
-    position: SeriesMarkerBarPosition;
-  }
+  { color: string; position: MarkerPosition; glyph: string }
 > = {
-  news: { shape: "circle", color: "#4da6ff", position: "aboveBar" },
-  tweet: { shape: "arrowDown", color: "#ff9a3d", position: "aboveBar" },
-  macro: { shape: "circle", color: "#ef5350", position: "aboveBar" },
-  earnings: { shape: "square", color: "#a78bfa", position: "aboveBar" },
-  user_pin: { shape: "circle", color: "#9ca3af", position: "belowBar" },
+  news: { color: "#4da6ff", position: "aboveBar", glyph: "N" },
+  tweet: { color: "#ff9a3d", position: "aboveBar", glyph: "T" },
+  macro: { color: "#ef5350", position: "aboveBar", glyph: "M" },
+  earnings: { color: "#a78bfa", position: "aboveBar", glyph: "E" },
+  user_pin: { color: "#9ca3af", position: "belowBar", glyph: "•" },
 };
 
 const KIND_LABEL: Record<ChartMarker["kind"], string> = {
@@ -134,13 +127,6 @@ export function PriceChart({
   // force the marker-overlay layout to recompute against fresh coordinates.
   const [layoutTick, setLayoutTick] = useState(0);
 
-  // Keep the handler in a ref so the main effect doesn't have to re-run
-  // (and rebuild the whole chart) when the parent re-creates the callback.
-  const onMarkerClickRef = useRef<typeof onMarkerClick>(onMarkerClick);
-  useEffect(() => {
-    onMarkerClickRef.current = onMarkerClick;
-  }, [onMarkerClick]);
-
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -192,40 +178,6 @@ export function PriceChart({
     chartRef.current = chart;
     seriesRef.current = series;
 
-    // Timeline-event dots. v5 moved markers to a plugin: createSeriesMarkers
-    // returns an ISeriesMarkersPluginApi we detach() on teardown. Sorted by
-    // time because the plugin requires monotonic ordering.
-    const mappedMarkers: SeriesMarker<Time>[] = (markers ?? [])
-      .map((m): SeriesMarkerBar<Time> => {
-        const style = MARKER_STYLE[m.kind];
-        return {
-          time: toChartTime(m.time),
-          position: style.position,
-          shape: style.shape,
-          color: style.color,
-          ...(m.title ? { text: m.title } : {}),
-          ...(m.id ? { id: m.id } : {}),
-        };
-      })
-      .sort((a, b) => {
-        const ta = typeof a.time === "number" ? a.time : Date.parse(String(a.time)) / 1000;
-        const tb = typeof b.time === "number" ? b.time : Date.parse(String(b.time)) / 1000;
-        return ta - tb;
-      });
-    const markersPlugin =
-      mappedMarkers.length > 0 ? createSeriesMarkers(series, mappedMarkers) : null;
-
-    // Marker click wiring. v5's plugin doesn't expose a per-marker click; the
-    // documented path is chart.subscribeClick + MouseEventParams.hoveredObjectId,
-    // which the createSeriesMarkers plugin populates with the marker's `id`.
-    const clickHandler = (param: { hoveredObjectId?: unknown }) => {
-      const cb = onMarkerClickRef.current;
-      if (!cb) return;
-      const id = param.hoveredObjectId;
-      if (typeof id === "string" && id.length > 0) cb(id);
-    };
-    chart.subscribeClick(clickHandler);
-
     // Recompute overlay coordinates whenever the visible range shifts (pan,
     // zoom, fit) or the data rebuilds. One state-bump drives the whole layer.
     const bumpLayout = () => setLayoutTick((t) => t + 1);
@@ -233,19 +185,16 @@ export function PriceChart({
     chart.timeScale().subscribeSizeChange(bumpLayout);
 
     chart.timeScale().fitContent();
-    // Kick one layout after fitContent lays down the initial range.
     bumpLayout();
 
     return () => {
       chart.timeScale().unsubscribeVisibleTimeRangeChange(bumpLayout);
       chart.timeScale().unsubscribeSizeChange(bumpLayout);
-      chart.unsubscribeClick(clickHandler);
-      markersPlugin?.detach();
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, [bars, seriesType, markers]);
+  }, [bars, seriesType]);
 
   // Per-marker pixel coordinates, rebuilt on every layout tick. The native
   // dots are drawn by the lightweight-charts plugin; these coordinates power
@@ -277,7 +226,7 @@ export function PriceChart({
       const priceY = series.priceToCoordinate(price);
       if (priceY === null) continue;
       const y =
-        style.position === "belowBar" ? priceY + 14 : priceY - 14;
+        style.position === "belowBar" ? priceY + 18 : priceY - 18;
 
       layouts.push({ id: m.id, x, y, marker: m });
     }
@@ -313,26 +262,30 @@ function MarkerHoverCard({
 }) {
   const { x, y, marker } = layout;
   const style = MARKER_STYLE[marker.kind];
-  // Hitbox ~24px square, centered on the native dot. The expanded card flips
-  // above or below the anchor depending on marker position so it never
-  // collides with the series.
-  const cardAbove = style.position === "belowBar";
+  // Dot is 14px; hitbox is 28px (doubled for forgiving hover). Card flips
+  // to the other side of the anchor so it never covers the candles.
+  const cardAbove = style.position === "aboveBar";
   return (
     <div
-      className="group pointer-events-auto absolute"
+      className="group pointer-events-auto absolute flex items-center justify-center"
       style={{
         left: `${x}px`,
         top: `${y}px`,
-        width: 24,
-        height: 24,
+        width: 28,
+        height: 28,
         transform: "translate(-50%, -50%)",
       }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {/* Invisible hitbox — the visible dot is drawn by lightweight-charts. */}
-      <div className="h-full w-full cursor-pointer" />
+      {/* Visible dot. Border ring lifts it off the candle body. */}
+      <span
+        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-ink shadow ring-2 ring-ink transition-transform duration-150 group-hover:scale-[1.6]"
+        style={{ background: style.color }}
+      >
+        {style.glyph}
+      </span>
 
       <div
         className={cn(
