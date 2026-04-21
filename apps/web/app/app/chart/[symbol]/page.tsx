@@ -87,6 +87,10 @@ export default async function ChartPage({
     time: e.occurred_at,
     kind: e.kind,
     title: e.title,
+    sourceCode: e.source_code,
+    body: e.body,
+    bias: e.bias,
+    impact: e.impact,
   }));
 
   return (
