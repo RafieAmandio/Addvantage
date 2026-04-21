@@ -15,7 +15,7 @@ export function LiveEventFeed({
   from,
   to,
   heading,
-  renderHeading,
+  headingPrefix,
   emptyMessage,
   maxHeightClass,
   className,
@@ -25,16 +25,25 @@ export function LiveEventFeed({
   from?: string;
   to?: string;
   heading?: string;
-  renderHeading?: (count: number) => string;
+  /**
+   * When set, renders `${headingPrefix} · ${count} events` with the live
+   * count. Kept as a string (not a function prop) so Server Components can
+   * hand it across the RSC boundary without tripping the
+   * "Functions cannot be passed directly to Client Components" rule.
+   */
+  headingPrefix?: string;
   emptyMessage?: string;
   maxHeightClass?: string;
   className?: string;
 }) {
   const { events } = useTimelineEvents({ initialEvents, symbols, from, to });
+  const resolvedHeading = headingPrefix
+    ? `${headingPrefix} · ${events.length} events`
+    : heading;
   return (
     <EventFeed
       events={events}
-      heading={renderHeading ? renderHeading(events.length) : heading}
+      heading={resolvedHeading}
       emptyMessage={emptyMessage}
       maxHeightClass={maxHeightClass}
       className={className}

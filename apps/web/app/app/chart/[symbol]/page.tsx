@@ -145,7 +145,7 @@ export default async function ChartPage({
             symbols={[symbol]}
             from={from.toISOString()}
             to={to.toISOString()}
-            renderHeading={(n) => `Timeline · ${n} events`}
+            headingPrefix="Timeline"
             emptyMessage={`No events for ${symbol} in window.`}
           />
         </aside>
