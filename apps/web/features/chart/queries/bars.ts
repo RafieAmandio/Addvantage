@@ -3,6 +3,7 @@ import { z } from "zod";
 import { supabaseServer } from "@/lib/supabase/server";
 import { getCache, setCache } from "@/lib/cache";
 import { logger } from "@/lib/logger";
+import { isMockMode } from "@/lib/config/public";
 
 /**
  * OHLCV bar shape for the chart feature. Source of truth on the write side
@@ -80,6 +81,10 @@ async function listBarsFromDb(input: ListBarsInput): Promise<Bar[]> {
  * Returns `[]` on DB error or schema mismatch (logged via `logger.error`).
  */
 export const listBars = cache(async (input: ListBarsInput): Promise<Bar[]> => {
+  // Mock mode: return [] so the chart page falls back to generateMockBars().
+  // That path already exists for Phase B before real bars were ingested; we
+  // just hitch a ride on it.
+  if (isMockMode()) return [];
   const { symbol, interval, from, to } = input;
   const limit = input.limit ?? DEFAULT_LIMIT;
   const key = `bars:${symbol}:${interval}:${from.toISOString()}:${to.toISOString()}:${limit}`;

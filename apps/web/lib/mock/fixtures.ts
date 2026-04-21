@@ -129,36 +129,145 @@ function regionToSymbol(region: string): string {
   }
 }
 
-/**
- * Project the prototype calendar rows into `timeline_events` shape
- * (`kind='macro'`). `/app/calendar` calls `listTimelineEvents({ kinds: ['macro'], from, to })`
- * and re-projects to `CalendarEvent` via `timelineEventToCalendarEvent`; the
- * roundtrip is lossy in the real path too, so we match it here.
- */
-export function mockTimelineMacroEvents(params: {
-  from?: string;
-  to?: string;
-}): TimelineEvent[] {
-  const { from, to } = params;
-  return mockCalendar
-    .filter((e) => {
-      if (from && e.ts < from) return false;
-      if (to && e.ts > to) return false;
-      return true;
+function macroEvents(): TimelineEvent[] {
+  return mockCalendar.map(
+    (e): TimelineEvent => ({
+      id: e.id,
+      kind: "macro",
+      source_code: "FF",
+      occurred_at: e.ts,
+      symbols: [regionToSymbol(e.region)],
+      title: e.title,
+      body: e.notes ?? null,
+      url: null,
+      bias: null,
+      impact: e.impact,
+      news_item_id: e.relatedNewsId ?? null,
     })
-    .map(
-      (e): TimelineEvent => ({
-        id: e.id,
-        kind: "macro",
-        source_code: "FF",
-        occurred_at: e.ts,
-        symbols: [regionToSymbol(e.region)],
-        title: e.title,
-        body: e.notes ?? null,
-        url: null,
-        bias: null,
-        impact: e.impact,
-        news_item_id: e.relatedNewsId ?? null,
-      })
-    );
+  );
+}
+
+function newsTimelineEvents(): TimelineEvent[] {
+  return mockNews.map(
+    (n): TimelineEvent => ({
+      id: `te-news-${n.id}`,
+      kind: "news",
+      source_code: deriveSourceCode(n.author),
+      occurred_at: n.ts,
+      symbols: n.affects,
+      title: n.headline,
+      body: n.analysis,
+      url: null,
+      bias: n.bias,
+      impact: n.impact,
+      news_item_id: n.id,
+    })
+  );
+}
+
+/**
+ * Synthesized tweets so the /app/chart sidebar has something to show against
+ * the OHLC candles. Spread across the last 14 days and tagged against the
+ * chart surfaces' supported symbols (SPX, BTC, ETH, DXY, GOLD) so markers
+ * actually land on the timeline. Deterministic — times are offsets from now
+ * so the demo looks fresh even on stale checkouts.
+ */
+function tweetEvents(): TimelineEvent[] {
+  const now = Date.now();
+  const hoursAgo = (h: number) => new Date(now - h * 3600 * 1000).toISOString();
+  const seeds: Array<{
+    h: number;
+    symbols: string[];
+    title: string;
+    body: string;
+    bias: "bullish" | "bearish" | "neutral";
+    impact: "high" | "medium" | "low";
+  }> = [
+    {
+      h: 2,
+      symbols: ["SPX", "USD"],
+      title: "We are going to have the GREATEST economy in HISTORY. Markets know it.",
+      body: "Truth Social post. Coincides with pre-open futures squeeze.",
+      bias: "bullish",
+      impact: "medium",
+    },
+    {
+      h: 8,
+      symbols: ["DXY", "USD"],
+      title: "China is manipulating their currency AGAIN. We will respond.",
+      body: "DXY bid on tape immediately after — watch for intraday mean-reversion.",
+      bias: "bullish",
+      impact: "high",
+    },
+    {
+      h: 26,
+      symbols: ["BTC", "ETH"],
+      title: "Crypto is the future. Bitcoin should be STRATEGIC reserve. Period.",
+      body: "Typical pump-and-fade pattern — sized positions should cut into strength.",
+      bias: "bullish",
+      impact: "high",
+    },
+    {
+      h: 52,
+      symbols: ["GOLD", "USD"],
+      title: "The Fed is DESTROYING our currency. Gold doesn't lie.",
+      body: "Gold up 0.6% in Asia session; DXY flat — correlation decoupling.",
+      bias: "bullish",
+      impact: "medium",
+    },
+    {
+      h: 74,
+      symbols: ["SPX"],
+      title: "Earnings are going to be HUGE. Mark my words. Dow 50,000 coming.",
+      body: "Ahead of bank earnings — positioning skew already lopsided long.",
+      bias: "bullish",
+      impact: "low",
+    },
+    {
+      h: 120,
+      symbols: ["ETH", "BTC"],
+      title: "ETF approvals were a GIFT. Now we need SEC gone completely.",
+      body: "Flow data: ETH ETF net inflow +$42M, BTC ETF +$210M overnight.",
+      bias: "bullish",
+      impact: "medium",
+    },
+    {
+      h: 168,
+      symbols: ["DXY", "USD", "JPY"],
+      title: "Japan is taking advantage. USD/JPY at these levels is UNACCEPTABLE.",
+      body: "Verbal intervention rhetoric. Pair faded 80 pips in the hour.",
+      bias: "bearish",
+      impact: "high",
+    },
+    {
+      h: 220,
+      symbols: ["GOLD"],
+      title: "Gold is the only honest money. Central banks know this.",
+      body: "Gold testing 2,420 resistance — watch for momentum break + retest.",
+      bias: "bullish",
+      impact: "low",
+    },
+  ];
+  return seeds.map((s, i) => ({
+    id: `te-tweet-${i}`,
+    kind: "tweet" as const,
+    source_code: "TRUMP",
+    occurred_at: hoursAgo(s.h),
+    symbols: s.symbols,
+    title: s.title,
+    body: s.body,
+    url: null,
+    bias: s.bias,
+    impact: s.impact,
+    news_item_id: null,
+  }));
+}
+
+/**
+ * Superset of the three kinds that actually have fixture data. Callers filter
+ * by `kinds` / `symbols` / window downstream. Other kinds (earnings,
+ * user_pin) return empty — the real app handles that gracefully.
+ */
+export function mockTimelineEvents(): TimelineEvent[] {
+  return [...macroEvents(), ...newsTimelineEvents(), ...tweetEvents()];
 }

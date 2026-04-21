@@ -7,7 +7,7 @@ import {
   type TimelineKind,
 } from "@/features/timeline/types";
 import { isMockMode } from "@/lib/config/public";
-import { mockTimelineMacroEvents } from "@/lib/mock/fixtures";
+import { mockTimelineEvents } from "@/lib/mock/fixtures";
 
 export { TIMELINE_KINDS };
 export type { TimelineEvent, TimelineKind };
@@ -51,14 +51,13 @@ export async function listTimelineEvents(
   if (kinds && kinds.length === 0) return [];
 
   if (isMockMode()) {
-    // Mock-mode only covers the macro calendar surface — other kinds return
-    // empty, which the timeline consumers already handle gracefully.
-    if (kinds && !kinds.includes("macro")) return [];
-    const rows = mockTimelineMacroEvents({ from, to });
-    const filtered = symbols
-      ? rows.filter((r) => r.symbols.some((s) => symbols.includes(s)))
-      : rows;
-    return filtered.slice(0, limit);
+    const all = mockTimelineEvents()
+      .filter((r) => (kinds ? kinds.includes(r.kind) : true))
+      .filter((r) => (symbols ? r.symbols.some((s) => symbols.includes(s)) : true))
+      .filter((r) => (from ? r.occurred_at >= from : true))
+      .filter((r) => (to ? r.occurred_at <= to : true))
+      .sort((a, b) => (a.occurred_at < b.occurred_at ? 1 : -1));
+    return all.slice(0, limit);
   }
 
   const supabase = supabaseServer();

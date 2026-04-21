@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { isMockMode } from "@/lib/config/public";
 import {
   TimelineEventSchema,
   type TimelineEvent,
@@ -60,6 +61,8 @@ export function useTimelineEvents({
   }, [symbolsKey, initialEvents]);
 
   useEffect(() => {
+    // Demo mode: no realtime — the initial fixture snapshot is all there is.
+    if (isMockMode()) return;
     const supabase = supabaseBrowser();
     const channel = supabase
       .channel(`timeline-events:${symbolsKey}`)

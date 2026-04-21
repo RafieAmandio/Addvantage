@@ -109,15 +109,7 @@ export default async function ChartPage({
             current={symbol}
             className="flex-wrap"
           />
-          <SymbolSearch
-            symbols={SUPPORTED_SYMBOLS}
-            current={symbol}
-            hrefFor={(s) =>
-              interval === DEFAULT_INTERVAL
-                ? `/app/chart/${s}`
-                : `/app/chart/${s}?interval=${interval}`
-            }
-          />
+          <SymbolSearch symbols={SUPPORTED_SYMBOLS} current={symbol} />
           <IntervalPicker
             current={interval}
             hrefFor={(i) =>
