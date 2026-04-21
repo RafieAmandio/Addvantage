@@ -6,8 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 pnpm + Turborepo monorepo. Node >= 20 (see `.nvmrc`). Two apps and two shared packages:
 
-- `apps/web` — Next.js 14 App Router. Public site, paid dashboard at `/app/*`, admin review console at `/admin/*`.
-- `apps/worker` — Long-lived Node service. Runs the hourly ingestion scheduler **and** the grammY Telegram bot in one process.
+- `apps/web` — Next.js 14 App Router. Public site, paid dashboard at `/app/*` (news, consult, chart, plan, watchlist, calendar, education, brief, channel, subscription, tags), admin console at `/admin/*` (review, archive, plans, sources). API routes under `app/api/*` include `consult/stream` (SSE), `bars`, `events`, `health`, `webhooks/xendit`.
+- `apps/worker` — Long-lived Node service. Runs the hourly ingestion scheduler, the grammY Telegram bot, the daily renewal-reminder cron (when email is configured), the heartbeat pinger, and the bars CLI — **all in one process**.
 - `packages/shared` — zod schemas, hashtag taxonomy, source registry. Imported by both apps as raw `.ts` (no build step).
 - `packages/db` — SQL migrations + generated Supabase `Database` type re-exported from `src/index.ts`.
 
@@ -24,7 +24,10 @@ pnpm dev:web                                          # next dev @ :3000
 pnpm --filter @tradevantage/worker dev                # worker in tsx watch mode
 
 # Trigger a single adapter end-to-end (fetch → dedupe → OpenAI → insert → Telegram ping)
-pnpm --filter @tradevantage/worker run:once FRED      # or SC | SPDJI | YRD | RBC
+pnpm --filter @tradevantage/worker run:once FRED      # or SC | SPDJI | YRD | RBC | TRUMP | FF
+
+# Bars pipeline (Phase B) — requires MARKET_DATA_PROVIDER + MARKET_DATA_API_KEY
+pnpm --filter @tradevantage/worker run:bars
 
 # Build / check
 pnpm build
@@ -42,7 +45,7 @@ This is the core flow and spans five files. Read them together when touching any
 
 1. `apps/worker/src/scheduler/index.ts` — `node-cron` fires at minute 3 every hour (and once at boot). Reads `public.sources.enabled` from Supabase; `ENABLED_SOURCES` env overrides the DB list. Iterates `ADAPTERS` and calls `runSource(code)`.
 2. `apps/worker/src/pipeline/runSource.ts` — opens an `ingestion_runs` row, calls the adapter, persists, pings Telegram, closes the run row with counters and updates `sources.last_*`.
-3. `apps/worker/src/adapters/*.ts` — one file per source, each implementing `SourceAdapter` from `adapters/base.ts` and registered in `adapters/index.ts`. Returns `Candidate[]`; must **not** pre-summarise.
+3. `apps/worker/src/adapters/*.ts` — one file per source, each implementing `SourceAdapter` from `adapters/base.ts` and registered in `adapters/index.ts`. Currently: FRED, SC, SPDJI, YRD, RBC, TRUMP (Truth Social RSS), FF (ForexFactory RSS + indicators variant). Returns `Candidate[]`; must **not** pre-summarise. Side-adapter families with their own registries live in `adapters/bars/`, `adapters/payment/`, and `adapters/email/` — same self-register pattern.
 4. `apps/worker/src/pipeline/persist.ts` — `contentHash([sourceCode, externalId, rawText])` is the dedupe key, stored in `news_items.content_hash` with unique `(source_code, content_hash)`. Existing hashes are pre-loaded per run to avoid per-row round-trips.
 5. `apps/worker/src/pipeline/rephrase.ts` — calls OpenAI with `response_format: json_schema` (strict), validates with `RephraseOutputSchema`, returns `{ headline, rephrased, analysis, impact, bias, affects, tags }`. Rows are inserted `status='pending'`.
 6. `apps/worker/src/telegram/notify.ts` — DMs every whitelisted admin (env `TELEGRAM_ADMIN_CHAT_IDS` ∪ `public.telegram_admins` where `active=true`) a deeplink to `/admin/review/[id]`. `apps/worker/src/telegram/bot.ts` also serves `/start`, `/whoami`, `/status` commands.
@@ -84,9 +87,26 @@ Three distinct clients — pick the right one:
 
 Auth helpers: `lib/auth/session.ts` exposes `getSession`, `getProfile`, `requireAdmin`. Server-only.
 
-## Worker env contract
+## Env contract (both apps)
 
-`apps/worker/src/lib/config.ts` is the **only** place `process.env` may be read in the worker. It validates at boot and exits on misconfig. The `emptyToUndef` preprocessor treats empty strings in `.env` as unset so a template `.env.example` can ship blank fields. If adding a new env var, extend `EnvSchema` there and list it in `turbo.json` `globalEnv`.
+Two validated schemas, same pattern: parse at boot, exit/throw on misconfig, `emptyToUndef` so blank `.env` fields count as unset.
+
+- `apps/worker/src/lib/config.ts` — the **only** place `process.env` may be read in the worker. Covers Supabase, OpenAI, Telegram, FRED, source RSS overrides, `ENABLED_SOURCES`, heartbeat, market data (with a `refine()` coupling `MARKET_DATA_PROVIDER` ↔ `MARKET_DATA_API_KEY`), Upstash, Xendit, Brevo + `RENEWAL_TEMPLATE_ID`, Logtail, Sentry.
+- `apps/web/lib/config/server.ts` — server-only mirror. Runtime-guards against client imports (throws if `typeof window !== "undefined"`). Covers service-role key, Xendit webhook token, Brevo + `DUNNING_TEMPLATE_ID`, Sentry DSN.
+
+Graceful-noop is the house rule for optional integrations (Upstash, Brevo, Xendit, Sentry, Logtail, Heartbeat): when an env is unset, the adapter doesn't self-register and callers either skip the work or return a 503 — the app never crashes on missing optional config.
+
+When adding a new env: extend the relevant schema, add it to `turbo.json` `globalEnv`, update `.env.example` files (root `infra/.env.example` if it's shared between web + worker deploy).
+
+## Subsystems beyond news ingestion
+
+Don't assume the worker is only the news pipeline. Other things it runs:
+
+- **Bars pipeline** — `apps/worker/src/adapters/bars/` (currently `twelvedata.ts`). Fed via `run:bars` CLI; consumed by `/app/chart` and `app/api/bars`.
+- **Payment webhooks** — Xendit adapter in `apps/worker/src/adapters/payment/xendit.ts`; web-side webhook at `apps/web/app/api/webhooks/xendit/route.ts` verifies via `XENDIT_WEBHOOK_TOKEN`. Both sides must see the same token.
+- **Email** — Brevo adapter in `apps/worker/src/adapters/email/brevo.ts` plus `apps/web/lib/email/brevo.ts`. Worker registers a daily 09:00 renewal-reminder cron (`scheduler/renewal-reminder.ts`) only when `EMAIL_PROVIDER=brevo`. Web uses Brevo for dunning with `DUNNING_TEMPLATE_ID`.
+- **Consult** — `/app/consult` hits `app/api/consult/stream` (SSE, OpenAI). Rate-limited via Upstash when configured; degrades to unbounded when not.
+- **Single-flight coalescing** — Upstash Redis. When unset, the singleflight wrapper becomes a direct fetcher call (still correct, just not coalesced across instances).
 
 ## Web state caveat
 
