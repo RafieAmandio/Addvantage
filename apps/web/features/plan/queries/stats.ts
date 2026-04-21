@@ -7,6 +7,8 @@ import {
   PlanOutcomeSchema,
   type ClosedPlanStats,
 } from "@/features/plan/types";
+import { isMockMode } from "@/lib/config/public";
+import { mockClosedPlanStats } from "@/lib/mock/fixtures";
 
 /**
  * Narrow row shape for the aggregate — intentionally smaller than
@@ -43,6 +45,7 @@ export interface GetClosedPlanStatsInput {
 export async function getClosedPlanStats(
   input: GetClosedPlanStatsInput = {},
 ): Promise<ClosedPlanStats> {
+  if (isMockMode()) return mockClosedPlanStats();
   const limit = input.limit ?? DEFAULT_LIMIT;
   try {
     const supabase = supabaseServer();

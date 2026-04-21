@@ -1,13 +1,19 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@tradevantage/db";
-import { publicConfig } from "@/lib/config/public";
+import { publicConfig, isMockMode } from "@/lib/config/public";
 
 /**
  * Refresh Supabase session cookies on every request. Called from
  * app/middleware.ts. Keeps SSR auth fresh without forcing a client round-trip.
  */
 export async function updateSession(request: NextRequest) {
+  // Mock-mode short-circuit: skip Supabase entirely and let every route
+  // through. Used for teammate demos where no Supabase creds are configured.
+  if (isMockMode()) {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(

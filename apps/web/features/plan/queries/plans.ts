@@ -2,6 +2,8 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import { requireAdmin } from "@/lib/auth/session";
 import { PlanRowSchema, type Plan } from "@/features/plan/types";
+import { isMockMode } from "@/lib/config/public";
+import { mockPublishedPlans, mockPlanById } from "@/lib/mock/fixtures";
 
 /**
  * Explicit SELECT column list for `trading_plans`. Never use `select('*')` —
@@ -27,6 +29,13 @@ export async function listPublishedPlans(
   input: ListPublishedPlansInput = {},
 ): Promise<Plan[]> {
   const limit = input.limit ?? DEFAULT_LIST_LIMIT;
+  if (isMockMode()) {
+    const all = mockPublishedPlans().filter((p) => p.status === "published");
+    const filtered = input.symbol
+      ? all.filter((p) => p.symbol === input.symbol)
+      : all;
+    return filtered.slice(0, limit);
+  }
   const supabase = supabaseServer();
   let query = supabase
     .from("trading_plans")
@@ -60,6 +69,7 @@ export async function listPublishedPlans(
  * status (RLS); non-admins only see `published` rows (policy in 0021).
  */
 export async function getPlanById(id: string): Promise<Plan | null> {
+  if (isMockMode()) return mockPlanById(id);
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from("trading_plans")

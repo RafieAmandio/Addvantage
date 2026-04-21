@@ -1,6 +1,26 @@
 import { supabaseServer } from "@/lib/supabase/server";
+import { isMockMode } from "@/lib/config/public";
+
+const MOCK_USER = {
+  id: "demo-operator",
+  email: "demo@tradevantage.local",
+} as const;
+
+const MOCK_PROFILE: ProfileSummary = {
+  id: MOCK_USER.id,
+  email: MOCK_USER.email,
+  handle: "demo-operator",
+  is_admin: false,
+  tier: "vip",
+  signed_liability: true,
+};
 
 export async function getSession() {
+  if (isMockMode()) return MOCK_USER as unknown as Awaited<ReturnType<typeof realGetUser>>;
+  return realGetUser();
+}
+
+async function realGetUser() {
   const supabase = supabaseServer();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
@@ -17,6 +37,7 @@ export interface ProfileSummary {
 }
 
 export async function getProfile(): Promise<ProfileSummary | null> {
+  if (isMockMode()) return MOCK_PROFILE;
   const user = await getSession();
   if (!user) return null;
   const supabase = supabaseServer();

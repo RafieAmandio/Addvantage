@@ -2,6 +2,8 @@ import { z } from "zod";
 import { IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
+import { isMockMode } from "@/lib/config/public";
+import { mockApprovedNews, mockApprovedNewsById } from "@/lib/mock/fixtures";
 
 const ImpactSchema = z.enum(IMPACT_LEVELS);
 const BiasSchema = z.enum(BIAS_LEVELS);
@@ -99,6 +101,7 @@ export function toNewsListItem(row: z.infer<typeof NewsListRowSchema>): NewsList
 
 /** Public-facing news feed: APPROVED items only, newest first. RLS enforces this. */
 export async function listApprovedNews(): Promise<NewsListItem[]> {
+  if (isMockMode()) return mockApprovedNews();
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from("news_items")
@@ -123,6 +126,7 @@ export async function listApprovedNews(): Promise<NewsListItem[]> {
 }
 
 export async function getApprovedNewsById(id: string): Promise<NewsListItem | null> {
+  if (isMockMode()) return mockApprovedNewsById(id);
   const supabase = supabaseServer();
   const { data } = await supabase
     .from("news_items")

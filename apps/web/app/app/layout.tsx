@@ -6,6 +6,7 @@ import { Shortcuts } from "@/components/layout/Shortcuts";
 import { SearchPalette } from "@/features/search/components/SearchPalette";
 import { VisitTracker } from "@/components/layout/VisitTracker";
 import { DocumentTitle } from "@/components/layout/DocumentTitle";
+import { DemoBanner } from "@/components/layout/DemoBanner";
 
 export default function AppLayout({
   children,
@@ -15,6 +16,7 @@ export default function AppLayout({
   return (
     <AppStateProvider>
       <ToastProvider>
+        <DemoBanner />
         <div className="flex min-h-screen bg-ink text-paper">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
