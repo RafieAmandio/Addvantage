@@ -185,21 +185,24 @@ export function PriceChart({
     chart.timeScale().subscribeSizeChange(bumpLayout);
 
     chart.timeScale().fitContent();
-    // bumpLayout synchronously is too early — the chart hasn't painted yet so
-    // timeToCoordinate returns null for every marker. rAF waits for the first
-    // paint; a second rAF covers the case where the ResizeObserver hasn't
-    // fed dimensions in yet. Cheap, idempotent, and fixes an intermittent
-    // "dots never appear" path.
-    let raf1 = 0;
-    let raf2 = 0;
-    raf1 = requestAnimationFrame(() => {
-      bumpLayout();
-      raf2 = requestAnimationFrame(bumpLayout);
-    });
+    // Bump layout repeatedly over the first ~200ms. Chart painting and
+    // coordinate resolution is async and its timing isn't fully observable
+    // through the public API; a few cheap bumps guarantee we land after the
+    // ResizeObserver has delivered dimensions and the pane has painted.
+    const rafs: number[] = [];
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    rafs.push(
+      requestAnimationFrame(() => {
+        bumpLayout();
+        rafs.push(requestAnimationFrame(bumpLayout));
+      })
+    );
+    timeouts.push(setTimeout(bumpLayout, 50));
+    timeouts.push(setTimeout(bumpLayout, 200));
 
     return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
+      rafs.forEach(cancelAnimationFrame);
+      timeouts.forEach(clearTimeout);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(bumpLayout);
       chart.timeScale().unsubscribeSizeChange(bumpLayout);
       chart.remove();
@@ -229,10 +232,14 @@ export function PriceChart({
     const layouts: MarkerLayout[] = [];
     for (const m of markers) {
       const t = toEpochSec(m.time);
-      const x = chart.timeScale().timeToCoordinate(toChartTime(m.time));
-      if (x === null) continue; // marker outside visible range
-
       const near = nearestBar(barIndex, t);
+      // Snap to the nearest bar's time — timeToCoordinate resolves reliably
+      // only for times that match the data set, not arbitrary timestamps
+      // between bars. One-hour snap granularity is imperceptible at the
+      // default zoom.
+      const x = chart.timeScale().timeToCoordinate(toChartTime(near.time));
+      if (x === null) continue;
+
       const style = MARKER_STYLE[m.kind];
       const price = style.position === "belowBar" ? near.low : near.high;
       const priceY = series.priceToCoordinate(price);
