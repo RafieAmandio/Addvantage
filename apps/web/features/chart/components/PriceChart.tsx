@@ -185,9 +185,21 @@ export function PriceChart({
     chart.timeScale().subscribeSizeChange(bumpLayout);
 
     chart.timeScale().fitContent();
-    bumpLayout();
+    // bumpLayout synchronously is too early — the chart hasn't painted yet so
+    // timeToCoordinate returns null for every marker. rAF waits for the first
+    // paint; a second rAF covers the case where the ResizeObserver hasn't
+    // fed dimensions in yet. Cheap, idempotent, and fixes an intermittent
+    // "dots never appear" path.
+    let raf1 = 0;
+    let raf2 = 0;
+    raf1 = requestAnimationFrame(() => {
+      bumpLayout();
+      raf2 = requestAnimationFrame(bumpLayout);
+    });
 
     return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(bumpLayout);
       chart.timeScale().unsubscribeSizeChange(bumpLayout);
       chart.remove();
@@ -237,8 +249,9 @@ export function PriceChart({
     <div className={cn("relative w-full", className)} style={{ height }}>
       <div ref={containerRef} className="absolute inset-0" />
       {/* Hover-card overlay. pointer-events-none on the layer so mouse events
-          only land on the individual hitboxes. */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          only land on the individual hitboxes. z-10 lifts it above the chart
+          canvas; no overflow-hidden — would clip dots near the plot edges. */}
+      <div className="pointer-events-none absolute inset-0 z-10">
         {markerLayouts.map((l) => (
           <MarkerHoverCard
             key={l.id}
