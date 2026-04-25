@@ -18,12 +18,12 @@ export function EventFeed({
   return (
     <div className={cn("border border-gray-3 bg-gray-2", className)}>
       {heading && (
-        <div className="border-b border-gray-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
+        <div className="border-b border-gray-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
           {heading}
         </div>
       )}
       {events.length === 0 ? (
-        <div className="px-4 py-8 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+        <div className="px-4 py-8 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/40">
           {emptyMessage}
         </div>
       ) : (

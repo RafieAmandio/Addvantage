@@ -5,7 +5,7 @@ export function TypingIndicator() {
         <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
           ● ANTS · AI
         </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           PROCESSING…
         </span>
       </div>
@@ -13,7 +13,7 @@ export function TypingIndicator() {
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:0ms]" />
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:200ms]" />
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:400ms]" />
-        <span className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <span className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
           DESK · TYPING
         </span>
       </div>

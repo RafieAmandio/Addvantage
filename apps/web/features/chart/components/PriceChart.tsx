@@ -100,10 +100,10 @@ function toChartTime(iso: string): Time {
   return Math.floor(ms / 1000) as UTCTimestamp;
 }
 
-const BG = "#0b0f14";
-const GRID = "#111111";
-const TEXT = "#e7ecef";
-const ACCENT = "#c6ff4d";
+const BG = "#111111";
+const GRID = "#1F1F1F";
+const TEXT = "#EEEEEE";
+const ACCENT = "#FFD400";
 
 interface MarkerLayout {
   id: string;
@@ -301,7 +301,7 @@ function MarkerHoverCard({
     >
       {/* Visible dot. Border ring lifts it off the candle body. */}
       <span
-        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-black shadow ring-2 ring-ink transition-transform duration-150 group-hover:scale-[1.6]"
+        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-black shadow transition-transform duration-150 group-hover:scale-[1.6]"
         style={{ background: style.color }}
       >
         {style.glyph}
