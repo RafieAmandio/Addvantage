@@ -39,7 +39,7 @@ export function DashboardHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden border-b border-gray-3 bg-black-2/30",
+        "relative overflow-hidden border-b border-gray-3 bg-gray-2/30",
         className
       )}
     >
@@ -65,7 +65,7 @@ export function DashboardHero({
             {/* Big search bar */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-black-2/60 px-5 py-4 text-left transition-colors hover:border-brand"
+              className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-gray-2/60 px-5 py-4 text-left transition-colors hover:border-brand"
             >
               <svg
                 width="20"
@@ -128,7 +128,7 @@ export function DashboardHero({
                 {OPERATOR_ID} · {paid ? "VIP+ Trader" : "Free access"}
               </div>
 
-              <div className="mt-5 grid grid-cols-3 gap-px bg-black-3">
+              <div className="mt-5 grid grid-cols-3 gap-px bg-gray-3">
                 <Stat label="High news" value={highImpactToday} />
                 <Stat label="Setups" value={openSetups} />
                 <Stat label="Cal · 48h" value={highCalendar} />

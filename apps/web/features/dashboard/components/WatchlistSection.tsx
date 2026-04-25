@@ -29,7 +29,7 @@ export function WatchlistSection({
 }) {
   return (
     <section
-      className={cn("border-b border-gray-3 bg-black-2/20", className)}
+      className={cn("border-b border-gray-3 bg-gray-2/20", className)}
     >
       <div className="mx-auto max-w-7xl px-6 py-10">
         <SectionHeader n="—" label="WATCHLIST" right={`${tickers.length} pinned`}>
@@ -68,14 +68,14 @@ export function WatchlistSection({
                 . The desk will ping you when it does.
               </div>
             ) : (
-              <div className="mt-3 space-y-px bg-black-3">
+              <div className="mt-3 space-y-px bg-gray-3">
                 {watchNewsMentions.slice(0, 3).map((n) => {
                   const hits = n.affects.filter((a) => tickers.includes(a));
                   return (
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group block bg-black p-4 transition-colors hover:bg-black-2"
+                      className="group block bg-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -112,12 +112,12 @@ export function WatchlistSection({
                 ● No setups on your pinned instruments in the current plan.
               </div>
             ) : (
-              <div className="mt-3 space-y-px bg-black-3">
+              <div className="mt-3 space-y-px bg-gray-3">
                 {watchSetupMentions.map((s) => (
                   <Link
                     key={s.id}
                     href={`/app/plan/${planId}#${s.id}`}
-                    className="group block bg-black p-4 transition-colors hover:bg-black-2"
+                    className="group block bg-black p-4 transition-colors hover:bg-gray-2"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -144,7 +144,7 @@ export function WatchlistSection({
             {watchArchiveSetups.length > 0 && (
               <div className="mt-6">
                 <DataLabel>Edge on your pins · archive</DataLabel>
-                <div className="mt-3 space-y-px bg-black-3">
+                <div className="mt-3 space-y-px bg-gray-3">
                   {watchArchiveSetups.map(({ plan: p, setup: s }) => {
                     const outcome = s.outcome ?? "open";
                     const isWin = outcome === "win";
@@ -153,7 +153,7 @@ export function WatchlistSection({
                       <Link
                         key={`${p.id}-${s.id}`}
                         href={`/app/plan/${p.id}#${s.id}`}
-                        className="group block bg-black p-3 transition-colors hover:bg-black-2"
+                        className="group block bg-black p-3 transition-colors hover:bg-gray-2"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0 flex-1">

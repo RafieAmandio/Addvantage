@@ -26,7 +26,7 @@ export function DiscoveryRow({
   className?: string;
 }) {
   return (
-    <section className={cn("border-b border-gray-3 bg-black-2/20", className)}>
+    <section className={cn("border-b border-gray-3 bg-gray-2/20", className)}>
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-12 gap-6">
           {/* Featured primer */}
@@ -34,7 +34,7 @@ export function DiscoveryRow({
             <SectionHeader n="03 /" label="Primer of the day" />
             <Link
               href={`/app/education/${featuredPrimer.id}`}
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-black-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {featuredPrimer.id} · {featuredPrimer.readingMin} min
@@ -59,7 +59,7 @@ export function DiscoveryRow({
             <SectionHeader n="04 /" label="Last consultation" />
             <Link
               href="/app/consult"
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-black-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {recentSession.id} · {recentSession.messages.length} messages
@@ -99,7 +99,7 @@ export function DiscoveryRow({
             </SectionHeader>
             <Link
               href="/app/channel"
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-black-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {channelTop.id} · BY {channelTop.author.toUpperCase()}

@@ -49,7 +49,7 @@ export function FeaturedRow({
                 Full feed →
               </Link>
             </SectionHeader>
-            <div className="mt-4 space-y-px bg-black-3">
+            <div className="mt-4 space-y-px bg-gray-3">
               {topNews.map((n) => {
                 const seen = seenHydrated && seenNewsIds.includes(n.id);
                 return (
@@ -57,7 +57,7 @@ export function FeaturedRow({
                     key={n.id}
                     href={`/app/news/${n.id}`}
                     className={cn(
-                      "group block bg-black p-5 transition-colors hover:bg-black-2",
+                      "group block bg-black p-5 transition-colors hover:bg-gray-2",
                       seen && "opacity-60 hover:opacity-100"
                     )}
                   >
@@ -96,7 +96,7 @@ export function FeaturedRow({
           {/* Right rail */}
           <aside className="col-span-12 space-y-8 lg:col-span-4">
             {/* Plan */}
-            <div className="border border-brand/40 bg-black-2/30 p-5 scanline">
+            <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
               <div className="flex items-center justify-between">
                 <DataLabel>Trading Plan · TX-03</DataLabel>
                 {paid ? (
@@ -149,7 +149,7 @@ export function FeaturedRow({
                   Full →
                 </Link>
               </SectionHeader>
-              <div className="mt-4 space-y-px bg-black-3">
+              <div className="mt-4 space-y-px bg-gray-3">
                 {upcoming.map((c) => (
                   <CalendarPeekRow key={c.id} event={c} />
                 ))}
