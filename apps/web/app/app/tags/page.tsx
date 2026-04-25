@@ -38,7 +38,7 @@ export default function TagsPage() {
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
           <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <span className="led lime" />
+            <span className="led" />
             DECODING TAG INDEX
           </div>
         </div>
@@ -241,7 +241,7 @@ function TagsView() {
                     </span>
                     {isHot && (
                       <span className="inline-flex items-center gap-1 border border-brand/60 bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        <span className="led lime" />
+                        <span className="led" />
                         TRENDING
                       </span>
                     )}

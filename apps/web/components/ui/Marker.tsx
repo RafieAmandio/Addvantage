@@ -59,7 +59,7 @@ export function ImpactPill({
         styles[level]
       )}
     >
-      {level === "high" && <span className="led lime" />}
+      {level === "high" && <span className="led" />}
       {level} impact
     </span>
   );
