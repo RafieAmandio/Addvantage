@@ -17,7 +17,7 @@ export default function AppLayout({
     <AppStateProvider>
       <ToastProvider>
         <DemoBanner />
-        <div className="flex min-h-screen bg-ink text-paper">
+        <div className="flex min-h-screen bg-black text-white">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             <TopBar />

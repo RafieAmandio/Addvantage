@@ -20,19 +20,19 @@ export default async function PlanPage() {
         </div>
         <div className="mx-auto max-w-7xl px-6 pb-24 pt-4">
           <div className="border border-gray-3 bg-gray-2/30 p-8 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
               TRADING PLAN
             </div>
-            <h1 className="mt-3 font-display text-2xl text-paper">
+            <h1 className="mt-3 font-display text-2xl text-white">
               No published plan yet.
             </h1>
-            <p className="mt-2 text-sm text-paper/60">
+            <p className="mt-2 text-sm text-white/60">
               The desk hasn&apos;t published a plan for this cycle. Check back
               soon.
             </p>
             <Link
               href="/app/plan/archive"
-              className="mt-6 inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+              className="mt-6 inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
             >
               View archive →
             </Link>
@@ -55,7 +55,7 @@ export default async function PlanPage() {
         headerExtra={
           <Link
             href="/app/plan/archive"
-            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
           >
             View archive →
           </Link>

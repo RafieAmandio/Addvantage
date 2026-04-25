@@ -301,7 +301,7 @@ function MarkerHoverCard({
     >
       {/* Visible dot. Border ring lifts it off the candle body. */}
       <span
-        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-ink shadow ring-2 ring-ink transition-transform duration-150 group-hover:scale-[1.6]"
+        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-black shadow ring-2 ring-ink transition-transform duration-150 group-hover:scale-[1.6]"
         style={{ background: style.color }}
       >
         {style.glyph}
@@ -317,7 +317,7 @@ function MarkerHoverCard({
           className="border border-gray-3 bg-gray-2 p-3 shadow-lg shadow-black/50"
           style={{ borderLeft: `2px solid ${style.color}` }}
         >
-          <div className="mb-1 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+          <div className="mb-1 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             <span style={{ color: style.color }}>
               {KIND_LABEL[marker.kind]}
               {marker.sourceCode ? ` · ${marker.sourceCode}` : ""}
@@ -325,12 +325,12 @@ function MarkerHoverCard({
             <span>{formatClock(marker.time)}</span>
           </div>
           {marker.title && (
-            <div className="font-display text-sm text-paper">
+            <div className="font-display text-sm text-white">
               {marker.title}
             </div>
           )}
           {marker.body && (
-            <div className="mt-1.5 line-clamp-3 text-xs text-paper/60">
+            <div className="mt-1.5 line-clamp-3 text-xs text-white/60">
               {marker.body}
             </div>
           )}
@@ -341,10 +341,10 @@ function MarkerHoverCard({
                   className={cn(
                     "border px-1.5 py-0.5",
                     marker.impact === "high"
-                      ? "border-blood/60 text-blood"
+                      ? "border-blood/60 text-red-500"
                       : marker.impact === "medium"
                       ? "border-amber-400/60 text-amber-400"
-                      : "border-gray-3 text-paper/50"
+                      : "border-gray-3 text-white/50"
                   )}
                 >
                   {marker.impact}
@@ -355,10 +355,10 @@ function MarkerHoverCard({
                   className={cn(
                     "border px-1.5 py-0.5",
                     marker.bias === "bullish"
-                      ? "border-lime/60 text-lime"
+                      ? "border-brand/60 text-brand"
                       : marker.bias === "bearish"
-                      ? "border-blood/60 text-blood"
-                      : "border-gray-3 text-paper/50"
+                      ? "border-blood/60 text-red-500"
+                      : "border-gray-3 text-white/50"
                   )}
                 >
                   {marker.bias}

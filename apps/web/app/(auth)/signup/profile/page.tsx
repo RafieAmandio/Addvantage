@@ -25,12 +25,12 @@ export default function ProfilePage() {
       {/* Left column — context + progress */}
       <div className="col-span-12 lg:col-span-5">
         <SectionNumber n="05 /" label="TRADER PROFILE" />
-        <h1 className="mt-8 font-display text-6xl leading-[0.9] text-paper">
+        <h1 className="mt-8 font-display text-6xl leading-[0.9] text-white">
           Tailoring
           <br />
-          your <span className="italic text-lime">terminal.</span>
+          your <span className="italic text-brand">terminal.</span>
         </h1>
-        <p className="mt-8 max-w-sm font-display text-lg text-paper/60">
+        <p className="mt-8 max-w-sm font-display text-lg text-white/60">
           Five questions. Your answers shape how the platform thinks about you —
           what it surfaces, how it speaks, what it assumes you already know.
         </p>
@@ -48,20 +48,20 @@ export default function ProfilePage() {
                 className={
                   "h-2.5 w-2.5 rounded-full transition-all " +
                   (i === step
-                    ? "bg-lime scale-125"
+                    ? "bg-brand scale-125"
                     : i < step
                     ? "bg-moss"
-                    : "bg-paper/20")
+                    : "bg-white/20")
                 }
               />
               <span
                 className={
                   "font-mono text-[9px] uppercase tracking-widest2 " +
                   (i === step
-                    ? "text-lime"
+                    ? "text-brand"
                     : i < step
-                    ? "text-paper/50"
-                    : "text-paper/20")
+                    ? "text-white/50"
+                    : "text-white/20")
                 }
               >
                 {i + 1}/3
@@ -70,13 +70,13 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        <p className="mt-6 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+        <p className="mt-6 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           Use number keys (1-4) to select · Enter to advance
         </p>
       </div>
 
       {/* Right column — form */}
-      <div className="col-span-12 border border-ink-3 bg-ink-2/40 p-10 lg:col-span-7">
+      <div className="col-span-12 border border-gray-3 text-black-2/40 p-10 lg:col-span-7">
         {step === 0 && <StepExperience form={form} setForm={setForm} />}
         {step === 1 && (
           <StepMarketsGoal
@@ -92,14 +92,14 @@ export default function ProfilePage() {
           <button
             onClick={back}
             disabled={step === 0}
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime disabled:opacity-30"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand disabled:opacity-30"
           >
             ← Back
           </button>
           <div className="flex items-center gap-4">
             <button
               onClick={skip}
-              className="font-mono text-[10px] uppercase tracking-widest2 text-paper/30 hover:text-paper/60 transition-colors"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/30 hover:text-white/60 transition-colors"
             >
               Skip for now
             </button>

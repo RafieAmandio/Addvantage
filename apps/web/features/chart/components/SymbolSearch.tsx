@@ -106,7 +106,7 @@ export function SymbolSearch({
       )}
     >
       <div className="flex items-center gap-2 border border-gray-3 bg-gray-2 px-2 py-1">
-        <span aria-hidden className="text-lime">
+        <span aria-hidden className="text-brand">
           /
         </span>
         <input
@@ -150,7 +150,7 @@ export function SymbolSearch({
           aria-controls={listboxId}
           aria-expanded={open}
           role="combobox"
-          className="w-24 bg-transparent text-paper placeholder:text-paper/40 outline-none"
+          className="w-24 bg-transparent text-white placeholder:text-white/40 outline-none"
         />
       </div>
       {open && filtered.length > 0 && (
@@ -176,10 +176,10 @@ export function SymbolSearch({
                 className={cn(
                   "cursor-pointer px-2 py-1 transition-colors",
                   active
-                    ? "bg-lime text-ink"
+                    ? "bg-brand text-black"
                     : isCurrent
-                      ? "text-lime"
-                      : "text-paper/70 hover:text-brand",
+                      ? "text-brand"
+                      : "text-white/70 hover:text-brand",
                 )}
               >
                 {s}
@@ -189,7 +189,7 @@ export function SymbolSearch({
         </ul>
       )}
       {open && filtered.length === 0 && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2 px-2 py-1 text-paper/40">
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2 px-2 py-1 text-white/40">
           no match
         </div>
       )}

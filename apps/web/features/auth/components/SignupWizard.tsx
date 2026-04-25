@@ -40,14 +40,14 @@ export function SignupWizard() {
     <main className="relative mx-auto grid max-w-7xl grid-cols-12 gap-6 px-6 py-20">
       <div className="col-span-12 lg:col-span-5">
         <SectionNumber n="00 /" label="ENROLLMENT" />
-        <h1 className="mt-8 font-display text-6xl leading-[0.9] text-paper">
+        <h1 className="mt-8 font-display text-6xl leading-[0.9] text-white">
           This is a
           <br />
-          <span className="italic text-lime">filter,</span>
+          <span className="italic text-brand">filter,</span>
           <br />
           not a funnel.
         </h1>
-        <p className="mt-8 max-w-sm font-display text-lg text-paper/60">
+        <p className="mt-8 max-w-sm font-display text-lg text-white/60">
           Three questions, then a liability waiver. If you can't get through
           the waiver, you're not who we built this for.
         </p>
@@ -65,10 +65,10 @@ export function SignupWizard() {
               className={
                 "flex items-center gap-3 " +
                 (i === step && !state.sent
-                  ? "text-lime"
+                  ? "text-brand"
                   : s.done
-                  ? "text-paper/70"
-                  : "text-paper/30")
+                  ? "text-white/70"
+                  : "text-white/30")
               }
             >
               <span>{s.n}</span>
@@ -81,21 +81,21 @@ export function SignupWizard() {
         </div>
       </div>
 
-      <div className="col-span-12 border border-ink-3 bg-ink-2/40 p-10 lg:col-span-7">
+      <div className="col-span-12 border border-gray-3 bg-black-2/40 p-10 lg:col-span-7">
         {state.sent ? (
           <div className="space-y-6">
             <DataLabel>Transmission dispatched</DataLabel>
-            <div className="font-display text-2xl text-paper">
+            <div className="font-display text-2xl text-white">
               Magic link dispatched to{" "}
-              <span className="italic text-lime">{state.email}</span>.
+              <span className="italic text-brand">{state.email}</span>.
             </div>
-            <p className="font-mono text-[11px] uppercase tracking-widest2 text-paper/60">
+            <p className="font-mono text-[11px] uppercase tracking-widest2 text-white/60">
               Follow the link to sign the liability waiver and complete
               enrollment. Link expires in 15 minutes.
             </p>
-            <div className="mt-8 border-t border-ink-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+            <div className="mt-8 border-t border-gray-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30">
               Already enrolled?{" "}
-              <Link href="/login" className="text-paper/60 hover:text-lime">
+              <Link href="/login" className="text-white/60 hover:text-brand">
                 Operator login →
               </Link>
             </div>
@@ -105,11 +105,11 @@ export function SignupWizard() {
             {step === 0 && (
               <div className="space-y-6 stagger">
                 <DataLabel>Step 01 / Identifier</DataLabel>
-                <h2 className="font-display text-3xl text-paper">
+                <h2 className="font-display text-3xl text-white">
                   How do we reach you?
                 </h2>
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                     Email
                   </label>
                   <input
@@ -119,11 +119,11 @@ export function SignupWizard() {
                       setForm({ ...form, email: e.target.value })
                     }
                     placeholder="operator@domain.local"
-                    className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-lime"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus:border-brand"
                   />
                 </div>
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                     Operator handle (optional)
                   </label>
                   <input
@@ -133,7 +133,7 @@ export function SignupWizard() {
                       setForm({ ...form, handle: e.target.value })
                     }
                     placeholder="operator-00417"
-                    className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper placeholder:text-paper/20 outline-none focus:border-lime"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus:border-brand"
                   />
                 </div>
               </div>
@@ -142,10 +142,10 @@ export function SignupWizard() {
             {step === 1 && (
               <div className="space-y-6 stagger">
                 <DataLabel>Step 02 / Self-classification</DataLabel>
-                <h2 className="font-display text-3xl text-paper">
+                <h2 className="font-display text-3xl text-white">
                   How long have you been in markets?
                 </h2>
-                <p className="font-mono text-[11px] uppercase tracking-widest2 text-lime">
+                <p className="font-mono text-[11px] uppercase tracking-widest2 text-brand">
                   ANTS is not for beginners. We will hold you to this answer.
                 </p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -164,8 +164,8 @@ export function SignupWizard() {
                       className={
                         "border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                         (form.experience === opt
-                          ? "border-lime bg-lime/10 text-lime"
-                          : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
+                          ? "border-brand bg-brand/10 text-brand"
+                          : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
                       }
                     >
                       {opt}
@@ -178,11 +178,11 @@ export function SignupWizard() {
             {step === 2 && (
               <div className="space-y-6 stagger">
                 <DataLabel>Step 03 / Confirmation</DataLabel>
-                <h2 className="font-display text-3xl text-paper">
+                <h2 className="font-display text-3xl text-white">
                   Final confirmation.
                 </h2>
-                <div className="border border-lime/40 bg-lime/5 p-6 font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
-                  <div className="mb-3 text-lime">YOU ARE ABOUT TO ATTEST:</div>
+                <div className="border border-brand/40 bg-brand/5 p-6 font-mono text-[11px] uppercase tracking-widest2 text-white/80">
+                  <div className="mb-3 text-brand">YOU ARE ABOUT TO ATTEST:</div>
                   <ul className="space-y-2">
                     <li>· You are not a beginner.</li>
                     <li>· You are not gambling.</li>
@@ -192,7 +192,7 @@ export function SignupWizard() {
                     </li>
                   </ul>
                 </div>
-                <p className="text-sm text-paper/50">
+                <p className="text-sm text-white/50">
                   Press continue to proceed to the liability waiver. There is
                   no way around this step.
                 </p>
@@ -204,7 +204,7 @@ export function SignupWizard() {
                 type="button"
                 onClick={() => step > 0 && setStep(step - 1)}
                 disabled={step === 0}
-                className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime disabled:opacity-30"
+                className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand disabled:opacity-30"
               >
                 ← Back
               </button>
@@ -237,9 +237,9 @@ export function SignupWizard() {
                 {ERROR_MESSAGES[state.error] ?? "Something went wrong."}
               </div>
             ) : null}
-            <div className="mt-8 border-t border-ink-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+            <div className="mt-8 border-t border-gray-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30">
               Already enrolled?{" "}
-              <Link href="/login" className="text-paper/60 hover:text-lime">
+              <Link href="/login" className="text-white/60 hover:text-brand">
                 Operator login →
               </Link>
             </div>

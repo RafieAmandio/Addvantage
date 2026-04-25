@@ -97,13 +97,13 @@ export default async function ChartPage({
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             INSTRUMENT · TIMELINE
           </div>
-          <h1 className="mt-1 font-display text-4xl text-paper sm:text-5xl">
-            {symbol} <span className="italic text-lime">chart</span>
+          <h1 className="mt-1 font-display text-4xl text-white sm:text-5xl">
+            {symbol} <span className="italic text-brand">chart</span>
           </h1>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             {usingMock ? "mock OHLC" : `real OHLC · ${interval}`} · {bars.length} bars · {events.length} events
           </div>
         </div>

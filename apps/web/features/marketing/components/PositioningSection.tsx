@@ -8,14 +8,14 @@ export function PositioningSection() {
   return (
     <section className="mt-[140px] flex flex-col items-center gap-4">
       <SectionHeader num="01" label="Positioning" />
-      <div className="w-full border-y border-paper">
+      <div className="w-full border-y border-white">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {/* What this is — white card */}
-          <div className="relative flex h-full min-h-[560px] flex-col gap-3 overflow-hidden border-x border-paper bg-paper p-12">
-            <h2 className="font-mono text-[36px] font-bold leading-none text-ink">
+          <div className="relative flex h-full min-h-[560px] flex-col gap-3 overflow-hidden border-x border-white bg-white p-12">
+            <h2 className="font-mono text-[36px] font-bold leading-none text-black">
               What this is
             </h2>
-            <p className="font-mono text-base font-light leading-[1.4] text-ink">
+            <p className="font-mono text-base font-light leading-[1.4] text-black">
               A market radar powered by AI and professionals, created for
               traders and investors who already know what they&apos;re doing.
             </p>
@@ -31,7 +31,7 @@ export function PositioningSection() {
 
           {/* Who this is not for */}
           <div className="flex flex-col gap-9 p-12">
-            <h3 className="font-mono text-2xl font-bold text-paper">
+            <h3 className="font-mono text-2xl font-bold text-white">
               Who this is not for
             </h3>
             <ul className="flex flex-col gap-4">
@@ -43,7 +43,7 @@ export function PositioningSection() {
                   </span>
                 </li>
               ))}
-              <li className="font-mono text-base font-light leading-[1.4] text-paper">
+              <li className="font-mono text-base font-light leading-[1.4] text-white">
                 We don&apos;t soften this.
                 <br />
                 Onboarding is a filter, not a funnel.
@@ -52,8 +52,8 @@ export function PositioningSection() {
           </div>
 
           {/* Who this is for */}
-          <div className="flex flex-col gap-9 border-x border-paper p-12">
-            <h3 className="font-mono text-2xl font-bold text-paper">
+          <div className="flex flex-col gap-9 border-x border-white p-12">
+            <h3 className="font-mono text-2xl font-bold text-white">
               Who this is for
             </h3>
             <ul className="flex flex-col gap-4">
@@ -63,15 +63,15 @@ export function PositioningSection() {
                 null,
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-4">
-                  <IconCheckBox className="h-6 w-6 shrink-0 text-lime" />
+                  <IconCheckBox className="h-6 w-6 shrink-0 text-brand" />
                   {item ? (
-                    <span className="font-mono text-base font-light leading-[1.4] text-paper">
+                    <span className="font-mono text-base font-light leading-[1.4] text-white">
                       {item}
                     </span>
                   ) : (
-                    <span className="font-mono text-base font-light leading-[1.4] text-paper">
+                    <span className="font-mono text-base font-light leading-[1.4] text-white">
                       Anyone who wants to activate{" "}
-                      <span className="text-lime">Six Eyes</span> on the
+                      <span className="text-brand">Six Eyes</span> on the
                       market.
                     </span>
                   )}

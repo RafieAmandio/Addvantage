@@ -206,7 +206,7 @@ export function Shortcuts() {
     <>
       {/* Floating hint pill */}
       {hint && (
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-lime bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-brand bg-black-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-brand shadow-[0_0_30px_rgba(245,158,11,0.3)]">
           {hint}
         </div>
       )}
@@ -215,25 +215,25 @@ export function Shortcuts() {
       {showHelp && (
         <div
           onClick={() => setShowHelp(false)}
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-ink/85 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl border border-lime bg-ink-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)]"
+            className="relative w-full max-w-2xl border border-brand bg-black-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.2)]"
           >
             <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
-            <div className="flex items-center justify-between border-b border-lime/40 pb-3">
+            <div className="flex items-center justify-between border-b border-brand/40 pb-3">
               <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                   REFERENCE / OPERATOR INPUT
                 </div>
-                <div className="font-display text-3xl text-paper">
-                  Keyboard <span className="italic text-lime">commands</span>
+                <div className="font-display text-3xl text-white">
+                  Keyboard <span className="italic text-brand">commands</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowHelp(false)}
-                className="border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime"
+                className="border border-gray-3 p-2 text-white/60 hover:border-brand hover:text-brand"
                 aria-label="Close"
               >
                 <svg
@@ -251,7 +251,7 @@ export function Shortcuts() {
 
             <div className="mt-6 max-h-[60vh] space-y-6 overflow-y-auto pr-1">
               <Section label="Navigation · two-key sequences">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   {ROUTES.map((r) => (
                     <Row
                       key={r.keys}
@@ -263,7 +263,7 @@ export function Shortcuts() {
               </Section>
 
               <Section label="Search & notifications">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="cmd k" label="Open search palette" />
                   <Row keys="/" label="Open search palette (single key)" />
                   <Row keys="n" label="Toggle notification inbox" />
@@ -272,7 +272,7 @@ export function Shortcuts() {
               </Section>
 
               <Section label="Global">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="u" label="Flip tier (Free / VIP+)" />
                   <Row keys="m" label="Open navigation drawer (mobile)" />
                   <Row keys="\" label="Toggle sidebar (desktop)" />
@@ -281,7 +281,7 @@ export function Shortcuts() {
               </Section>
 
               <Section label="Calendar">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="[" label="Step back (prev day/week/month)" />
                   <Row keys="]" label="Step forward" />
                   <Row keys="k" label="Anchor −1 day (any view)" />
@@ -291,28 +291,28 @@ export function Shortcuts() {
               </Section>
 
               <Section label="News & Plan detail">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="j" label="Next article / older plan" />
                   <Row keys="k" label="Previous article / newer plan" />
                 </div>
               </Section>
 
               <Section label="Page search (News · Archive · Education)">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="s" label="Focus page search input" />
                   <Row keys="esc" label="Blur search input" />
                 </div>
               </Section>
 
               <Section label="Consultation">
-                <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-px bg-black-3 sm:grid-cols-2">
                   <Row keys="i" label="Focus message input (insert mode)" />
                   <Row keys="esc" label="Blur input (normal mode)" />
                 </div>
               </Section>
             </div>
 
-            <div className="mt-6 border-t border-ink-3 pt-4 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+            <div className="mt-6 border-t border-gray-3 pt-4 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               ● Two-key sequences time out after 1.5 seconds. Inputs are
               suppressed inside text fields — press ESC first to regain
               shortcut control.
@@ -334,10 +334,10 @@ function Section({
   return (
     <section>
       <div className="mb-2 flex items-center gap-3">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
           ● {label}
         </span>
-        <span className="h-px flex-1 bg-lime/20" />
+        <span className="h-px flex-1 bg-brand/20" />
       </div>
       {children}
     </section>
@@ -346,15 +346,15 @@ function Section({
 
 function Row({ keys, label }: { keys: string; label: string }) {
   return (
-    <div className="flex items-center justify-between bg-ink p-3">
-      <span className="font-mono text-[11px] uppercase tracking-widest2 text-paper/70">
+    <div className="flex items-center justify-between bg-black p-3">
+      <span className="font-mono text-[11px] uppercase tracking-widest2 text-white/70">
         {label}
       </span>
       <span className="flex gap-1">
         {keys.split(" ").map((k, i) => (
           <kbd
             key={i}
-            className="border border-lime/40 bg-ink-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-lime"
+            className="border border-brand/40 bg-black-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-brand"
           >
             {k}
           </kbd>

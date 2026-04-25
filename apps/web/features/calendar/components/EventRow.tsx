@@ -19,12 +19,12 @@ export function EventRow({
     : null;
 
   return (
-    <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-ink px-3 py-3 transition-colors hover:bg-gray-2">
+    <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-black px-3 py-3 transition-colors hover:bg-gray-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
           <Link
             href={`/app/calendar/${event.id}`}
-            className="font-display text-base leading-tight text-paper group-hover:text-brand hover:text-brand hover:underline"
+            className="font-display text-base leading-tight text-white group-hover:text-brand hover:text-brand hover:underline"
           >
             {event.title}
           </Link>
@@ -32,20 +32,20 @@ export function EventRow({
             <Link
               href={`/app/news/${related.id}`}
               title={related.headline}
-              className="border border-lime/40 bg-lime/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
               ↗ {related.id}
             </Link>
           )}
         </div>
         {event.notes && (
-          <div className="mt-1 line-clamp-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-1 line-clamp-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             ● {event.notes}
           </div>
         )}
       </div>
 
-      <div className="text-center font-mono text-xs text-paper/70">
+      <div className="text-center font-mono text-xs text-white/70">
         {formatCalendarTime(event.ts, anchorYmd, showTimeOffset)}
       </div>
 

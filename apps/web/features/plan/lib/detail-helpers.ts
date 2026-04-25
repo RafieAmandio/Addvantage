@@ -94,13 +94,13 @@ export type OutcomeMeta = {
 export const OUTCOME_META: Record<SetupOutcome, OutcomeMeta> = {
   live: {
     label: "LIVE",
-    style: "border-lime text-lime bg-lime/10",
-    dot: "bg-lime",
+    style: "border-brand text-brand bg-brand/10",
+    dot: "bg-brand",
   },
   open: {
     label: "OPEN",
-    style: "border-lime/70 text-lime bg-lime/5",
-    dot: "bg-lime/70",
+    style: "border-brand/70 text-brand bg-brand/5",
+    dot: "bg-brand/70",
   },
   win: {
     label: "WIN",
@@ -119,12 +119,12 @@ export const OUTCOME_META: Record<SetupOutcome, OutcomeMeta> = {
   },
   invalidated: {
     label: "FLAT",
-    style: "border-paper/30 text-paper/70 bg-paper/5",
-    dot: "bg-paper/40",
+    style: "border-white/30 text-white/70 bg-white/5",
+    dot: "bg-white/40",
   },
   skipped: {
     label: "SKIPPED",
-    style: "border-paper/20 text-paper/40 bg-transparent",
-    dot: "bg-paper/20",
+    style: "border-white/20 text-white/40 bg-transparent",
+    dot: "bg-white/20",
   },
 };

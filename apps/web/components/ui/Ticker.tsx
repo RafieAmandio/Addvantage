@@ -12,16 +12,16 @@ export function MarketTicker() {
             key={`${it.sym}-${i}`}
             className="flex items-center gap-2 px-6 font-mono text-[11px] uppercase tracking-widest2"
           >
-            <span className="text-paper/50">{it.sym}</span>
-            <span className="text-paper">{it.val}</span>
+            <span className="text-white/50">{it.sym}</span>
+            <span className="text-white">{it.val}</span>
             <span
               className={
-                it.dir === "up" ? "text-moss" : "text-lime"
+                it.dir === "up" ? "text-moss" : "text-brand"
               }
             >
               {it.dir === "up" ? "▲" : "▼"} {it.chg}
             </span>
-            <span className="text-lime/30">|</span>
+            <span className="text-brand/30">|</span>
           </span>
         ))}
       </div>

@@ -39,20 +39,20 @@ export default function TagPage({
         <div className="mx-auto max-w-7xl px-6 py-10">
           <Link
             href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
           >
             ← All hashtags
           </Link>
           <DataLabel className="mt-6">Hashtag · cross-cut</DataLabel>
-          <h1 className="mt-2 font-display text-6xl leading-none text-paper">
-            <span className="text-lime">#</span>
+          <h1 className="mt-2 font-display text-6xl leading-none text-white">
+            <span className="text-brand">#</span>
             {tag}
           </h1>
-          <div className="mt-2 font-mono text-xs italic uppercase tracking-widest2 text-lime/80">
+          <div className="mt-2 font-mono text-xs italic uppercase tracking-widest2 text-brand/80">
             {meta.label}
           </div>
-          <p className="mt-3 max-w-2xl text-paper/70">{meta.description}</p>
-          <div className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <p className="mt-3 max-w-2xl text-white/70">{meta.description}</p>
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             {total} TOTAL ITEMS · {matchedPrimers.length} PRIMERS ·{" "}
             {matchedNews.length} NEWS · {matchedSessions.length} CONSULT ·{" "}
             {matchedChannel.length} CHANNEL
@@ -68,18 +68,18 @@ export default function TagPage({
                 <Link
                   key={p.id}
                   href={`/app/education/${p.id}`}
-                  className="bg-ink p-5 hover:bg-gray-2"
+                  className="text-black p-5 hover:bg-gray-2"
                 >
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id}
                   </div>
-                  <div className="mt-2 font-display text-xl text-paper">
+                  <div className="mt-2 font-display text-xl text-white">
                     {p.title}
                   </div>
-                  <div className="mt-1 font-mono text-[10px] italic text-lime/60">
+                  <div className="mt-1 font-mono text-[10px] italic text-brand/60">
                     {p.framework}
                   </div>
-                  <p className="mt-3 text-sm text-paper/60">{p.summary}</p>
+                  <p className="mt-3 text-sm text-white/60">{p.summary}</p>
                 </Link>
               ))}
             </div>
@@ -90,14 +90,14 @@ export default function TagPage({
           <Group n="02 /" label="NEWS">
             <div className="space-y-px bg-gray-3">
               {matchedNews.map((n) => (
-                <div key={n.id} className="bg-ink p-4 hover:bg-gray-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                <div key={n.id} className="text-black p-4 hover:bg-gray-2">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {n.id}
                   </div>
-                  <div className="mt-1 font-display text-lg text-paper">
+                  <div className="mt-1 font-display text-lg text-white">
                     {n.headline}
                   </div>
-                  <p className="mt-1 text-sm text-paper/60">{n.analysis}</p>
+                  <p className="mt-1 text-sm text-white/60">{n.analysis}</p>
                 </div>
               ))}
             </div>
@@ -108,19 +108,19 @@ export default function TagPage({
           <Group n="03 /" label="CONSULTATION LOGS">
             <div className="space-y-px bg-gray-3">
               {matchedSessions.map((s) => (
-                <div key={s.id} className="bg-ink p-4 hover:bg-gray-2">
+                <div key={s.id} className="text-black p-4 hover:bg-gray-2">
                   <div className="flex items-baseline justify-between">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                       {s.id}
                     </div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                       {formatDate(s.lastAt)} · {s.messages.length} msgs
                     </div>
                   </div>
-                  <div className="mt-1 font-display text-lg text-paper">
+                  <div className="mt-1 font-display text-lg text-white">
                     {s.title}
                   </div>
-                  <div className="mt-2 line-clamp-2 text-sm text-paper/60">
+                  <div className="mt-2 line-clamp-2 text-sm text-white/60">
                     {s.messages[s.messages.length - 1]?.body}
                   </div>
                 </div>
@@ -133,11 +133,11 @@ export default function TagPage({
           <Group n="04 /" label="CHANNEL POSTS">
             <div className="space-y-px bg-gray-3">
               {matchedChannel.map((p) => (
-                <div key={p.id} className="bg-ink p-4 hover:bg-gray-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                <div key={p.id} className="text-black p-4 hover:bg-gray-2">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id} · {formatDate(p.ts)}
                   </div>
-                  <p className="mt-2 text-sm text-paper/80">{p.body}</p>
+                  <p className="mt-2 text-sm text-white/80">{p.body}</p>
                 </div>
               ))}
             </div>
@@ -145,7 +145,7 @@ export default function TagPage({
         )}
 
         {total === 0 && (
-          <div className="border border-gray-3 bg-gray-2 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="border border-gray-3 bg-gray-2 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             No items tagged #{tag} yet. Tag will populate as content is
             published.
           </div>

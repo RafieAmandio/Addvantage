@@ -41,8 +41,8 @@ export function CalendarToolbar({
             className={cn(
               "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
               view === v
-                ? "bg-lime text-ink"
-                : "bg-gray-2 text-paper/60 hover:bg-gray-2 hover:text-paper"
+                ? "bg-brand text-black"
+                : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white"
             )}
           >
             {v}
@@ -55,22 +55,22 @@ export function CalendarToolbar({
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))}
           aria-label={`Previous ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
         >
           ←
         </button>
-        <div className="min-w-[180px] border border-lime/40 bg-gray-2/40 px-4 py-2 text-center">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="min-w-[180px] border border-brand/40 bg-gray-2/40 px-4 py-2 text-center">
+          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             {view === "day" ? "Day" : view === "week" ? "Week" : "Month"}
           </div>
-          <div className="font-display text-base text-lime">
+          <div className="font-display text-base text-brand">
             {rangeLabel(view, anchor)}
           </div>
         </div>
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, 1))}
           aria-label={`Next ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
         >
           →
         </button>
@@ -80,8 +80,8 @@ export function CalendarToolbar({
           className={cn(
             "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
             anchor === DEMO_TODAY_YMD
-              ? "cursor-default border-gray-3 text-paper/30"
-              : "border-lime/60 text-lime hover:bg-brand hover:text-ink"
+              ? "cursor-default border-gray-3 text-white/30"
+              : "border-brand/60 text-brand hover:bg-brand hover:text-black"
           )}
         >
           Today
@@ -89,8 +89,8 @@ export function CalendarToolbar({
       </div>
 
       {/* Counts */}
-      <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
-        <span className="text-lime">{eventCount}</span>
+      <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+        <span className="text-brand">{eventCount}</span>
         <span>events in view</span>
       </div>
     </div>

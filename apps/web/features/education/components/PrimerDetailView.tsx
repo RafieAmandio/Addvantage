@@ -45,10 +45,10 @@ export function PrimerDetailView({
               <DataLabel>
                 {primer.id} · {primer.readingMin} min · by {primer.author}
               </DataLabel>
-              <h1 className="mt-2 font-display text-5xl leading-tight text-paper">
+              <h1 className="mt-2 font-display text-5xl leading-tight text-white">
                 {primer.title}
               </h1>
-              <div className="mt-2 font-mono text-xs italic text-lime">
+              <div className="mt-2 font-mono text-xs italic text-brand">
                 {primer.framework}
               </div>
             </div>
@@ -86,8 +86,8 @@ export function PrimerDetailView({
                 className={
                   "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (isRead
-                    ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-blood"
-                    : "border-lime/60 text-lime hover:bg-brand hover:text-ink")
+                    ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-red-500"
+                    : "border-brand/60 text-brand hover:bg-brand hover:text-black")
                 }
               >
                 {isRead ? "✓ READ · MARK UNREAD" : "MARK AS READ →"}
@@ -105,7 +105,7 @@ export function PrimerDetailView({
           />
         )}
         <div className={locked ? "pointer-events-none select-none blur-sm" : ""}>
-          <p className="border-l-4 border-lime bg-gray-2/40 p-6 font-display text-2xl italic leading-relaxed text-paper/90">
+          <p className="border-l-4 border-brand bg-gray-2/40 p-6 font-display text-2xl italic leading-relaxed text-white/90">
             {primer.summary}
           </p>
 
@@ -114,9 +114,9 @@ export function PrimerDetailView({
             {primer.body.map((para, i) => (
               <p
                 key={i}
-                className="text-base leading-relaxed text-paper/85"
+                className="text-base leading-relaxed text-white/85"
               >
-                <span className="mr-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                <span className="mr-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
                   ¶ {String(i + 1).padStart(2, "0")}
                 </span>
                 {para}
@@ -131,7 +131,7 @@ export function PrimerDetailView({
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
                 >
                   #{t}
                 </Link>
@@ -144,28 +144,28 @@ export function PrimerDetailView({
           <Link
             href={prev ? `/app/education/${prev.id}` : "/app/education"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 transition-colors hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Previous
             </div>
-            <div className="mt-1 line-clamp-1 text-sm text-paper">
+            <div className="mt-1 line-clamp-1 text-sm text-white">
               {prev?.title ?? "Library"}
             </div>
           </Link>
           <Link
             href={next ? `/app/education/${next.id}` : "/app/education"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Next →
             </div>
-            <div className="mt-1 line-clamp-1 text-sm text-paper">
+            <div className="mt-1 line-clamp-1 text-sm text-white">
               {next?.title ?? "Library"}
             </div>
           </Link>

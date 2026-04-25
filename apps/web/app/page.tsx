@@ -7,7 +7,7 @@ import { TransmissionsSection } from "@/features/marketing/components/Transmissi
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-ink text-paper">
+    <main className="min-h-screen bg-black text-white">
       <HeroSection />
       <PositioningSection />
       <TransmissionsSection />

@@ -11,17 +11,17 @@ export function PlanCompareHero({ className }: { className?: string }) {
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>
             <DataLabel>Transmission TX-03 · Compare</DataLabel>
-            <h1 className="mt-2 font-display text-5xl text-paper">
-              Plan <span className="italic text-lime">comparison</span>
+            <h1 className="mt-2 font-display text-5xl text-white">
+              Plan <span className="italic text-brand">comparison</span>
             </h1>
-            <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+            <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
               Put two trading plans side by side. Common instruments
               highlight, R totals compare, thesis lines up for reading.
             </p>
           </div>
           <Link
             href="/app/plan/archive"
-            className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+            className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
           >
             ← Archive
           </Link>

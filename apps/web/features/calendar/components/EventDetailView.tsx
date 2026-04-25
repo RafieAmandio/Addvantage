@@ -26,18 +26,18 @@ export function EventDetailView({
           <div className="flex items-center gap-3">
             <Link
               href="/app/calendar"
-              className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-brand"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
             >
               ← Calendar
             </Link>
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/30">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
               /
             </span>
             <DataLabel>
               {event.kind.toUpperCase()} · {formatTime(event.occurred_at)}Z
             </DataLabel>
           </div>
-          <h1 className="mt-3 font-display text-4xl leading-tight text-paper">
+          <h1 className="mt-3 font-display text-4xl leading-tight text-white">
             {event.title}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -49,7 +49,7 @@ export function EventDetailView({
                 {event.symbols.map((s) => (
                   <span
                     key={s}
-                    className="border border-paper/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/70"
+                    className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/70"
                   >
                     {s}
                   </span>
@@ -58,7 +58,7 @@ export function EventDetailView({
             )}
           </div>
           {event.body && (
-            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-paper/80">
+            <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/80">
               {event.body}
             </p>
           )}

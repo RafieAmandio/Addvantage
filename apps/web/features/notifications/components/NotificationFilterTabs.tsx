@@ -39,8 +39,8 @@ export function NotificationFilterTabs({
           className={cn(
             "whitespace-nowrap px-2.5 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
             filter === f.v
-              ? "bg-lime text-ink"
-              : "bg-ink text-paper/60 hover:text-paper"
+              ? "bg-brand text-black"
+              : "bg-black text-white/60 hover:text-white"
           )}
         >
           {f.label}

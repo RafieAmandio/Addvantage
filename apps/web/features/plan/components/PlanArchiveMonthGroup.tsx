@@ -15,18 +15,18 @@ function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-lime/30 pb-2">
+      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-brand/30 pb-2">
         <div className="flex items-baseline gap-3">
-          <div className="font-display text-3xl italic text-lime">
+          <div className="font-display text-3xl italic text-brand">
             {group.label}
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             · {group.plans.length}{" "}
             {group.plans.length === 1 ? "plan" : "plans"}
           </div>
         </div>
         {closedInMonth > 0 && (
-          <div className="flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+          <div className="flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
             <span>Month R ·</span>
             <span
               className={
@@ -34,8 +34,8 @@ function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
                 (mR > 0
                   ? "text-moss"
                   : mR < 0
-                  ? "text-blood"
-                  : "text-paper/70")
+                  ? "text-red-500"
+                  : "text-white/70")
               }
             >
               {(mR >= 0 ? "+" : "") + mR.toFixed(1)}R

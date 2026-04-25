@@ -41,18 +41,18 @@ export function CalendarEmptyState({
     <div className={cn(isMonth ? "max-w-md text-center" : "text-center", className)}>
       <div
         className={cn(
-          "font-mono uppercase tracking-widest2 text-blood",
+          "font-mono uppercase tracking-widest2 text-red-500",
           isMonth ? "text-[10px]" : "text-[10px]"
         )}
       >
         ● NULL TRANSMISSION
       </div>
-      <div className={cn("mt-3 font-display text-paper", bodySize)}>
+      <div className={cn("mt-3 font-display text-white", bodySize)}>
         {title}
       </div>
       <div
         className={cn(
-          "mt-2 font-mono uppercase tracking-widest2 text-paper/40",
+          "mt-2 font-mono uppercase tracking-widest2 text-white/40",
           "text-[10px]"
         )}
       >
@@ -69,7 +69,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(-1)}
             className={cn(
-              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink",
+              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black",
               btnPad,
               size
             )}
@@ -85,8 +85,8 @@ export function CalendarEmptyState({
             btnPad,
             size,
             anchor === DEMO_TODAY_YMD
-              ? "cursor-default border-gray-3 text-paper/30"
-              : "border-lime/60 text-lime hover:bg-brand hover:text-ink"
+              ? "cursor-default border-gray-3 text-white/30"
+              : "border-brand/60 text-brand hover:bg-brand hover:text-black"
           )}
         >
           Today
@@ -95,7 +95,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(1)}
             className={cn(
-              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink",
+              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black",
               btnPad,
               size
             )}
@@ -109,7 +109,7 @@ export function CalendarEmptyState({
           <button
             onClick={onResetFilters}
             className={cn(
-              "border border-gray-3 font-mono uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand",
+              "border border-gray-3 font-mono uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand",
               btnPad,
               size
             )}

@@ -86,10 +86,10 @@ export default function WatchlistPage() {
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <div>
               <DataLabel>Operator · Watchlist</DataLabel>
-              <h1 className="mt-2 font-display text-5xl text-paper">
-                Your <span className="italic text-lime">pins</span>
+              <h1 className="mt-2 font-display text-5xl text-white">
+                Your <span className="italic text-brand">pins</span>
               </h1>
-              <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+              <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
                 Instruments you've pinned for close monitoring. Every news
                 item, live setup, and historical trade touching these tickers
                 is rolled up here.
@@ -98,7 +98,7 @@ export default function WatchlistPage() {
             {tickers.length > 0 && (
               <button
                 onClick={() => setConfirmingClear(true)}
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
               >
                 ✕ Clear all
               </button>

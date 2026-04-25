@@ -32,7 +32,7 @@ export function ScrollableConversation({
     <div className="relative flex-1 min-h-0">
       <div
         ref={containerRef}
-        className="h-full space-y-4 overflow-y-auto bg-ink p-5"
+        className="h-full space-y-4 overflow-y-auto bg-black p-5"
       >
         {children}
       </div>
@@ -43,7 +43,7 @@ export function ScrollableConversation({
           }}
           aria-label="Scroll to top of conversation"
           title="Back to top"
-          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-lime/60 bg-gray-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-brand hover:text-ink"
+          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-brand/60 bg-gray-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-brand hover:text-black"
         >
           <span aria-hidden>↑</span>
           TOP

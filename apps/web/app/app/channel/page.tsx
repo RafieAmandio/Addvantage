@@ -11,15 +11,15 @@ export default function ChannelPage() {
           <div className="flex items-baseline justify-between">
             <div>
               <DataLabel>Transmission TX-06 · Free pillar</DataLabel>
-              <h1 className="mt-2 font-display text-5xl text-paper">
-                My <span className="italic text-lime">Channel</span>
+              <h1 className="mt-2 font-display text-5xl text-white">
+                My <span className="italic text-brand">Channel</span>
               </h1>
-              <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+              <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
                 Founder broadcast. Daily takes. No replies, no comments, no
                 debate. Read or scroll past.
               </p>
             </div>
-            <div className="hidden text-right font-mono text-[10px] uppercase tracking-widest2 text-paper/40 lg:block">
+            <div className="hidden text-right font-mono text-[10px] uppercase tracking-widest2 text-white/40 lg:block">
               <div>ANTHONY</div>
               <div>FOUNDING OPERATOR</div>
               <div className="mt-2 text-moss">● BROADCASTING</div>
@@ -35,19 +35,19 @@ export default function ChannelPage() {
           {channelPosts.map((p, i) => (
             <article
               key={p.id}
-              className="relative border-l-2 border-lime/40 pl-6"
+              className="relative border-l-2 border-brand/40 pl-6"
             >
-              <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-lime" />
+              <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-brand" />
               <div className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2">
-                <span className="text-lime">{p.id}</span>
-                <span className="text-paper/40">·</span>
-                <span className="text-paper/60">
+                <span className="text-brand">{p.id}</span>
+                <span className="text-white/40">·</span>
+                <span className="text-white/60">
                   {formatDate(p.ts)} · {formatTime(p.ts)}Z
                 </span>
-                <span className="text-paper/40">·</span>
-                <span className="text-lime">BY {p.author.toUpperCase()}</span>
+                <span className="text-white/40">·</span>
+                <span className="text-brand">BY {p.author.toUpperCase()}</span>
               </div>
-              <p className="mt-3 font-display text-xl leading-snug text-paper">
+              <p className="mt-3 font-display text-xl leading-snug text-white">
                 {p.body}
               </p>
               {p.tags.length > 0 && (
@@ -56,7 +56,7 @@ export default function ChannelPage() {
                     <Link
                       key={t}
                       href={`/app/tags/${t}`}
-                      className="font-mono text-[10px] uppercase tracking-widest2 text-lime/70 hover:text-brand"
+                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 hover:text-brand"
                     >
                       #{t}
                     </Link>

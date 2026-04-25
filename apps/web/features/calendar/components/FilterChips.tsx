@@ -20,8 +20,8 @@ export function FilterChips({
           className={cn(
             "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
             value === opt.value
-              ? "bg-lime text-ink"
-              : "bg-gray-2 text-paper/60 hover:text-paper"
+              ? "bg-brand text-black"
+              : "bg-gray-2 text-white/60 hover:text-white"
           )}
         >
           {opt.label}

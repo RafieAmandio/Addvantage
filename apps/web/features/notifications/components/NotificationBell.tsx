@@ -90,14 +90,14 @@ export function NotificationBell({ className }: NotificationBellProps) {
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={open}
         className={cn(
-          "relative border bg-gray-2 px-2.5 py-1.5 text-paper/60 transition-colors hover:border-brand hover:text-brand",
-          open ? "border-lime text-lime" : "border-gray-3"
+          "relative border bg-gray-2 px-2.5 py-1.5 text-white/60 transition-colors hover:border-brand hover:text-brand",
+          open ? "border-brand text-brand" : "border-gray-3"
         )}
       >
         <BellIcon />
         {unreadCount > 0 && (
           <span
-            className="absolute -right-1 -top-1 flex h-4 min-w-[16px] animate-pulse-once items-center justify-center bg-blood px-1 font-mono text-[9px] font-semibold leading-none text-paper shadow-[0_0_10px_rgba(220,38,38,0.6)]"
+            className="absolute -right-1 -top-1 flex h-4 min-w-[16px] animate-pulse-once items-center justify-center bg-blood px-1 font-mono text-[9px] font-semibold leading-none text-white shadow-[0_0_10px_rgba(220,38,38,0.6)]"
             aria-hidden
           >
             {unreadCount > 9 ? "9+" : unreadCount}
@@ -110,7 +110,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
           ref={panelRef}
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-full z-50 mt-2 w-[min(92vw,420px)] border border-lime bg-gray-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]"
+          className="absolute right-0 top-full z-50 mt-2 w-[min(92vw,420px)] border border-brand bg-gray-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]"
         >
           <div className="classification-stripe h-1" />
 
@@ -159,7 +159,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
             })}
           </div>
 
-          <div className="border-t border-gray-3 bg-gray-2/60 px-4 py-2 text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+          <div className="border-t border-gray-3 bg-gray-2/60 px-4 py-2 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             ● {visible.length} / {notifications.length} · ↑↓ NAV · ↵ OPEN · ESC / N
           </div>
         </div>

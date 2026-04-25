@@ -23,31 +23,31 @@ function CompactSetup({
       className={cn(
         "block border p-3 transition-colors",
         highlighted
-          ? "border-lime bg-lime/5 hover:bg-brand/10"
-          : "border-gray-3 bg-ink hover:bg-gray-2"
+          ? "border-brand bg-brand/5 hover:bg-brand/10"
+          : "border-gray-3 bg-black hover:bg-gray-2"
       )}
     >
       <div className="flex items-baseline justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
               {s.id}
             </span>
-            <span className="font-display text-base text-paper">
+            <span className="font-display text-base text-white">
               {highlighted && "★ "}
               {s.instrument}
             </span>
             <span
               className={cn(
                 "font-mono text-[9px] uppercase tracking-widest2",
-                s.direction === "long" ? "text-moss" : "text-lime"
+                s.direction === "long" ? "text-moss" : "text-brand"
               )}
             >
               {s.direction}
             </span>
             <BiasBadge bias={s.bias} />
           </div>
-          <div className="mt-1 line-clamp-2 font-mono text-[10px] text-paper/60">
+          <div className="mt-1 line-clamp-2 font-mono text-[10px] text-white/60">
             {s.rationale}
           </div>
         </div>
@@ -58,8 +58,8 @@ function CompactSetup({
               isWin
                 ? "text-moss"
                 : isLoss
-                ? "text-blood"
-                : "text-paper/60"
+                ? "text-red-500"
+                : "text-white/60"
             )}
           >
             {s.outcomeR}
@@ -93,16 +93,16 @@ export function PlanCompareColumn({
           <div className="flex items-center gap-2">
             <Link
               href={`/app/plan/${plan.id}`}
-              className="font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
             >
               {plan.id}
             </Link>
             {isLatest ? (
-              <span className="border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+              <span className="border border-brand bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
                 ● LATEST
               </span>
             ) : (
-              <span className="border border-gray-3 bg-ink px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+              <span className="border border-gray-3 bg-black px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                 ARCHIVE
               </span>
             )}
@@ -114,31 +114,31 @@ export function PlanCompareColumn({
                 outcome.totalR > 0
                   ? "text-moss"
                   : outcome.totalR < 0
-                  ? "text-blood"
-                  : "text-paper/60"
+                  ? "text-red-500"
+                  : "text-white/60"
               )}
             >
               {outcome.totalRLabel}
             </div>
           )}
         </div>
-        <div className="mt-1 font-display text-2xl text-paper">
+        <div className="mt-1 font-display text-2xl text-white">
           {formatDate(plan.date)}
         </div>
-        <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
           <span>{plan.horizon}</span>
-          <span className="text-lime/40">·</span>
+          <span className="text-brand/40">·</span>
           <span>by {plan.authoredBy}</span>
-          <span className="text-lime/40">·</span>
+          <span className="text-brand/40">·</span>
           <span className="text-moss">▲ {longs}</span>
-          <span className="text-lime">▼ {shorts}</span>
+          <span className="text-brand">▼ {shorts}</span>
         </div>
       </div>
 
       {/* Thesis */}
       <div className="border-b border-gray-3 p-5">
         <DataLabel>Thesis</DataLabel>
-        <p className="mt-2 font-display text-base leading-relaxed text-paper/90">
+        <p className="mt-2 font-display text-base leading-relaxed text-white/90">
           {plan.thesis}
         </p>
       </div>
@@ -162,10 +162,10 @@ export function PlanCompareColumn({
       {plan.risks.length > 0 && (
         <div className="border-t border-gray-3 bg-gray-2/30 p-5">
           <DataLabel>Risks · {plan.risks.length}</DataLabel>
-          <ul className="mt-2 space-y-1 text-sm text-paper/70">
+          <ul className="mt-2 space-y-1 text-sm text-white/70">
             {plan.risks.map((r, i) => (
               <li key={i} className="flex gap-2">
-                <span className="font-mono text-[10px] text-blood">
+                <span className="font-mono text-[10px] text-red-500">
                   R0{i + 1}
                 </span>
                 <span>{r}</span>

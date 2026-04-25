@@ -6,15 +6,15 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
   const isAi = msg.role === "ai";
   const align = isUser ? "items-end" : "items-start";
   const tagColor = isUser
-    ? "text-lime"
+    ? "text-brand"
     : isAi
     ? "text-moss"
-    : "text-paper";
+    : "text-white";
   const bg = isUser
-    ? "bg-lime/10 border-lime/40"
+    ? "bg-brand/10 border-brand/40"
     : isAi
     ? "bg-gray-2 border-gray-3"
-    : "bg-gray-2 border-lime/40";
+    : "bg-gray-2 border-brand/40";
 
   return (
     <div className={`flex flex-col ${align}`}>
@@ -24,12 +24,12 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
         >
           ● {isUser ? "OPERATOR" : isAi ? "ANTS · AI" : `DESK · ${msg.author ?? "TEAM"}`}
         </span>
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           {formatTime(msg.ts)}Z
         </span>
       </div>
       <div
-        className={`mt-1 max-w-[80%] whitespace-pre-line border ${bg} p-4 text-sm leading-relaxed text-paper/90`}
+        className={`mt-1 max-w-[80%] whitespace-pre-line border ${bg} p-4 text-sm leading-relaxed text-white/90`}
       >
         {msg.body}
       </div>
@@ -38,7 +38,7 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
           {msg.tags.map((t) => (
             <span
               key={t}
-              className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
+              className="font-mono text-[9px] uppercase tracking-widest2 text-brand/60"
             >
               #{t}
             </span>

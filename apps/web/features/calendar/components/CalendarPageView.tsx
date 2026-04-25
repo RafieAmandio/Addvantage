@@ -161,7 +161,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
             />
             {filtered.length === 0 && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                <div className="pointer-events-auto border border-lime bg-gray-2/95 p-6 shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
+                <div className="pointer-events-auto border border-brand bg-gray-2/95 p-6 shadow-[0_0_60px_rgba(245,158,11,0.18)] backdrop-blur">
                   <CalendarEmptyState
                     variant="month"
                     title={`No events in ${rangeLabel("month", anchor)}.`}

@@ -126,10 +126,10 @@ const TONE_STYLES: Record<
   { border: string; bar: string; led: string; text: string }
 > = {
   info: {
-    border: "border-lime/50",
-    bar: "bg-lime",
+    border: "border-brand/50",
+    bar: "bg-brand",
     led: "lime",
-    text: "text-lime",
+    text: "text-brand",
   },
   success: {
     border: "border-moss/60",
@@ -138,10 +138,10 @@ const TONE_STYLES: Record<
     text: "text-moss",
   },
   warn: {
-    border: "border-lime",
+    border: "border-brand",
     bar: "bg-brand-dim",
     led: "lime",
-    text: "text-lime",
+    text: "text-brand",
   },
   error: {
     border: "border-blood/70",
@@ -175,11 +175,11 @@ function ToastCard({
           >
             ● {toast.tone === "success" ? "ACK" : toast.tone === "error" ? "DENIED" : toast.tone === "warn" ? "WARN" : "INFO"}
           </div>
-          <div className="mt-1 font-display text-base text-paper">
+          <div className="mt-1 font-display text-base text-white">
             {toast.title}
           </div>
           {toast.description && (
-            <div className="mt-1 text-xs text-paper/60">{toast.description}</div>
+            <div className="mt-1 text-xs text-white/60">{toast.description}</div>
           )}
           {toast.action && (
             <button
@@ -187,7 +187,7 @@ function ToastCard({
                 toast.action!.onClick();
                 onDismiss();
               }}
-              className="mt-2 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+              className="mt-2 border border-brand/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
               {toast.action.label}
             </button>
@@ -196,7 +196,7 @@ function ToastCard({
         <button
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand"
         >
           ✕
         </button>

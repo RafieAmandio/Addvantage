@@ -9,19 +9,19 @@ export function MarketingFooter() {
           <LogoMark size={45} />
           <Wordmark size={36} />
         </div>
-        <p className="font-mono text-base font-light leading-[1.4] text-paper">
+        <p className="font-mono text-base font-light leading-[1.4] text-white">
           +Vantage does not manage funds. ANTS accepts no liability for
           trading decisions made by recipients. Liability waiver enforced at
           signup.
         </p>
       </div>
-      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-paper">
+      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-white">
         <p className="font-bold">Surface</p>
         <p>Telegram (free pillars)</p>
         <p>DOMAIN web (paid)</p>
         <p>1v1 Consult</p>
       </div>
-      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-paper">
+      <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-white">
         <p className="font-bold">Operator</p>
         <Link href="/login" className="hover:text-brand">
           Login

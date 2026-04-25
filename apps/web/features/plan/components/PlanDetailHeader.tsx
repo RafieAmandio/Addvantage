@@ -52,38 +52,38 @@ export function PlanDetailHeader({
             <div className="flex items-center gap-3">
               <DataLabel>Transmission TX-03 · Restricted</DataLabel>
               {isLatest && (
-                <span className="border border-lime bg-lime/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                <span className="border border-brand bg-brand/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
                   ● LATEST
                 </span>
               )}
               {!isLatest && (
-                <span className="border border-gray-3 bg-ink px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+                <span className="border border-gray-3 bg-black px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                   ARCHIVE
                 </span>
               )}
             </div>
-            <h1 className="mt-2 font-display text-5xl text-paper">
-              Trading <span className="italic text-lime">Plan</span>
+            <h1 className="mt-2 font-display text-5xl text-white">
+              Trading <span className="italic text-brand">Plan</span>
             </h1>
-            <p className="mt-2 font-mono text-[11px] uppercase tracking-widest2 text-paper/40">
-              Plan ID <span className="text-paper">{plan.id}</span> ·{" "}
+            <p className="mt-2 font-mono text-[11px] uppercase tracking-widest2 text-white/40">
+              Plan ID <span className="text-white">{plan.id}</span> ·{" "}
               {formatDate(plan.date)} · Authored by{" "}
-              <span className="text-paper">{plan.authoredBy}</span>
+              <span className="text-white">{plan.authoredBy}</span>
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
             <div className="font-mono text-[10px] uppercase tracking-widest2">
-              <div className={paid ? "text-moss" : "text-blood"}>
+              <div className={paid ? "text-moss" : "text-red-500"}>
                 ● {paid ? "ACCESS GRANTED" : "ACCESS DENIED"}
               </div>
-              <div className="text-paper/40">Horizon · {plan.horizon}</div>
+              <div className="text-white/40">Horizon · {plan.horizon}</div>
             </div>
             <div className="flex items-center gap-2">
               {paid && (
                 <button
                   onClick={exportPlanMarkdown}
                   title="Copy this plan as markdown to your clipboard"
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
                 >
                   ⇩ EXPORT MD
                 </button>

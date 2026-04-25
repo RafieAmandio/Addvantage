@@ -33,17 +33,17 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
   return (
     <div className={cn("mb-6 border border-gray-3 bg-gray-2/30 p-5", className)}>
       <div className="flex items-baseline justify-between">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           ● R per plan · oldest → newest
         </div>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           {allClosed.length} closed plans
         </div>
       </div>
       <div className="relative mt-3 h-24">
         {/* Center zero line */}
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-paper/20" />
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-white/20" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           0
         </div>
         <div className="relative flex h-full items-center gap-1 px-4">
@@ -69,7 +69,7 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
                 className="group relative flex h-full flex-1 items-center"
               >
                 {live ? (
-                  <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-lime/70 bg-lime/5 group-hover:bg-brand/10" />
+                  <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-brand/70 bg-brand/5 group-hover:bg-brand/10" />
                 ) : (
                   <div
                     className={cn(
@@ -86,14 +86,14 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
                     "absolute z-20 whitespace-nowrap border bg-gray-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 opacity-0 shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-opacity group-hover:opacity-100",
                     tipAlign,
                     live
-                      ? "border-lime/60 text-lime"
+                      ? "border-brand/60 text-brand"
                       : positive
                       ? "border-moss/60 text-moss"
                       : "border-blood/60 text-[#fda4af]",
                     "bottom-full mb-1"
                   )}
                 >
-                  <div className="text-[8px] text-paper/50">
+                  <div className="text-[8px] text-white/50">
                     {p.id} · {formatDate(p.date)}
                   </div>
                   <div className="font-display text-sm not-italic leading-none">
@@ -107,10 +107,10 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
           })}
         </div>
       </div>
-      <div className="mt-2 flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+      <div className="mt-2 flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/30">
         <span>{formatDate(sortedAsc[0].date)}</span>
-        <span className="text-paper/40">hover for R · dashed = live</span>
-        <span className="text-lime">{formatDate(latest.date)}</span>
+        <span className="text-white/40">hover for R · dashed = live</span>
+        <span className="text-brand">{formatDate(latest.date)}</span>
       </div>
     </div>
   );

@@ -43,8 +43,8 @@ export function WatchPin({
         "inline-flex items-center justify-center border transition-colors",
         size === "sm" ? "h-5 w-5 text-[10px]" : "h-6 w-6 text-xs",
         pinned
-          ? "border-lime bg-lime/10 text-lime hover:border-blood hover:bg-blood/10 hover:text-blood"
-          : "border-paper/20 text-paper/40 hover:border-brand hover:text-brand",
+          ? "border-brand bg-brand/10 text-brand hover:border-blood hover:bg-blood/10 hover:text-red-500"
+          : "border-white/20 text-white/40 hover:border-brand hover:text-brand",
         className
       )}
     >

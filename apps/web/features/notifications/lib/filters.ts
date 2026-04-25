@@ -27,11 +27,11 @@ export const KIND_LABEL: Record<NotificationKind, string> = {
 };
 
 export const KIND_COLOR: Record<NotificationKind, string> = {
-  alert: "text-blood",
-  plan: "text-lime",
+  alert: "text-red-500",
+  plan: "text-brand",
   consult: "text-moss",
-  education: "text-lime",
-  system: "text-paper/60",
+  education: "text-brand",
+  system: "text-white/60",
 };
 
 export type NotifFilter = "all" | "unread" | NotificationKind;

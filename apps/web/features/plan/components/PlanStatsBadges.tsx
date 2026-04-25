@@ -18,10 +18,10 @@ function formatR(v: number | null): string {
 }
 
 function rTone(v: number | null): string {
-  if (v === null) return "text-paper";
+  if (v === null) return "text-white";
   if (v > 0) return "text-moss";
-  if (v < 0) return "text-blood";
-  return "text-paper";
+  if (v < 0) return "text-red-500";
+  return "text-white";
 }
 
 export function PlanStatsBadges({ stats, className }: Props) {
@@ -33,10 +33,10 @@ export function PlanStatsBadges({ stats, className }: Props) {
           className,
         )}
       >
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Closed-plan stats
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
           No closed plans yet
         </span>
       </div>
@@ -50,22 +50,22 @@ export function PlanStatsBadges({ stats, className }: Props) {
         className,
       )}
     >
-      <div className="bg-ink p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-4">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Closed
         </div>
-        <div className="mt-1 font-display text-2xl text-paper">{stats.n}</div>
+        <div className="mt-1 font-display text-2xl text-white">{stats.n}</div>
       </div>
-      <div className="bg-ink p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-4">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Win rate
         </div>
-        <div className="mt-1 font-display text-2xl text-paper">
+        <div className="mt-1 font-display text-2xl text-white">
           {formatPct(stats.winRate)}
         </div>
       </div>
-      <div className="bg-ink p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-4">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Avg R
         </div>
         <div
@@ -74,11 +74,11 @@ export function PlanStatsBadges({ stats, className }: Props) {
           {formatR(stats.avgR)}
         </div>
       </div>
-      <div className="bg-ink p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-4">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           By direction
         </div>
-        <div className="mt-1 flex flex-col gap-0.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70">
+        <div className="mt-1 flex flex-col gap-0.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70">
           <span>
             Long {stats.byDirection.long.n} ·{" "}
             {formatPct(stats.byDirection.long.winRate)} ·{" "}

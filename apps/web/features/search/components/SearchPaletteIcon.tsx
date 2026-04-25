@@ -7,7 +7,7 @@ export function SearchPaletteIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
-      className="text-lime"
+      className="text-brand"
       aria-hidden
     >
       <circle cx="9" cy="9" r="6" />

@@ -50,7 +50,7 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-3 bg-ink/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-gray-3 bg-black/95 backdrop-blur">
       {/* Classification stripe */}
       <div className="classification-stripe h-1" />
 
@@ -60,7 +60,7 @@ export function TopBar() {
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
-            className="border border-ink-3 p-2 text-paper/70 hover:border-lime hover:text-lime lg:hidden"
+            className="border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:hidden"
           >
             <svg
               width="14"
@@ -80,7 +80,7 @@ export function TopBar() {
               onClick={() => setSidebarCollapsed(false)}
               aria-label="Expand sidebar"
               title="Expand sidebar · \\"
-              className="hidden items-center gap-1 border border-ink-3 p-2 text-paper/70 hover:border-lime hover:text-lime lg:flex"
+              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:flex"
             >
               <svg
                 width="14"
@@ -102,28 +102,28 @@ export function TopBar() {
             </button>
           )}
 
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             ● <span className="hidden sm:inline">TRANSMISSION </span>LIVE
           </div>
-          <div className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40 sm:flex">
+          <div className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:flex">
             <span>NODE 04</span>
-            <span className="text-lime/40">/</span>
+            <span className="text-brand/40">/</span>
             <span>BRIEF 088</span>
-            <span className="text-lime/40">/</span>
+            <span className="text-brand/40">/</span>
             <span suppressHydrationWarning>{stamp || "—"}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           {/* Dev tier toggle */}
-          <div className="flex items-center gap-1 border border-ink-3 bg-ink-2 p-1">
+          <div className="flex items-center gap-1 border border-gray-3 bg-black-2 p-1">
             <button
               onClick={() => flipTier("free")}
               className={cn(
                 "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                 !paid
-                  ? "bg-lime text-ink"
-                  : "text-paper/40 hover:text-paper"
+                  ? "bg-brand text-black"
+                  : "text-white/40 hover:text-white"
               )}
             >
               Free
@@ -133,8 +133,8 @@ export function TopBar() {
               className={cn(
                 "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                 paid
-                  ? "bg-lime text-ink"
-                  : "text-paper/40 hover:text-paper"
+                  ? "bg-brand text-black"
+                  : "text-white/40 hover:text-white"
               )}
             >
               VIP+
@@ -145,7 +145,7 @@ export function TopBar() {
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Search the DOMAIN"
-            className="group flex items-center gap-2 border border-ink-3 bg-ink-2 px-3 py-1.5 text-paper/50 transition-colors hover:border-lime hover:text-lime sm:gap-3"
+            className="group flex items-center gap-2 border border-gray-3 bg-black-2 px-3 py-1.5 text-white/50 transition-colors hover:border-brand hover:text-brand sm:gap-3"
           >
             <svg
               width="13"
@@ -163,10 +163,10 @@ export function TopBar() {
               Search
             </span>
             <span className="hidden items-center gap-1 lg:flex">
-              <kbd className="border border-ink-3 bg-ink px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <kbd className="border border-gray-3 bg-black px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 {isMac ? "⌘" : "Ctrl"}
               </kbd>
-              <kbd className="border border-ink-3 bg-ink px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <kbd className="border border-gray-3 bg-black px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 K
               </kbd>
             </span>
@@ -180,23 +180,23 @@ export function TopBar() {
             }
             aria-label="Show keyboard shortcuts and help"
             title="Press ? for keyboard shortcuts"
-            className="border border-ink-3 bg-ink-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-lime hover:text-lime"
+            className="border border-gray-3 bg-black-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand"
           >
             ?
           </button>
 
           <Link
             href="/app/subscription"
-            className="hidden border border-lime/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink sm:block"
+            className="hidden border border-brand/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black sm:block"
           >
             {paid ? "Manage tier" : "Upgrade →"}
           </Link>
 
-          <div className="flex items-center gap-2 border-l border-ink-3 pl-4 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
+          <div className="flex items-center gap-2 border-l border-gray-3 pl-4 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
             <span className="led" />
             <span className="hidden sm:inline">{operatorName.toUpperCase()}</span>
-            <span className="text-paper/30 hidden lg:inline">·</span>
-            <span className="text-paper/40 hidden lg:inline">U-00417</span>
+            <span className="text-white/30 hidden lg:inline">·</span>
+            <span className="text-white/40 hidden lg:inline">U-00417</span>
           </div>
         </div>
       </div>

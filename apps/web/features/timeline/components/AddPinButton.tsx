@@ -38,7 +38,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="border border-lime bg-lime px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-ink transition-colors hover:bg-brand-dim hover:text-paper disabled:opacity-50"
+      className="border border-brand bg-brand px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-50"
     >
       {pending ? "Pinning…" : "Pin event →"}
     </button>
@@ -112,7 +112,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-brand hover:text-brand focus:border-lime focus:text-lime focus:outline-none"
+        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus:border-brand focus:text-brand focus:outline-none"
       >
         + Pin event
       </button>
@@ -120,7 +120,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       {flash ? (
         <div
           role="status"
-          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-lime bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime shadow-[0_0_40px_rgba(163,230,53,0.25)]"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-brand bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand shadow-[0_0_40px_rgba(163,230,53,0.25)]"
         >
           {flash}
         </div>
@@ -135,22 +135,22 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
         >
           <div
             onClick={close}
-            className="absolute inset-0 bg-ink/85 backdrop-blur-md"
+            className="absolute inset-0 bg-black/85 backdrop-blur-md"
             aria-hidden
           />
-          <div className="relative w-full max-w-lg border border-lime bg-gray-2 shadow-[0_0_60px_rgba(163,230,53,0.18)]">
+          <div className="relative w-full max-w-lg border border-brand bg-gray-2 shadow-[0_0_60px_rgba(163,230,53,0.18)]">
             <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
             <div className="border-b border-gray-3 p-5">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 ● PIN EVENT · {symbol}
               </div>
               <h3
                 id="add-pin-title"
-                className="mt-2 font-display text-2xl leading-tight text-paper"
+                className="mt-2 font-display text-2xl leading-tight text-white"
               >
                 Mark a moment on the chart
               </h3>
-              <p className="mt-2 text-sm text-paper/60">
+              <p className="mt-2 text-sm text-white/60">
                 Only you will see this pin. It renders as a grey marker below
                 the price candles.
               </p>
@@ -162,7 +162,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
               <div>
                 <label
                   htmlFor="pin-title"
-                  className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40"
+                  className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
                 >
                   Title *
                 </label>
@@ -173,39 +173,39 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="text"
                   required
                   maxLength={200}
-                  className="mt-2 w-full border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                  className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="pin-body"
-                  className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40"
+                  className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
                 >
-                  Notes <span className="text-paper/30">(optional)</span>
+                  Notes <span className="text-white/30">(optional)</span>
                 </label>
                 <textarea
                   id="pin-body"
                   name="body"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 w-full resize-none border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                  className="mt-2 w-full resize-none border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                     Symbol
                   </label>
-                  <div className="mt-2 border border-gray-3 bg-ink/60 px-3 py-2 font-mono text-sm text-paper/70">
+                  <div className="mt-2 border border-gray-3 bg-black/60 px-3 py-2 font-mono text-sm text-white/70">
                     {symbol}
                   </div>
                 </div>
                 <div>
                   <label
                     htmlFor="pin-occurred-at"
-                    className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40"
+                    className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
                   >
                     Occurred at *
                   </label>
@@ -215,7 +215,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                     required
                     value={localDt}
                     onChange={(e) => setLocalDt(e.currentTarget.value)}
-                    className="mt-2 w-full border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                    className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
                   />
                   <input type="hidden" name="occurredAt" value={occurredAtIso} />
                 </div>
@@ -235,8 +235,8 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="button"
                   onClick={close}
                   className={cn(
-                    "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60",
-                    "hover:border-brand hover:text-brand focus:border-lime focus:text-lime focus:outline-none",
+                    "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60",
+                    "hover:border-brand hover:text-brand focus:border-brand focus:text-brand focus:outline-none",
                   )}
                 >
                   Cancel · esc

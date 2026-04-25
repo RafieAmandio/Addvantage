@@ -22,24 +22,24 @@ export function LoginForm() {
 
   if (state.sent) {
     return (
-      <div className="col-span-12 border border-ink-3 bg-ink-2/40 p-10 lg:col-span-7">
+      <div className="col-span-12 border border-gray-3 bg-black-2/40 p-10 lg:col-span-7">
         <DataLabel>Transmission dispatched</DataLabel>
-        <div className="mt-6 font-display text-2xl text-paper">
+        <div className="mt-6 font-display text-2xl text-white">
           Magic link dispatched to{" "}
-          <span className="italic text-lime">{state.email}</span>.
+          <span className="italic text-brand">{state.email}</span>.
         </div>
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-widest2 text-paper/50">
+        <p className="mt-4 font-mono text-[11px] uppercase tracking-widest2 text-white/50">
           Check your inbox. It expires in 15 minutes.
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/signup"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-lime"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
           >
             No clearance? Request access →
           </Link>
         </div>
-        <div className="mt-12 border-t border-ink-3 pt-6 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+        <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           By authenticating you re-affirm the liability waiver signed at
           enrollment. ANTS retains no fiduciary duty.
         </div>
@@ -50,12 +50,12 @@ export function LoginForm() {
   return (
     <form
       action={formAction}
-      className="col-span-12 border border-ink-3 bg-ink-2/40 p-10 lg:col-span-7"
+      className="col-span-12 border border-gray-3 bg-black-2/40 p-10 lg:col-span-7"
     >
       <DataLabel>Credential entry · 01 field</DataLabel>
       <div className="mt-6 space-y-6">
         <div>
-          <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <label className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             Operator email
           </label>
           <input
@@ -64,7 +64,7 @@ export function LoginForm() {
             required
             autoComplete="email"
             defaultValue={state.email ?? ""}
-            className="mt-2 w-full border-b border-paper/20 bg-transparent py-3 font-mono text-lg text-paper outline-none transition-colors focus:border-lime"
+            className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white outline-none transition-colors focus:border-brand"
           />
           {state.error ? (
             <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-red-400">
@@ -79,12 +79,12 @@ export function LoginForm() {
         </Button>
         <Link
           href="/signup"
-          className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-lime"
+          className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
         >
           No clearance? Request access →
         </Link>
       </div>
-      <div className="mt-12 border-t border-ink-3 pt-6 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+      <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
         By authenticating you re-affirm the liability waiver signed at
         enrollment. ANTS retains no fiduciary duty.
       </div>

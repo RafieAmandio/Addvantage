@@ -82,7 +82,7 @@ export function PlanDetailSetupCard({
           onClick={copySetupLink}
           title={`Copy deep link to ${s.id}`}
           aria-label={`Copy link to setup ${s.id}`}
-          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand"
         >
           ⌯ LINK
         </button>
@@ -90,13 +90,13 @@ export function PlanDetailSetupCard({
           onClick={copySetup}
           title={`Copy ${s.id} as text`}
           aria-label={`Copy setup ${s.id} text`}
-          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand"
         >
           ⧉ TEXT
         </button>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
           {s.id}
         </span>
         <div className="flex items-center gap-2 pr-24">
@@ -116,12 +116,12 @@ export function PlanDetailSetupCard({
         </div>
       </div>
       <div className="mt-3 flex items-baseline gap-3">
-        <h3 className="font-display text-3xl text-paper">{s.instrument}</h3>
+        <h3 className="font-display text-3xl text-white">{s.instrument}</h3>
         <WatchPin ticker={s.instrument} size="md" />
         <span
           className={
             "font-mono text-sm uppercase tracking-widest2 " +
-            (s.direction === "long" ? "text-moss" : "text-lime")
+            (s.direction === "long" ? "text-moss" : "text-brand")
           }
         >
           {s.direction}
@@ -136,7 +136,7 @@ export function PlanDetailSetupCard({
         <Field label="Targets">
           <ol className="space-y-0.5">
             {s.targets.map((t, i) => (
-              <li key={t} className="font-mono text-paper">
+              <li key={t} className="font-mono text-white">
                 T{i + 1} · {t}
               </li>
             ))}
@@ -146,14 +146,14 @@ export function PlanDetailSetupCard({
 
       <div className="mt-4 border-t border-gray-3 pt-3">
         <DataLabel>Rationale</DataLabel>
-        <p className="mt-1 text-sm text-paper/70">{s.rationale}</p>
+        <p className="mt-1 text-sm text-white/70">{s.rationale}</p>
       </div>
 
       <div className="mt-4 border-t border-blood/40 pt-3">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-blood">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
           Invalidation
         </div>
-        <p className="mt-1 text-sm text-paper/80">{s.invalidation}</p>
+        <p className="mt-1 text-sm text-white/80">{s.invalidation}</p>
       </div>
 
       <div className="mt-4 flex items-center justify-between">
@@ -163,7 +163,7 @@ export function PlanDetailSetupCard({
             <span
               key={i}
               className={
-                "h-2 w-4 " + (i <= s.confidence ? "bg-lime" : "bg-gray-3")
+                "h-2 w-4 " + (i <= s.confidence ? "bg-brand" : "bg-gray-3")
               }
             />
           ))}
@@ -178,13 +178,13 @@ export function PlanDetailSetupCard({
               (status === "win"
                 ? "text-moss"
                 : status === "loss" || status === "stopped"
-                ? "text-blood"
-                : "text-paper/60")
+                ? "text-red-500"
+                : "text-white/60")
             }
           >
             Outcome · {meta.label}
           </div>
-          <p className="mt-1 text-sm text-paper/80">{s.outcomeNotes}</p>
+          <p className="mt-1 text-sm text-white/80">{s.outcomeNotes}</p>
         </div>
       )}
     </div>
@@ -203,11 +203,11 @@ function Field({
   return (
     <div
       className={
-        "border-l-2 pl-3 " + (highlight ? "border-blood" : "border-paper/20")
+        "border-l-2 pl-3 " + (highlight ? "border-blood" : "border-white/20")
       }
     >
       <DataLabel>{label}</DataLabel>
-      <div className="font-mono text-paper">{children}</div>
+      <div className="font-mono text-white">{children}</div>
     </div>
   );
 }

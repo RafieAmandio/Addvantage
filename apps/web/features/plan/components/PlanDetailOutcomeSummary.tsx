@@ -21,7 +21,7 @@ export function PlanDetailOutcomeSummary({
       <DataLabel>Plan outcome</DataLabel>
       <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2">
         <div>
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             Total R
           </div>
           <div
@@ -30,8 +30,8 @@ export function PlanDetailOutcomeSummary({
               (outcome.totalR > 0
                 ? "text-moss"
                 : outcome.totalR < 0
-                ? "text-blood"
-                : "text-paper/70")
+                ? "text-red-500"
+                : "text-white/70")
             }
           >
             {outcome.totalRLabel}
@@ -45,7 +45,7 @@ export function PlanDetailOutcomeSummary({
         {outcome.skipped > 0 && (
           <OutcomeStat label="Skipped" value={outcome.skipped} tone="muted" />
         )}
-        <div className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           {outcome.closed} / {plan.setups.length} setups closed
         </div>
       </div>
@@ -66,11 +66,11 @@ function OutcomeStat({
     tone === "moss"
       ? "text-moss"
       : tone === "blood"
-      ? "text-blood"
-      : "text-paper/60";
+      ? "text-red-500"
+      : "text-white/60";
   return (
     <div>
-      <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         {label}
       </div>
       <div className={`font-display text-2xl ${color}`}>{value}</div>

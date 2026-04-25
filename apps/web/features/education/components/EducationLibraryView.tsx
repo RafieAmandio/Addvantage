@@ -33,7 +33,7 @@ export function EducationLibraryView({ primers }: { primers: Primer[] }) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             <span className="led lime" />
             DECODING LIBRARY
           </div>
@@ -94,10 +94,10 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-05</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-paper">
-            Education <span className="italic text-lime">Library</span>
+          <h1 className="mt-2 font-display text-5xl text-white">
+            Education <span className="italic text-brand">Library</span>
           </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
             Process. Psychology. Risk. System design. No price-action snake
             oil. Each primer is anchored to a real framework and tagged into
             the hashtag system.
@@ -133,15 +133,15 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
           {hydrated && accessible.length > 0 && (
             <div className="flex items-center gap-4">
               <div className="min-w-[160px]">
-                <div className="flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+                <div className="flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                   <span>Progress</span>
-                  <span className="text-lime">
+                  <span className="text-brand">
                     {readCount} / {accessible.length} · {pct}%
                   </span>
                 </div>
                 <div className="mt-1 h-1 w-full bg-gray-3">
                   <div
-                    className="h-full bg-lime transition-all"
+                    className="h-full bg-brand transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -149,7 +149,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
               {readCount > 0 && (
                 <button
                   onClick={() => setConfirmingReset(true)}
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-blood hover:text-blood"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-red-500"
                 >
                   Reset
                 </button>
@@ -160,15 +160,15 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
 
         {visiblePrimers.length === 0 && query && (
           <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
               ● NULL TRANSMISSION
             </div>
-            <div className="mt-3 font-display text-2xl text-paper">
+            <div className="mt-3 font-display text-2xl text-white">
               No primers match "{query}".
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
               ✕ Clear search
             </button>

@@ -41,7 +41,7 @@ export function PlanArchiveView(props: PlanArchiveViewProps) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             <span className="led lime" />
             DECODING ARCHIVE
           </div>
@@ -173,7 +173,7 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
           ))}
         </div>
 
-        <div className="mt-10 border border-gray-3 bg-gray-2/30 p-5 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="mt-10 border border-gray-3 bg-gray-2/30 p-5 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
           ● Plan archive is read-only. Historical plans are never edited after
           publication. If a plan closed outside its stated invalidation, the
           next plan&apos;s risks section cites it by ID.

@@ -59,13 +59,13 @@ export function ConfirmDialog({
     >
       <div
         onClick={onCancel}
-        className="absolute inset-0 bg-ink/85 backdrop-blur-md"
+        className="absolute inset-0 bg-black/85 backdrop-blur-md"
         aria-hidden
       />
       <div
         className={cn(
           "relative w-full max-w-md border bg-gray-2 shadow-[0_0_60px_rgba(245,158,11,0.18)]",
-          destructive ? "border-blood" : "border-lime"
+          destructive ? "border-blood" : "border-brand"
         )}
       >
         <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
@@ -73,26 +73,26 @@ export function ConfirmDialog({
           <div
             className={cn(
               "font-mono text-[10px] uppercase tracking-widest2",
-              destructive ? "text-blood" : "text-lime"
+              destructive ? "text-red-500" : "text-brand"
             )}
           >
             ● {destructive ? "DESTRUCTIVE · CONFIRM REQUIRED" : "CONFIRM REQUIRED"}
           </div>
           <h3
             id="confirm-title"
-            className="mt-2 font-display text-2xl leading-tight text-paper"
+            className="mt-2 font-display text-2xl leading-tight text-white"
           >
             {title}
           </h3>
           {description && (
-            <p className="mt-2 text-sm text-paper/60">{description}</p>
+            <p className="mt-2 text-sm text-white/60">{description}</p>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-3 p-5">
           <button
             onClick={onCancel}
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
           >
             {cancelLabel} · esc
           </button>
@@ -101,8 +101,8 @@ export function ConfirmDialog({
             className={cn(
               "border px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
               destructive
-                ? "border-blood bg-blood/10 text-[#fda4af] hover:bg-blood hover:text-paper"
-                : "border-lime bg-lime text-ink hover:bg-brand-dim hover:text-paper"
+                ? "border-blood bg-blood/10 text-[#fda4af] hover:bg-blood hover:text-white"
+                : "border-brand bg-brand text-black hover:bg-brand-dim hover:text-white"
             )}
           >
             {confirmLabel} →

@@ -14,10 +14,10 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   if (news.length === 0) {
     return (
       <div className="border border-gray-3 bg-gray-2/40 p-8 text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
           ● NO RELATED NEWS
         </div>
-        <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
           No approved news items in the ±2h window overlapping this event.
         </p>
       </div>
@@ -32,13 +32,13 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
           <Link
             key={n.id}
             href={`/app/news/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-3">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 [{n.source_code}]
               </div>
-              <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+              <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                 {formatTime(ts)}Z
               </div>
               <div className="mt-3 space-y-1.5">
@@ -49,10 +49,10 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
               </div>
             </div>
             <div className="col-span-12 lg:col-span-9">
-              <h3 className="font-display text-xl leading-snug text-paper transition-colors group-hover:text-brand">
+              <h3 className="font-display text-xl leading-snug text-white transition-colors group-hover:text-brand">
                 {n.headline}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-paper/80">
+              <p className="mt-2 text-sm leading-relaxed text-white/80">
                 {n.analysis}
               </p>
               {n.affects.length > 0 && (
@@ -61,7 +61,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
                   {n.affects.map((a) => (
                     <span
                       key={a}
-                      className="border border-paper/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/70"
+                      className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/70"
                     >
                       {a}
                     </span>

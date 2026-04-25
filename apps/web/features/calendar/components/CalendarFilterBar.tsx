@@ -33,7 +33,7 @@ export function CalendarFilterBar({
       )}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Impact
         </span>
         <FilterChips
@@ -49,7 +49,7 @@ export function CalendarFilterBar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Region
         </span>
         <FilterChips
@@ -66,7 +66,7 @@ export function CalendarFilterBar({
         {filtersActive && (
           <button
             onClick={onReset}
-            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
           >
             ✕ Reset filters
           </button>

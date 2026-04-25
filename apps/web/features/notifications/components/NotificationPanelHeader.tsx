@@ -21,10 +21,10 @@ export function NotificationPanelHeader({
       )}
     >
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
           ● TRANSMISSION INBOX
         </div>
-        <div className="font-display text-base text-paper">
+        <div className="font-display text-base text-white">
           {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
         </div>
       </div>
@@ -34,8 +34,8 @@ export function NotificationPanelHeader({
         className={cn(
           "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2",
           unreadCount === 0
-            ? "cursor-default border-gray-3 text-paper/30"
-            : "border-lime/60 text-lime hover:bg-brand hover:text-ink"
+            ? "cursor-default border-gray-3 text-white/30"
+            : "border-brand/60 text-brand hover:bg-brand hover:text-black"
         )}
       >
         Mark all read

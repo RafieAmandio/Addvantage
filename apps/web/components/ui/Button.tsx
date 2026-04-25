@@ -15,11 +15,11 @@ export function Button({
     "group relative inline-flex items-center justify-center gap-2 font-mono uppercase tracking-widest2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40";
   const variants = {
     lime:
-      "bg-lime text-ink hover:bg-lime-dim hover:text-paper border border-lime",
+      "bg-brand text-black hover:bg-brand-dim hover:text-white border border-brand",
     outline:
-      "border border-lime/60 text-lime hover:bg-lime hover:text-ink",
+      "border border-brand/60 text-brand hover:bg-brand hover:text-black",
     ghost:
-      "text-paper/70 hover:text-lime border border-transparent hover:border-lime/40",
+      "text-white/70 hover:text-brand border border-transparent hover:border-brand/40",
   } as const;
   const sizes = {
     sm: "h-8 px-3 text-[10px]",

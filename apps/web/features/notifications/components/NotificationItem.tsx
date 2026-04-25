@@ -49,7 +49,7 @@ export function NotificationItem({
         }}
         aria-label={isRead ? "Mark as unread" : "Mark as read"}
         title={isRead ? "Mark as unread" : "Mark as read"}
-        className="absolute right-2 top-2 z-10 border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 transition-opacity hover:border-brand hover:text-brand opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+        className="absolute right-2 top-2 z-10 border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-opacity hover:border-brand hover:text-brand opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
       >
         {isRead ? "↶ UNREAD" : "✓ READ"}
       </button>
@@ -59,9 +59,9 @@ export function NotificationItem({
         className={cn(
           "group block border-b border-gray-3 px-4 py-3 transition-colors last:border-b-0",
           pinMatch && !isRead
-            ? "border-l-2 border-l-lime bg-lime/5 hover:bg-brand/10"
+            ? "border-l-2 border-l-lime bg-brand/5 hover:bg-brand/10"
             : isRead
-              ? "bg-ink hover:bg-gray-2"
+              ? "bg-black hover:bg-gray-2"
               : "bg-gray-2/40 hover:bg-gray-2"
         )}
       >
@@ -69,12 +69,12 @@ export function NotificationItem({
           <div className="mt-1 shrink-0">
             {!isRead && (
               <span
-                className="block h-2 w-2 rounded-full bg-lime shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                className="block h-2 w-2 rounded-full bg-brand shadow-[0_0_8px_rgba(245,158,11,0.6)]"
                 aria-label="Unread"
               />
             )}
             {isRead && (
-              <span className="block h-2 w-2 rounded-full border border-paper/20" />
+              <span className="block h-2 w-2 rounded-full border border-white/20" />
             )}
           </div>
           <div className="min-w-0 flex-1">
@@ -88,23 +88,23 @@ export function NotificationItem({
                 ● {KIND_LABEL[n.kind]}
               </span>
               {pinMatch && (
-                <span className="inline-flex items-center border border-lime bg-lime/10 px-1 py-0 font-mono text-[8px] uppercase tracking-widest2 text-lime">
+                <span className="inline-flex items-center border border-brand bg-brand/10 px-1 py-0 font-mono text-[8px] uppercase tracking-widest2 text-brand">
                   ★ PIN · {pinMatch}
                 </span>
               )}
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 · {n.id} · {formatDate(n.ts)} · {formatTime(n.ts)}Z
               </span>
             </div>
             <div
               className={cn(
                 "mt-1 font-display text-base leading-snug",
-                isRead ? "text-paper/60" : "text-paper group-hover:text-brand"
+                isRead ? "text-white/60" : "text-white group-hover:text-brand"
               )}
             >
               {n.title}
             </div>
-            <p className="mt-1 line-clamp-2 text-xs text-paper/60">{n.body}</p>
+            <p className="mt-1 line-clamp-2 text-xs text-white/60">{n.body}</p>
           </div>
         </div>
       </Link>
@@ -117,12 +117,12 @@ export function BucketLabel({ bucket }: { bucket: BucketId }) {
     bucket === 0
       ? {
           label: "★ ON YOUR WATCHLIST",
-          color: "text-lime",
-          border: "border-lime/40",
+          color: "text-brand",
+          border: "border-brand/40",
         }
       : bucket === 1
-        ? { label: "● UNREAD", color: "text-paper/60", border: "border-gray-3" }
-        : { label: "○ READ", color: "text-paper/30", border: "border-gray-3" };
+        ? { label: "● UNREAD", color: "text-white/60", border: "border-gray-3" }
+        : { label: "○ READ", color: "text-white/30", border: "border-gray-3" };
   return (
     <div
       className={cn(

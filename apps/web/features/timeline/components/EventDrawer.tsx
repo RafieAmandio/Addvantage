@@ -12,41 +12,41 @@ export interface EventDrawerProps {
 function kindBadge(kind: TimelineEvent["kind"]): string {
   switch (kind) {
     case "news":
-      return "bg-lime/15 text-lime";
+      return "bg-brand/15 text-brand";
     case "tweet":
       return "bg-amber-400/15 text-amber-400";
     case "macro":
-      return "bg-blood/15 text-blood";
+      return "bg-blood/15 text-red-500";
     case "earnings":
       return "bg-cyan-400/15 text-cyan-400";
     case "user_pin":
-      return "bg-paper/15 text-paper/70";
+      return "bg-white/15 text-white/70";
   }
 }
 
 function biasColor(bias: TimelineEvent["bias"]): string {
   switch (bias) {
     case "bullish":
-      return "bg-lime/15 text-lime";
+      return "bg-brand/15 text-brand";
     case "bearish":
-      return "bg-blood/15 text-blood";
+      return "bg-blood/15 text-red-500";
     case "neutral":
-      return "bg-paper/15 text-paper/70";
+      return "bg-white/15 text-white/70";
     default:
-      return "bg-paper/10 text-paper/50";
+      return "bg-white/10 text-white/50";
   }
 }
 
 function impactColor(impact: TimelineEvent["impact"]): string {
   switch (impact) {
     case "high":
-      return "bg-blood/15 text-blood";
+      return "bg-blood/15 text-red-500";
     case "medium":
       return "bg-amber-400/15 text-amber-400";
     case "low":
-      return "bg-paper/15 text-paper/70";
+      return "bg-white/15 text-white/70";
     default:
-      return "bg-paper/10 text-paper/50";
+      return "bg-white/10 text-white/50";
   }
 }
 
@@ -103,11 +103,11 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
                 {event.kind}
               </span>
               {event.source_code && (
-                <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                   [{event.source_code}]
                 </span>
               )}
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 {formatOccurredAt(event.occurred_at)}
               </span>
             </div>
@@ -116,14 +116,14 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-paper/70 hover:bg-gray-3 hover:text-paper"
+            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 hover:bg-gray-3 hover:text-white"
           >
             ×
           </button>
         </header>
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <h2 className="font-display text-2xl leading-tight text-paper">
+          <h2 className="font-display text-2xl leading-tight text-white">
             {event.title}
           </h2>
 
@@ -153,21 +153,21 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
           )}
 
           {event.body && (
-            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-paper/90">
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-white/90">
               {event.body}
             </p>
           )}
 
           {event.symbols.length > 0 && (
             <div className="mt-5">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 Affects
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {event.symbols.map((s) => (
                   <span
                     key={s}
-                    className="border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/80"
+                    className="border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-white/80"
                   >
                     {s}
                   </span>
@@ -183,12 +183,12 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
               href={event.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:underline"
+              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
             >
               View source →
             </a>
           ) : (
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/30">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
               No external source
             </span>
           )}

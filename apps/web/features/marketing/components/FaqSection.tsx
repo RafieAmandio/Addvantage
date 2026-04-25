@@ -5,10 +5,10 @@ export function FaqSection() {
   return (
     <section className="mt-[140px] flex flex-col items-center gap-4">
       <SectionHeader num="03" label="Frequent Interrogations" />
-      <div className="w-full border-y border-paper">
+      <div className="w-full border-y border-white">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left — headline w/ discord */}
-          <div className="relative overflow-hidden border-x border-paper p-12">
+          <div className="relative overflow-hidden border-x border-white p-12">
             <div className="pointer-events-none absolute left-[-256px] top-[224px] h-[1073px] w-[1073px] blur-[2.5px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -17,7 +17,7 @@ export function FaqSection() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="relative flex flex-col gap-2 text-paper">
+            <div className="relative flex flex-col gap-2 text-white">
               <h2 className="font-mono text-[64px] font-bold leading-none">
                 Where&apos;s the Discord?
               </h2>
@@ -29,22 +29,22 @@ export function FaqSection() {
           </div>
 
           {/* Right — 4 reasons stack */}
-          <div className="flex flex-col border-x border-paper">
+          <div className="flex flex-col border-x border-white">
             {faq.map((f, i) => (
               <div
                 key={f.q}
                 className={
                   "flex flex-col gap-2 p-12" +
-                  (i < faq.length - 1 ? " border-b border-paper" : "")
+                  (i < faq.length - 1 ? " border-b border-white" : "")
                 }
               >
-                <p className="font-mono text-base font-light leading-[1.4] text-paper">
+                <p className="font-mono text-base font-light leading-[1.4] text-white">
                   Reason {String(i + 1).padStart(2, "0")}
                 </p>
-                <h3 className="font-mono text-2xl font-bold leading-[1.4] text-paper">
+                <h3 className="font-mono text-2xl font-bold leading-[1.4] text-white">
                   {f.q}
                 </h3>
-                <p className="font-mono text-base font-light leading-[1.4] text-paper">
+                <p className="font-mono text-base font-light leading-[1.4] text-white">
                   {f.a}
                 </p>
               </div>

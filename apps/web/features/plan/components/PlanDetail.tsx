@@ -104,8 +104,8 @@ export function PlanDetail({
           {/* Thesis */}
           <section>
             <SectionNumber n="01 /" label="DIRECTIONAL THESIS" />
-            <div className="mt-4 border-l-4 border-lime bg-gray-2/40 p-6">
-              <p className="font-display text-xl leading-relaxed text-paper">
+            <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
+              <p className="font-display text-xl leading-relaxed text-white">
                 {plan.thesis}
               </p>
             </div>
@@ -148,7 +148,7 @@ export function PlanDetail({
             sectionNumber={risksSectionNumber}
           />
 
-          <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             Plan revision · v1 · Authored {formatDate(plan.date)} by{" "}
             {plan.authoredBy} · Reviewed by Desk · Distributed via DOMAIN /
             Telegram

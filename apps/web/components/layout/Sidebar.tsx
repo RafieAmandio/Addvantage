@@ -35,24 +35,15 @@ export function Sidebar() {
   const drawerRef = useRef<HTMLElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
 
-  // Close mobile drawer on route change
   useEffect(() => {
     setNavOpen(false);
   }, [pathname, setNavOpen]);
 
-  // Lock body scroll when drawer is open
   useEffect(() => {
-    if (navOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.body.style.overflow = navOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [navOpen]);
 
-  // Focus trap for mobile drawer
   useEffect(() => {
     if (!navOpen) return;
     lastFocused.current = document.activeElement as HTMLElement;
@@ -86,12 +77,15 @@ export function Sidebar() {
 
   const inner = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-ink-3 px-6 py-6">
+      <div className="flex items-center justify-between border-b border-gray-3 px-6 py-6">
         <div>
-          <Link href="/" className="font-display text-3xl text-paper">
-            ANTS<span className="text-lime">.</span>
+          <Link
+            href="/"
+            className="group font-display text-3xl text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            ANTS<span className="text-brand">.</span>
           </Link>
-          <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             DOMAIN // OPERATOR
           </div>
         </div>
@@ -99,38 +93,19 @@ export function Sidebar() {
           <button
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
-            title="Collapse sidebar · \\"
-            className="hidden border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime lg:block"
+            title="Collapse sidebar · \"
+            className="hidden items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:flex"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden
-            >
-              <path
-                d="M9 2L4 7l5 5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              <path d="M9 2L4 7l5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             onClick={() => setNavOpen(false)}
             aria-label="Close navigation"
-            className="border border-ink-3 p-2 text-paper/60 hover:border-lime hover:text-lime lg:hidden"
+            className="flex items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:hidden"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
               <path d="M2 2l10 10M12 2L2 12" />
             </svg>
           </button>
@@ -139,63 +114,42 @@ export function Sidebar() {
 
       <nav className="flex-1 overflow-y-auto p-4">
         <NavGroup label="Live transmissions">
-          {nav
-            .filter((n) => n.group === "live")
-            .map((n) => (
-              <NavItem
-                key={n.href}
-                {...n}
-                active={pathname === n.href}
-                paid={paid}
-              />
-            ))}
+          {nav.filter((n) => n.group === "live").map((n) => (
+            <NavItem key={n.href} {...n} active={pathname === n.href} paid={paid} />
+          ))}
         </NavGroup>
         <NavGroup label="Operator surfaces">
-          {nav
-            .filter((n) => n.group === "ops")
-            .map((n) => (
-              <NavItem
-                key={n.href}
-                {...n}
-                active={pathname.startsWith(n.href)}
-                paid={paid}
-              />
-            ))}
+          {nav.filter((n) => n.group === "ops").map((n) => (
+            <NavItem key={n.href} {...n} active={pathname.startsWith(n.href)} paid={paid} />
+          ))}
         </NavGroup>
         <NavGroup label="Account">
-          {nav
-            .filter((n) => n.group === "self")
-            .map((n) => (
-              <NavItem
-                key={n.href}
-                {...n}
-                active={pathname === n.href}
-                paid={paid}
-              />
-            ))}
+          {nav.filter((n) => n.group === "self").map((n) => (
+            <NavItem key={n.href} {...n} active={pathname === n.href} paid={paid} />
+          ))}
         </NavGroup>
       </nav>
 
-      <div className="border-t border-ink-3 p-4">
-        <div className="border border-lime/30 bg-lime/5 p-3">
+      <div className="border-t border-gray-3 p-4">
+        <div className="border border-brand/30 bg-brand/5 p-3">
           <div className="flex items-baseline justify-between">
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+            <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
               ● TIER {paid ? "01" : "00"}
             </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               U-00417
             </div>
           </div>
-          <div className="mt-2 font-display text-lg leading-tight text-paper">
+          <div className="mt-2 font-display text-lg leading-tight text-white">
             {operatorName}
           </div>
-          <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+          <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             {paid ? "VIP+ Trader" : "Free access"}
           </div>
           {!paid && (
             <Link
               href="/app/subscription"
-              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-paper/60 underline decoration-lime/40 hover:text-lime"
+              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand hover:decoration-brand"
             >
               Upgrade access →
             </Link>
@@ -210,38 +164,35 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop persistent sidebar — hidden entirely when collapsed */}
       {!sidebarCollapsed && (
-        <aside className="hidden w-64 shrink-0 border-r border-ink-3 bg-ink-2/40 lg:block">
+        <aside className="hidden w-64 shrink-0 border-r border-gray-3 bg-gray-2/40 lg:block">
           <div className="sticky top-0 h-screen">{inner}</div>
         </aside>
       )}
 
-      {/* Mobile drawer */}
       <div
         className={cn(
           "fixed inset-0 z-50 lg:hidden",
           navOpen ? "pointer-events-auto" : "pointer-events-none"
         )}
       >
-        {/* Backdrop */}
         <div
           onClick={() => setNavOpen(false)}
           className={cn(
-            "absolute inset-0 bg-ink/80 backdrop-blur-sm transition-opacity duration-300",
+            "absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300",
             navOpen ? "opacity-100" : "opacity-0"
           )}
         />
-        {/* Drawer panel */}
         <aside
           ref={drawerRef}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation"
           className={cn(
-            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-lime/40 bg-ink-2 shadow-[0_0_60px_rgba(245,158,11,0.15)] transition-transform duration-300",
+            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-brand/40 bg-gray-2 transition-transform duration-300",
             navOpen ? "translate-x-0" : "-translate-x-full"
           )}
+          style={{ boxShadow: navOpen ? "0 0 60px rgba(255,212,0,0.1)" : undefined }}
         >
           {inner}
         </aside>
@@ -250,16 +201,10 @@ export function Sidebar() {
   );
 }
 
-function NavGroup({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function NavGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mb-6">
-      <div className="mb-2 px-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+      <div className="mb-2 px-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
         {label}
       </div>
       <div className="space-y-px">{children}</div>
@@ -268,29 +213,20 @@ function NavGroup({
 }
 
 function NavItem({
-  code,
-  label,
-  href,
-  active,
-  locked,
-  paid,
+  code, label, href, active, locked, paid,
 }: {
-  code: string;
-  label: string;
-  href: string;
-  active?: boolean;
-  locked?: boolean;
-  paid: boolean;
+  code: string; label: string; href: string;
+  active?: boolean; locked?: boolean; paid: boolean;
 }) {
   const isLocked = locked && !paid;
   return (
     <Link
       href={href}
       className={cn(
-        "group flex items-center justify-between px-3 py-2 transition-colors",
+        "group flex items-center justify-between px-3 py-2 transition-all duration-150",
         active
-          ? "border-l-2 border-lime bg-lime/10 text-lime"
-          : "border-l-2 border-transparent text-paper/60 hover:border-lime/40 hover:bg-ink-2 hover:text-paper"
+          ? "border-l-2 border-brand bg-brand/10 text-brand"
+          : "border-l-2 border-transparent text-white/60 hover:border-brand/40 hover:bg-gray-2 hover:text-white"
       )}
     >
       <span className="flex items-center gap-3">
@@ -302,7 +238,7 @@ function NavItem({
         </span>
       </span>
       {isLocked && (
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
           ●
         </span>
       )}

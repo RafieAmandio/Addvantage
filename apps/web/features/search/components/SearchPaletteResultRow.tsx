@@ -36,26 +36,26 @@ function SearchPaletteResultRowImpl({
       className={cn(
         "block w-full border-b border-gray-3 px-5 py-4 text-left transition-colors",
         active
-          ? "border-l-2 border-l-lime bg-lime/10"
-          : "border-l-2 border-l-transparent bg-ink hover:bg-gray-2",
+          ? "border-l-2 border-l-lime bg-brand/10"
+          : "border-l-2 border-l-transparent bg-black hover:bg-gray-2",
       )}
     >
       <div className="flex items-baseline justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
               {result.id}
             </span>
             {result.author && (
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 · BY {result.author.toUpperCase()}
               </span>
             )}
           </div>
-          <div className="mt-1 truncate font-display text-lg text-paper">
+          <div className="mt-1 truncate font-display text-lg text-white">
             <Highlight text={result.title} query={query} />
           </div>
-          <div className="mt-1 line-clamp-2 text-sm text-paper/60">
+          <div className="mt-1 line-clamp-2 text-sm text-white/60">
             <Highlight text={result.snippet} query={query} />
           </div>
           {result.tags && result.tags.length > 0 && (
@@ -63,7 +63,7 @@ function SearchPaletteResultRowImpl({
               {result.tags.slice(0, 4).map((t) => (
                 <span
                   key={t}
-                  className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
+                  className="font-mono text-[9px] uppercase tracking-widest2 text-brand/60"
                 >
                   #{t}
                 </span>
@@ -71,7 +71,7 @@ function SearchPaletteResultRowImpl({
             </div>
           )}
         </div>
-        <div className="hidden shrink-0 text-right font-mono text-[9px] uppercase tracking-widest2 text-paper/40 sm:block">
+        <div className="hidden shrink-0 text-right font-mono text-[9px] uppercase tracking-widest2 text-white/40 sm:block">
           <div>{KIND_META[kind].label}</div>
           {result.meta && <div className="mt-1">{result.meta}</div>}
         </div>

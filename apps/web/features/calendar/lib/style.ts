@@ -8,13 +8,13 @@ export const IMPACT_LABEL: Record<Impact, string> = {
 
 export const IMPACT_STYLE: Record<Impact, string> = {
   high: "border-blood/60 bg-blood/20 text-[#fda4af]",
-  medium: "border-lime/60 bg-lime/10 text-lime",
+  medium: "border-brand/60 bg-brand/10 text-brand",
   low: "border-moss/60 bg-moss/10 text-moss",
 };
 
 export const IMPACT_DOT: Record<Impact, string> = {
   high: "bg-[#991b1b] border-[#fda4af]",
-  medium: "bg-lime border-lime",
+  medium: "bg-brand border-brand",
   low: "bg-moss border-moss",
 };
 

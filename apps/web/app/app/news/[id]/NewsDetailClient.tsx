@@ -104,22 +104,22 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           />
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
               [{item.source_code}]
             </span>
             <ImpactPill level={item.impact} />
             <BiasBadge bias={item.bias} />
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               {formatDate(ts)} · {formatTime(ts)}Z
             </span>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
               BY {item.author.toUpperCase()}
             </span>
           </div>
 
-          <h1 className="mt-4 font-display text-5xl leading-[1.05] text-paper">
+          <h1 className="mt-4 font-display text-5xl leading-[1.05] text-white">
             {item.headline}
           </h1>
         </div>
@@ -127,8 +127,8 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
       <div className="mx-auto max-w-4xl px-6 py-10">
         <SectionNumber n="01 /" label="WHAT THIS MEANS FOR PRICE" />
-        <div className="mt-4 border-l-4 border-lime bg-gray-2/40 p-6">
-          <p className="font-display text-xl leading-relaxed text-paper/90">
+        <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
+          <p className="font-display text-xl leading-relaxed text-white/90">
             {item.analysis}
           </p>
         </div>
@@ -140,7 +140,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
               {item.affects.map((a) => (
                 <div
                   key={a}
-                  className="flex items-center gap-1.5 border border-lime/40 px-3 py-1.5 font-mono text-xs uppercase tracking-widest2 text-lime"
+                  className="flex items-center gap-1.5 border border-brand/40 px-3 py-1.5 font-mono text-xs uppercase tracking-widest2 text-brand"
                 >
                   <span>{a}</span>
                   <WatchPin ticker={a} />
@@ -174,7 +174,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
                 >
                   #{t}
                 </Link>
@@ -186,7 +186,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
         {hasRelated && (
           <div className="mt-12 border-t border-gray-3 pt-10">
             <SectionNumber n="05 /" label="RELATED · BY HASHTAG" />
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Other items in the DOMAIN that share at least one tag with this article.
             </p>
 
@@ -198,17 +198,17 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group bg-ink p-4 transition-colors hover:bg-gray-2"
+                      className="group text-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                           [{n.source_code}]
                         </span>
-                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                           · BY {n.author.toUpperCase()}
                         </span>
                       </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-brand">
+                      <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
                         {n.headline}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
@@ -218,8 +218,8 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                             className={
                               "font-mono text-[9px] uppercase tracking-widest2 " +
                               (item.tags.includes(t)
-                                ? "text-lime"
-                                : "text-paper/30")
+                                ? "text-brand"
+                                : "text-white/30")
                             }
                           >
                             #{t}
@@ -240,15 +240,15 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={p.id}
                       href={`/app/education/${p.id}`}
-                      className="group bg-ink p-4 transition-colors hover:bg-gray-2"
+                      className="group text-black p-4 transition-colors hover:bg-gray-2"
                     >
-                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         {p.id} · {p.readingMin} min
                       </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-brand">
+                      <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
                         {p.title}
                       </div>
-                      <div className="mt-1 font-mono text-[9px] italic uppercase tracking-widest2 text-lime/60">
+                      <div className="mt-1 font-mono text-[9px] italic uppercase tracking-widest2 text-brand/60">
                         {p.framework}
                       </div>
                     </Link>
@@ -265,15 +265,15 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={c.id}
                       href="/app/channel"
-                      className="group block bg-ink p-4 transition-colors hover:bg-gray-2"
+                      className="group block text-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2">
-                        <span className="text-lime">{c.id}</span>
-                        <span className="text-paper/40">
+                        <span className="text-brand">{c.id}</span>
+                        <span className="text-white/40">
                           · BY {c.author.toUpperCase()} · {formatDate(c.ts)}
                         </span>
                       </div>
-                      <p className="mt-2 line-clamp-2 text-sm text-paper/80 group-hover:text-paper">
+                      <p className="mt-2 line-clamp-2 text-sm text-white/80 group-hover:text-white">
                         {c.body}
                       </p>
                     </Link>
@@ -288,28 +288,28 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
+              "block text-black p-4 transition-colors hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Newer
             </div>
-            <div className="mt-1 line-clamp-1 text-sm text-paper">
+            <div className="mt-1 line-clamp-1 text-sm text-white">
               {prev?.headline ?? "Top of feed"}
             </div>
           </Link>
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block text-black p-4 text-right transition-colors hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Older →
             </div>
-            <div className="mt-1 line-clamp-1 text-sm text-paper">
+            <div className="mt-1 line-clamp-1 text-sm text-white">
               {next?.headline ?? "Bottom of feed"}
             </div>
           </Link>
@@ -322,10 +322,10 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <dt className="text-[10px] uppercase tracking-widest2 text-paper/40">
+      <dt className="text-[10px] uppercase tracking-widest2 text-white/40">
         {label}
       </dt>
-      <dd className="text-paper">{value}</dd>
+      <dd className="text-white">{value}</dd>
     </div>
   );
 }

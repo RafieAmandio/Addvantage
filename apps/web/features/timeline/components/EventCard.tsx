@@ -6,15 +6,15 @@ import type { TimelineEvent } from "@/features/timeline/queries/timeline";
 function kindBadge(kind: TimelineEvent["kind"]): string {
   switch (kind) {
     case "news":
-      return "bg-lime/15 text-lime";
+      return "bg-brand/15 text-brand";
     case "tweet":
       return "bg-amber-400/15 text-amber-400";
     case "macro":
-      return "bg-blood/15 text-blood";
+      return "bg-blood/15 text-red-500";
     case "earnings":
       return "bg-cyan-400/15 text-cyan-400";
     case "user_pin":
-      return "bg-paper/15 text-paper/70";
+      return "bg-white/15 text-white/70";
   }
 }
 
@@ -47,15 +47,15 @@ function EventCardInner({
           {event.kind}
         </span>
         {event.source_code && (
-          <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+          <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
             [{event.source_code}]
           </span>
         )}
-        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           {formatTime(event.occurred_at)}
         </span>
       </div>
-      <div className="mt-1.5 text-sm leading-snug text-paper">{event.title}</div>
+      <div className="mt-1.5 text-sm leading-snug text-white">{event.title}</div>
     </div>
   );
   if (!href) return body;

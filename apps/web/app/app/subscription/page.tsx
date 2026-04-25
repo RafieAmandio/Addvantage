@@ -36,25 +36,25 @@ export default function SubscriptionPage() {
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Operator account · Tier control</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-paper">
-            Subscription <span className="italic text-lime">& Access</span>
+          <h1 className="mt-2 font-display text-5xl text-white">
+            Subscription <span className="italic text-brand">& Access</span>
           </h1>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* Status panel */}
-        <section className="border border-lime/40 bg-gray-2/30 p-8">
+        <section className="border border-brand/40 bg-gray-2/30 p-8">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-4">
               <DataLabel>Current tier</DataLabel>
-              <div className="mt-2 font-display text-4xl text-paper">
+              <div className="mt-2 font-display text-4xl text-white">
                 {paid ? "VIP+ Trader" : "Free"}
               </div>
               <div
                 className={
                   "mt-1 font-mono text-[10px] uppercase tracking-widest2 " +
-                  (paid ? "text-moss" : "text-paper/40")
+                  (paid ? "text-moss" : "text-white/40")
                 }
               >
                 ● {paid ? "OPERATOR · ACTIVE" : "FREE TIER · LIMITED"}
@@ -62,20 +62,20 @@ export default function SubscriptionPage() {
             </div>
             <div className="col-span-6 lg:col-span-3">
               <DataLabel>Renews</DataLabel>
-              <div className="mt-2 font-mono text-paper">
+              <div className="mt-2 font-mono text-white">
                 {paid ? formatDate("2026-07-07T00:00:00Z") : "—"}
               </div>
             </div>
             <div className="col-span-6 lg:col-span-3">
               <DataLabel>Cadence</DataLabel>
-              <div className="mt-2 font-mono text-paper">3-month</div>
+              <div className="mt-2 font-mono text-white">3-month</div>
             </div>
             <div className="col-span-12 lg:col-span-2">
               <DataLabel>Liability</DataLabel>
               <div
                 className={
                   "mt-2 font-mono text-sm uppercase tracking-widest2 " +
-                  (liabilitySigned ? "text-moss" : "text-blood")
+                  (liabilitySigned ? "text-moss" : "text-red-500")
                 }
               >
                 {liabilitySigned ? "✓ SIGNED" : "● UNSIGNED"}
@@ -95,9 +95,9 @@ export default function SubscriptionPage() {
                 <div
                   key={p.id}
                   className={cn(
-                    "col-span-12 border bg-ink p-8 lg:col-span-6",
+                    "col-span-12 border text-black p-8 lg:col-span-6",
                     p.highlight
-                      ? "border-lime"
+                      ? "border-brand"
                       : "border-gray-3"
                   )}
                 >
@@ -106,7 +106,7 @@ export default function SubscriptionPage() {
                       <DataLabel>
                         {p.id === "free" ? "Tier 00" : "Tier 01"}
                       </DataLabel>
-                      <div className="mt-2 font-display text-3xl text-paper">
+                      <div className="mt-2 font-display text-3xl text-white">
                         {p.name}
                       </div>
                     </div>
@@ -120,19 +120,19 @@ export default function SubscriptionPage() {
                     <div
                       className={
                         "font-display text-5xl " +
-                        (p.highlight ? "text-lime" : "text-paper")
+                        (p.highlight ? "text-brand" : "text-white")
                       }
                     >
                       IDR {p.priceIDR === 0 ? "0" : formatIDR(p.priceIDR)}
                     </div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                       / {p.cadence}
                     </div>
                   </div>
-                  <ul className="mt-8 space-y-2 text-sm text-paper/80">
+                  <ul className="mt-8 space-y-2 text-sm text-white/80">
                     {p.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <span className="font-mono text-lime">+</span>
+                        <span className="font-mono text-brand">+</span>
                         <span>{f}</span>
                       </li>
                     ))}
@@ -178,7 +178,7 @@ export default function SubscriptionPage() {
           <SectionNumber n="02 /" label="PAYMENT LEDGER" />
           <div className="mt-4 border border-gray-3">
             <table className="w-full font-mono text-xs">
-              <thead className="bg-gray-2 text-[9px] uppercase tracking-widest2 text-paper/40">
+              <thead className="bg-gray-2 text-[9px] uppercase tracking-widest2 text-white/40">
                 <tr>
                   <th className="px-4 py-3 text-left">TXN ID</th>
                   <th className="px-4 py-3 text-left">DATE</th>
@@ -219,14 +219,14 @@ export default function SubscriptionPage() {
                     key={row.id}
                     className={cn(
                       "border-t border-gray-3",
-                      i % 2 === 0 ? "bg-ink" : "bg-gray-2/30"
+                      i % 2 === 0 ? "text-black" : "bg-gray-2/30"
                     )}
                   >
-                    <td className="px-4 py-3 text-lime">{row.id}</td>
-                    <td className="px-4 py-3 text-paper/80">{row.date}</td>
-                    <td className="px-4 py-3 text-paper/80">{row.method}</td>
-                    <td className="px-4 py-3 text-paper/80">{row.pkg}</td>
-                    <td className="px-4 py-3 text-right text-paper">
+                    <td className="px-4 py-3 text-brand">{row.id}</td>
+                    <td className="px-4 py-3 text-white/80">{row.date}</td>
+                    <td className="px-4 py-3 text-white/80">{row.method}</td>
+                    <td className="px-4 py-3 text-white/80">{row.pkg}</td>
+                    <td className="px-4 py-3 text-right text-white">
                       {row.amt}
                     </td>
                     <td className="px-4 py-3 text-right text-moss">
@@ -239,7 +239,7 @@ export default function SubscriptionPage() {
           </div>
         </section>
 
-        <div className="mt-12 border border-gray-3 bg-gray-2/30 p-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="mt-12 border border-gray-3 bg-gray-2/30 p-6 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
           ALL PRICING IN INDONESIAN RUPIAH (IDR). 3-MONTH BILLING IS A
           DELIBERATE FILTER — ANYONE UNWILLING TO COMMIT A QUARTER IS NOT THE
           TARGET AUDIENCE. NO PRO-RATING. NO REFUNDS.

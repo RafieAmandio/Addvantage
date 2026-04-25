@@ -17,7 +17,7 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
   return (
     <Link
       href={`/app/education/${p.id}`}
-      className="group relative col-span-12 bg-ink p-8 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
+      className="group relative col-span-12 bg-black p-8 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
     >
       {read && !locked && (
         <div className="absolute right-0 top-0 bg-moss/15 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
@@ -25,13 +25,13 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
         </div>
       )}
       <div className="flex items-start justify-between">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
           <Highlight text={p.id} query={query} />
         </div>
         <div
           className={
             "font-mono text-[9px] uppercase tracking-widest2 " +
-            (locked ? "text-blood" : "text-moss")
+            (locked ? "text-red-500" : "text-moss")
           }
         >
           ● {locked ? "LOCKED" : "OPEN"}
@@ -40,15 +40,15 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
       <h3
         className={
           "mt-6 font-display text-3xl leading-tight transition-colors " +
-          (read && !locked ? "text-paper/60" : "text-paper")
+          (read && !locked ? "text-white/60" : "text-white")
         }
       >
         <Highlight text={p.title} query={query} />
       </h3>
-      <div className="mt-1 font-mono text-[10px] italic uppercase tracking-widest2 text-lime/70">
+      <div className="mt-1 font-mono text-[10px] italic uppercase tracking-widest2 text-brand/70">
         <Highlight text={p.framework} query={query} />
       </div>
-      <p className="mt-4 text-sm text-paper/70">
+      <p className="mt-4 text-sm text-white/70">
         <Highlight text={p.summary} query={query} />
       </p>
       <div className="mt-6 flex items-center justify-between border-t border-gray-3 pt-3">
@@ -56,13 +56,13 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
           {p.tags.slice(0, 2).map((t) => (
             <span
               key={t}
-              className="font-mono text-[9px] uppercase tracking-widest2 text-lime/60"
+              className="font-mono text-[9px] uppercase tracking-widest2 text-brand/60"
             >
               #<Highlight text={t} query={query} />
             </span>
           ))}
         </div>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           {p.readingMin} min · {indexLabel}
         </div>
       </div>

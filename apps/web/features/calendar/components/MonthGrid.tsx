@@ -40,11 +40,11 @@ export function MonthGrid({
   return (
     <div className="border border-gray-3">
       {/* Weekday header row */}
-      <div className="grid grid-cols-7 border-b-2 border-lime/40 bg-gray-2/95">
+      <div className="grid grid-cols-7 border-b-2 border-brand/40 bg-gray-2/95">
         {weekdayHeaders.map((w) => (
           <div
             key={w}
-            className="px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime"
+            className="px-3 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand"
           >
             {w}
           </div>
@@ -73,15 +73,15 @@ export function MonthGrid({
                 i % 7 === 6 && "border-r-0",
                 Math.floor(i / 7) === 5 && "border-b-0",
                 inMonth
-                  ? "bg-ink hover:bg-gray-2"
+                  ? "bg-black hover:bg-gray-2"
                   : "bg-gray-2/30 hover:bg-gray-2/60",
                 // Non-anchor hover gets a faint lime preview outline
                 !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-brand/30",
                 // Anchor (keyboard cursor) — inset lime border, overridden
                 // visually by the today ring below when they coincide.
-                isAnchor && !isToday && "bg-lime/5 ring-2 ring-inset ring-brand/60",
+                isAnchor && !isToday && "bg-brand/5 ring-2 ring-inset ring-brand/60",
                 isToday && "ring-1 ring-inset ring-brand",
-                isAnchor && isToday && "ring-2 ring-brand bg-lime/10"
+                isAnchor && isToday && "ring-2 ring-brand bg-brand/10"
               )}
             >
               {/* Day number */}
@@ -90,29 +90,29 @@ export function MonthGrid({
                   className={cn(
                     "font-mono text-[11px] font-semibold tracking-widest2",
                     isToday
-                      ? "text-lime"
+                      ? "text-brand"
                       : isAnchor
-                      ? "text-lime"
+                      ? "text-brand"
                       : inMonth
-                      ? "text-paper/80"
-                      : "text-paper/25",
-                    isWeekend && inMonth && !isToday && !isAnchor && "text-paper/50"
+                      ? "text-white/80"
+                      : "text-white/25",
+                    isWeekend && inMonth && !isToday && !isAnchor && "text-white/50"
                   )}
                 >
                   {String(day).padStart(2, "0")}
                 </span>
                 {isToday && (
-                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-lime">
+                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-brand">
                     TODAY
                   </span>
                 )}
                 {!isToday && isAnchor && (
-                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-lime">
+                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-brand">
                     ● ANCHOR
                   </span>
                 )}
                 {!isToday && !isAnchor && dayEvents.length > 0 && (
-                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-paper/30">
+                  <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">
                     {dayEvents.length}
                   </span>
                 )}
@@ -132,13 +132,13 @@ export function MonthGrid({
                         IMPACT_DOT[e.impact]
                       )}
                     />
-                    <span className="truncate font-mono text-[9px] uppercase tracking-widest2 text-paper/70 group-hover:text-paper">
+                    <span className="truncate font-mono text-[9px] uppercase tracking-widest2 text-white/70 group-hover:text-white">
                       {shortName(e.title)}
                     </span>
                   </div>
                 ))}
                 {overflow > 0 && (
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime/70">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand/70">
                     +{overflow} more
                   </div>
                 )}

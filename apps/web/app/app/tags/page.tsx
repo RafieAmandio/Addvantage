@@ -37,7 +37,7 @@ export default function TagsPage() {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             <span className="led lime" />
             DECODING TAG INDEX
           </div>
@@ -137,10 +137,10 @@ function TagsView() {
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Index · Cross-cut</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-paper">
-            Hashtag <span className="italic text-lime">Explorer</span>
+          <h1 className="mt-2 font-display text-5xl text-white">
+            Hashtag <span className="italic text-brand">Explorer</span>
           </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
             The connective tissue of the DOMAIN. Pull every primer, post,
             consultation log, and broadcast under a tag.
           </p>
@@ -173,7 +173,7 @@ function TagsView() {
             }
           />
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               Sort
             </span>
             <div className="flex flex-wrap gap-px bg-gray-3">
@@ -190,8 +190,8 @@ function TagsView() {
                   className={cn(
                     "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                     sortMode === opt.v
-                      ? "bg-lime text-ink"
-                      : "bg-gray-2 text-paper/60 hover:text-paper"
+                      ? "bg-brand text-black"
+                      : "bg-gray-2 text-white/60 hover:text-white"
                   )}
                 >
                   {opt.label}
@@ -203,15 +203,15 @@ function TagsView() {
 
         {visibleCounts.length === 0 && query && (
           <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
               ● NULL TRANSMISSION
             </div>
-            <div className="mt-3 font-display text-2xl text-paper">
+            <div className="mt-3 font-display text-2xl text-white">
               No tags match "{query}".
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
               ✕ Clear search
             </button>
@@ -227,37 +227,37 @@ function TagsView() {
               <Link
                 key={tag}
                 href={`/app/tags/${tag}`}
-                className="group relative col-span-12 overflow-hidden bg-ink p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
+                className="group relative col-span-12 overflow-hidden text-black p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
               >
                 {/* Density bar — bottom edge, scaled to count */}
                 <div
-                  className="absolute bottom-0 left-0 h-0.5 bg-lime/70 transition-all group-hover:h-1"
+                  className="absolute bottom-0 left-0 h-0.5 bg-brand/70 transition-all group-hover:h-1"
                   style={{ width: `${Math.max(4, density * 100)}%` }}
                 />
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {isHot && (
-                      <span className="inline-flex items-center gap-1 border border-lime/60 bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                      <span className="inline-flex items-center gap-1 border border-brand/60 bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         <span className="led lime" />
                         TRENDING
                       </span>
                     )}
                   </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                     {c} items
                   </div>
                 </div>
-                <div className="mt-3 font-display text-2xl text-paper">
-                  <span className="text-lime">#</span>
+                <div className="mt-3 font-display text-2xl text-white">
+                  <span className="text-brand">#</span>
                   <Highlight text={tag} query={query} />
                 </div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-lime/60">
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-brand/60">
                   <Highlight text={meta.label} query={query} />
                 </div>
-                <p className="mt-3 text-sm text-paper/60">
+                <p className="mt-3 text-sm text-white/60">
                   <Highlight text={meta.description} query={query} />
                 </p>
               </Link>

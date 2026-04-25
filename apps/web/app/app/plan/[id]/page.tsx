@@ -61,13 +61,13 @@ export default async function PlanDetailPage({
             <Link
               href={`/app/plan/compare?a=${plan.id}`}
               title="Compare this plan with another"
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
             >
               ⇌ COMPARE
             </Link>
             <Link
               href="/app/plan/archive"
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
             >
               ← Archive
             </Link>
@@ -82,28 +82,28 @@ export default async function PlanDetailPage({
           <Link
             href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
+              "block text-black p-4 transition-colors hover:bg-gray-2 " +
               (newer ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Newer plan
             </div>
-            <div className="mt-1 text-sm text-paper">
+            <div className="mt-1 text-sm text-white">
               {newer ? `${newer.id} · ${newer.date}` : "Already newest"}
             </div>
           </Link>
           <Link
             href={older ? `/app/plan/${older.id}` : "/app/plan/archive"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block text-black p-4 text-right transition-colors hover:bg-gray-2 " +
               (older ? "" : "pointer-events-none opacity-30")
             }
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Older plan →
             </div>
-            <div className="mt-1 text-sm text-paper">
+            <div className="mt-1 text-sm text-white">
               {older ? `${older.id} · ${older.date}` : "Archive bottom"}
             </div>
           </Link>

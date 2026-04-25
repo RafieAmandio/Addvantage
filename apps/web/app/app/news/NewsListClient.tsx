@@ -35,7 +35,7 @@ export function NewsListClient({ items }: { items: NewsListItem[] }) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             <span className="led lime" />
             DECODING NEWS FEED
           </div>
@@ -113,10 +113,10 @@ function View({ items }: { items: NewsListItem[] }) {
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-01 · Free pillar</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-paper">
-            Live <span className="italic text-lime">News</span>
+          <h1 className="mt-2 font-display text-5xl text-white">
+            Live <span className="italic text-brand">News</span>
           </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-paper/60">
+          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
             Raw market-moving news, annotated with what it actually means for
             price. No "analysts say". No "experts believe".
           </p>
@@ -140,7 +140,7 @@ function View({ items }: { items: NewsListItem[] }) {
 
         {seenHydrated && seenCount > 0 && (
           <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               {seenCount} seen
             </span>
             <button
@@ -148,15 +148,15 @@ function View({ items }: { items: NewsListItem[] }) {
               className={
                 "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
                 (hideSeen
-                  ? "border-lime bg-lime/10 text-lime"
-                  : "border-gray-3 text-paper/60 hover:border-brand hover:text-brand")
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-gray-3 text-white/60 hover:border-brand hover:text-brand")
               }
             >
               {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}
             </button>
             <button
               onClick={() => setConfirmingResetSeen(true)}
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
             >
               ↶ Reset seen
             </button>
@@ -182,8 +182,8 @@ function View({ items }: { items: NewsListItem[] }) {
                 className={
                   "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (filter === f
-                    ? "bg-lime text-ink"
-                    : "bg-gray-2 text-paper/60 hover:bg-gray-2 hover:text-paper")
+                    ? "bg-brand text-black"
+                    : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white")
                 }
               >
                 {f}
@@ -194,14 +194,14 @@ function View({ items }: { items: NewsListItem[] }) {
 
         {filtered.length === 0 && (
           <div className="border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
               ● NULL TRANSMISSION
             </div>
-            <div className="mt-3 font-display text-2xl text-paper">
+            <div className="mt-3 font-display text-2xl text-white">
               No items match{query ? ` "${query}"` : " this filter"}
               {filter !== "all" && query ? ` in the ${filter} cut` : ""}.
             </div>
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Try a different cut. The desk doesn't fabricate items to fill a screen.
             </p>
           </div>

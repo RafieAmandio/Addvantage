@@ -19,21 +19,21 @@ function SummaryCell({
     valueTone === "moss"
       ? "text-moss"
       : valueTone === "blood"
-      ? "text-blood"
+      ? "text-red-500"
       : valueTone === "lime"
-      ? "text-lime"
+      ? "text-brand"
       : valueTone === "paper"
-      ? "text-paper"
-      : "text-paper/30";
+      ? "text-white"
+      : "text-white/30";
   return (
-    <div className="bg-ink p-5">
-      <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+    <div className="bg-black p-5">
+      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         {label}
       </div>
       <div className={cn("mt-1 font-display text-3xl", toneClass)}>
         {value}
       </div>
-      <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         {sub}
       </div>
     </div>
@@ -124,7 +124,7 @@ export function PlanCompareCommonChips({
       {instruments.map((i) => (
         <span
           key={i}
-          className="border border-lime bg-lime/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-lime"
+          className="border border-brand bg-brand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-brand"
         >
           ★ {i}
         </span>

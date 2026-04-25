@@ -12,16 +12,16 @@ export function StepPhilosophy({ form, setForm }: Props) {
   return (
     <div className="space-y-6 stagger">
       <DataLabel>Question 05 / Philosophy check</DataLabel>
-      <h2 className="font-display text-3xl text-paper">
+      <h2 className="font-display text-3xl text-white">
         The accountability question.
       </h2>
-      <div className="border border-lime/40 bg-lime/5 p-6">
-        <p className="font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
+      <div className="border border-brand/40 bg-brand/5 p-6">
+        <p className="font-mono text-[11px] uppercase tracking-widest2 text-white/80">
           If analyst Vantage gives trade ideas and you take the same trade and
           lose — whose fault is it?
         </p>
       </div>
-      <p className="font-mono text-[9px] uppercase tracking-widest2 text-paper/30">
+      <p className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
         There is no wrong answer. Your response helps us calibrate how we
         communicate with you.
       </p>
@@ -33,17 +33,17 @@ export function StepPhilosophy({ form, setForm }: Props) {
             className={
               "relative w-full border p-5 text-left transition-all " +
               (form.faultAttribution === opt.value
-                ? "border-lime bg-lime/10"
-                : "border-ink-3 hover:border-lime/40")
+                ? "border-brand bg-brand/10"
+                : "border-gray-3 hover:border-brand/40")
             }
           >
-            <span className="absolute right-4 top-4 font-mono text-[9px] text-paper/20">
+            <span className="absolute right-4 top-4 font-mono text-[9px] text-white/20">
               {i + 1}
             </span>
-            <div className="font-mono text-xs uppercase tracking-widest2 text-paper">
+            <div className="font-mono text-xs uppercase tracking-widest2 text-white">
               {opt.label}
             </div>
-            <div className="mt-1 text-sm text-paper/50">{opt.desc}</div>
+            <div className="mt-1 text-sm text-white/50">{opt.desc}</div>
           </button>
         ))}
       </div>

@@ -17,7 +17,7 @@ export function StepExperience({ form, setForm }: Props) {
     <div className="space-y-8 stagger">
       <div className="space-y-4">
         <DataLabel>Question 01 / Length of time trading</DataLabel>
-        <h2 className="font-display text-3xl text-paper">
+        <h2 className="font-display text-3xl text-white">
           How long have you been trading?
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -30,11 +30,11 @@ export function StepExperience({ form, setForm }: Props) {
               className={
                 "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                 (form.tradingLength === opt.value
-                  ? "border-lime bg-lime/10 text-lime"
-                  : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
               }
             >
-              <span className="absolute right-3 top-3 text-[9px] text-paper/20">
+              <span className="absolute right-3 top-3 text-[9px] text-white/20">
                 {i + 1}
               </span>
               {opt.label}
@@ -43,9 +43,9 @@ export function StepExperience({ form, setForm }: Props) {
         </div>
       </div>
 
-      <div className="border-t border-ink-3 pt-8 space-y-4">
+      <div className="border-t border-gray-3 pt-8 space-y-4">
         <DataLabel>Question 02 / Longest profitable period</DataLabel>
-        <h2 className="font-display text-3xl text-paper">
+        <h2 className="font-display text-3xl text-white">
           What's the longest you've stayed profitable?
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -58,11 +58,11 @@ export function StepExperience({ form, setForm }: Props) {
               className={
                 "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
                 (form.longestProfitable === opt.value
-                  ? "border-lime bg-lime/10 text-lime"
-                  : "border-ink-3 text-paper/60 hover:border-lime/40 hover:text-paper")
+                  ? "border-brand bg-brand/10 text-brand"
+                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
               }
             >
-              <span className="absolute right-3 top-3 text-[9px] text-paper/20">
+              <span className="absolute right-3 top-3 text-[9px] text-white/20">
                 {i + 1}
               </span>
               {opt.label}

@@ -28,10 +28,10 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
         <div className="flex items-center gap-3">
           <WatchPin ticker={ticker} size="md" />
           <div>
-            <div className="font-display text-4xl italic text-lime">
+            <div className="font-display text-4xl italic text-brand">
               {ticker}
             </div>
-            <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+            <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               {newsItems.length} news · {liveSetups.length} live ·{" "}
               {archiveSetups.length} historical · {calendarEvents.length}{" "}
               upcoming
@@ -41,7 +41,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
         <div className="flex items-center gap-3">
           {closedCount > 0 && (
             <div className="text-right">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+              <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 Edge · {closedCount} closed
               </div>
               <div
@@ -50,8 +50,8 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   (totalR > 0
                     ? "text-moss"
                     : totalR < 0
-                    ? "text-blood"
-                    : "text-paper/60")
+                    ? "text-red-500"
+                    : "text-white/60")
                 }
               >
                 {(totalR >= 0 ? "+" : "") + totalR.toFixed(1)}R
@@ -60,7 +60,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           )}
           <button
             onClick={() => onUnpin(ticker)}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
           >
             ✕ Unpin
           </button>
@@ -73,7 +73,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
         <div>
           <DataLabel>Recent news · {newsItems.length}</DataLabel>
           {newsItems.length === 0 ? (
-            <div className="mt-3 border border-gray-3 bg-ink p-4 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="mt-3 border border-gray-3 bg-black p-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ● Nothing on the wire mentions {ticker} right now.
             </div>
           ) : (
@@ -82,19 +82,19 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                 <Link
                   key={n.id}
                   href={`/app/news/${n.id}`}
-                  className="group block bg-ink p-3 transition-colors hover:bg-gray-2"
+                  className="group block bg-black p-3 transition-colors hover:bg-gray-2"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                       {n.id}
                     </span>
                     <ImpactPill level={n.impact} />
                     <BiasBadge bias={n.bias} />
-                    <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                    <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                       {formatDate(n.ts)} · {formatTime(n.ts)}Z
                     </span>
                   </div>
-                  <div className="mt-1 font-display text-base leading-snug text-paper transition-colors group-hover:text-brand">
+                  <div className="mt-1 font-display text-base leading-snug text-white transition-colors group-hover:text-brand">
                     {n.headline}
                   </div>
                 </Link>
@@ -113,29 +113,29 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   <Link
                     key={`${p.id}-${s.id}`}
                     href={`/app/plan/${p.id}#${s.id}`}
-                    className="group block bg-ink p-3 transition-colors hover:bg-gray-2"
+                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         {p.id} · {s.id}
                       </span>
                       <span
                         className={
                           "font-mono text-[9px] uppercase tracking-widest2 " +
-                          (s.direction === "long" ? "text-moss" : "text-lime")
+                          (s.direction === "long" ? "text-moss" : "text-brand")
                         }
                       >
                         {s.direction}
                       </span>
-                      <span className="ml-auto border border-lime bg-lime/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                      <span className="ml-auto border border-brand bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         ● LIVE
                       </span>
                     </div>
-                    <div className="mt-1 font-mono text-[10px] text-paper/70">
+                    <div className="mt-1 font-mono text-[10px] text-white/70">
                       Entry {s.entry}
                     </div>
-                    <div className="font-mono text-[10px] text-paper/70">
-                      Stop <span className="text-blood">{s.stop}</span>
+                    <div className="font-mono text-[10px] text-white/70">
+                      Stop <span className="text-red-500">{s.stop}</span>
                     </div>
                   </Link>
                 ))}
@@ -155,10 +155,10 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                     <Link
                       key={`${p.id}-${s.id}`}
                       href={`/app/plan/${p.id}#${s.id}`}
-                      className="group block bg-ink p-3 transition-colors hover:bg-gray-2"
+                      className="group block bg-black p-3 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                           {p.id} · {s.id}
                         </span>
                         <span
@@ -166,17 +166,17 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                             "font-mono text-[9px] uppercase tracking-widest2 " +
                             (s.direction === "long"
                               ? "text-moss"
-                              : "text-lime")
+                              : "text-brand")
                           }
                         >
                           {s.direction}
                         </span>
-                        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                           {formatDate(p.date)}
                         </span>
                       </div>
                       <div className="mt-1 flex items-baseline justify-between gap-2">
-                        <div className="truncate font-mono text-[10px] text-paper/60">
+                        <div className="truncate font-mono text-[10px] text-white/60">
                           {s.rationale}
                         </div>
                         {s.outcomeR && (
@@ -186,8 +186,8 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                               isWin
                                 ? "text-moss"
                                 : isLoss
-                                ? "text-blood"
-                                : "text-paper/60"
+                                ? "text-red-500"
+                                : "text-white/60"
                             )}
                           >
                             {s.outcomeR}
@@ -204,7 +204,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           {liveSetups.length === 0 && archiveSetups.length === 0 && (
             <div>
               <DataLabel>Setups</DataLabel>
-              <div className="mt-3 border border-gray-3 bg-ink p-4 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+              <div className="mt-3 border border-gray-3 bg-black p-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                 ● No setups on {ticker} in the current plan or archive.
               </div>
             </div>
@@ -218,29 +218,29 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   <Link
                     key={e.id}
                     href="/app/calendar"
-                    className="group block bg-ink p-3 transition-colors hover:bg-gray-2"
+                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         {e.id}
                       </span>
                       <span
                         className={
                           "font-mono text-[9px] uppercase tracking-widest2 " +
                           (e.impact === "high"
-                            ? "text-blood"
+                            ? "text-red-500"
                             : e.impact === "medium"
-                            ? "text-lime"
+                            ? "text-brand"
                             : "text-moss")
                         }
                       >
                         {e.impact.toUpperCase()}
                       </span>
-                      <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+                      <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                         {formatDate(e.ts)} · {formatTime(e.ts)}Z
                       </span>
                     </div>
-                    <div className="mt-1 font-display text-sm text-paper transition-colors group-hover:text-brand">
+                    <div className="mt-1 font-display text-sm text-white transition-colors group-hover:text-brand">
                       {e.title}
                     </div>
                   </Link>

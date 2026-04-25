@@ -21,16 +21,16 @@ const ITEMS: Array<{ title: string; body: string }> = [
 export function CalendarLegend({ className }: { className?: string }) {
   return (
     <div className={cn("mt-8 border border-gray-3 bg-gray-2/30 p-4", className)}>
-      <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         ● Reading the table
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-4 text-sm text-paper/70 sm:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-4 text-sm text-white/70 sm:grid-cols-3">
         {ITEMS.map((item) => (
           <div key={item.title}>
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
               {item.title}
             </div>
-            <div className="mt-1 text-xs text-paper/60">{item.body}</div>
+            <div className="mt-1 text-xs text-white/60">{item.body}</div>
           </div>
         ))}
       </div>

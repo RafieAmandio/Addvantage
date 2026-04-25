@@ -20,10 +20,10 @@ export function PlanDetailRisks({
             key={i}
             className="flex items-start gap-3 border-l-2 border-blood/60 bg-blood/5 p-4"
           >
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
+            <span className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
               R0{i + 1}
             </span>
-            <span className="text-sm text-paper/80">{r}</span>
+            <span className="text-sm text-white/80">{r}</span>
           </li>
         ))}
       </ul>

@@ -23,35 +23,35 @@ export function PlanArchiveStatsStrip({
         className
       )}
     >
-      <div className="bg-ink p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-5">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Plans on record
         </div>
-        <div className="mt-1 font-display text-3xl text-paper">
+        <div className="mt-1 font-display text-3xl text-white">
           {plansCount}
         </div>
       </div>
-      <div className="bg-ink p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-5">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Latest
         </div>
-        <div className="mt-1 font-display text-3xl text-lime">
+        <div className="mt-1 font-display text-3xl text-brand">
           {latest.id.replace(/^TP-/, "")}
         </div>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           {formatDate(latest.date)}
         </div>
       </div>
-      <div className="bg-ink p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-5">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Closed plans
         </div>
-        <div className="mt-1 font-display text-3xl text-paper">
+        <div className="mt-1 font-display text-3xl text-white">
           {closedCount}
         </div>
       </div>
-      <div className="bg-ink p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="bg-black p-5">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
           Aggregate R · closed
         </div>
         <div
@@ -60,8 +60,8 @@ export function PlanArchiveStatsStrip({
             (aggregateR > 0
               ? "text-moss"
               : aggregateR < 0
-              ? "text-blood"
-              : "text-paper")
+              ? "text-red-500"
+              : "text-white")
           }
         >
           {(aggregateR >= 0 ? "+" : "") + aggregateR.toFixed(1)}R

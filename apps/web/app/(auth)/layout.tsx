@@ -9,14 +9,14 @@ export default function AuthLayout({
 }) {
   return (
     <AppStateProvider>
-      <div className="min-h-screen bg-ink text-paper">
+      <div className="min-h-screen bg-black text-white">
         <ClassificationStripe label="ACCESS CONTROL // AUTHENTICATION" />
-        <header className="border-b border-ink-3 bg-ink-2/50">
+        <header className="border-b border-gray-3 bg-gray-2/50">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-            <Link href="/" className="font-display text-2xl text-paper">
-              ANTS<span className="text-lime">.</span>
+            <Link href="/" className="font-display text-2xl text-white">
+              ANTS<span className="text-brand">.</span>
             </Link>
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Return to brief
             </div>
           </div>

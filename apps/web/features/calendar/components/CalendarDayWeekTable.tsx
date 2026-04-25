@@ -23,20 +23,20 @@ export function CalendarDayWeekTable({
   return (
     <div className={cn("overflow-x-auto border border-gray-3", className)}>
       <div className="min-w-[780px]">
-        <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-lime/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+        <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
+          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Event
           </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Time
           </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Impact
           </div>
           {CURRENCIES.map((c) => (
             <div
               key={c}
-              className="text-center font-mono text-[10px] uppercase tracking-widest2 text-lime"
+              className="text-center font-mono text-[10px] uppercase tracking-widest2 text-brand"
             >
               {c}
             </div>
@@ -55,11 +55,11 @@ export function CalendarDayWeekTable({
             <section key={ymd}>
               <div className="border-y border-gray-3 bg-gray-2/60 px-3 py-2.5">
                 <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {formatDayHeader(ymd)}
                   </span>
-                  <span className="h-px flex-1 bg-lime/20" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+                  <span className="h-px flex-1 bg-brand/20" />
+                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
                     — {summary}
                   </span>
                 </div>

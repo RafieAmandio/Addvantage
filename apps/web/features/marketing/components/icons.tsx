@@ -5,7 +5,7 @@ export function LogoMark({ size = 30 }: { size?: number }) {
   return (
     <div
       style={{ width: size, height: size, borderRadius: Math.round(size * 0.17) }}
-      className="relative flex shrink-0 items-center justify-center bg-lime"
+      className="relative flex shrink-0 items-center justify-center bg-brand"
     >
       <svg
         width={iconSize}
@@ -27,7 +27,7 @@ export function LogoMark({ size = 30 }: { size?: number }) {
 export function Wordmark({ size = 24 }: { size?: number }) {
   return (
     <div
-      className="flex items-baseline gap-1 text-paper"
+      className="flex items-baseline gap-1 text-white"
       style={{ fontFamily: FUTURA }}
     >
       <span className="font-bold" style={{ fontSize: size * 0.67 }}>
@@ -83,8 +83,8 @@ export function ArrowUpPixel({ className = "h-4 w-4" }: { className?: string }) 
 export function SectionHeader({ num, label }: { num: string; label: string }) {
   return (
     <div className="flex w-full items-center justify-between px-6 text-center font-mono text-base font-bold md:px-[140px]">
-      <span className="text-lime">{num}</span>
-      <span className="text-paper">{label}</span>
+      <span className="text-brand">{num}</span>
+      <span className="text-white">{label}</span>
     </div>
   );
 }

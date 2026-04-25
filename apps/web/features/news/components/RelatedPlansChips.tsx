@@ -17,7 +17,7 @@ export function RelatedPlansChips({ planIds, className }: Props) {
 
   return (
     <div className={cn("", className)}>
-      <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
         Related plans · {ids.length}
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -25,7 +25,7 @@ export function RelatedPlansChips({ planIds, className }: Props) {
           <Link
             key={id}
             href={`/app/plan/${id}`}
-            className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
+            className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
           >
             {id}
           </Link>

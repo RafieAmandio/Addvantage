@@ -19,7 +19,7 @@ export function HeroSection() {
           </Link>
           <Link
             href="/signup"
-            className="rounded-[10px] bg-lime px-4 py-2 font-mono text-base font-bold text-ink transition-colors hover:bg-brand-dim"
+            className="rounded-[10px] bg-brand px-4 py-2 font-mono text-base font-bold text-black transition-colors hover:bg-brand-dim"
           >
             Join Now!
           </Link>
@@ -27,15 +27,15 @@ export function HeroSection() {
 
         {/* Hero content — top-aligned */}
         <div className="relative z-20 mx-auto flex max-w-[1100px] flex-col items-center gap-12 px-6 pt-8 text-center md:pt-[80px]">
-          <h1 className="font-sans leading-none text-paper">
+          <h1 className="font-sans leading-none text-white">
             <span className="block text-[clamp(3rem,10vw,128px)] font-normal">
               WELCOME TO
             </span>
             <span className="block text-[clamp(3rem,10vw,128px)] font-bold">
-              THE DOMAIN<span className="text-lime">.</span>
+              THE DOMAIN<span className="text-brand">.</span>
             </span>
           </h1>
-          <p className="max-w-2xl font-mono text-base leading-[1.4] text-paper">
+          <p className="max-w-2xl font-mono text-base leading-[1.4] text-white">
             Directional Outlook &amp; Macro Alpha Intelligence — a market
             radar powered by AI and professionals, built for traders who
             already know what they&apos;re doing.
@@ -43,13 +43,13 @@ export function HeroSection() {
           <div className="flex w-full max-w-[675px] gap-6">
             <Link
               href="/signup"
-              className="flex-1 rounded-[10px] bg-lime px-8 py-4 text-center font-mono text-base font-bold text-gray-2 transition-colors hover:bg-brand-dim"
+              className="flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2 transition-colors hover:bg-brand-dim"
             >
               Request Access
             </Link>
             <Link
               href="/login"
-              className="flex-1 rounded-[10px] border border-lime bg-ink/80 px-8 py-4 text-center font-mono text-base font-bold text-lime backdrop-blur-[9.4px] transition-colors hover:bg-ink"
+              className="flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand backdrop-blur-[9.4px] transition-colors hover:bg-black"
             >
               Operator Login
             </Link>
@@ -76,21 +76,21 @@ export function HeroSection() {
                 key={`${t.sym}-${i}`}
                 className="flex w-[220px] shrink-0 items-center justify-center gap-[11px] rounded-[10px] bg-white/10 p-4 backdrop-blur-[8.65px]"
               >
-                <span className="font-mono text-base font-bold text-paper">
+                <span className="font-mono text-base font-bold text-white">
                   {t.sym}
                 </span>
-                <span className="font-mono text-base text-paper">
+                <span className="font-mono text-base text-white">
                   {t.val}
                 </span>
                 {t.dir === "up" ? (
-                  <TriangleUp className="h-[10px] w-[15px] text-lime" />
+                  <TriangleUp className="h-[10px] w-[15px] text-brand" />
                 ) : (
                   <TriangleDown className="h-[10px] w-[15px] text-[#E03C3C]" />
                 )}
                 <span
                   className={
                     "font-mono text-base " +
-                    (t.dir === "up" ? "text-lime" : "text-[#E03C3C]")
+                    (t.dir === "up" ? "text-brand" : "text-[#E03C3C]")
                   }
                 >
                   {t.chg}

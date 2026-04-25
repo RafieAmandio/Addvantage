@@ -39,22 +39,22 @@ export default function LiabilityPage() {
 
   return (
     <main className="relative mx-auto max-w-5xl px-6 py-16">
-      <div className="border border-lime/60 bg-ink-2/40 p-8 sm:p-12">
-        <div className="flex items-center justify-between border-b border-lime/40 pb-4">
+      <div className="border border-brand/60 text-black-2/40 p-8 sm:p-12">
+        <div className="flex items-center justify-between border-b border-brand/40 pb-4">
           <div>
             <DataLabel>Document W-001 · Final form</DataLabel>
-            <div className="mt-1 font-display text-3xl text-paper">
+            <div className="mt-1 font-display text-3xl text-white">
               Liability Release & Waiver
             </div>
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             <div>VERSION 1.0</div>
             <div>2026 REVISION</div>
           </div>
         </div>
 
-        <div className="mt-8 space-y-5 text-sm leading-relaxed text-paper/80">
-          <p className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
+        <div className="mt-8 space-y-5 text-sm leading-relaxed text-white/80">
+          <p className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             READ EVERY LINE. THIS DOCUMENT IS BINDING.
           </p>
           <p>
@@ -64,9 +64,9 @@ export default function LiabilityPage() {
             (Directional Outlook & Macro Alpha Intelligence) (collectively,
             the "Platform"):
           </p>
-          <ol className="space-y-4 border-l border-lime/40 pl-6">
+          <ol className="space-y-4 border-l border-brand/40 pl-6">
             <li>
-              <strong className="font-display italic text-lime">
+              <strong className="font-display italic text-brand">
                 01. Not investment advice.
               </strong>{" "}
               All content delivered through the Platform — including news,
@@ -76,7 +76,7 @@ export default function LiabilityPage() {
               tax advice.
             </li>
             <li>
-              <strong className="font-display italic text-lime">
+              <strong className="font-display italic text-brand">
                 02. No fiduciary duty.
               </strong>{" "}
               ANTS does not act as a financial advisor, broker, or fiduciary.
@@ -84,7 +84,7 @@ export default function LiabilityPage() {
               behalf.
             </li>
             <li>
-              <strong className="font-display italic text-lime">
+              <strong className="font-display italic text-brand">
                 03. Trading risk acknowledgement.
               </strong>{" "}
               You understand that trading and investing carry substantial
@@ -92,7 +92,7 @@ export default function LiabilityPage() {
               performance is not indicative of future results.
             </li>
             <li>
-              <strong className="font-display italic text-lime">
+              <strong className="font-display italic text-brand">
                 04. Sole responsibility.
               </strong>{" "}
               You are solely responsible for any decision to act, or refrain
@@ -101,7 +101,7 @@ export default function LiabilityPage() {
               liability for any losses, damages, or expenses you may incur.
             </li>
             <li>
-              <strong className="font-display italic text-lime">
+              <strong className="font-display italic text-brand">
                 05. Operator self-classification.
               </strong>{" "}
               You attest that you are an experienced market participant. You
@@ -113,7 +113,7 @@ export default function LiabilityPage() {
           </ol>
         </div>
 
-        <div className="mt-10 space-y-3 border-t border-ink-3 pt-8">
+        <div className="mt-10 space-y-3 border-t border-gray-3 pt-8">
           <DataLabel>Acknowledgements (all required)</DataLabel>
           {[
             { k: "a", label: "I understand this is not investment advice." },
@@ -133,7 +133,7 @@ export default function LiabilityPage() {
           ].map((a) => (
             <label
               key={a.k}
-              className="flex cursor-pointer items-start gap-3 border border-ink-3 bg-ink p-4 transition-colors hover:border-lime/40"
+              className="flex cursor-pointer items-start gap-3 border border-gray-3 text-black p-4 transition-colors hover:border-brand/40"
             >
               <input
                 type="checkbox"
@@ -143,7 +143,7 @@ export default function LiabilityPage() {
                 }
                 className="mt-1 h-4 w-4 accent-lime"
               />
-              <span className="font-mono text-[11px] uppercase tracking-widest2 text-paper/80">
+              <span className="font-mono text-[11px] uppercase tracking-widest2 text-white/80">
                 {a.label}
               </span>
             </label>
@@ -160,18 +160,18 @@ export default function LiabilityPage() {
             className={
               "mt-2 w-full border-b-2 bg-transparent py-3 font-display text-3xl italic outline-none transition-colors " +
               (signatureError
-                ? "border-blood text-blood"
+                ? "border-blood text-red-500"
                 : looksLikeFullName
                 ? "border-moss text-moss"
-                : "border-lime/40 text-lime focus:border-lime")
+                : "border-brand/40 text-brand focus:border-brand")
             }
           />
           {signatureError && (
-            <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-blood">
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-red-500">
               ● {signatureError}
             </div>
           )}
-          <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/40">
             <span suppressHydrationWarning>
               Signed at: {new Date().toUTCString()}
             </span>
@@ -179,12 +179,12 @@ export default function LiabilityPage() {
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-between border-t border-ink-3 pt-6">
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+        <div className="mt-8 flex items-center justify-between border-t border-gray-3 pt-6">
+          <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             {canSign ? (
               <span className="text-moss">● READY TO SIGN</span>
             ) : (
-              <span className="text-blood">● INCOMPLETE</span>
+              <span className="text-red-500">● INCOMPLETE</span>
             )}
           </span>
           <Button onClick={submit} disabled={!canSign} size="lg">

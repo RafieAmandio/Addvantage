@@ -18,13 +18,13 @@ export function PlanComparePicker({
 }) {
   return (
     <label className="block">
-      <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         {label}
       </div>
       <select
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="mt-1 w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-paper outline-none focus:border-lime"
+        className="mt-1 w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white outline-none focus:border-brand"
       >
         <option value="">— pick a plan —</option>
         {plans.map((p) => {
@@ -59,7 +59,7 @@ export function PlanCompareSwapButton({
         disabled={!a || !b}
         title="Swap A and B"
         aria-label="Swap plans"
-        className="flex items-center gap-2 border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand disabled:cursor-default disabled:opacity-30"
+        className="flex items-center gap-2 border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand disabled:cursor-default disabled:opacity-30"
       >
         <span className="text-base leading-none">⇄</span>
         <span className="sm:hidden">Swap</span>

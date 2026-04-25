@@ -119,11 +119,11 @@ export function SearchPalette() {
       {/* Backdrop */}
       <div
         onClick={() => setSearchOpen(false)}
-        className="absolute inset-0 bg-ink/85 backdrop-blur-md"
+        className="absolute inset-0 bg-black/85 backdrop-blur-md"
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-3xl border border-lime bg-gray-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
+      <div className="relative w-full max-w-3xl border border-brand bg-gray-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
         {/* Classification stripe */}
         <div className="classification-stripe h-1" />
 
