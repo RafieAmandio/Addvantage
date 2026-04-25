@@ -21,12 +21,12 @@ export function EventDetailView({
 }) {
   return (
     <div className="bg-grid-fine">
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex items-center gap-3">
             <Link
               href="/app/calendar"
-              className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-brand"
             >
               ← Calendar
             </Link>

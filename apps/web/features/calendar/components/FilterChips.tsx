@@ -12,7 +12,7 @@ export function FilterChips({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-px bg-ink-3">
+    <div className="flex flex-wrap gap-px bg-gray-3">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -21,7 +21,7 @@ export function FilterChips({
             "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
             value === opt.value
               ? "bg-lime text-ink"
-              : "bg-ink-2 text-paper/60 hover:text-paper"
+              : "bg-gray-2 text-paper/60 hover:text-paper"
           )}
         >
           {opt.label}

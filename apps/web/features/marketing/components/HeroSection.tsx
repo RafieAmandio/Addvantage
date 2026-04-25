@@ -19,7 +19,7 @@ export function HeroSection() {
           </Link>
           <Link
             href="/signup"
-            className="rounded-[10px] bg-lime px-4 py-2 font-mono text-base font-bold text-ink transition-colors hover:bg-lime-dim"
+            className="rounded-[10px] bg-lime px-4 py-2 font-mono text-base font-bold text-ink transition-colors hover:bg-brand-dim"
           >
             Join Now!
           </Link>
@@ -43,7 +43,7 @@ export function HeroSection() {
           <div className="flex w-full max-w-[675px] gap-6">
             <Link
               href="/signup"
-              className="flex-1 rounded-[10px] bg-lime px-8 py-4 text-center font-mono text-base font-bold text-ink-2 transition-colors hover:bg-lime-dim"
+              className="flex-1 rounded-[10px] bg-lime px-8 py-4 text-center font-mono text-base font-bold text-gray-2 transition-colors hover:bg-brand-dim"
             >
               Request Access
             </Link>

@@ -36,7 +36,7 @@ export default function BriefPage() {
   return (
     <div className="bg-grid">
       {/* Hero strip */}
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex items-baseline justify-between">
             <div>
@@ -66,14 +66,14 @@ export default function BriefPage() {
                   "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
                   (hideSeen
                     ? "border-lime bg-lime/10 text-lime"
-                    : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime")
+                    : "border-gray-3 text-paper/60 hover:border-brand hover:text-brand")
                 }
               >
                 {hideSeen ? `✓ HIDING ${seenInTop} SEEN` : `HIDE ${seenInTop} SEEN`}
               </button>
             )}
           </div>
-          <div className="mt-4 space-y-px bg-ink-3">
+          <div className="mt-4 space-y-px bg-gray-3">
             {topNews.map((n) => {
               const seen = seenHydrated && seenIds.includes(n.id);
               return (
@@ -81,7 +81,7 @@ export default function BriefPage() {
                 key={n.id}
                 href={`/app/news/${n.id}`}
                 className={
-                  "group block bg-ink p-5 transition-colors hover:bg-ink-2 " +
+                  "group block bg-ink p-5 transition-colors hover:bg-gray-2 " +
                   (seen ? "opacity-60 hover:opacity-100" : "")
                 }
               >
@@ -102,7 +102,7 @@ export default function BriefPage() {
                 </div>
                 <h3
                   className={
-                    "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-lime " +
+                    "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-brand " +
                     (seen ? "text-paper/70" : "text-paper")
                   }
                 >
@@ -134,7 +134,7 @@ export default function BriefPage() {
         {/* Right column */}
         <aside className="col-span-12 space-y-8 lg:col-span-4">
           {/* Trading plan teaser */}
-          <div className="border border-lime/40 bg-ink-2/30 p-5 scanline">
+          <div className="border border-lime/40 bg-gray-2/30 p-5 scanline">
             <div className="flex items-center justify-between">
               <DataLabel>Trading Plan · TX-03</DataLabel>
               {paid ? (
@@ -154,7 +154,7 @@ export default function BriefPage() {
               {plan.setups.map((s) => (
                 <div
                   key={s.id}
-                  className="border border-ink-3 bg-ink p-2"
+                  className="border border-gray-3 bg-ink p-2"
                 >
                   <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
                     {s.instrument}
@@ -172,7 +172,7 @@ export default function BriefPage() {
             </div>
             <Link
               href="/app/plan"
-              className="mt-4 block border border-lime/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="mt-4 block border border-lime/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               {paid ? "Open plan →" : "Unlock plan →"}
             </Link>
@@ -181,7 +181,7 @@ export default function BriefPage() {
           {/* Calendar peek */}
           <div>
             <SectionNumber n="02 /" label="CALENDAR · 48H" />
-            <div className="mt-4 space-y-px bg-ink-3">
+            <div className="mt-4 space-y-px bg-gray-3">
               {upcoming.map((c) => (
                 <CalendarPeekRow key={c.id} event={c} />
               ))}
@@ -191,7 +191,7 @@ export default function BriefPage() {
           {/* Channel */}
           <div>
             <SectionNumber n="03 /" label="MY CHANNEL" />
-            <div className="mt-4 border border-ink-3 bg-ink p-4">
+            <div className="mt-4 border border-gray-3 bg-ink p-4">
               <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                 {channelPosts[0].id} · {formatTime(channelPosts[0].ts)}Z
               </div>

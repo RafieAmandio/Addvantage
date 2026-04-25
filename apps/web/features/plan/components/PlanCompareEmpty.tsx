@@ -4,7 +4,7 @@ export function PlanCompareEmpty({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "border border-ink-3 bg-ink-2/40 p-12 text-center",
+        "border border-gray-3 bg-gray-2/40 p-12 text-center",
         className
       )}
     >

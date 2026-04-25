@@ -31,7 +31,7 @@ export function PrimerDetailView({
 
   return (
     <div>
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <Breadcrumbs
             items={[
@@ -87,7 +87,7 @@ export function PrimerDetailView({
                   "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (isRead
                     ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-blood"
-                    : "border-lime/60 text-lime hover:bg-lime hover:text-ink")
+                    : "border-lime/60 text-lime hover:bg-brand hover:text-ink")
                 }
               >
                 {isRead ? "✓ READ · MARK UNREAD" : "MARK AS READ →"}
@@ -105,7 +105,7 @@ export function PrimerDetailView({
           />
         )}
         <div className={locked ? "pointer-events-none select-none blur-sm" : ""}>
-          <p className="border-l-4 border-lime bg-ink-2/40 p-6 font-display text-2xl italic leading-relaxed text-paper/90">
+          <p className="border-l-4 border-lime bg-gray-2/40 p-6 font-display text-2xl italic leading-relaxed text-paper/90">
             {primer.summary}
           </p>
 
@@ -124,14 +124,14 @@ export function PrimerDetailView({
             ))}
           </article>
 
-          <div className="mt-12 border-t border-ink-3 pt-6">
+          <div className="mt-12 border-t border-gray-3 pt-6">
             <DataLabel>Tagged into</DataLabel>
             <div className="mt-2 flex flex-wrap gap-2">
               {primer.tags.map((t) => (
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
                 >
                   #{t}
                 </Link>
@@ -140,11 +140,11 @@ export function PrimerDetailView({
           </div>
         </div>
 
-        <nav className="mt-16 grid grid-cols-2 gap-px border border-ink-3 bg-ink-3">
+        <nav className="mt-16 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={prev ? `/app/education/${prev.id}` : "/app/education"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -158,7 +158,7 @@ export function PrimerDetailView({
           <Link
             href={next ? `/app/education/${next.id}` : "/app/education"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >

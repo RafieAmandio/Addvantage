@@ -13,7 +13,7 @@ import type { NewsListItem } from "@/features/news/queries/news";
 export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   if (news.length === 0) {
     return (
-      <div className="border border-ink-3 bg-ink-2/40 p-8 text-center">
+      <div className="border border-gray-3 bg-gray-2/40 p-8 text-center">
         <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
           ● NO RELATED NEWS
         </div>
@@ -25,14 +25,14 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   }
 
   return (
-    <div className="space-y-px bg-ink-3">
+    <div className="space-y-px bg-gray-3">
       {news.map((n) => {
         const ts = n.published_at ?? n.fetched_at;
         return (
           <Link
             key={n.id}
             href={`/app/news/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-ink-2"
+            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-3">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
@@ -49,7 +49,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
               </div>
             </div>
             <div className="col-span-12 lg:col-span-9">
-              <h3 className="font-display text-xl leading-snug text-paper transition-colors group-hover:text-lime">
+              <h3 className="font-display text-xl leading-snug text-paper transition-colors group-hover:text-brand">
                 {n.headline}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-paper/80">

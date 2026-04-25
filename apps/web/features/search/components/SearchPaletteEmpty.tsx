@@ -23,22 +23,22 @@ export function SearchPaletteEmpty({
           <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
             ● Where you were
           </div>
-          <div className="mt-3 grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+          <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-2">
             {visits.map((v) => (
               <button
                 key={v.href}
                 onClick={() => onJump(v.href)}
-                className="group flex items-center justify-between bg-ink p-3 text-left transition-colors hover:bg-ink-2"
+                className="group flex items-center justify-between bg-ink p-3 text-left transition-colors hover:bg-gray-2"
               >
                 <div className="min-w-0 flex-1">
                   <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                     {v.kind}
                   </div>
-                  <div className="mt-0.5 truncate text-sm text-paper transition-colors group-hover:text-lime">
+                  <div className="mt-0.5 truncate text-sm text-paper transition-colors group-hover:text-brand">
                     {v.label}
                   </div>
                 </div>
-                <span className="ml-3 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 group-hover:text-lime">
+                <span className="ml-3 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-paper/30 group-hover:text-brand">
                   →
                 </span>
               </button>
@@ -57,7 +57,7 @@ export function SearchPaletteEmpty({
               <button
                 key={q}
                 onClick={() => onPick(q)}
-                className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
+                className="border border-gray-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-brand hover:text-brand"
               >
                 {q}
               </button>
@@ -75,7 +75,7 @@ export function SearchPaletteEmpty({
             <button
               key={q}
               onClick={() => onPick(q)}
-              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               {q}
             </button>
@@ -83,7 +83,7 @@ export function SearchPaletteEmpty({
         </div>
       </section>
 
-      <div className="mt-8 grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-2">
         <Tip
           chord="Cmd K"
           alt="Ctrl K"
@@ -116,7 +116,7 @@ function Tip({
       <span className="flex items-center gap-1">
         {alt && (
           <>
-            <kbd className="border border-lime/30 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">
+            <kbd className="border border-lime/30 bg-gray-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">
               {alt}
             </kbd>
             <span className="text-paper/30">/</span>
@@ -125,7 +125,7 @@ function Tip({
         {chord.split(" ").map((k, i) => (
           <kbd
             key={i}
-            className="border border-lime/40 bg-ink-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
+            className="border border-lime/40 bg-gray-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime"
           >
             {k}
           </kbd>

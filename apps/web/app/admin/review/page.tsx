@@ -19,17 +19,17 @@ export default async function AdminReviewQueuePage() {
       </div>
 
       {items.length === 0 && (
-        <div className="border border-ink-3 bg-ink-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="border border-gray-3 bg-gray-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
           ● INBOX CLEAR · no pending items
         </div>
       )}
 
-      <div className="space-y-px bg-ink-3">
+      <div className="space-y-px bg-gray-3">
         {items.map((n) => (
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-ink-2"
+            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
@@ -45,7 +45,7 @@ export default async function AdminReviewQueuePage() {
               </div>
             </div>
             <div className="col-span-12 lg:col-span-10">
-              <div className="font-display text-xl text-paper transition-colors group-hover:text-lime">
+              <div className="font-display text-xl text-paper transition-colors group-hover:text-brand">
                 {n.headline}
               </div>
               <p className="mt-2 line-clamp-2 text-sm text-paper/70">{n.analysis}</p>

@@ -67,7 +67,7 @@ export function PlanSiblingKeys({
 
   if (!hint) return null;
   return (
-    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-lime bg-ink-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-lime bg-gray-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-lime shadow-[0_0_30px_rgba(245,158,11,0.3)]">
       {hint}
     </div>
   );

@@ -56,14 +56,14 @@ export function PlanDetail({
           el.scrollIntoView({ behavior: "smooth", block: "center" });
           el.classList.add(
             "ring-2",
-            "ring-lime",
+            "ring-brand",
             "ring-offset-2",
             "ring-offset-ink"
           );
           setTimeout(() => {
             el.classList.remove(
               "ring-2",
-              "ring-lime",
+              "ring-brand",
               "ring-offset-2",
               "ring-offset-ink"
             );
@@ -104,7 +104,7 @@ export function PlanDetail({
           {/* Thesis */}
           <section>
             <SectionNumber n="01 /" label="DIRECTIONAL THESIS" />
-            <div className="mt-4 border-l-4 border-lime bg-ink-2/40 p-6">
+            <div className="mt-4 border-l-4 border-lime bg-gray-2/40 p-6">
               <p className="font-display text-xl leading-relaxed text-paper">
                 {plan.thesis}
               </p>
@@ -148,7 +148,7 @@ export function PlanDetail({
             sectionNumber={risksSectionNumber}
           />
 
-          <div className="mt-12 border-t border-ink-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
             Plan revision · v1 · Authored {formatDate(plan.date)} by{" "}
             {plan.authoredBy} · Reviewed by Desk · Distributed via DOMAIN /
             Telegram

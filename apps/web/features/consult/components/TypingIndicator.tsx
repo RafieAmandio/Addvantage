@@ -9,7 +9,7 @@ export function TypingIndicator() {
           PROCESSING…
         </span>
       </div>
-      <div className="mt-1 inline-flex items-center gap-2 border border-ink-3 bg-ink-2 px-4 py-3">
+      <div className="mt-1 inline-flex items-center gap-2 border border-gray-3 bg-gray-2 px-4 py-3">
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:0ms]" />
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:200ms]" />
         <span className="h-2 w-2 animate-pulse rounded-full bg-moss [animation-delay:400ms]" />

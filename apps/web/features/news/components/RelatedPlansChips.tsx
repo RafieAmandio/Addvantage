@@ -25,7 +25,7 @@ export function RelatedPlansChips({ planIds, className }: Props) {
           <Link
             key={id}
             href={`/app/plan/${id}`}
-            className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+            className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
           >
             {id}
           </Link>

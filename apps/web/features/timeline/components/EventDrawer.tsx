@@ -81,17 +81,17 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
         type="button"
         aria-label="Close event details"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-ink-1/70"
+        className="absolute inset-0 cursor-default bg-gray-1/70"
       />
 
       {/* Panel */}
       <aside
         className={cn(
-          "absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-ink-3 bg-ink-2",
+          "absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-gray-3 bg-gray-2",
           "sm:max-w-md",
         )}
       >
-        <header className="flex items-start justify-between gap-3 border-b border-ink-3 px-5 py-4">
+        <header className="flex items-start justify-between gap-3 border-b border-gray-3 px-5 py-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span
@@ -116,7 +116,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 border border-ink-3 px-2 py-0.5 font-mono text-sm text-paper/70 hover:bg-ink-3 hover:text-paper"
+            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-paper/70 hover:bg-gray-3 hover:text-paper"
           >
             ×
           </button>
@@ -167,7 +167,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
                 {event.symbols.map((s) => (
                   <span
                     key={s}
-                    className="border border-ink-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/80"
+                    className="border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/80"
                   >
                     {s}
                   </span>
@@ -177,7 +177,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
           )}
         </div>
 
-        <footer className="border-t border-ink-3 px-5 py-3">
+        <footer className="border-t border-gray-3 px-5 py-3">
           {event.url ? (
             <a
               href={event.url}

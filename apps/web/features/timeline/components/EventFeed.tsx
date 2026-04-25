@@ -16,9 +16,9 @@ export function EventFeed({
   className?: string;
 }) {
   return (
-    <div className={cn("border border-ink-3 bg-ink-2", className)}>
+    <div className={cn("border border-gray-3 bg-gray-2", className)}>
       {heading && (
-        <div className="border-b border-ink-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
+        <div className="border-b border-gray-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
           {heading}
         </div>
       )}

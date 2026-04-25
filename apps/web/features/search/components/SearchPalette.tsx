@@ -123,7 +123,7 @@ export function SearchPalette() {
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-3xl border border-lime bg-ink-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
+      <div className="relative w-full max-w-3xl border border-lime bg-gray-2 shadow-[0_0_80px_rgba(245,158,11,0.18)]">
         {/* Classification stripe */}
         <div className="classification-stripe h-1" />
 

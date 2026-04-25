@@ -34,10 +34,10 @@ function SearchPaletteResultRowImpl({
       onMouseEnter={() => onHover(index)}
       onClick={() => onCommit(result)}
       className={cn(
-        "block w-full border-b border-ink-3 px-5 py-4 text-left transition-colors",
+        "block w-full border-b border-gray-3 px-5 py-4 text-left transition-colors",
         active
           ? "border-l-2 border-l-lime bg-lime/10"
-          : "border-l-2 border-l-transparent bg-ink hover:bg-ink-2",
+          : "border-l-2 border-l-transparent bg-ink hover:bg-gray-2",
       )}
     >
       <div className="flex items-baseline justify-between gap-4">

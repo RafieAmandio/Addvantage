@@ -31,7 +31,7 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
   );
 
   return (
-    <div className={cn("mb-6 border border-ink-3 bg-ink-2/30 p-5", className)}>
+    <div className={cn("mb-6 border border-gray-3 bg-gray-2/30 p-5", className)}>
       <div className="flex items-baseline justify-between">
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
           ● R per plan · oldest → newest
@@ -69,7 +69,7 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
                 className="group relative flex h-full flex-1 items-center"
               >
                 {live ? (
-                  <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-lime/70 bg-lime/5 group-hover:bg-lime/10" />
+                  <div className="absolute left-0 right-0 top-1/2 h-[30%] -translate-y-1/2 border-2 border-dashed border-lime/70 bg-lime/5 group-hover:bg-brand/10" />
                 ) : (
                   <div
                     className={cn(
@@ -83,7 +83,7 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
                 )}
                 <div
                   className={cn(
-                    "absolute z-20 whitespace-nowrap border bg-ink-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 opacity-0 shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-opacity group-hover:opacity-100",
+                    "absolute z-20 whitespace-nowrap border bg-gray-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 opacity-0 shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-opacity group-hover:opacity-100",
                     tipAlign,
                     live
                       ? "border-lime/60 text-lime"

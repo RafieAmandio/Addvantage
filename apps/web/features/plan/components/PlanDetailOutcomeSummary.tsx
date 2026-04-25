@@ -17,7 +17,7 @@ export function PlanDetailOutcomeSummary({
   plan: TradingPlan;
 }) {
   return (
-    <section className="mt-8 border border-ink-3 bg-ink-2/40 p-5">
+    <section className="mt-8 border border-gray-3 bg-gray-2/40 p-5">
       <DataLabel>Plan outcome</DataLabel>
       <div className="mt-3 flex flex-wrap items-baseline gap-x-6 gap-y-2">
         <div>

@@ -35,11 +35,11 @@ export default function TagPage({
 
   return (
     <div className="bg-grid-fine">
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <Link
             href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/40 hover:text-brand"
           >
             ← All hashtags
           </Link>
@@ -63,12 +63,12 @@ export default function TagPage({
       <div className="mx-auto max-w-7xl px-6 py-10">
         {matchedPrimers.length > 0 && (
           <Group n="01 /" label="PRIMERS">
-            <div className="grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-2 lg:grid-cols-3">
               {matchedPrimers.map((p) => (
                 <Link
                   key={p.id}
                   href={`/app/education/${p.id}`}
-                  className="bg-ink p-5 hover:bg-ink-2"
+                  className="bg-ink p-5 hover:bg-gray-2"
                 >
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {p.id}
@@ -88,9 +88,9 @@ export default function TagPage({
 
         {matchedNews.length > 0 && (
           <Group n="02 /" label="NEWS">
-            <div className="space-y-px bg-ink-3">
+            <div className="space-y-px bg-gray-3">
               {matchedNews.map((n) => (
-                <div key={n.id} className="bg-ink p-4 hover:bg-ink-2">
+                <div key={n.id} className="bg-ink p-4 hover:bg-gray-2">
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {n.id}
                   </div>
@@ -106,9 +106,9 @@ export default function TagPage({
 
         {matchedSessions.length > 0 && (
           <Group n="03 /" label="CONSULTATION LOGS">
-            <div className="space-y-px bg-ink-3">
+            <div className="space-y-px bg-gray-3">
               {matchedSessions.map((s) => (
-                <div key={s.id} className="bg-ink p-4 hover:bg-ink-2">
+                <div key={s.id} className="bg-ink p-4 hover:bg-gray-2">
                   <div className="flex items-baseline justify-between">
                     <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                       {s.id}
@@ -131,9 +131,9 @@ export default function TagPage({
 
         {matchedChannel.length > 0 && (
           <Group n="04 /" label="CHANNEL POSTS">
-            <div className="space-y-px bg-ink-3">
+            <div className="space-y-px bg-gray-3">
               {matchedChannel.map((p) => (
-                <div key={p.id} className="bg-ink p-4 hover:bg-ink-2">
+                <div key={p.id} className="bg-ink p-4 hover:bg-gray-2">
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {p.id} · {formatDate(p.ts)}
                   </div>
@@ -145,7 +145,7 @@ export default function TagPage({
         )}
 
         {total === 0 && (
-          <div className="border border-ink-3 bg-ink-2 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
+          <div className="border border-gray-3 bg-gray-2 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
             No items tagged #{tag} yet. Tag will populate as content is
             published.
           </div>

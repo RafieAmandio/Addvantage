@@ -12,7 +12,7 @@ export default async function AdminSourcesPage() {
         Source <span className="italic text-lime">registry</span>
       </h1>
 
-      <div className="space-y-px bg-ink-3">
+      <div className="space-y-px bg-gray-3">
         {rows.map((s) => (
           <div key={s.code} className="grid grid-cols-12 gap-6 bg-ink p-5">
             <div className="col-span-12 md:col-span-2">
@@ -34,7 +34,7 @@ export default async function AdminSourcesPage() {
                 href={s.url}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-lime"
+                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:text-brand"
               >
                 {s.url}
               </a>

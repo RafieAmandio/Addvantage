@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 export function CalendarHero({ className }: { className?: string }) {
   return (
-    <div className={cn("border-b border-ink-3 bg-ink-2/30", className)}>
+    <div className={cn("border-b border-gray-3 bg-gray-2/30", className)}>
       <div className="mx-auto max-w-7xl px-6 py-10">
         <DataLabel>Transmission TX-02 · Free pillar</DataLabel>
         <h1 className="mt-2 font-display text-5xl text-paper">

@@ -43,7 +43,7 @@ export function ScrollableConversation({
           }}
           aria-label="Scroll to top of conversation"
           title="Back to top"
-          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-lime/60 bg-ink-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-lime hover:text-ink"
+          className="absolute right-4 top-4 z-10 flex items-center gap-2 border border-lime/60 bg-gray-2 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:bg-brand hover:text-ink"
         >
           <span aria-hidden>↑</span>
           TOP

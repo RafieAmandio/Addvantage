@@ -16,7 +16,7 @@ export function ConsultHeroHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("border-b border-ink-3 bg-ink-2/30", className)}>
+    <div className={cn("border-b border-gray-3 bg-gray-2/30", className)}>
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>

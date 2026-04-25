@@ -18,7 +18,7 @@ export function CalendarPeekRow({ event }: { event: CalendarEvent }) {
   return (
     <Link
       href="/app/calendar"
-      className="group flex items-start gap-3 bg-ink p-3 transition-colors hover:bg-ink-2"
+      className="group flex items-start gap-3 bg-ink p-3 transition-colors hover:bg-gray-2"
     >
       <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
         {formatTime(event.ts)}Z
@@ -33,7 +33,7 @@ export function CalendarPeekRow({ event }: { event: CalendarEvent }) {
             {topCcy} {topScore}/9
           </span>
         </div>
-        <div className="truncate text-sm text-paper transition-colors group-hover:text-lime">
+        <div className="truncate text-sm text-paper transition-colors group-hover:text-brand">
           {event.title}
         </div>
       </div>

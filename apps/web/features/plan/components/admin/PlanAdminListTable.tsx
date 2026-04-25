@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Plan, PlanStatus } from "@/features/plan/types";
 
 const STATUS_CHIP: Record<PlanStatus, string> = {
-  draft: "bg-ink-2 border-ink-3 text-paper/60",
+  draft: "bg-gray-2 border-gray-3 text-paper/60",
   published: "bg-lime/10 border-lime text-lime",
   closed: "bg-blood/10 border-blood text-blood",
 };
@@ -15,19 +15,19 @@ function fmt(ts: string | null) {
 export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
   if (plans.length === 0) {
     return (
-      <div className="border border-ink-3 bg-ink-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+      <div className="border border-gray-3 bg-gray-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
         ● NO PLANS · click “New plan” to author the first
       </div>
     );
   }
 
   return (
-    <div className="space-y-px bg-ink-3">
+    <div className="space-y-px bg-gray-3">
       {plans.map((p) => (
         <Link
           key={p.id}
           href={`/admin/plans/${p.id}`}
-          className="group grid grid-cols-12 items-center gap-6 bg-ink p-5 transition-colors hover:bg-ink-2"
+          className="group grid grid-cols-12 items-center gap-6 bg-ink p-5 transition-colors hover:bg-gray-2"
         >
           <div className="col-span-12 lg:col-span-2">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
@@ -43,7 +43,7 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
             </div>
           </div>
           <div className="col-span-12 lg:col-span-8">
-            <div className="font-display text-xl text-paper transition-colors group-hover:text-lime">
+            <div className="font-display text-xl text-paper transition-colors group-hover:text-brand">
               {p.thesis || "(no thesis)"}
             </div>
             <div className="mt-2 flex flex-wrap gap-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/60">

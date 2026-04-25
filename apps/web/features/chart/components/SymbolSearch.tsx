@@ -105,7 +105,7 @@ export function SymbolSearch({
         className,
       )}
     >
-      <div className="flex items-center gap-2 border border-ink-3 bg-ink-2 px-2 py-1">
+      <div className="flex items-center gap-2 border border-gray-3 bg-gray-2 px-2 py-1">
         <span aria-hidden className="text-lime">
           /
         </span>
@@ -157,7 +157,7 @@ export function SymbolSearch({
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute left-0 right-0 top-full z-20 mt-1 border border-ink-3 bg-ink-2"
+          className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2"
         >
           {filtered.map((s, idx) => {
             const active = idx === activeIdx;
@@ -179,7 +179,7 @@ export function SymbolSearch({
                     ? "bg-lime text-ink"
                     : isCurrent
                       ? "text-lime"
-                      : "text-paper/70 hover:text-lime",
+                      : "text-paper/70 hover:text-brand",
                 )}
               >
                 {s}
@@ -189,7 +189,7 @@ export function SymbolSearch({
         </ul>
       )}
       {open && filtered.length === 0 && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 border border-ink-3 bg-ink-2 px-2 py-1 text-paper/40">
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2 px-2 py-1 text-paper/40">
           no match
         </div>
       )}

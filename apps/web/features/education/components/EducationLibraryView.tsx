@@ -91,7 +91,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
         }}
         onCancel={() => setConfirmingReset(false)}
       />
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-05</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
@@ -139,7 +139,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
                     {readCount} / {accessible.length} · {pct}%
                   </span>
                 </div>
-                <div className="mt-1 h-1 w-full bg-ink-3">
+                <div className="mt-1 h-1 w-full bg-gray-3">
                   <div
                     className="h-full bg-lime transition-all"
                     style={{ width: `${pct}%` }}
@@ -149,7 +149,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
               {readCount > 0 && (
                 <button
                   onClick={() => setConfirmingReset(true)}
-                  className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-blood hover:text-blood"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-blood hover:text-blood"
                 >
                   Reset
                 </button>
@@ -159,7 +159,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
         </div>
 
         {visiblePrimers.length === 0 && query && (
-          <div className="mt-6 border border-ink-3 bg-ink-2/40 p-12 text-center">
+          <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
               ● NULL TRANSMISSION
             </div>
@@ -168,14 +168,14 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               ✕ Clear search
             </button>
           </div>
         )}
 
-        <div className="mt-6 grid grid-cols-12 gap-px bg-ink-3">
+        <div className="mt-6 grid grid-cols-12 gap-px bg-gray-3">
           {visiblePrimers.map((p) => {
             const i = indexById.get(p.id) ?? 0;
             const indexLabel =

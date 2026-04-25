@@ -28,7 +28,7 @@ export function NotificationFilterTabs({
   return (
     <div
       className={cn(
-        "flex flex-wrap gap-px overflow-x-auto border-b border-ink-3 bg-ink-2/60 p-2",
+        "flex flex-wrap gap-px overflow-x-auto border-b border-gray-3 bg-gray-2/60 p-2",
         className
       )}
     >

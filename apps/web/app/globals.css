@@ -10,7 +10,7 @@
 }
 
 html, body {
-  background-color: #202832;
+  background-color: #111111;
   color: #EEEEEE;
   font-family: "Inter", system-ui, sans-serif;
   font-feature-settings: "ss01", "ss02", "cv11";
@@ -19,15 +19,15 @@ html, body {
 }
 
 ::selection {
-  background: #61C933;
-  color: #202832;
+  background: #FFD400;
+  color: #111111;
 }
 
 /* Grid background utility */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgba(97, 201, 51, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(97, 201, 51, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 212, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 212, 0, 0.06) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
@@ -50,14 +50,14 @@ html, body {
   mix-blend-mode: overlay;
 }
 
-/* Classification stripe */
+/* Classification stripe — orange/black hazard */
 .classification-stripe {
   background: repeating-linear-gradient(
     -45deg,
-    #61C933 0,
-    #61C933 12px,
-    #202832 12px,
-    #202832 24px
+    #FFD400 0,
+    #FFD400 12px,
+    #111111 12px,
+    #111111 24px
   );
 }
 
@@ -73,7 +73,7 @@ html, body {
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(245, 158, 11, 0.08) 50%,
+    rgba(255, 212, 0, 0.08) 50%,
     transparent 100%
   );
   height: 40%;
@@ -81,29 +81,29 @@ html, body {
   pointer-events: none;
 }
 
-/* LED dot */
+/* LED dot — orange */
 .led {
   display: inline-block;
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #65A30D;
-  box-shadow: 0 0 6px #65A30D, 0 0 12px rgba(101, 163, 13, 0.5);
+  background: #FFD400;
+  box-shadow: 0 0 6px #FFD400, 0 0 12px rgba(255, 212, 0, 0.5);
 }
 .led.red {
   background: #DC2626;
   box-shadow: 0 0 6px #DC2626, 0 0 12px rgba(220, 38, 38, 0.5);
 }
-.led.lime {
-  background: #61C933;
-  box-shadow: 0 0 6px #61C933, 0 0 12px rgba(97, 201, 51, 0.5);
+.led.moss {
+  background: #65A30D;
+  box-shadow: 0 0 6px #65A30D, 0 0 12px rgba(101, 163, 13, 0.5);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #202832; }
-::-webkit-scrollbar-thumb { background: #383E47; border: 2px solid #202832; }
-::-webkit-scrollbar-thumb:hover { background: #4FA826; }
+::-webkit-scrollbar-track { background: #111111; }
+::-webkit-scrollbar-thumb { background: #2A2A2A; border: 2px solid #111111; }
+::-webkit-scrollbar-thumb:hover { background: #FFD400; }
 
 /* Toast progress bar */
 @keyframes toastBar {
@@ -113,9 +113,9 @@ html, body {
 
 /* Notification badge pulse — fires on first paint only, 2 cycles, then stops */
 @keyframes pulseOnce {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-  50% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 212, 0, 0.7); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(255, 212, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 212, 0, 0); }
 }
 .animate-pulse-once {
   animation: pulseOnce 1.6s ease-out 2;
@@ -133,3 +133,14 @@ html, body {
 .stagger > *:nth-child(6) { animation-delay: 300ms; }
 .stagger > *:nth-child(7) { animation-delay: 360ms; }
 .stagger > *:nth-child(8) { animation-delay: 420ms; }
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 2px solid #FFD400;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}

@@ -14,7 +14,7 @@ export function WatchlistStatsStrip({
   aggregateR,
 }: Props) {
   return (
-    <div className="mb-8 grid grid-cols-2 gap-px bg-ink-3 sm:grid-cols-4">
+    <div className="mb-8 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-4">
       <div className="bg-ink p-5">
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
           Pinned

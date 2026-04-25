@@ -13,8 +13,8 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
   const bg = isUser
     ? "bg-lime/10 border-lime/40"
     : isAi
-    ? "bg-ink-2 border-ink-3"
-    : "bg-ink-2 border-lime/40";
+    ? "bg-gray-2 border-gray-3"
+    : "bg-gray-2 border-lime/40";
 
   return (
     <div className={`flex flex-col ${align}`}>

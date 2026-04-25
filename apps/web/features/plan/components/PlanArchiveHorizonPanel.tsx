@@ -23,7 +23,7 @@ export function PlanArchiveHorizonPanel({
 }: Props) {
   return (
     <div
-      className={cn("mb-10 border border-ink-3 bg-ink-2/30 p-5", className)}
+      className={cn("mb-10 border border-gray-3 bg-gray-2/30 p-5", className)}
     >
       <div className="flex items-center justify-between">
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
@@ -32,20 +32,20 @@ export function PlanArchiveHorizonPanel({
         {horizonFilter !== "all" && (
           <button
             onClick={() => setHorizonFilter("all")}
-            className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
           >
             ✕ Clear
           </button>
         )}
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-px bg-ink-3 sm:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-4">
         <button
           onClick={() => setHorizonFilter("all")}
           className={cn(
             "bg-ink p-4 text-left transition-colors",
             horizonFilter === "all"
-              ? "border-l-2 border-lime bg-ink-2"
-              : "hover:bg-ink-2"
+              ? "border-l-2 border-lime bg-gray-2"
+              : "hover:bg-gray-2"
           )}
         >
           <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
@@ -82,10 +82,10 @@ export function PlanArchiveHorizonPanel({
               className={cn(
                 "bg-ink p-4 text-left transition-colors",
                 horizonFilter === h
-                  ? "border-l-2 border-lime bg-ink-2"
+                  ? "border-l-2 border-lime bg-gray-2"
                   : noData
                   ? "cursor-default opacity-60"
-                  : "hover:bg-ink-2"
+                  : "hover:bg-gray-2"
               )}
             >
               <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">

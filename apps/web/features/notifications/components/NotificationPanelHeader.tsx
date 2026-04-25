@@ -16,7 +16,7 @@ export function NotificationPanelHeader({
   return (
     <div
       className={cn(
-        "flex items-center justify-between border-b border-ink-3 bg-ink-2/80 px-4 py-3",
+        "flex items-center justify-between border-b border-gray-3 bg-gray-2/80 px-4 py-3",
         className
       )}
     >
@@ -34,8 +34,8 @@ export function NotificationPanelHeader({
         className={cn(
           "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2",
           unreadCount === 0
-            ? "cursor-default border-ink-3 text-paper/30"
-            : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
+            ? "cursor-default border-gray-3 text-paper/30"
+            : "border-lime/60 text-lime hover:bg-brand hover:text-ink"
         )}
       >
         Mark all read

@@ -134,7 +134,7 @@ function TagsView() {
   return (
     <div>
       <BackToTop />
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Index · Cross-cut</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
@@ -176,7 +176,7 @@ function TagsView() {
             <span className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
               Sort
             </span>
-            <div className="flex flex-wrap gap-px bg-ink-3">
+            <div className="flex flex-wrap gap-px bg-gray-3">
               {(
                 [
                   { v: "density", label: "Most used" },
@@ -191,7 +191,7 @@ function TagsView() {
                     "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                     sortMode === opt.v
                       ? "bg-lime text-ink"
-                      : "bg-ink-2 text-paper/60 hover:text-paper"
+                      : "bg-gray-2 text-paper/60 hover:text-paper"
                   )}
                 >
                   {opt.label}
@@ -202,7 +202,7 @@ function TagsView() {
         </div>
 
         {visibleCounts.length === 0 && query && (
-          <div className="mt-6 border border-ink-3 bg-ink-2/40 p-12 text-center">
+          <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
               ● NULL TRANSMISSION
             </div>
@@ -211,14 +211,14 @@ function TagsView() {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               ✕ Clear search
             </button>
           </div>
         )}
 
-        <div className="mt-6 grid grid-cols-12 gap-px bg-ink-3">
+        <div className="mt-6 grid grid-cols-12 gap-px bg-gray-3">
           {visibleCounts.map(({ tag, c }, i) => {
             const meta = hashtagMeta[tag];
             const density = c / maxCount;
@@ -227,7 +227,7 @@ function TagsView() {
               <Link
                 key={tag}
                 href={`/app/tags/${tag}`}
-                className="group relative col-span-12 overflow-hidden bg-ink p-6 transition-colors hover:bg-ink-2 sm:col-span-6 lg:col-span-4"
+                className="group relative col-span-12 overflow-hidden bg-ink p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
               >
                 {/* Density bar — bottom edge, scaled to count */}
                 <div

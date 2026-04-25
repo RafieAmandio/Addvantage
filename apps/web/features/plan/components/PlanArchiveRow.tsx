@@ -19,7 +19,7 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
   return (
     <Link
       href={`/app/plan/${plan.id}`}
-      className="group grid grid-cols-12 gap-6 bg-ink p-6 transition-colors hover:bg-ink-2"
+      className="group grid grid-cols-12 gap-6 bg-ink p-6 transition-colors hover:bg-gray-2"
     >
       {/* Meta column */}
       <div className="col-span-12 lg:col-span-3">
@@ -45,7 +45,7 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
           <span className="text-lime">▼ {shorts} short</span>
         </div>
         {outcome && !isLatest && (
-          <div className="mt-3 flex items-baseline gap-3 border-t border-ink-3 pt-3">
+          <div className="mt-3 flex items-baseline gap-3 border-t border-gray-3 pt-3">
             <div
               className={
                 "font-display text-2xl " +
@@ -66,7 +66,7 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
           </div>
         )}
         {isLatest && (
-          <div className="mt-3 border-t border-ink-3 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
+          <div className="mt-3 border-t border-gray-3 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
             ● LIVE · no outcome yet
           </div>
         )}

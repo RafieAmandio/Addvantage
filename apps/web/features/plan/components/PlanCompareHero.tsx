@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 export function PlanCompareHero({ className }: { className?: string }) {
   return (
     <div
-      className={cn("border-b border-ink-3 bg-ink-2/30", className)}
+      className={cn("border-b border-gray-3 bg-gray-2/30", className)}
     >
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -21,7 +21,7 @@ export function PlanCompareHero({ className }: { className?: string }) {
           </div>
           <Link
             href="/app/plan/archive"
-            className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+            className="border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
           >
             ← Archive
           </Link>

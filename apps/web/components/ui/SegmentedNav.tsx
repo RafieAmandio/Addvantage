@@ -29,7 +29,7 @@ export function SegmentedNav<T extends string>({
             "border px-2 py-1 transition-colors",
             item === current
               ? "border-lime bg-lime text-ink"
-              : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime",
+              : "border-gray-3 text-paper/60 hover:border-brand hover:text-brand",
           )}
         >
           {labelFor ? labelFor(item) : item}

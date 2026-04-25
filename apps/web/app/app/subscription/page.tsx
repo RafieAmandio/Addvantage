@@ -33,7 +33,7 @@ export default function SubscriptionPage() {
 
   return (
     <div className="bg-grid-fine">
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Operator account · Tier control</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* Status panel */}
-        <section className="border border-lime/40 bg-ink-2/30 p-8">
+        <section className="border border-lime/40 bg-gray-2/30 p-8">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-4">
               <DataLabel>Current tier</DataLabel>
@@ -98,7 +98,7 @@ export default function SubscriptionPage() {
                     "col-span-12 border bg-ink p-8 lg:col-span-6",
                     p.highlight
                       ? "border-lime"
-                      : "border-ink-3"
+                      : "border-gray-3"
                   )}
                 >
                   <div className="flex items-start justify-between">
@@ -176,9 +176,9 @@ export default function SubscriptionPage() {
         {/* Payment history */}
         <section className="mt-12">
           <SectionNumber n="02 /" label="PAYMENT LEDGER" />
-          <div className="mt-4 border border-ink-3">
+          <div className="mt-4 border border-gray-3">
             <table className="w-full font-mono text-xs">
-              <thead className="bg-ink-2 text-[9px] uppercase tracking-widest2 text-paper/40">
+              <thead className="bg-gray-2 text-[9px] uppercase tracking-widest2 text-paper/40">
                 <tr>
                   <th className="px-4 py-3 text-left">TXN ID</th>
                   <th className="px-4 py-3 text-left">DATE</th>
@@ -218,8 +218,8 @@ export default function SubscriptionPage() {
                   <tr
                     key={row.id}
                     className={cn(
-                      "border-t border-ink-3",
-                      i % 2 === 0 ? "bg-ink" : "bg-ink-2/30"
+                      "border-t border-gray-3",
+                      i % 2 === 0 ? "bg-ink" : "bg-gray-2/30"
                     )}
                   >
                     <td className="px-4 py-3 text-lime">{row.id}</td>
@@ -239,7 +239,7 @@ export default function SubscriptionPage() {
           </div>
         </section>
 
-        <div className="mt-12 border border-ink-3 bg-ink-2/30 p-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="mt-12 border border-gray-3 bg-gray-2/30 p-6 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
           ALL PRICING IN INDONESIAN RUPIAH (IDR). 3-MONTH BILLING IS A
           DELIBERATE FILTER — ANYONE UNWILLING TO COMMIT A QUARTER IS NOT THE
           TARGET AUDIENCE. NO PRO-RATING. NO REFUNDS.

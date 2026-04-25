@@ -75,14 +75,14 @@ export function PlanDetailSetupCard({
   return (
     <div
       id={s.id}
-      className="group/setup relative scroll-mt-24 border border-ink-3 bg-ink-2/30 p-5 transition-all hover:border-lime/40"
+      className="group/setup relative scroll-mt-24 border border-gray-3 bg-gray-2/30 p-5 transition-all hover:border-brand/40"
     >
       <div className="absolute right-3 top-3 z-10 flex gap-1 opacity-0 transition-opacity group-hover/setup:opacity-100">
         <button
           onClick={copySetupLink}
           title={`Copy deep link to ${s.id}`}
           aria-label={`Copy link to setup ${s.id}`}
-          className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-lime hover:text-lime"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
         >
           ⌯ LINK
         </button>
@@ -90,7 +90,7 @@ export function PlanDetailSetupCard({
           onClick={copySetup}
           title={`Copy ${s.id} as text`}
           aria-label={`Copy setup ${s.id} text`}
-          className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-lime hover:text-lime"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
         >
           ⧉ TEXT
         </button>
@@ -144,7 +144,7 @@ export function PlanDetailSetupCard({
         </Field>
       </div>
 
-      <div className="mt-4 border-t border-ink-3 pt-3">
+      <div className="mt-4 border-t border-gray-3 pt-3">
         <DataLabel>Rationale</DataLabel>
         <p className="mt-1 text-sm text-paper/70">{s.rationale}</p>
       </div>
@@ -163,7 +163,7 @@ export function PlanDetailSetupCard({
             <span
               key={i}
               className={
-                "h-2 w-4 " + (i <= s.confidence ? "bg-lime" : "bg-ink-3")
+                "h-2 w-4 " + (i <= s.confidence ? "bg-lime" : "bg-gray-3")
               }
             />
           ))}
@@ -171,7 +171,7 @@ export function PlanDetailSetupCard({
       </div>
 
       {s.outcomeNotes && (
-        <div className="mt-4 border-t border-ink-3 pt-3">
+        <div className="mt-4 border-t border-gray-3 pt-3">
           <div
             className={
               "font-mono text-[9px] uppercase tracking-widest2 " +

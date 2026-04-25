@@ -44,11 +44,11 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
 
   const statusChip = plan
     ? {
-        draft: "bg-ink-2 border-ink-3 text-paper/60",
+        draft: "bg-gray-2 border-gray-3 text-paper/60",
         published: "bg-lime/10 border-lime text-lime",
         closed: "bg-blood/10 border-blood text-blood",
       }[plan.status]
-    : "bg-ink-2 border-ink-3 text-paper/60";
+    : "bg-gray-2 border-gray-3 text-paper/60";
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -56,7 +56,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/plans"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-lime"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50 hover:text-brand"
           >
             ← Plans
           </Link>
@@ -85,7 +85,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
         </div>
       )}
       {state.ok && !isNew && (
-        <div className="mb-4 border border-ink-3 bg-ink-2/40 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
+        <div className="mb-4 border border-gray-3 bg-gray-2/40 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60">
           saved
         </div>
       )}
@@ -98,14 +98,14 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={plan?.symbol ?? ""}
               required
               placeholder="SPX"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             />
           </Field>
           <Field label="Direction">
             <select
               name="direction"
               defaultValue={plan?.direction ?? "long"}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             >
               {DIRECTIONS.map((d) => (
                 <option key={d} value={d}>
@@ -118,7 +118,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <select
               name="tier"
               defaultValue={plan?.tier ?? "free"}
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
             >
               {TIERS.map((t) => (
                 <option key={t} value={t}>
@@ -136,7 +136,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             required
             defaultValue={plan?.thesis ?? ""}
             placeholder="Why this trade, what breaks it"
-            className="mt-4 w-full border border-ink-3 bg-ink-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-lime focus:outline-none"
+            className="mt-4 w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-paper focus:border-lime focus:outline-none"
           />
         </Field>
 
@@ -147,7 +147,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.entry ?? null)}
               type="number"
               step="any"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
             />
           </Field>
           <Field label="Stop">
@@ -156,7 +156,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.stop ?? null)}
               type="number"
               step="any"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
             />
           </Field>
           <Field label="Target">
@@ -165,7 +165,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.target ?? null)}
               type="number"
               step="any"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
             />
           </Field>
           <Field label="R multiple">
@@ -174,7 +174,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.r_multiple ?? null)}
               type="number"
               step="any"
-              className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
             />
           </Field>
         </div>
@@ -184,7 +184,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             name="tags"
             defaultValue={plan?.tags.join(", ") ?? ""}
             placeholder="risk-management, mean-reversion"
-            className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
+            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
           />
         </Field>
 
@@ -197,7 +197,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 ? JSON.stringify(plan.setups, null, 2)
                 : "[]"
             }
-            className="w-full border border-ink-3 bg-ink-2 px-3 py-2 font-mono text-xs leading-relaxed text-paper focus:border-lime focus:outline-none"
+            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs leading-relaxed text-paper focus:border-lime focus:outline-none"
           />
         </Field>
 
@@ -207,7 +207,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
       </form>
 
       {plan && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-ink-3 bg-ink-2/20 p-4">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-gray-3 bg-gray-2/20 p-4">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
             Lifecycle
           </div>
@@ -230,7 +230,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 <select
                   name="outcome"
                   defaultValue="win"
-                  className="border border-ink-3 bg-ink-2 px-2 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
+                  className="border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs uppercase tracking-widest2 text-paper focus:border-lime focus:outline-none"
                 >
                   {OUTCOMES.map((o) => (
                     <option key={o} value={o}>
@@ -244,7 +244,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                   step="any"
                   placeholder="Close price"
                   aria-label="Close price"
-                  className="w-32 border border-ink-3 bg-ink-2 px-2 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
+                  className="w-32 border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs text-paper focus:border-lime focus:outline-none"
                 />
                 <button
                   type="submit"
@@ -257,7 +257,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <form action={deletePlan.bind(null, plan.id)}>
               <button
                 type="submit"
-                className="border border-ink-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
               >
                 Delete
               </button>

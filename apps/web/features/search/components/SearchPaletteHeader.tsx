@@ -20,7 +20,7 @@ export const SearchPaletteHeader = forwardRef<
   ref,
 ) {
   return (
-    <div className="border-b border-ink-3 bg-ink-2/80">
+    <div className="border-b border-gray-3 bg-gray-2/80">
       <div className="flex items-center gap-3 px-5 py-4">
         <SearchPaletteIcon />
         <input
@@ -34,12 +34,12 @@ export const SearchPaletteHeader = forwardRef<
         <button
           onClick={onClose}
           aria-label="Close search"
-          className="border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-lime hover:text-lime"
+          className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-brand hover:text-brand"
         >
           esc
         </button>
       </div>
-      <div className="flex items-center justify-between border-t border-ink-3 px-5 py-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
+      <div className="flex items-center justify-between border-t border-gray-3 px-5 py-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
         <span>
           {query
             ? `${resultCount} ${resultCount === 1 ? "result" : "results"} across ${channelCount} ${channelCount === 1 ? "channel" : "channels"}`

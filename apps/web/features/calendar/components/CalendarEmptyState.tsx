@@ -69,7 +69,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(-1)}
             className={cn(
-              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink",
+              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink",
               btnPad,
               size
             )}
@@ -85,8 +85,8 @@ export function CalendarEmptyState({
             btnPad,
             size,
             anchor === DEMO_TODAY_YMD
-              ? "cursor-default border-ink-3 text-paper/30"
-              : "border-lime/60 text-lime hover:bg-lime hover:text-ink"
+              ? "cursor-default border-gray-3 text-paper/30"
+              : "border-lime/60 text-lime hover:bg-brand hover:text-ink"
           )}
         >
           Today
@@ -95,7 +95,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(1)}
             className={cn(
-              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink",
+              "border border-lime/60 font-mono uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink",
               btnPad,
               size
             )}
@@ -109,7 +109,7 @@ export function CalendarEmptyState({
           <button
             onClick={onResetFilters}
             className={cn(
-              "border border-ink-3 font-mono uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime",
+              "border border-gray-3 font-mono uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand",
               btnPad,
               size
             )}

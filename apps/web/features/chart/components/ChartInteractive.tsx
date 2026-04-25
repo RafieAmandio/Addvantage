@@ -53,7 +53,7 @@ export function ChartInteractive({
 
   return (
     <>
-      <div className="border border-ink-3 bg-ink-2 p-3">
+      <div className="border border-gray-3 bg-gray-2 p-3">
         <div className="mb-3 flex items-center justify-end">
           <AddPinButton symbol={symbol} />
         </div>

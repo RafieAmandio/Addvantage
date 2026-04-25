@@ -20,7 +20,7 @@ const ITEMS: Array<{ title: string; body: string }> = [
 
 export function CalendarLegend({ className }: { className?: string }) {
   return (
-    <div className={cn("mt-8 border border-ink-3 bg-ink-2/30 p-4", className)}>
+    <div className={cn("mt-8 border border-gray-3 bg-gray-2/30 p-4", className)}>
       <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
         ● Reading the table
       </div>

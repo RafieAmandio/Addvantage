@@ -63,7 +63,7 @@ export function PageSearchInput({
   }, [focusKey, inputId]);
 
   return (
-    <div className="border border-ink-3 bg-ink-2/40">
+    <div className="border border-gray-3 bg-gray-2/40">
       <div className="flex items-center gap-3 px-4 py-3">
         <svg
           width="16"
@@ -98,14 +98,14 @@ export function PageSearchInput({
             onClick={() => onChange("")}
             title="Clear search"
             aria-label="Clear search"
-            className="border border-ink-3 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+            className="border border-gray-3 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
           >
             ✕
           </button>
         )}
       </div>
       {matchLabel && value && (
-        <div className="border-t border-ink-3 bg-ink/60 px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
+        <div className="border-t border-gray-3 bg-ink/60 px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-lime">
           ● {matchLabel}
         </div>
       )}

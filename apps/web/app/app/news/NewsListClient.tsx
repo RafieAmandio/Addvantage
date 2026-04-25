@@ -110,7 +110,7 @@ function View({ items }: { items: NewsListItem[] }) {
         }}
         onCancel={() => setConfirmingResetSeen(false)}
       />
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <DataLabel>Transmission TX-01 · Free pillar</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-paper">
@@ -149,14 +149,14 @@ function View({ items }: { items: NewsListItem[] }) {
                 "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
                 (hideSeen
                   ? "border-lime bg-lime/10 text-lime"
-                  : "border-ink-3 text-paper/60 hover:border-lime hover:text-lime")
+                  : "border-gray-3 text-paper/60 hover:border-brand hover:text-brand")
               }
             >
               {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}
             </button>
             <button
               onClick={() => setConfirmingResetSeen(true)}
-              className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
             >
               ↶ Reset seen
             </button>
@@ -165,7 +165,7 @@ function View({ items }: { items: NewsListItem[] }) {
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <SectionNumber n="01 /" label={`${filtered.length} ITEMS`} />
-          <div className="flex flex-wrap gap-px bg-ink-3">
+          <div className="flex flex-wrap gap-px bg-gray-3">
             {(
               [
                 "all",
@@ -183,7 +183,7 @@ function View({ items }: { items: NewsListItem[] }) {
                   "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (filter === f
                     ? "bg-lime text-ink"
-                    : "bg-ink-2 text-paper/60 hover:bg-ink-2 hover:text-paper")
+                    : "bg-gray-2 text-paper/60 hover:bg-gray-2 hover:text-paper")
                 }
               >
                 {f}
@@ -193,7 +193,7 @@ function View({ items }: { items: NewsListItem[] }) {
         </div>
 
         {filtered.length === 0 && (
-          <div className="border border-ink-3 bg-ink-2/40 p-12 text-center">
+          <div className="border border-gray-3 bg-gray-2/40 p-12 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">
               ● NULL TRANSMISSION
             </div>
@@ -207,7 +207,7 @@ function View({ items }: { items: NewsListItem[] }) {
           </div>
         )}
 
-        <div className="space-y-px bg-ink-3">
+        <div className="space-y-px bg-gray-3">
           {filtered.map((n) => (
             <NewsListRow
               key={n.id}

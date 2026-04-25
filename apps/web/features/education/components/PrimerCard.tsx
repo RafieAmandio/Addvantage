@@ -17,7 +17,7 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
   return (
     <Link
       href={`/app/education/${p.id}`}
-      className="group relative col-span-12 bg-ink p-8 transition-colors hover:bg-ink-2 sm:col-span-6 lg:col-span-4"
+      className="group relative col-span-12 bg-ink p-8 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
     >
       {read && !locked && (
         <div className="absolute right-0 top-0 bg-moss/15 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
@@ -51,7 +51,7 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
       <p className="mt-4 text-sm text-paper/70">
         <Highlight text={p.summary} query={query} />
       </p>
-      <div className="mt-6 flex items-center justify-between border-t border-ink-3 pt-3">
+      <div className="mt-6 flex items-center justify-between border-t border-gray-3 pt-3">
         <div className="flex flex-wrap gap-1">
           {p.tags.slice(0, 2).map((t) => (
             <span

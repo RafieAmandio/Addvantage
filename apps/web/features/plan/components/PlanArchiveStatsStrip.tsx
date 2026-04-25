@@ -19,7 +19,7 @@ export function PlanArchiveStatsStrip({
   return (
     <div
       className={cn(
-        "mb-6 grid grid-cols-1 gap-px bg-ink-3 sm:grid-cols-4",
+        "mb-6 grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-4",
         className
       )}
     >

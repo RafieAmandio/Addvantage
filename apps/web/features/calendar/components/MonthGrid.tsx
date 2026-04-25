@@ -38,9 +38,9 @@ export function MonthGrid({
   const weekdayHeaders = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   return (
-    <div className="border border-ink-3">
+    <div className="border border-gray-3">
       {/* Weekday header row */}
-      <div className="grid grid-cols-7 border-b-2 border-lime/40 bg-ink-2/95">
+      <div className="grid grid-cols-7 border-b-2 border-lime/40 bg-gray-2/95">
         {weekdayHeaders.map((w) => (
           <div
             key={w}
@@ -69,19 +69,19 @@ export function MonthGrid({
               onClick={() => onPickDay(ymd)}
               title={`${formatDayHeader(ymd)} — click to drill into day view`}
               className={cn(
-                "group relative flex min-h-[110px] flex-col items-stretch border-b border-r border-ink-3 p-2 text-left transition-colors",
+                "group relative flex min-h-[110px] flex-col items-stretch border-b border-r border-gray-3 p-2 text-left transition-colors",
                 i % 7 === 6 && "border-r-0",
                 Math.floor(i / 7) === 5 && "border-b-0",
                 inMonth
-                  ? "bg-ink hover:bg-ink-2"
-                  : "bg-ink-2/30 hover:bg-ink-2/60",
+                  ? "bg-ink hover:bg-gray-2"
+                  : "bg-gray-2/30 hover:bg-gray-2/60",
                 // Non-anchor hover gets a faint lime preview outline
-                !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-lime/30",
+                !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-brand/30",
                 // Anchor (keyboard cursor) — inset lime border, overridden
                 // visually by the today ring below when they coincide.
-                isAnchor && !isToday && "bg-lime/5 ring-2 ring-inset ring-lime/60",
-                isToday && "ring-1 ring-inset ring-lime",
-                isAnchor && isToday && "ring-2 ring-lime bg-lime/10"
+                isAnchor && !isToday && "bg-lime/5 ring-2 ring-inset ring-brand/60",
+                isToday && "ring-1 ring-inset ring-brand",
+                isAnchor && isToday && "ring-2 ring-brand bg-lime/10"
               )}
             >
               {/* Day number */}

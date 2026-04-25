@@ -5,7 +5,7 @@ import { tickerItems } from "@/lib/mock/ticker";
 export function MarketTicker() {
   const stream = [...tickerItems, ...tickerItems];
   return (
-    <div className="overflow-hidden border-y border-ink-3 bg-ink-2/60">
+    <div className="overflow-hidden border-y border-gray-3 bg-gray-2/60">
       <div className="flex animate-ticker whitespace-nowrap py-2 will-change-transform">
         {stream.map((it, i) => (
           <span

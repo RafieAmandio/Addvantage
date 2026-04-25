@@ -23,8 +23,8 @@ function CompactSetup({
       className={cn(
         "block border p-3 transition-colors",
         highlighted
-          ? "border-lime bg-lime/5 hover:bg-lime/10"
-          : "border-ink-3 bg-ink hover:bg-ink-2"
+          ? "border-lime bg-lime/5 hover:bg-brand/10"
+          : "border-gray-3 bg-ink hover:bg-gray-2"
       )}
     >
       <div className="flex items-baseline justify-between gap-2">
@@ -86,9 +86,9 @@ export function PlanCompareColumn({
   const shorts = plan.setups.filter((s) => s.direction === "short").length;
 
   return (
-    <article className={cn("border border-ink-3 bg-ink-2/20", className)}>
+    <article className={cn("border border-gray-3 bg-gray-2/20", className)}>
       {/* Header */}
-      <div className="border-b border-ink-3 bg-ink-2/60 p-5">
+      <div className="border-b border-gray-3 bg-gray-2/60 p-5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Link
@@ -102,7 +102,7 @@ export function PlanCompareColumn({
                 ● LATEST
               </span>
             ) : (
-              <span className="border border-ink-3 bg-ink px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+              <span className="border border-gray-3 bg-ink px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
                 ARCHIVE
               </span>
             )}
@@ -136,7 +136,7 @@ export function PlanCompareColumn({
       </div>
 
       {/* Thesis */}
-      <div className="border-b border-ink-3 p-5">
+      <div className="border-b border-gray-3 p-5">
         <DataLabel>Thesis</DataLabel>
         <p className="mt-2 font-display text-base leading-relaxed text-paper/90">
           {plan.thesis}
@@ -160,7 +160,7 @@ export function PlanCompareColumn({
 
       {/* Risks */}
       {plan.risks.length > 0 && (
-        <div className="border-t border-ink-3 bg-ink-2/30 p-5">
+        <div className="border-t border-gray-3 bg-gray-2/30 p-5">
           <DataLabel>Risks · {plan.risks.length}</DataLabel>
           <ul className="mt-2 space-y-1 text-sm text-paper/70">
             {plan.risks.map((r, i) => (

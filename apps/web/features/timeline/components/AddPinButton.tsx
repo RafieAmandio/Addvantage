@@ -38,7 +38,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="border border-lime bg-lime px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-ink transition-colors hover:bg-lime-dim hover:text-paper disabled:opacity-50"
+      className="border border-lime bg-lime px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-ink transition-colors hover:bg-brand-dim hover:text-paper disabled:opacity-50"
     >
       {pending ? "Pinning…" : "Pin event →"}
     </button>
@@ -112,7 +112,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-lime hover:text-lime focus:border-lime focus:text-lime focus:outline-none"
+        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 transition-colors hover:border-brand hover:text-brand focus:border-lime focus:text-lime focus:outline-none"
       >
         + Pin event
       </button>
@@ -120,7 +120,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       {flash ? (
         <div
           role="status"
-          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-lime bg-ink-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime shadow-[0_0_40px_rgba(163,230,53,0.25)]"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-lime bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime shadow-[0_0_40px_rgba(163,230,53,0.25)]"
         >
           {flash}
         </div>
@@ -138,9 +138,9 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
             className="absolute inset-0 bg-ink/85 backdrop-blur-md"
             aria-hidden
           />
-          <div className="relative w-full max-w-lg border border-lime bg-ink-2 shadow-[0_0_60px_rgba(163,230,53,0.18)]">
+          <div className="relative w-full max-w-lg border border-lime bg-gray-2 shadow-[0_0_60px_rgba(163,230,53,0.18)]">
             <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
-            <div className="border-b border-ink-3 p-5">
+            <div className="border-b border-gray-3 p-5">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                 ● PIN EVENT · {symbol}
               </div>
@@ -173,7 +173,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="text"
                   required
                   maxLength={200}
-                  className="mt-2 w-full border border-ink-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                  className="mt-2 w-full border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
                 />
               </div>
 
@@ -189,7 +189,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   name="body"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 w-full resize-none border border-ink-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                  className="mt-2 w-full resize-none border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
                 />
               </div>
 
@@ -198,7 +198,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   <label className="block font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
                     Symbol
                   </label>
-                  <div className="mt-2 border border-ink-3 bg-ink/60 px-3 py-2 font-mono text-sm text-paper/70">
+                  <div className="mt-2 border border-gray-3 bg-ink/60 px-3 py-2 font-mono text-sm text-paper/70">
                     {symbol}
                   </div>
                 </div>
@@ -215,7 +215,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                     required
                     value={localDt}
                     onChange={(e) => setLocalDt(e.currentTarget.value)}
-                    className="mt-2 w-full border border-ink-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
+                    className="mt-2 w-full border border-gray-3 bg-ink px-3 py-2 font-mono text-sm text-paper outline-none transition-colors focus:border-lime"
                   />
                   <input type="hidden" name="occurredAt" value={occurredAtIso} />
                 </div>
@@ -235,8 +235,8 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="button"
                   onClick={close}
                   className={cn(
-                    "border border-ink-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60",
-                    "hover:border-lime hover:text-lime focus:border-lime focus:text-lime focus:outline-none",
+                    "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/60",
+                    "hover:border-brand hover:text-brand focus:border-lime focus:text-lime focus:outline-none",
                   )}
                 >
                   Cancel · esc

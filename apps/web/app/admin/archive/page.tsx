@@ -18,17 +18,17 @@ export default async function AdminArchivePage() {
       </div>
 
       {items.length === 0 && (
-        <div className="border border-ink-3 bg-ink-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="border border-gray-3 bg-gray-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
           ● EMPTY · no rejected items
         </div>
       )}
 
-      <div className="space-y-px bg-ink-3">
+      <div className="space-y-px bg-gray-3">
         {items.map((n) => (
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-ink-2"
+            className="group grid grid-cols-12 gap-6 bg-ink p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood">

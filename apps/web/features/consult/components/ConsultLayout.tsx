@@ -91,13 +91,13 @@ export function ConsultLayout({
         </div>
         <button
           onClick={onNewSession}
-          className="mt-3 flex w-full items-center justify-center gap-2 border border-lime bg-lime/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+          className="mt-3 flex w-full items-center justify-center gap-2 border border-lime bg-lime/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
         >
           <span className="text-base leading-none">+</span>
           New session
         </button>
         {sessions.length === 0 && (
-          <div className="mt-3 border border-ink-3 bg-ink p-4 text-center">
+          <div className="mt-3 border border-gray-3 bg-ink p-4 text-center">
             <div className="font-mono text-[9px] uppercase tracking-widest2 text-blood">
               ● NO MATCHES
             </div>
@@ -106,13 +106,13 @@ export function ConsultLayout({
             </div>
             <button
               onClick={() => setSessionQuery("")}
-              className="mt-3 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="mt-3 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               ✕ Clear
             </button>
           </div>
         )}
-        <div className="mt-3 space-y-px bg-ink-3">
+        <div className="mt-3 space-y-px bg-gray-3">
           {sessions.map((s) => {
             const msgCount =
               s.messages.length + (extrasBySession[s.id]?.length ?? 0);
@@ -122,8 +122,8 @@ export function ConsultLayout({
               <div
                 key={s.id}
                 className={cn(
-                  "group relative bg-ink transition-colors hover:bg-ink-2",
-                  s.id === activeId && "border-l-2 border-lime bg-ink-2"
+                  "group relative bg-ink transition-colors hover:bg-gray-2",
+                  s.id === activeId && "border-l-2 border-lime bg-gray-2"
                 )}
               >
                 <button
@@ -187,7 +187,7 @@ export function ConsultLayout({
                         setRenamingId(s.id);
                       }}
                       title="Rename session"
-                      className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-lime hover:text-lime"
+                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-brand hover:text-brand"
                     >
                       ✎
                     </button>
@@ -197,7 +197,7 @@ export function ConsultLayout({
                         onDeleteSession(s.id, s.title);
                       }}
                       title="Delete session"
-                      className="border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-blood hover:text-blood"
+                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50 hover:border-blood hover:text-blood"
                     >
                       ✕
                     </button>
@@ -210,8 +210,8 @@ export function ConsultLayout({
       </aside>
 
       {/* Conversation */}
-      <section className="col-span-12 flex h-[75vh] flex-col border border-ink-3 lg:col-span-9">
-        <div className="border-b border-ink-3 bg-ink-2/40 px-5 py-3">
+      <section className="col-span-12 flex h-[75vh] flex-col border border-gray-3 lg:col-span-9">
+        <div className="border-b border-gray-3 bg-gray-2/40 px-5 py-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
@@ -235,7 +235,7 @@ export function ConsultLayout({
               onClick={onExportSession}
               title="Copy this session as markdown"
               aria-label="Export session as markdown"
-              className="shrink-0 border border-ink-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+              className="shrink-0 border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
             >
               ⇩ EXPORT MD
             </button>
@@ -268,7 +268,7 @@ export function ConsultLayout({
           <div ref={endRef} />
         </ScrollableConversation>
 
-        <div className="border-t border-ink-3 bg-ink-2/40 p-4">
+        <div className="border-t border-gray-3 bg-gray-2/40 p-4">
           <div className="flex items-end gap-3">
             <textarea
               data-consult-input
@@ -289,11 +289,11 @@ export function ConsultLayout({
               }}
               rows={2}
               placeholder="Describe your situation. Include position size, entry, stop, and what you're feeling about it…  (press i to focus, esc to blur)"
-              className="flex-1 resize-none border border-ink-3 bg-ink p-3 font-mono text-sm text-paper placeholder:text-paper/30 outline-none focus:border-lime"
+              className="flex-1 resize-none border border-gray-3 bg-ink p-3 font-mono text-sm text-paper placeholder:text-paper/30 outline-none focus:border-lime"
             />
             <button
               onClick={send}
-              className="bg-lime px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-lime-dim hover:text-paper"
+              className="bg-lime px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-ink hover:bg-brand-dim hover:text-paper"
             >
               Transmit →
             </button>

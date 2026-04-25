@@ -52,7 +52,7 @@ export function AccessSection() {
             </ul>
             <Link
               href="/signup"
-              className="flex w-full items-center justify-center gap-4 bg-lime p-4 font-mono text-base font-bold text-ink transition-colors hover:bg-lime-dim"
+              className="flex w-full items-center justify-center gap-4 bg-lime p-4 font-mono text-base font-bold text-ink transition-colors hover:bg-brand-dim"
             >
               Request Access
               <ArrowUpPixel className="h-4 w-4 rotate-90" />

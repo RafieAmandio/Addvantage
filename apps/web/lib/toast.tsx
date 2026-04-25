@@ -139,7 +139,7 @@ const TONE_STYLES: Record<
   },
   warn: {
     border: "border-lime",
-    bar: "bg-lime-dim",
+    bar: "bg-brand-dim",
     led: "lime",
     text: "text-lime",
   },
@@ -161,7 +161,7 @@ function ToastCard({
   const styles = TONE_STYLES[toast.tone];
   return (
     <div
-      className={`pointer-events-auto relative w-full border ${styles.border} bg-ink-2 shadow-[0_0_30px_rgba(245,158,11,0.18)]`}
+      className={`pointer-events-auto relative w-full border ${styles.border} bg-gray-2 shadow-[0_0_30px_rgba(245,158,11,0.18)]`}
       role="status"
     >
       {/* Top accent bar */}
@@ -187,7 +187,7 @@ function ToastCard({
                 toast.action!.onClick();
                 onDismiss();
               }}
-              className="mt-2 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="mt-2 border border-lime/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               {toast.action.label}
             </button>
@@ -196,14 +196,14 @@ function ToastCard({
         <button
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="border border-ink-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-lime hover:text-lime"
+          className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 hover:border-brand hover:text-brand"
         >
           ✕
         </button>
       </div>
 
       {/* Auto-dismiss progress bar — keyframes live in globals.css */}
-      <div className="h-px w-full bg-ink-3">
+      <div className="h-px w-full bg-gray-3">
         <div
           className={`h-full ${styles.bar}`}
           style={{

@@ -5,7 +5,7 @@ export function TransmissionsSection() {
   return (
     <section className="mt-[140px] flex flex-col items-center gap-4">
       <SectionHeader num="02" label="Transmissions" />
-      <div className="w-full border-y border-paper bg-ink-2">
+      <div className="w-full border-y border-paper bg-gray-2">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {pillars.map((p, i) => {
             // columns 1 and 3 on each row get left/right borders

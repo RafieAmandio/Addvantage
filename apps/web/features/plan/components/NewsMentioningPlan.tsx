@@ -18,8 +18,8 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
 
   return (
     <section className={cn("mx-auto max-w-7xl px-6 pb-12", className)}>
-      <div className="border border-ink-3 bg-ink-2/30">
-        <header className="border-b border-ink-3 px-4 py-3">
+      <div className="border border-gray-3 bg-gray-2/30">
+        <header className="border-b border-gray-3 px-4 py-3">
           <h2 className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
             News mentioning this plan · {rows.length}
           </h2>
@@ -31,7 +31,7 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
               <li key={n.id}>
                 <Link
                   href={`/app/news/${n.id}`}
-                  className="group block px-4 py-3 transition-colors hover:bg-ink-2"
+                  className="group block px-4 py-3 transition-colors hover:bg-gray-2"
                 >
                   <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
                     <span className="text-lime">[{n.source_code}]</span>
@@ -39,7 +39,7 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
                       · {formatDate(ts)} · {formatTime(ts)}Z
                     </span>
                   </div>
-                  <div className="mt-1 text-sm text-paper transition-colors group-hover:text-lime">
+                  <div className="mt-1 text-sm text-paper transition-colors group-hover:text-brand">
                     {n.headline}
                   </div>
                 </Link>

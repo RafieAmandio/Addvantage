@@ -81,7 +81,7 @@ export default function WatchlistPage() {
       />
 
       {/* Hero */}
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <div>
@@ -98,7 +98,7 @@ export default function WatchlistPage() {
             {tickers.length > 0 && (
               <button
                 onClick={() => setConfirmingClear(true)}
-                className="border border-ink-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
               >
                 ✕ Clear all
               </button>

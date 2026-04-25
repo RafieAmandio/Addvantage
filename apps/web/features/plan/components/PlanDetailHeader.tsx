@@ -44,7 +44,7 @@ export function PlanDetailHeader({
   };
 
   return (
-    <div className="border-b border-ink-3 bg-ink-2/30">
+    <div className="border-b border-gray-3 bg-gray-2/30">
       <div className="mx-auto max-w-7xl px-6 py-10">
         {breadcrumbs && <div className="mb-4">{breadcrumbs}</div>}
         <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -57,7 +57,7 @@ export function PlanDetailHeader({
                 </span>
               )}
               {!isLatest && (
-                <span className="border border-ink-3 bg-ink px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
+                <span className="border border-gray-3 bg-ink px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
                   ARCHIVE
                 </span>
               )}
@@ -83,7 +83,7 @@ export function PlanDetailHeader({
                 <button
                   onClick={exportPlanMarkdown}
                   title="Copy this plan as markdown to your clipboard"
-                  className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
                 >
                   ⇩ EXPORT MD
                 </button>

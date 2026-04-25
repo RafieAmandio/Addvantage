@@ -19,7 +19,7 @@ export default async function PlanPage() {
           <PlanStatsBadges stats={stats} />
         </div>
         <div className="mx-auto max-w-7xl px-6 pb-24 pt-4">
-          <div className="border border-ink-3 bg-ink-2/30 p-8 text-center">
+          <div className="border border-gray-3 bg-gray-2/30 p-8 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
               TRADING PLAN
             </div>
@@ -32,7 +32,7 @@ export default async function PlanPage() {
             </p>
             <Link
               href="/app/plan/archive"
-              className="mt-6 inline-block border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+              className="mt-6 inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
             >
               View archive →
             </Link>
@@ -55,7 +55,7 @@ export default async function PlanPage() {
         headerExtra={
           <Link
             href="/app/plan/archive"
-            className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
           >
             View archive →
           </Link>

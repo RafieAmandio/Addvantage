@@ -93,7 +93,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
   return (
     <div className="bg-grid-fine">
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-4xl px-6 py-10">
           <Breadcrumbs
             items={[
@@ -127,7 +127,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
       <div className="mx-auto max-w-4xl px-6 py-10">
         <SectionNumber n="01 /" label="WHAT THIS MEANS FOR PRICE" />
-        <div className="mt-4 border-l-4 border-lime bg-ink-2/40 p-6">
+        <div className="mt-4 border-l-4 border-lime bg-gray-2/40 p-6">
           <p className="font-display text-xl leading-relaxed text-paper/90">
             {item.analysis}
           </p>
@@ -151,7 +151,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
           <div className="col-span-12 md:col-span-5">
             <SectionNumber n="03 /" label="METADATA" />
-            <dl className="mt-4 space-y-2 border border-ink-3 bg-ink-2/30 p-4 font-mono text-xs">
+            <dl className="mt-4 space-y-2 border border-gray-3 bg-gray-2/30 p-4 font-mono text-xs">
               <Row label="Source" value={`[${item.source_code}]`} />
               <Row label="Author" value={item.author} />
               <Row label="Captured" value={`${formatTime(ts)}Z`} />
@@ -174,7 +174,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+                  className="border border-lime/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
                 >
                   #{t}
                 </Link>
@@ -184,7 +184,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
         )}
 
         {hasRelated && (
-          <div className="mt-12 border-t border-ink-3 pt-10">
+          <div className="mt-12 border-t border-gray-3 pt-10">
             <SectionNumber n="05 /" label="RELATED · BY HASHTAG" />
             <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-paper/40">
               Other items in the DOMAIN that share at least one tag with this article.
@@ -193,12 +193,12 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             {relatedNews.length > 0 && (
               <div className="mt-6">
                 <DataLabel>News · {relatedNews.length}</DataLabel>
-                <div className="mt-3 grid grid-cols-1 gap-px bg-ink-3 md:grid-cols-2">
+                <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
                   {relatedNews.map((n) => (
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group bg-ink p-4 transition-colors hover:bg-ink-2"
+                      className="group bg-ink p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
@@ -208,7 +208,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                           · BY {n.author.toUpperCase()}
                         </span>
                       </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-lime">
+                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-brand">
                         {n.headline}
                       </div>
                       <div className="mt-2 flex flex-wrap gap-1">
@@ -235,17 +235,17 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             {relatedPrimers.length > 0 && (
               <div className="mt-6">
                 <DataLabel>Primers · {relatedPrimers.length}</DataLabel>
-                <div className="mt-3 grid grid-cols-1 gap-px bg-ink-3 md:grid-cols-2">
+                <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
                   {relatedPrimers.map((p) => (
                     <Link
                       key={p.id}
                       href={`/app/education/${p.id}`}
-                      className="group bg-ink p-4 transition-colors hover:bg-ink-2"
+                      className="group bg-ink p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="font-mono text-[9px] uppercase tracking-widest2 text-lime">
                         {p.id} · {p.readingMin} min
                       </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-lime">
+                      <div className="mt-1 font-display text-lg leading-snug text-paper transition-colors group-hover:text-brand">
                         {p.title}
                       </div>
                       <div className="mt-1 font-mono text-[9px] italic uppercase tracking-widest2 text-lime/60">
@@ -260,12 +260,12 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             {relatedChannel.length > 0 && (
               <div className="mt-6">
                 <DataLabel>Channel posts · {relatedChannel.length}</DataLabel>
-                <div className="mt-3 space-y-px bg-ink-3">
+                <div className="mt-3 space-y-px bg-gray-3">
                   {relatedChannel.map((c) => (
                     <Link
                       key={c.id}
                       href="/app/channel"
-                      className="group block bg-ink p-4 transition-colors hover:bg-ink-2"
+                      className="group block bg-ink p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2">
                         <span className="text-lime">{c.id}</span>
@@ -284,11 +284,11 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         )}
 
-        <nav className="mt-16 grid grid-cols-2 gap-px border border-ink-3 bg-ink-3">
+        <nav className="mt-16 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -302,7 +302,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >

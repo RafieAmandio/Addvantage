@@ -101,7 +101,7 @@ function toChartTime(iso: string): Time {
 }
 
 const BG = "#0b0f14";
-const GRID = "#202832";
+const GRID = "#111111";
 const TEXT = "#e7ecef";
 const ACCENT = "#c6ff4d";
 
@@ -314,7 +314,7 @@ function MarkerHoverCard({
         )}
       >
         <div
-          className="border border-ink-3 bg-ink-2 p-3 shadow-lg shadow-black/50"
+          className="border border-gray-3 bg-gray-2 p-3 shadow-lg shadow-black/50"
           style={{ borderLeft: `2px solid ${style.color}` }}
         >
           <div className="mb-1 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
@@ -344,7 +344,7 @@ function MarkerHoverCard({
                       ? "border-blood/60 text-blood"
                       : marker.impact === "medium"
                       ? "border-amber-400/60 text-amber-400"
-                      : "border-ink-3 text-paper/50"
+                      : "border-gray-3 text-paper/50"
                   )}
                 >
                   {marker.impact}
@@ -358,7 +358,7 @@ function MarkerHoverCard({
                       ? "border-lime/60 text-lime"
                       : marker.bias === "bearish"
                       ? "border-blood/60 text-blood"
-                      : "border-ink-3 text-paper/50"
+                      : "border-gray-3 text-paper/50"
                   )}
                 >
                   {marker.bias}

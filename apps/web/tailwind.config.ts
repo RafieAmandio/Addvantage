@@ -5,30 +5,37 @@ const config: Config = {
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./lib/**/*.{ts,tsx}",
+    "./features/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
-        // Slate ink — page + surfaces
-        ink: {
-          DEFAULT: "#202832",
-          2: "#383E47",
-          3: "#4A5160",
-          4: "#5A6273",
+        // Orange — DOMAIN brand accent (CTAs, highlights, active states)
+        brand: {
+          DEFAULT: "#FFD400",
+          dim: "#E6C000",
+          deep: "#CCAF00",
         },
-        // Paper — light text
-        paper: {
+        // Black — page backgrounds
+        black: {
+          DEFAULT: "#111111",
+          2: "#1A1A1A",
+          3: "#222222",
+        },
+        // Gray — elevated surfaces, cards, inputs
+        gray: {
+          DEFAULT: "#1F1F1F",
+          2: "#2A2A2A",
+          3: "#333333",
+          4: "#444444",
+        },
+        // White — primary text
+        white: {
           DEFAULT: "#EEEEEE",
           2: "#D6D6D6",
           3: "#B8B8B8",
         },
-        // Lime — DOMAIN brand accent (hero CTAs, logo, ALL highlights)
-        lime: {
-          DEFAULT: "#61C933",
-          dim: "#4FA826",
-          deep: "#357019",
-        },
-        // Status
+        // Status colors
         blood: "#991B1B",
         moss: "#65A30D",
         steel: "#6B7280",

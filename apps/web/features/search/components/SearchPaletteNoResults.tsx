@@ -25,7 +25,7 @@ export function SearchPaletteNoResults({
         The desk doesn&apos;t fabricate results to fill a screen.
       </div>
 
-      <div className="mx-auto mt-8 max-w-md border-t border-ink-3 pt-6">
+      <div className="mx-auto mt-8 max-w-md border-t border-gray-3 pt-6">
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/40">
           ● Try one of these instead
         </div>
@@ -34,7 +34,7 @@ export function SearchPaletteNoResults({
             <button
               key={s}
               onClick={() => onPick(s)}
-              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="border border-lime/30 bg-lime/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               {s}
             </button>
@@ -50,7 +50,7 @@ export function SearchPaletteNoResults({
                 <button
                   key={q}
                   onClick={() => onPick(q)}
-                  className="border border-ink-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-lime hover:text-lime"
+                  className="border border-gray-3 bg-ink px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-paper/70 hover:border-brand hover:text-brand"
                 >
                   {q}
                 </button>

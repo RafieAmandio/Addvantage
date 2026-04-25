@@ -29,7 +29,7 @@ export function PlanStatsBadges({ stats, className }: Props) {
     return (
       <div
         className={cn(
-          "mb-6 inline-flex items-center gap-2 border border-ink-3 bg-ink-2/40 px-3 py-1.5",
+          "mb-6 inline-flex items-center gap-2 border border-gray-3 bg-gray-2/40 px-3 py-1.5",
           className,
         )}
       >
@@ -46,7 +46,7 @@ export function PlanStatsBadges({ stats, className }: Props) {
   return (
     <div
       className={cn(
-        "mb-6 grid grid-cols-2 gap-px bg-ink-3 sm:grid-cols-4",
+        "mb-6 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-4",
         className,
       )}
     >

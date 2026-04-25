@@ -66,7 +66,7 @@ export function CalendarFilterBar({
         {filtersActive && (
           <button
             onClick={onReset}
-            className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
+            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-blood hover:text-blood"
           >
             ✕ Reset filters
           </button>

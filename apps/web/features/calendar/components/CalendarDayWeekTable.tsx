@@ -21,9 +21,9 @@ export function CalendarDayWeekTable({
   className,
 }: Props) {
   return (
-    <div className={cn("overflow-x-auto border border-ink-3", className)}>
+    <div className={cn("overflow-x-auto border border-gray-3", className)}>
       <div className="min-w-[780px]">
-        <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-lime/40 bg-ink-2/95 px-3 py-2 backdrop-blur">
+        <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-lime/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
           <div className="font-mono text-[9px] uppercase tracking-widest2 text-paper/50">
             Event
           </div>
@@ -44,7 +44,7 @@ export function CalendarDayWeekTable({
         </div>
 
         {groups.length === 0 && (
-          <div className="border-y border-ink-3 bg-ink-2/40 p-12">
+          <div className="border-y border-gray-3 bg-gray-2/40 p-12">
             {emptyState}
           </div>
         )}
@@ -53,7 +53,7 @@ export function CalendarDayWeekTable({
           const summary = deriveSummary(events);
           return (
             <section key={ymd}>
-              <div className="border-y border-ink-3 bg-ink-2/60 px-3 py-2.5">
+              <div className="border-y border-gray-3 bg-gray-2/60 px-3 py-2.5">
                 <div className="flex items-baseline gap-3">
                   <span className="font-mono text-[10px] uppercase tracking-widest2 text-lime">
                     {formatDayHeader(ymd)}

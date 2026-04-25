@@ -173,7 +173,7 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
           ))}
         </div>
 
-        <div className="mt-10 border border-ink-3 bg-ink-2/30 p-5 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
+        <div className="mt-10 border border-gray-3 bg-gray-2/30 p-5 font-mono text-[10px] uppercase tracking-widest2 text-paper/50">
           ● Plan archive is read-only. Historical plans are never edited after
           publication. If a plan closed outside its stated invalidation, the
           next plan&apos;s risks section cites it by ID.

@@ -15,7 +15,7 @@ export function PlanArchiveEmpty({
   return (
     <div
       className={cn(
-        "mt-6 border border-ink-3 bg-ink-2/40 p-12 text-center",
+        "mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center",
         className
       )}
     >
@@ -31,7 +31,7 @@ export function PlanArchiveEmpty({
       </div>
       <button
         onClick={onClear}
-        className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+        className="mt-6 border border-lime/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
       >
         ✕ Show all plans
       </button>

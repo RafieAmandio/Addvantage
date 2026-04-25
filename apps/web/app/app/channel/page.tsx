@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function ChannelPage() {
   return (
     <div>
-      <div className="border-b border-ink-3 bg-ink-2/30">
+      <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <div className="flex items-baseline justify-between">
             <div>
@@ -56,7 +56,7 @@ export default function ChannelPage() {
                     <Link
                       key={t}
                       href={`/app/tags/${t}`}
-                      className="font-mono text-[10px] uppercase tracking-widest2 text-lime/70 hover:text-lime"
+                      className="font-mono text-[10px] uppercase tracking-widest2 text-lime/70 hover:text-brand"
                     >
                       #{t}
                     </Link>

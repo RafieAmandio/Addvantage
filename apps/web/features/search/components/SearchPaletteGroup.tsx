@@ -32,8 +32,8 @@ export function SearchPaletteGroup({
   onCommit,
 }: SearchPaletteGroupProps) {
   return (
-    <div className="border-b border-ink-3 last:border-b-0">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ink-3 bg-ink-2/95 px-5 py-2 backdrop-blur">
+    <div className="border-b border-gray-3 last:border-b-0">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-3 bg-gray-2/95 px-5 py-2 backdrop-blur">
         <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-lime">
           <span>{KIND_META[kind].code}</span>
           <span className="h-px w-6 bg-lime/40" />

@@ -49,7 +49,7 @@ export function NotificationItem({
         }}
         aria-label={isRead ? "Mark as unread" : "Mark as read"}
         title={isRead ? "Mark as unread" : "Mark as read"}
-        className="absolute right-2 top-2 z-10 border border-ink-3 bg-ink-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 transition-opacity hover:border-lime hover:text-lime opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+        className="absolute right-2 top-2 z-10 border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/40 transition-opacity hover:border-brand hover:text-brand opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
       >
         {isRead ? "↶ UNREAD" : "✓ READ"}
       </button>
@@ -57,12 +57,12 @@ export function NotificationItem({
         href={n.href}
         onClick={onNavigate}
         className={cn(
-          "group block border-b border-ink-3 px-4 py-3 transition-colors last:border-b-0",
+          "group block border-b border-gray-3 px-4 py-3 transition-colors last:border-b-0",
           pinMatch && !isRead
-            ? "border-l-2 border-l-lime bg-lime/5 hover:bg-lime/10"
+            ? "border-l-2 border-l-lime bg-lime/5 hover:bg-brand/10"
             : isRead
-              ? "bg-ink hover:bg-ink-2"
-              : "bg-ink-2/40 hover:bg-ink-2"
+              ? "bg-ink hover:bg-gray-2"
+              : "bg-gray-2/40 hover:bg-gray-2"
         )}
       >
         <div className="flex items-start gap-3 pr-16">
@@ -99,7 +99,7 @@ export function NotificationItem({
             <div
               className={cn(
                 "mt-1 font-display text-base leading-snug",
-                isRead ? "text-paper/60" : "text-paper group-hover:text-lime"
+                isRead ? "text-paper/60" : "text-paper group-hover:text-brand"
               )}
             >
               {n.title}
@@ -121,12 +121,12 @@ export function BucketLabel({ bucket }: { bucket: BucketId }) {
           border: "border-lime/40",
         }
       : bucket === 1
-        ? { label: "● UNREAD", color: "text-paper/60", border: "border-ink-3" }
-        : { label: "○ READ", color: "text-paper/30", border: "border-ink-3" };
+        ? { label: "● UNREAD", color: "text-paper/60", border: "border-gray-3" }
+        : { label: "○ READ", color: "text-paper/30", border: "border-gray-3" };
   return (
     <div
       className={cn(
-        "flex items-center gap-2 border-b bg-ink-2/40 px-4 py-1.5",
+        "flex items-center gap-2 border-b bg-gray-2/40 px-4 py-1.5",
         meta.border
       )}
     >
@@ -138,7 +138,7 @@ export function BucketLabel({ bucket }: { bucket: BucketId }) {
       >
         {meta.label}
       </span>
-      <span className="h-px flex-1 bg-ink-3" />
+      <span className="h-px flex-1 bg-gray-3" />
     </div>
   );
 }

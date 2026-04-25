@@ -36,7 +36,7 @@ function EventCardInner({
 }) {
   const href = eventHref(event);
   const body = (
-    <div className={cn("px-4 py-3 hover:bg-ink-3", className)}>
+    <div className={cn("px-4 py-3 hover:bg-gray-3", className)}>
       <div className="flex items-center gap-2">
         <span
           className={cn(

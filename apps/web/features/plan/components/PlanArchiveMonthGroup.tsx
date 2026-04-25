@@ -44,7 +44,7 @@ function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
         )}
       </div>
 
-      <div className="space-y-px bg-ink-3">
+      <div className="space-y-px bg-gray-3">
         {group.plans.map((p) => (
           <PlanArchiveRow
             key={p.id}

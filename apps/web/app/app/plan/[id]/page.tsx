@@ -61,13 +61,13 @@ export default async function PlanDetailPage({
             <Link
               href={`/app/plan/compare?a=${plan.id}`}
               title="Compare this plan with another"
-              className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
             >
               ⇌ COMPARE
             </Link>
             <Link
               href="/app/plan/archive"
-              className="border border-ink-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-lime hover:text-lime"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-paper/60 hover:border-brand hover:text-brand"
             >
               ← Archive
             </Link>
@@ -78,11 +78,11 @@ export default async function PlanDetailPage({
       <NewsMentioningPlan planId={plan.id} />
 
       <div className="mx-auto max-w-7xl px-6 pb-12">
-        <nav className="grid grid-cols-2 gap-px border border-ink-3 bg-ink-3">
+        <nav className="grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}
             className={
-              "block bg-ink p-4 transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 transition-colors hover:bg-gray-2 " +
               (newer ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -96,7 +96,7 @@ export default async function PlanDetailPage({
           <Link
             href={older ? `/app/plan/${older.id}` : "/app/plan/archive"}
             className={
-              "block bg-ink p-4 text-right transition-colors hover:bg-ink-2 " +
+              "block bg-ink p-4 text-right transition-colors hover:bg-gray-2 " +
               (older ? "" : "pointer-events-none opacity-30")
             }
           >

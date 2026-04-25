@@ -19,12 +19,12 @@ export function EventRow({
     : null;
 
   return (
-    <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-ink-3 bg-ink px-3 py-3 transition-colors hover:bg-ink-2">
+    <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-ink px-3 py-3 transition-colors hover:bg-gray-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
           <Link
             href={`/app/calendar/${event.id}`}
-            className="font-display text-base leading-tight text-paper group-hover:text-lime hover:text-lime hover:underline"
+            className="font-display text-base leading-tight text-paper group-hover:text-brand hover:text-brand hover:underline"
           >
             {event.title}
           </Link>
@@ -32,7 +32,7 @@ export function EventRow({
             <Link
               href={`/app/news/${related.id}`}
               title={related.headline}
-              className="border border-lime/40 bg-lime/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-lime hover:text-ink"
+              className="border border-lime/40 bg-lime/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-lime hover:bg-brand hover:text-ink"
             >
               ↗ {related.id}
             </Link>
