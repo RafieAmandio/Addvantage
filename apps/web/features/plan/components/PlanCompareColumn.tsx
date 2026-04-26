@@ -21,7 +21,7 @@ function CompactSetup({
     <Link
       href={`/app/plan/${planId}#${s.id}`}
       className={cn(
-        "block border p-3 transition-colors",
+        "block border p-3 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
         highlighted
           ? "border-brand bg-brand/5 hover:bg-brand/10"
           : "border-gray-3 bg-black hover:bg-gray-2"
@@ -92,7 +92,7 @@ export function PlanCompareColumn({
           <div className="flex items-center gap-2">
             <Link
               href={`/app/plan/${plan.id}`}
-              className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               {plan.id}
             </Link>
