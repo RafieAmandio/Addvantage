@@ -87,7 +87,7 @@ export function CalendarEmptyState({
           >
             {isMonth
               ? "Next event →"
-              : `Next event · ${formatDayHeader(nearestForward!)} →`}
+              : `Next event · ${formatDayHeader(nearestForward)} →`}
           </button>
         )}
         {filtersActive && (

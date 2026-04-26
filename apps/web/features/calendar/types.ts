@@ -37,3 +37,5 @@ export const REGIONS: ReadonlyArray<CalendarEvent["region"]> = [
   "ID",
   "GLOBAL",
 ];
+
+export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;

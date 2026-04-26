@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { CURRENCIES } from "@/features/calendar/mock";
+import { CURRENCIES } from "@/features/calendar/types";
 import type { CalendarEvent } from "@/features/calendar/types";
 import { formatDayHeader } from "@/features/calendar/lib/format";
 import { deriveSummary } from "@/features/calendar/lib/group";

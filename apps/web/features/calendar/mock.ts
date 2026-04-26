@@ -1,6 +1,5 @@
 import type { CalendarEvent, CalendarDayMeta } from "@/features/calendar/types";
-
-export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;
+export { CURRENCIES } from "@/features/calendar/types";
 
 export const calendarDayMeta: CalendarDayMeta[] = [
   { date: "2026-04-03", summary: "NFP + Unemployment" },

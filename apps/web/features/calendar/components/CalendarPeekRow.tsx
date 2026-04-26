@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CalendarEvent } from "@/features/calendar/types";
-import { CURRENCIES } from "@/features/calendar/mock";
+import { CURRENCIES } from "@/features/calendar/types";
 import { formatTime } from "@/lib/cn";
 
 export function CalendarPeekRow({ event }: { event: CalendarEvent }) {
