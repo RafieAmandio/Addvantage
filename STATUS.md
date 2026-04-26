@@ -60,7 +60,7 @@
 | 1.3 | Admin: show AI system prompt + user message | [ ] | What was sent to OpenAI |
 | 1.4 | Admin: show AI raw response (before schema parsing) | [ ] | Full JSON output from model |
 | 1.5 | Admin: show diff: raw text → headline, rephrased, analysis | [ ] | Side-by-side or inline diff |
-| 1.6 | Admin: ingestion logs page | [ ] | Per-source pipeline stats, run history |
+| 1.6 | Admin: ingestion logs page | [x] | Built /admin/logs — summary stats, desktop table, mobile cards, error banner, linked in admin nav |
 | 1.7 | Admin: show `ingestion_runs` data (fetched, new, rephrased counts) | [ ] | |
 | 1.8 | Admin: `raw_text` column surfaced in review UI | [ ] | |
 

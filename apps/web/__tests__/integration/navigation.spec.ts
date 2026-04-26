@@ -10,9 +10,9 @@ const BASE_URL = "http://localhost:3000";
 test.describe("Public pages", () => {
   test("homepage loads without crash", async ({ page }) => {
     await page.goto(`${BASE_URL}/`);
-    await expect(page).not.toHaveSelector('[data-testid="error-boundary"]', {
-      timeout: 5000,
-    });
+    await expect(
+      page.locator('[data-testid="error-boundary"]')
+    ).toHaveCount(0, { timeout: 5000 });
   });
 
   test("login page loads", async ({ page }) => {

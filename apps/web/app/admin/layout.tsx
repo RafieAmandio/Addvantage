@@ -41,6 +41,9 @@ export default async function AdminLayout({
               <Link href="/admin/sources" className="hover:text-brand">
                 Sources
               </Link>
+              <Link href="/admin/logs" className="hover:text-brand">
+                Logs
+              </Link>
             </nav>
           </div>
           <Link

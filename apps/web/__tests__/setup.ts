@@ -1,4 +1,6 @@
+/// <reference types="vitest/globals" />
 import "@testing-library/jest-dom";
+import React from "react";
 import { vi, expect } from "vitest";
 
 // Mock next/navigation
@@ -19,7 +21,7 @@ vi.mock("next/navigation", () => ({
 // Mock next/image
 vi.mock("next/image", () => ({
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) =>
-    React.createElement("img", props),
+    React.createElement("img", props as React.HTMLAttributes<HTMLImageElement>),
 }));
 
 // Mock Supabase client
