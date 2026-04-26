@@ -1,6 +1,6 @@
 import { config } from "../lib/config";
 import { fetchText } from "../lib/http";
-import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
  * Truth Social adapter — polls a public RSS mirror of Donald Trump's Truth
@@ -57,7 +57,7 @@ export class TruthSocialAdapter implements SourceAdapter {
         occurredAt,
       });
     }
-    return dedupe(out).slice(0, 20);
+    return dedupeByExternalId(out).slice(0, 20);
   }
 }
 
@@ -130,11 +130,3 @@ function parseRssDate(s: string): string | undefined {
   return Number.isFinite(d.getTime()) ? d.toISOString() : undefined;
 }
 
-function dedupe(items: Candidate[]): Candidate[] {
-  const seen = new Set<string>();
-  return items.filter((c) => {
-    if (seen.has(c.externalId)) return false;
-    seen.add(c.externalId);
-    return true;
-  });
-}

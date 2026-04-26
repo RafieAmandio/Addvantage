@@ -1,6 +1,6 @@
 import { config } from "../lib/config";
 import { fetchText } from "../lib/http";
-import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 import { matchIndicator } from "./forexfactory-indicators";
 
 /**
@@ -113,7 +113,7 @@ export class ForexFactoryAdapter implements SourceAdapter {
           : {}),
       });
     }
-    const deduped = dedupe(out);
+    const deduped = dedupeByExternalId(out);
     ctx.logger.debug(
       {
         kept: deduped.length,
@@ -224,11 +224,3 @@ function stableId(parts: string[]): string {
   return `ff:${(h >>> 0).toString(16)}`;
 }
 
-function dedupe(items: Candidate[]): Candidate[] {
-  const seen = new Set<string>();
-  return items.filter((c) => {
-    if (seen.has(c.externalId)) return false;
-    seen.add(c.externalId);
-    return true;
-  });
-}

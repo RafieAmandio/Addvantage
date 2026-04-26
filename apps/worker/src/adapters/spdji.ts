@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import { fetchText } from "../lib/http";
-import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
  * S&P Dow Jones Indices — the entire `www.spglobal.com/spdji/` hostname is
@@ -45,19 +45,10 @@ export class SpdjiAdapter implements SourceAdapter {
         });
       });
 
-      return dedupe(out).slice(0, 8);
+      return dedupeByExternalId(out).slice(0, 8);
     } catch (err) {
       ctx.logger.warn({ err: String(err) }, "spdji unavailable (Cloudflare)");
       return [];
     }
   }
-}
-
-function dedupe(items: Candidate[]): Candidate[] {
-  const seen = new Set<string>();
-  return items.filter((c) => {
-    if (seen.has(c.externalId)) return false;
-    seen.add(c.externalId);
-    return true;
-  });
 }

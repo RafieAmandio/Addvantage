@@ -77,12 +77,12 @@ async function main() {
   );
 
   // Coalesce concurrent invocations with the same (provider, symbol,
-   // interval, window) onto a single Twelve Data call. Ten-second request
-   // bursts from parallel CLI runs or retries thus share one upstream hit.
-   const sfKey = `bars:${adapter.code}:${symbol}:${interval}:${from.toISOString()}:${to.toISOString()}`;
-   const bars = await singleflight<Bar[]>(sfKey, 30, () =>
-     adapter.fetchBars({ symbol, interval, from, to }),
-   );
+  // interval, window) onto a single Twelve Data call. Ten-second request
+  // bursts from parallel CLI runs or retries thus share one upstream hit.
+  const sfKey = `bars:${adapter.code}:${symbol}:${interval}:${from.toISOString()}:${to.toISOString()}`;
+  const bars = await singleflight<Bar[]>(sfKey, 30, () =>
+    adapter.fetchBars({ symbol, interval, from, to }),
+  );
 
   logger.info(
     { symbol, interval, count: bars.length },

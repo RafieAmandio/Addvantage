@@ -37,3 +37,12 @@ export interface SourceAdapter {
   readonly name: string;
   fetch(ctx: AdapterContext): Promise<Candidate[]>;
 }
+
+export function dedupeByExternalId(items: Candidate[]): Candidate[] {
+  const seen = new Set<string>();
+  return items.filter((c) => {
+    if (seen.has(c.externalId)) return false;
+    seen.add(c.externalId);
+    return true;
+  });
+}

@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import { fetchText } from "../lib/http";
-import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
  * RBC Wealth Management — Asia Insights landing. Real articles live at
@@ -50,19 +50,10 @@ export class RbcAdapter implements SourceAdapter {
         });
       });
 
-      return dedupe(out).slice(0, 10);
+      return dedupeByExternalId(out).slice(0, 10);
     } catch (err) {
       ctx.logger.warn({ err: String(err) }, "rbc fetch failed");
       return [];
     }
   }
-}
-
-function dedupe(items: Candidate[]): Candidate[] {
-  const seen = new Set<string>();
-  return items.filter((c) => {
-    if (seen.has(c.externalId)) return false;
-    seen.add(c.externalId);
-    return true;
-  });
 }

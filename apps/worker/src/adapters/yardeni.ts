@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import { fetchText } from "../lib/http";
-import type { AdapterContext, Candidate, SourceAdapter } from "./base";
+import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
  * Yardeni Research — homepage hero lists the latest Morning Briefings and
@@ -62,7 +62,7 @@ export class YardeniAdapter implements SourceAdapter {
         });
       });
 
-      return dedupe(out).slice(0, 10);
+      return dedupeByExternalId(out).slice(0, 10);
     } catch (err) {
       ctx.logger.warn({ err: String(err) }, "yardeni fetch failed");
       return [];
@@ -73,13 +73,4 @@ export class YardeniAdapter implements SourceAdapter {
 function slugToTitle(href: string): string {
   const slug = href.split("/").filter(Boolean).pop() ?? "";
   return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function dedupe(items: Candidate[]): Candidate[] {
-  const seen = new Set<string>();
-  return items.filter((c) => {
-    if (seen.has(c.externalId)) return false;
-    seen.add(c.externalId);
-    return true;
-  });
 }

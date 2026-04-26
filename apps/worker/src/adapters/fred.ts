@@ -19,15 +19,6 @@ interface FredObservationsResponse {
   observations: FredObservation[];
 }
 
-interface FredSeriesResponse {
-  seriess: Array<{
-    id: string;
-    title: string;
-    units_short?: string;
-    frequency_short?: string;
-  }>;
-}
-
 /**
  * Curated series we care about. Each entry is a (series_id, short_label).
  * Add sparingly — each series is one API call per poll.
@@ -94,6 +85,3 @@ export class FredAdapter implements SourceAdapter {
     return { seriesCount: SERIES.length };
   }
 }
-
-// Silence unused-import in strict mode if future consumer imports are removed.
-type _FredSeriesResponse = FredSeriesResponse;
