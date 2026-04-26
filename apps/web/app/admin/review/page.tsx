@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listPendingNews } from "@/features/news/queries/news";
+import { formatDateTime } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -67,7 +68,7 @@ export default async function AdminReviewQueuePage() {
                 [{n.source_code}]
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {new Date(n.fetched_at).toISOString().slice(0, 16).replace("T", " ")}
+                {formatDateTime(n.fetched_at)}
               </div>
               <div className="mt-2 flex gap-2 font-mono text-[9px] uppercase tracking-widest2">
                 <span className="text-brand">{n.impact}</span>

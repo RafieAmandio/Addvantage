@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listRejectedNews } from "@/features/news/queries/news";
+import { formatDate } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -53,9 +54,7 @@ export default async function AdminArchivePage() {
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 rejected{" "}
-                {n.reviewed_at
-                  ? new Date(n.reviewed_at).toISOString().slice(0, 10)
-                  : "—"}
+                {n.reviewed_at ? formatDate(n.reviewed_at) : "—"}
               </div>
             </div>
             <div className="col-span-12 lg:col-span-10">
