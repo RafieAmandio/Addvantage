@@ -10,7 +10,7 @@ export default function LiabilityPage() {
   const router = useRouter();
   const { signLiability, setTier } = useAppState();
   const [signature, setSignature] = useState("");
-  const [acks, setAcks] = useState({
+  const [acks, setAcks] = useState<Record<string, boolean>>({
     a: false,
     b: false,
     c: false,
@@ -137,7 +137,7 @@ export default function LiabilityPage() {
             >
               <input
                 type="checkbox"
-                checked={(acks as Record<string, boolean>)[a.k]}
+                checked={acks[a.k]}
                 onChange={(e) =>
                   setAcks({ ...acks, [a.k]: e.target.checked })
                 }
