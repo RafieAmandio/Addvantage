@@ -27,7 +27,7 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
         <Link
           key={p.id}
           href={`/admin/plans/${p.id}`}
-          className="group grid grid-cols-12 items-center gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
+          className="group grid grid-cols-12 items-center gap-6 bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2"
         >
           <div className="col-span-12 lg:col-span-2">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">

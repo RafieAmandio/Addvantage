@@ -70,7 +70,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="stagger mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link

@@ -7,7 +7,7 @@ export const revalidate = 0;
 export default async function AdminArchivePage() {
   const items = await listRejectedNews();
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="stagger mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-baseline justify-between">
         <h1 className="font-display text-4xl text-white">
           Rejected <span className="italic text-brand">archive</span>
@@ -45,7 +45,7 @@ export default async function AdminArchivePage() {
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">

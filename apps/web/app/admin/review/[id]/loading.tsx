@@ -1,7 +1,7 @@
 export default function ReviewDetailLoading() {
   return (
     <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-5xl animate-pulse">
+      <div className="mx-auto max-w-7xl animate-pulse">
         <div className="mb-4 h-3 w-24 rounded bg-gray-2" />
         <div className="mb-6 h-8 w-2/3 rounded bg-gray-2" />
         <div className="grid gap-6 md:grid-cols-2">

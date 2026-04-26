@@ -1,7 +1,7 @@
 export default function AdminPlansLoading() {
   return (
     <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-5xl animate-pulse">
+      <div className="mx-auto max-w-7xl animate-pulse">
         <div className="mb-6 flex items-center justify-between">
           <div className="space-y-2">
             <div className="h-3 w-24 rounded bg-gray-2" />

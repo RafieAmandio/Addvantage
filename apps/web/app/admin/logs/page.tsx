@@ -73,7 +73,7 @@ export default async function IngestionLogsPage() {
 
   return (
     <div className="bg-grid-fine min-h-screen px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-7xl">
+      <div className="stagger mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">

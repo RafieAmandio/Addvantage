@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/auth/session";
+import { AdminNav } from "./AdminNav";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,6 @@ export default async function AdminLayout({
     redirect("/login?next=/admin/review");
   }
   if (!profile.is_admin) {
-    // Logged-in but non-admin: bounce to the operator dashboard rather than
-    // render a dead "FORBIDDEN" page. Avoids the impression that the admin
-    // surface even exists for ordinary users, and keeps URLs in /app/* on
-    // accidental link follows.
     redirect("/app");
   }
   return (
@@ -28,27 +25,11 @@ export default async function AdminLayout({
             <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
               DESK · ADMIN
             </span>
-            <nav className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-              <Link href="/admin/review" className="hover:text-brand">
-                Review
-              </Link>
-              <Link href="/admin/archive" className="hover:text-brand">
-                Archive
-              </Link>
-              <Link href="/admin/plans" className="hover:text-brand">
-                Plans
-              </Link>
-              <Link href="/admin/sources" className="hover:text-brand">
-                Sources
-              </Link>
-              <Link href="/admin/logs" className="hover:text-brand">
-                Logs
-              </Link>
-            </nav>
+            <AdminNav />
           </div>
           <Link
             href="/app"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
           >
             ← Back to DOMAIN
           </Link>
