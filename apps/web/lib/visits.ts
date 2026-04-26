@@ -1,6 +1,4 @@
-import { news } from "@/features/news/mock";
-import { primers } from "@/features/education/mock";
-import { allHashtags, hashtagMeta } from "@/features/tags/constants";
+import { allHashtags } from "@/features/tags/constants";
 import type { Hashtag } from "@tradevantage/shared";
 
 const KEY = "ants-domain-recent-visits";
@@ -66,23 +64,12 @@ function describeRoute(href: string): { label: string; kind: string } | null {
     return base;
   }
 
-  const newsMatch = pathname.match(/^\/app\/news\/(.+)$/);
-  if (newsMatch) {
-    const item = news.find((n) => n.id === newsMatch[1]);
-    if (item) {
-      return {
-        label: item.headline.length > 60
-          ? item.headline.slice(0, 60) + "…"
-          : item.headline,
-        kind: "News",
-      };
-    }
+  if (/^\/app\/news\/.+$/.test(pathname)) {
+    return { label: "News Article", kind: "News" };
   }
 
-  const eduMatch = pathname.match(/^\/app\/education\/(.+)$/);
-  if (eduMatch) {
-    const p = primers.find((p) => p.id === eduMatch[1]);
-    if (p) return { label: p.title, kind: "Primer" };
+  if (/^\/app\/education\/.+$/.test(pathname)) {
+    return { label: "Education Primer", kind: "Primer" };
   }
 
   const tagMatch = pathname.match(/^\/app\/tags\/(.+)$/);
