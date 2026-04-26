@@ -129,7 +129,7 @@ export default async function ChartPage({
       <div className="grid grid-cols-12 gap-4 sm:gap-6">
         <div className="col-span-12 lg:col-span-8">
           {usingMock && (
-            <div className="mb-3 border border-amber-400/40 bg-amber-400/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-amber-400">
+            <div className="mb-3 border border-brand/40 bg-brand/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand">
               [mock data — instrument_bars empty]
             </div>
           )}

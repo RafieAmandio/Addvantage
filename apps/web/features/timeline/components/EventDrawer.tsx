@@ -14,11 +14,11 @@ function kindBadge(kind: TimelineEvent["kind"]): string {
     case "news":
       return "bg-brand/15 text-brand";
     case "tweet":
-      return "bg-amber-400/15 text-amber-400";
+      return "bg-brand/10 text-brand/70";
     case "macro":
       return "bg-blood/15 text-red-500";
     case "earnings":
-      return "bg-cyan-400/15 text-cyan-400";
+      return "bg-moss/15 text-moss";
     case "user_pin":
       return "bg-white/15 text-white/70";
   }
@@ -42,7 +42,7 @@ function impactColor(impact: TimelineEvent["impact"]): string {
     case "high":
       return "bg-blood/15 text-red-500";
     case "medium":
-      return "bg-amber-400/15 text-amber-400";
+      return "bg-brand/15 text-brand";
     case "low":
       return "bg-white/15 text-white/70";
     default:

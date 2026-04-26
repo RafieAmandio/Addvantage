@@ -45,7 +45,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
 
   const statusChip = {
     pending: "bg-brand/10 border-brand text-brand",
-    approved: "bg-emerald-600/10 border-emerald-500 text-emerald-400",
+    approved: "bg-moss/10 border-moss text-moss",
     rejected: "bg-blood/10 border-blood text-red-500",
   }[item.status] ?? "bg-gray-2 border-gray-3 text-white/60";
 

@@ -45,7 +45,7 @@ export default async function AdminSourcesPage() {
                 <div
                   className={
                     "mt-1 font-mono text-[9px] uppercase tracking-widest2 " +
-                    (s.enabled ? "text-emerald-400" : "text-white/40")
+                    (s.enabled ? "text-moss" : "text-white/40")
                   }
                 >
                   {s.enabled ? "● ENABLED" : "○ DISABLED"}

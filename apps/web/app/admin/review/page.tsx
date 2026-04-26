@@ -28,7 +28,7 @@ export default async function AdminReviewQueuePage() {
 
       {items.length === 0 && (
         <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-emerald-400">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-moss">
             ● INBOX CLEAR
           </div>
           <div className="mt-3 font-display text-2xl text-white">

@@ -343,7 +343,7 @@ function MarkerHoverCard({
                     marker.impact === "high"
                       ? "border-blood/60 text-red-500"
                       : marker.impact === "medium"
-                      ? "border-amber-400/60 text-amber-400"
+                      ? "border-brand/60 text-brand"
                       : "border-gray-3 text-white/50"
                   )}
                 >
