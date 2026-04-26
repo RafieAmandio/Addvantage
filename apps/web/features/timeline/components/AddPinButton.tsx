@@ -19,11 +19,6 @@ const ERROR_MESSAGES: Record<string, string> = {
   "invalid occurredAt": "Pick a valid date/time.",
 };
 
-/**
- * Converts a `Date` into the `YYYY-MM-DDTHH:MM` local-time string that
- * `<input type="datetime-local">` expects. Avoids the UTC offset that
- * `Date#toISOString()` would introduce.
- */
 function toLocalInputValue(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return (
@@ -58,16 +53,11 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
   );
   const titleInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Reset the datetime to "now" each time the modal opens so a stale closure
-  // doesn't leak a time from when the page first mounted.
   useEffect(() => {
     if (open) setLocalDt(toLocalInputValue(new Date()));
   }, [open]);
 
-  // `<input type="datetime-local">` submits `YYYY-MM-DDTHH:MM` (no offset),
-  // but the server action's zod schema requires a full ISO 8601 datetime.
-  // Derive a hidden `occurredAt` that the browser treats as local time then
-  // serialises with UTC offset via Date → toISOString.
+  // datetime-local gives no offset; server action needs full ISO — convert via Date.
   const occurredAtIso = useMemo(() => {
     if (!localDt) return "";
     const d = new Date(localDt);
@@ -76,7 +66,6 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
 
   const close = useCallback(() => setOpen(false), []);
 
-  // Escape to close + body-scroll lock while open.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -87,7 +76,6 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    // Focus the title input on open so the form is immediately typeable.
     const t = setTimeout(() => titleInputRef.current?.focus(), 10);
     return () => {
       document.body.style.overflow = "";
@@ -96,8 +84,6 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
     };
   }, [open, close]);
 
-  // Close + flash toast on successful submit. useFormState transitions `state`
-  // from its initial `{ ok: false }` to `{ ok: true }` when the action resolves.
   useEffect(() => {
     if (state.ok) {
       setOpen(false);

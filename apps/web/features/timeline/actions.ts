@@ -8,14 +8,6 @@ import { logger } from "@/lib/logger";
 import { supabaseServer } from "@/lib/supabase/server";
 import { enforceUserRateLimit } from "@/lib/user-ratelimit";
 
-/**
- * User-pin create action. Auth-gated (middleware already blocks unauthenticated
- * requests to `/app/*`, but we re-check `auth.getUser()` as defense-in-depth).
- *
- * RLS policy `timeline_events_user_pin_insert` (migration 0017) enforces
- * `kind='user_pin'` and `created_by = auth.uid()` at the DB layer — so even
- * a direct server-action call cannot spoof another user's pin.
- */
 const UserPinSchema = z.object({
   title: z.string().trim().min(1, "title required").max(200),
   body: z.string().trim().max(2000).optional(),

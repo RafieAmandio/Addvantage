@@ -4,11 +4,6 @@ import type { TimelineEvent } from "@/features/timeline/types";
 import { useTimelineEvents } from "@/features/timeline/hooks/useTimelineEvents";
 import { EventFeed } from "./EventFeed";
 
-/**
- * Thin client wrapper around `EventFeed` that live-appends new
- * `timeline_events` INSERTs matching the given symbols + window. Seeded by
- * `initialEvents` from the server; never refetches on mount.
- */
 export function LiveEventFeed({
   initialEvents,
   symbols,
@@ -25,12 +20,7 @@ export function LiveEventFeed({
   from?: string;
   to?: string;
   heading?: string;
-  /**
-   * When set, renders `${headingPrefix} · ${count} events` with the live
-   * count. Kept as a string (not a function prop) so Server Components can
-   * hand it across the RSC boundary without tripping the
-   * "Functions cannot be passed directly to Client Components" rule.
-   */
+  // String (not function) so it can cross the RSC → client boundary.
   headingPrefix?: string;
   emptyMessage?: string;
   maxHeightClass?: string;

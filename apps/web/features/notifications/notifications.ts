@@ -68,7 +68,6 @@ export function useReadNotifications() {
     });
   }, []);
 
-  /** Overwrite the full read-state set. Used by undo actions. */
   const restore = useCallback((ids: string[]) => {
     setReadIds(() => {
       const next = Array.from(new Set(ids));

@@ -41,10 +41,6 @@ interface IndexEntry {
 
 let cachedIndex: IndexEntry[] | null = null;
 
-/**
- * Shape of a locally-persisted consult session. Mirrors what the consult
- * page writes to localStorage under `ants-domain-consult-v1`.
- */
 interface LocalConsultSession {
   id: string;
   title: string;
@@ -59,10 +55,6 @@ interface PersistedConsult {
   extras: Record<string, ConsultMessage[]>;
 }
 
-/**
- * Read local consult sessions out of localStorage at search time.
- * Returns [] on SSR or when nothing's persisted.
- */
 function getLocalConsultEntries(): IndexEntry[] {
   if (typeof window === "undefined") return [];
   try {
@@ -228,18 +220,10 @@ function buildIndex(): IndexEntry[] {
 
 function getIndex(): IndexEntry[] {
   if (!cachedIndex) cachedIndex = buildIndex();
-  // Local sessions are live (not cached) — read fresh on every search so
-  // renames and new messages show up without a page reload.
+  // Local sessions aren't cached — must be fresh each search for renames/new messages.
   return [...getLocalConsultEntries(), ...cachedIndex];
 }
 
-/**
- * Score a single entry against tokens. Higher = better.
- * - Title match: 10 per token
- * - Tag exact match: 8 per token
- * - Haystack contains: 3 per token
- * - Bonus: all tokens present anywhere
- */
 function score(entry: IndexEntry, tokens: string[]): number {
   if (tokens.length === 0) return 0;
   const title = entry.title.toLowerCase();

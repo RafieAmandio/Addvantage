@@ -9,10 +9,6 @@ export interface MockNotification {
   href: string;     // where to navigate on click
 }
 
-/**
- * Hardcoded operator notifications. In a real product these would arrive over
- * SSE / websockets. Ordered newest-first.
- */
 export const notifications: MockNotification[] = [
   {
     id: "NTF-021",

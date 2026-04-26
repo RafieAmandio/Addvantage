@@ -18,11 +18,6 @@ interface UseNotificationBellResult {
   buttonRef: RefObject<HTMLButtonElement>;
 }
 
-/**
- * Encapsulates all imperative bell behaviors: open state, outside-click,
- * keyboard navigation, global `ants:bell-toggle` shortcut, active-row reset
- * on filter change, and scroll-into-view of the active row.
- */
 export function useNotificationBell({
   visible,
   markRead,
@@ -37,7 +32,6 @@ export function useNotificationBell({
     setOpenState((prev) => (typeof o === "function" ? o(prev) : o));
   };
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {
@@ -51,7 +45,6 @@ export function useNotificationBell({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  // Keyboard navigation inside the panel
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -79,7 +72,6 @@ export function useNotificationBell({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, activeIdx, visible, markRead, router]);
 
-  // Scroll the active row into view inside the panel's scroll container
   useEffect(() => {
     if (!open) return;
     const el = panelRef.current?.querySelector<HTMLElement>(
@@ -88,7 +80,6 @@ export function useNotificationBell({
     el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [activeIdx, open]);
 
-  // Listen for global `n` shortcut from Shortcuts.tsx
   useEffect(() => {
     const onToggle = () => setOpenState((o) => !o);
     window.addEventListener("ants:bell-toggle", onToggle);

@@ -15,10 +15,6 @@ export function saveRecentSearches(list: string[]): void {
   } catch {}
 }
 
-/**
- * Insert `query` at the head of `recent`, de-duplicated and capped at MAX_RECENT.
- * Empty/whitespace-only queries are dropped.
- */
 export function pushRecentSearch(recent: string[], query: string): string[] {
   const trimmed = query.trim();
   return [trimmed, ...recent.filter((q) => q !== trimmed)]

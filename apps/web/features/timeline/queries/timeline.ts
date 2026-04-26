@@ -15,37 +15,17 @@ const TIMELINE_EVENT_COLUMNS =
   "id,kind,source_code,occurred_at,symbols,title,body,url,bias,impact,news_item_id";
 
 interface ListTimelineParams {
-  /**
-   * Symbols to filter by. If provided, must be non-empty — matches
-   * `symbols && {…}` (array overlap) semantics. Omit to read across all
-   * symbols (useful for kind-scoped views like the macro calendar).
-   */
   symbols?: string[];
-  /** Kinds to filter by (e.g. `['macro']` for the calendar). Omit for all. */
   kinds?: TimelineKind[];
-  /** ISO timestamp lower bound (inclusive). */
   from?: string;
-  /** ISO timestamp upper bound (inclusive). */
   to?: string;
-  /** Hard cap on rows returned (so a misuse can't OOM the page). */
   limit?: number;
 }
 
-/**
- * Returns timeline events for the given filters + window. Reads directly
- * from `timeline_events` (the single source of truth since Phase C): news,
- * tweets, macro, earnings, and the caller's own pins. Newest-first by
- * `occurred_at`. Caller is responsible for slicing to the visible viewport.
- *
- * At least one of `symbols` or `kinds` SHOULD be provided to keep scans
- * bounded; an explicit `limit` is always applied regardless.
- */
 export async function listTimelineEvents(
   params: ListTimelineParams
 ): Promise<TimelineEvent[]> {
   const { symbols, kinds, from, to, limit = 200 } = params;
-  // If symbols filter is present but empty, caller wanted an intersection
-  // with nothing — short-circuit. Omitted (undefined) means "all symbols".
   if (symbols && symbols.length === 0) return [];
   if (kinds && kinds.length === 0) return [];
 
@@ -93,12 +73,6 @@ export async function listTimelineEvents(
   return parsed.data;
 }
 
-/**
- * Single timeline_events row by id. Same narrow projection as
- * `listTimelineEvents` so the detail view speaks the identical schema.
- * Returns `null` on not-found, shape mismatch, or network error (matching
- * the feature's fail-soft convention — callers fall through to `notFound()`).
- */
 export async function getTimelineEventById(
   id: string
 ): Promise<TimelineEvent | null> {

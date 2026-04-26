@@ -1,9 +1,5 @@
 import type { NotificationKind, MockNotification } from "@/features/notifications/mock";
 
-/**
- * Check if a notification mentions any of the user's pinned tickers.
- * Matches against the title and body text.
- */
 export function notificationMatchesPin(
   n: MockNotification,
   tickers: string[]
@@ -11,7 +7,7 @@ export function notificationMatchesPin(
   if (tickers.length === 0) return null;
   const haystack = `${n.title} ${n.body}`.toUpperCase();
   for (const t of tickers) {
-    // Use word-boundary-ish matching so "TSM" doesn't match "TSMC"
+    // Word-boundary match so "TSM" doesn't match "TSMC".
     const re = new RegExp(`\\b${t.toUpperCase()}\\b`);
     if (re.test(haystack)) return t;
   }
@@ -71,11 +67,6 @@ interface NotificationWithBucket {
   bucket: BucketId;
 }
 
-/**
- * Filter + priority-sort notifications.
- * Priority: pinned-unread (0) → unread (1) → read (2). Within each bucket,
- * preserve the source (newest-first) order.
- */
 export function buildVisibleNotifications(
   all: MockNotification[],
   filter: NotifFilter,
