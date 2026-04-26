@@ -56,9 +56,10 @@ export function ConsultLayout({
   isLocalSession: (id: string) => boolean;
 }) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="grid grid-cols-12 gap-4">
-      <aside className="col-span-12 lg:col-span-3">
+      <aside className={cn("col-span-12 lg:col-span-3", !sidebarOpen && "hidden lg:block")}>
         <div className="flex items-center justify-between">
           <SectionNumber
             n="—"
@@ -208,8 +209,17 @@ export function ConsultLayout({
         <div className="border-b border-gray-3 bg-gray-2/40 px-5 py-3">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                {shortSessionCode(active.id)}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSidebarOpen((o) => !o)}
+                  aria-label={sidebarOpen ? "Hide sessions" : "Show sessions"}
+                  className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none lg:hidden"
+                >
+                  {sidebarOpen ? "✕ HIDE" : "☰ SESSIONS"}
+                </button>
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+                  {shortSessionCode(active.id)}
+                </div>
               </div>
               <div className="mt-1 font-display text-lg text-white">
                 {active.title}

@@ -105,6 +105,12 @@ html, body {
 ::-webkit-scrollbar-thumb { background: #2A2A2A; border: 2px solid #111111; }
 ::-webkit-scrollbar-thumb:hover { background: #FFD400; }
 
+/* Loading bar animation */
+@keyframes loadbar {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1.1); opacity: 1; }
+}
+
 /* Toast progress bar */
 @keyframes toastBar {
   from { width: 100%; }

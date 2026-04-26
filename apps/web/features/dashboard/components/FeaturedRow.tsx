@@ -16,7 +16,7 @@ export function FeaturedRow({
   topNews: NewsListItem[];
   seenNewsIds: string[];
   seenHydrated: boolean;
-  plan: TradingPlan;
+  plan: TradingPlan | null;
   paid: boolean;
   className?: string;
 }) {
@@ -107,30 +107,43 @@ export function FeaturedRow({
                   </span>
                 )}
               </div>
-              <h3 className="mt-3 font-display text-2xl text-white">
-                {paid
-                  ? plan.thesis.length > 100
-                    ? plan.thesis.slice(0, 100) + "…"
-                    : plan.thesis
-                  : "Macro is repricing the cut path. Four setups live."}
-              </h3>
-              <div className="mt-4 grid grid-cols-2 gap-2 text-center">
-                {plan.setups.map((s) => (
-                  <div key={s.id} className="border border-gray-3 bg-black p-2">
-                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                      {s.instrument}
-                    </div>
-                    <div
-                      className={cn(
-                        "font-display text-sm",
-                        s.direction === "long" ? "text-moss" : "text-brand"
-                      )}
-                    >
-                      {s.direction === "long" ? "LONG" : "SHORT"}
-                    </div>
+              {plan ? (
+                <>
+                  <h3 className="mt-3 font-display text-2xl text-white">
+                    {paid
+                      ? plan.thesis.length > 100
+                        ? plan.thesis.slice(0, 100) + "…"
+                        : plan.thesis
+                      : "Macro is repricing the cut path. Four setups live."}
+                  </h3>
+                  <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+                    {plan.setups.map((s) => (
+                      <div key={s.id} className="border border-gray-3 bg-black p-2">
+                        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                          {s.instrument}
+                        </div>
+                        <div
+                          className={cn(
+                            "font-display text-sm",
+                            s.direction === "long" ? "text-moss" : "text-brand"
+                          )}
+                        >
+                          {s.direction === "long" ? "LONG" : "SHORT"}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              ) : (
+                <div className="mt-3 py-6 text-center">
+                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                    ● No active plan
+                  </div>
+                  <div className="mt-2 font-display text-sm text-white/30">
+                    The desk hasn&apos;t published a trading plan yet.
+                  </div>
+                </div>
+              )}
               <Link
                 href="/app/plan"
                 className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"

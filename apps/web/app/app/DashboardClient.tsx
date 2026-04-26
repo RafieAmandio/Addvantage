@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import { tradingPlans as mockPlans, getAllPlans as getMockPlans } from "@/features/plan/mock";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { useAppState, isPaid } from "@/lib/state";
 import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
@@ -56,31 +55,28 @@ export function DashboardClient({ news, primers, plans }: Props) {
   const greet = hour === null ? "Welcome" : greeting(hour);
 
   const allTradingPlans = useMemo(
-    () => (plans.length > 0 ? plans.map(dbPlanToTradingPlan) : mockPlans),
+    () => plans.map(dbPlanToTradingPlan),
     [plans],
-  );
-  const allPlansForArchive = useMemo(
-    () => (plans.length > 0 ? allTradingPlans : getMockPlans()),
-    [plans, allTradingPlans],
   );
 
   const topNews = news.slice(0, 3);
-  const plan = allTradingPlans[0];
+  const plan = allTradingPlans[0] ?? null;
   const featuredPrimer = pickFeaturedPrimer(primers, readIds, paid);
 
   const watchNewsMentions = watchHydrated
     ? filterNewsByWatch(news, tickers)
     : [];
-  const watchSetupMentions = watchHydrated
-    ? filterSetupsByWatch(plan.setups, tickers)
-    : [];
+  const watchSetupMentions =
+    watchHydrated && plan
+      ? filterSetupsByWatch(plan.setups, tickers)
+      : [];
 
   const watchArchiveSetups = watchHydrated
-    ? collectWatchArchiveSetups(allPlansForArchive, tickers, plan.id)
+    ? collectWatchArchiveSetups(allTradingPlans, tickers, plan?.id ?? "")
     : [];
 
   const highImpactToday = news.filter((n) => n.impact === "high").length;
-  const openSetups = plan.setups.length;
+  const openSetups = plan?.setups.length ?? 0;
 
   return (
     <div className="bg-grid">
@@ -97,7 +93,7 @@ export function DashboardClient({ news, primers, plans }: Props) {
 
         <PillarShortcuts paid={paid} />
 
-        {watchHydrated && tickers.length > 0 && (
+        {watchHydrated && tickers.length > 0 && plan && (
           <WatchlistSection
             tickers={tickers}
             watchNewsMentions={watchNewsMentions}

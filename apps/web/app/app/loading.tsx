@@ -23,13 +23,6 @@ export default function AppLoading() {
           DECODING PACKETS · PLEASE STAND BY
         </div>
       </div>
-
-      <style>{`
-        @keyframes loadbar {
-          0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
-          50% { transform: scaleY(1.1); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
