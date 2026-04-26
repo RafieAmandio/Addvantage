@@ -25,8 +25,8 @@ async function getSources() {
 function statusBadge(status: string) {
   if (status === "ok")
     return (
-      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-emerald-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
+        <span className="h-1.5 w-1.5 rounded-full bg-moss" />
         ok
       </span>
     );
@@ -74,7 +74,6 @@ export default async function IngestionLogsPage() {
   return (
     <div className="bg-grid-fine min-h-screen px-4 py-10 md:px-6">
       <div className="stagger mx-auto max-w-7xl">
-        {/* Header */}
         <div className="mb-8">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             OPERATOR // ADMIN
@@ -88,7 +87,6 @@ export default async function IngestionLogsPage() {
           </p>
         </div>
 
-        {/* Summary stats */}
         <div className="mb-6 grid grid-cols-2 gap-px bg-gray-3 md:grid-cols-4">
           {[
             { label: "Runs", value: runs.length },
@@ -124,7 +122,6 @@ export default async function IngestionLogsPage() {
           </div>
         ) : (
           <>
-            {/* Desktop table */}
             <div className="hidden md:block">
               <div className="space-y-px bg-gray-3">
                 <div className="grid grid-cols-12 gap-4 bg-black px-4 py-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
@@ -175,7 +172,6 @@ export default async function IngestionLogsPage() {
               </div>
             </div>
 
-            {/* Mobile cards */}
             <div className="space-y-px bg-gray-3 md:hidden">
               {runs.map((run) => (
                 <div key={run.id} className="bg-black px-4 py-3">
