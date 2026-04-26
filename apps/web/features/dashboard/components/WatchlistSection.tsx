@@ -40,7 +40,7 @@ export function WatchlistSection({
             ))}
             <Link
               href="/app/watchlist"
-              className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
+              className="ml-2 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               Manage all →
             </Link>
@@ -69,7 +69,7 @@ export function WatchlistSection({
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
+                      className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -110,7 +110,7 @@ export function WatchlistSection({
                   <Link
                     key={s.id}
                     href={`/app/plan/${planId}#${s.id}`}
-                    className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
+                    className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -146,7 +146,7 @@ export function WatchlistSection({
                       <Link
                         key={`${p.id}-${s.id}`}
                         href={`/app/plan/${p.id}#${s.id}`}
-                        className="group block bg-black p-3 transition-all hover:-translate-y-px hover:bg-gray-2"
+                        className="group block bg-black p-3 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0 flex-1">

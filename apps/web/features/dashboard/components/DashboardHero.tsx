@@ -55,7 +55,7 @@ export function DashboardHero({
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search news, plans, primers, channels"
-              className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-gray-2/60 px-5 py-4 text-left transition-colors hover:border-brand"
+              className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-gray-2/60 px-5 py-4 text-left transition-colors hover:border-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               <svg
                 width="20"
@@ -90,7 +90,7 @@ export function DashboardHero({
                   <button
                     key={s}
                     onClick={() => setSearchOpen(true)}
-                    className="border-b border-transparent text-white/60 hover:border-brand hover:text-brand"
+                    className="border-b border-transparent text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     {s}
                   </button>
@@ -124,13 +124,13 @@ export function DashboardHero({
 
               <Link
                 href="/app/brief"
-                className="mt-5 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+                className="mt-5 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Open today&apos;s full brief →
               </Link>
               <Link
                 href="/app/subscription"
-                className="mt-2 block py-1 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:text-brand"
+                className="mt-2 block py-1 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {paid ? "Manage subscription" : "Upgrade access"}
               </Link>
@@ -180,7 +180,7 @@ function NameField() {
     <button
       onClick={() => setEditing(true)}
       title="Click to rename"
-      className="group mt-2 block w-full text-left font-display text-2xl text-white transition-colors hover:text-brand"
+      className="group mt-2 block w-full text-left font-display text-2xl text-white transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       {operatorName}
       <span className="ml-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30 opacity-0 transition-opacity group-hover:opacity-100">

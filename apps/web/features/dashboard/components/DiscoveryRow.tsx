@@ -18,7 +18,7 @@ export function DiscoveryRow({
         <SectionHeader n="03 /" label="Primer of the day" />
         <Link
           href={`/app/education/${featuredPrimer.id}`}
-          className="mt-4 block max-w-lg border border-gray-3 bg-black p-6 transition-all hover:-translate-y-px hover:border-brand/40 hover:bg-gray-2"
+          className="mt-4 block max-w-lg border border-gray-3 bg-black p-6 transition-all hover:-translate-y-px hover:border-brand/40 hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             {featuredPrimer.id} · {featuredPrimer.readingMin} min

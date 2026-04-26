@@ -32,7 +32,7 @@ export function FeaturedRow({
             >
               <Link
                 href="/app/news"
-                className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
+                className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Full feed →
               </Link>
@@ -56,7 +56,7 @@ export function FeaturedRow({
                       key={n.id}
                       href={`/app/news/${n.id}`}
                       className={cn(
-                        "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2",
+                        "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                         seen && "opacity-60 hover:opacity-100"
                       )}
                     >
@@ -133,7 +133,7 @@ export function FeaturedRow({
               </div>
               <Link
                 href="/app/plan"
-                className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+                className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {paid ? "Open plan →" : "Unlock plan →"}
               </Link>

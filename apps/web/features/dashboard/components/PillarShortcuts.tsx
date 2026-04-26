@@ -69,7 +69,7 @@ function PillarTile({
   return (
     <Link
       href={href}
-      className="group flex items-center justify-between bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
+      className="group flex items-center justify-between bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       <div>
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
