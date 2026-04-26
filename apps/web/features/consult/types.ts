@@ -23,7 +23,7 @@ export interface LocalSession {
   title: string;
   startedAt: string;
   lastAt: string;
-  tags: [];
+  tags: string[];
   messages: ConsultMessage[];
 }
 

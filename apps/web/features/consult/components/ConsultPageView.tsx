@@ -40,13 +40,7 @@ export function ConsultPageView({
   const endRef = useRef<HTMLDivElement>(null);
 
   const allSessions: ConsultSession[] = useMemo(
-    () => [
-      ...localSessions.map((s) => ({
-        ...s,
-        tags: [] as never[],
-      })) as unknown as ConsultSession[],
-      ...mockSessions,
-    ],
+    () => [...localSessions, ...mockSessions],
     [localSessions]
   );
 
