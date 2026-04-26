@@ -1,14 +1,12 @@
 import { DataLabel } from "@/components/ui/Marker";
 import type { TradingPlan } from "@/features/plan/types";
-import type { computePlanOutcome } from "@/features/plan/mock";
-
-type PlanOutcome = NonNullable<ReturnType<typeof computePlanOutcome>>;
+import type { PlanOutcomeDigest } from "@/features/plan/lib/detail-helpers";
 
 export function PlanDetailOutcomeSummary({
   outcome,
   plan,
 }: {
-  outcome: PlanOutcome;
+  outcome: PlanOutcomeDigest;
   plan: TradingPlan;
 }) {
   return (

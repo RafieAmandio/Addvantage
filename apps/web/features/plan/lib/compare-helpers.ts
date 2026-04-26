@@ -1,5 +1,8 @@
 import type { TradingPlan } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/mock";
+import {
+  computePlanOutcome,
+  type PlanOutcomeDigest,
+} from "@/features/plan/lib/detail-helpers";
 
 export function commonInstruments(
   planA: TradingPlan,
@@ -11,8 +14,8 @@ export function commonInstruments(
 }
 
 export type CompareSummary = {
-  outcomeA: ReturnType<typeof computePlanOutcome>;
-  outcomeB: ReturnType<typeof computePlanOutcome>;
+  outcomeA: PlanOutcomeDigest | null;
+  outcomeB: PlanOutcomeDigest | null;
   bothClosed: boolean;
   deltaR: number | null;
 };

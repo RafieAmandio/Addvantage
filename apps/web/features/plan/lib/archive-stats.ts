@@ -1,5 +1,5 @@
 import type { TradingPlan } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/mock";
+import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import type { HorizonRBreakdown } from "@/features/plan/types";
 
 export function aggregateR(plans: TradingPlan[]): number {

@@ -72,6 +72,46 @@ export function planToMarkdown(plan: TradingPlan): string {
   return lines.join("\n");
 }
 
+export interface PlanOutcomeDigest {
+  closed: number;
+  wins: number;
+  losses: number;
+  flat: number;
+  skipped: number;
+  totalR: number;
+  totalRLabel: string;
+}
+
+export function computePlanOutcome(plan: TradingPlan): PlanOutcomeDigest | null {
+  const closed = plan.setups.filter(
+    (s) => s.outcome && s.outcome !== "live" && s.outcome !== "open"
+  );
+  if (closed.length === 0) return null;
+
+  const wins = closed.filter((s) => s.outcome === "win").length;
+  const losses = closed.filter(
+    (s) => s.outcome === "loss" || s.outcome === "stopped"
+  ).length;
+  const flat = closed.filter((s) => s.outcome === "invalidated").length;
+  const skipped = closed.filter((s) => s.outcome === "skipped").length;
+
+  const totalR = closed.reduce((acc, s) => {
+    if (!s.outcomeR) return acc;
+    const n = parseFloat(s.outcomeR.replace(/R/i, ""));
+    return isFinite(n) ? acc + n : acc;
+  }, 0);
+
+  return {
+    closed: closed.length,
+    wins,
+    losses,
+    flat,
+    skipped,
+    totalR,
+    totalRLabel: (totalR >= 0 ? "+" : "") + totalR.toFixed(1) + "R",
+  };
+}
+
 type OutcomeMeta = {
   label: string;
   style: string;

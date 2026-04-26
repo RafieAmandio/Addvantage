@@ -2,7 +2,7 @@ import Link from "next/link";
 import { DataLabel, BiasBadge } from "@/components/ui/Marker";
 import { cn, formatDate } from "@/lib/cn";
 import type { TradingPlan, TradingSetup } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/mock";
+import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 
 function CompactSetup({
   setup: s,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { TradingPlan } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/mock";
+import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import { cn, formatDate } from "@/lib/cn";
 
 type Props = {

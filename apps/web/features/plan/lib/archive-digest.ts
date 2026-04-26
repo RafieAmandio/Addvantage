@@ -1,5 +1,5 @@
 import type { TradingPlan } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/mock";
+import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import { formatDate } from "@/lib/cn";
 
 function planToDigestMarkdown(plan: TradingPlan): string {

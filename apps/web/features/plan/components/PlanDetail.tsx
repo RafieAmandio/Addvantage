@@ -5,7 +5,7 @@ import { useAppState, isPaid } from "@/lib/state";
 import { SectionNumber } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { formatDate } from "@/lib/cn";
-import { computePlanOutcome } from "@/features/plan/mock";
+import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import type { TradingPlan } from "@/features/plan/types";
 import { PlanDetailHeader } from "@/features/plan/components/PlanDetailHeader";
 import { PlanDetailOutcomeSummary } from "@/features/plan/components/PlanDetailOutcomeSummary";
