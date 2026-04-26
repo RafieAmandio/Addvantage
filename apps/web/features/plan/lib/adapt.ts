@@ -1,7 +1,7 @@
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
 import type { Plan } from "@/features/plan/types";
 import { logger } from "@/lib/logger";
-import type { TradingPlan, TradingSetup, Bias } from "@/lib/mock/types";
+import type { TradingPlan, TradingSetup, Bias } from "@/features/plan/types";
 
 const KNOWN_HASHTAGS = new Set<string>(HASHTAGS);
 

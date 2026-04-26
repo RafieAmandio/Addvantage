@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import { computePlanOutcome } from "@/features/plan/mock";
 import { cn, formatDate } from "@/lib/cn";
 

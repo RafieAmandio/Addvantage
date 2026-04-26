@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import {
   TODAY_YMD,
   type ImpactFilter,

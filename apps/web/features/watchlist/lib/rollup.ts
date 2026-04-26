@@ -1,5 +1,5 @@
 import { getAllPlans } from "@/features/plan/mock";
-import type { TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { TradingPlan, TradingSetup } from "@/features/plan/types";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TickerRollup } from "@/features/watchlist/types";
 

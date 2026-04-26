@@ -3,7 +3,7 @@
 import { DataLabel, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { useToast } from "@/lib/toast";
-import type { TradingSetup } from "@/lib/mock/types";
+import type { TradingSetup } from "@/features/plan/types";
 import {
   OUTCOME_META,
   setupToText,

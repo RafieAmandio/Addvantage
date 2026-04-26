@@ -1,5 +1,42 @@
 import { z } from "zod";
-import type { TradingPlan } from "@/lib/mock/types";
+
+export type Bias = "bullish" | "bearish" | "neutral";
+
+export type SetupOutcome =
+  | "live"
+  | "open"
+  | "win"
+  | "loss"
+  | "stopped"
+  | "invalidated"
+  | "skipped";
+
+export interface TradingSetup {
+  id: string;
+  instrument: string;
+  direction: "long" | "short";
+  bias: Bias;
+  entry: string;
+  stop: string;
+  targets: string[];
+  invalidation: string;
+  rationale: string;
+  confidence: 1 | 2 | 3 | 4 | 5;
+  tags: string[];
+  outcome?: SetupOutcome;
+  outcomeNotes?: string;
+  outcomeR?: string;
+}
+
+export interface TradingPlan {
+  id: string;
+  date: string;
+  horizon: "intraday" | "swing" | "weekly";
+  thesis: string;
+  setups: TradingSetup[];
+  risks: string[];
+  authoredBy: string;
+}
 
 export type HorizonFilter = "all" | TradingPlan["horizon"];
 
@@ -83,3 +120,12 @@ export const ClosedPlanStatsSchema = z.object({
 });
 
 export type ClosedPlanStats = z.infer<typeof ClosedPlanStatsSchema>;
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  priceIDR: number;
+  cadence: "3-month";
+  features: string[];
+  highlight?: boolean;
+}

@@ -3,7 +3,7 @@
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import {
   commonInstruments as getCommonInstruments,
   computeCompareSummary,

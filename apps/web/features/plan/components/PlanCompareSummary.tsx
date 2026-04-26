@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import type { CompareSummary } from "@/features/plan/lib/compare-helpers";
 
 type Tone = "moss" | "blood" | "brand" | "white" | "muted";

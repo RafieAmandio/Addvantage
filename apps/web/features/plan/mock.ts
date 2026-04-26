@@ -1,4 +1,4 @@
-import type { TradingPlan, Plan } from "@/lib/mock/types";
+import type { TradingPlan, SubscriptionPlan } from "@/features/plan/types";
 
 export const tradingPlans: TradingPlan[] = [
   {
@@ -268,7 +268,7 @@ export function getAllPlans(): TradingPlan[] {
   return [...tradingPlans].sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export const subscriptionPlans: Plan[] = [
+export const subscriptionPlans: SubscriptionPlan[] = [
   {
     id: "free",
     name: "Free",

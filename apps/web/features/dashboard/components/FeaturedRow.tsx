@@ -3,7 +3,7 @@ import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
 import { formatTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 
 export function FeaturedRow({
   topNews,

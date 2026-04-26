@@ -1,6 +1,25 @@
-import type { CalendarEvent, Impact } from "@/lib/mock/types";
+export type Impact = "high" | "medium" | "low";
 
-// WIB (UTC+7) today — used as default anchor for the calendar view
+export type CurrencyScores = [number, number, number, number, number, number, number];
+
+export interface CalendarEvent {
+  id: string;
+  ts: string;
+  region: "US" | "EU" | "UK" | "JP" | "CN" | "ID" | "GLOBAL";
+  title: string;
+  impact: Impact;
+  scores: CurrencyScores;
+  forecast?: string;
+  previous?: string;
+  notes?: string;
+  relatedNewsId?: string;
+}
+
+export interface CalendarDayMeta {
+  date: string;
+  summary: string;
+}
+
 export const TODAY_YMD = new Date(Date.now() + 7 * 60 * 60 * 1000)
   .toISOString()
   .slice(0, 10);

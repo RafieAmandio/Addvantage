@@ -1,5 +1,5 @@
 import { formatDate } from "@/lib/cn";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 
 export function PlanComparePicker({
   label,

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import { formatCalendarTime } from "@/features/calendar/lib/format";
 import { IMPACT_LABEL, IMPACT_STYLE } from "@/features/calendar/lib/style";
 import { ScoreCell } from "@/features/calendar/components/ScoreCell";

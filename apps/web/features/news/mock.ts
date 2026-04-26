@@ -1,4 +1,4 @@
-import type { NewsItem } from "@/lib/mock/types";
+import type { NewsItem } from "@/features/news/types";
 
 // Note: every item is signed by an ANTS author. We never credit the original
 // wire source — refurbished news is presented as our own analysis. This is

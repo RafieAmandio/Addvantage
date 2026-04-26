@@ -1,4 +1,4 @@
-import type { CalendarEvent, CurrencyScores } from "@/lib/mock/types";
+import type { CalendarEvent, CurrencyScores } from "@/features/calendar/types";
 import type { TimelineEvent } from "@/features/timeline/types";
 
 function symbolToRegion(sym: string | undefined): CalendarEvent["region"] {

@@ -3,7 +3,7 @@
 import { DataLabel } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
 import { useToast } from "@/lib/toast";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import { planToMarkdown } from "@/features/plan/lib/detail-helpers";
 
 export function PlanDetailHeader({

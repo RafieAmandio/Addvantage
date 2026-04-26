@@ -1,4 +1,4 @@
-import type { TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { TradingPlan, TradingSetup } from "@/features/plan/types";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
 
 interface NewsWithAffects {

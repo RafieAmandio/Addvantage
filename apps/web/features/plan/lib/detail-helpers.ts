@@ -1,4 +1,4 @@
-import type { SetupOutcome, TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { SetupOutcome, TradingPlan, TradingSetup } from "@/features/plan/types";
 import { formatDate } from "@/lib/cn";
 
 export function setupToText(s: TradingSetup, planId: string): string {

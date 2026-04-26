@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import type { Tier } from "./mock/types";
+export type Tier = "visitor" | "free" | "vip";
 
 interface TraderProfile {
   tradingLength: string;

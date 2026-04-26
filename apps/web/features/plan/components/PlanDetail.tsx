@@ -6,7 +6,7 @@ import { SectionNumber } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { formatDate } from "@/lib/cn";
 import { computePlanOutcome } from "@/features/plan/mock";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import { PlanDetailHeader } from "@/features/plan/components/PlanDetailHeader";
 import { PlanDetailOutcomeSummary } from "@/features/plan/components/PlanDetailOutcomeSummary";
 import { PlanDetailSetupCard } from "@/features/plan/components/PlanDetailSetupCard";

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 import { CURRENCIES } from "@/features/calendar/mock";
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import { formatDayHeader } from "@/features/calendar/lib/format";
 import { deriveSummary } from "@/features/calendar/lib/group";
 import { EventRow } from "@/features/calendar/components/EventRow";

@@ -7,7 +7,7 @@ import { SectionNumber } from "@/components/ui/Marker";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { useToast } from "@/lib/toast";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import type { HorizonFilter } from "@/features/plan/types";
 import {
   groupByMonth,

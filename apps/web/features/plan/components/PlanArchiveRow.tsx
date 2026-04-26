@@ -1,6 +1,6 @@
 import { memo } from "react";
 import Link from "next/link";
-import type { TradingPlan } from "@/lib/mock/types";
+import type { TradingPlan } from "@/features/plan/types";
 import { computePlanOutcome } from "@/features/plan/mock";
 import { Highlight } from "@/components/ui/Highlight";
 import { formatDate } from "@/lib/cn";

@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import { calendarDayMeta } from "@/features/calendar/mock";
 import { wibYmd } from "./date";
 import { shortName } from "./format";

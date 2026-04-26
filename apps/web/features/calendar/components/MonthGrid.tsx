@@ -1,6 +1,6 @@
 "use client";
 
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import { cn } from "@/lib/cn";
 import { monthGridDays, startOfMonth, wibYmd, ymdToDate } from "@/features/calendar/lib/date";
 import { formatDayHeader, shortName } from "@/features/calendar/lib/format";

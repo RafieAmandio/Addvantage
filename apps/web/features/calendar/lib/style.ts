@@ -1,4 +1,4 @@
-import type { Impact } from "@/lib/mock/types";
+import type { Impact } from "@/features/calendar/types";
 
 export const IMPACT_LABEL: Record<Impact, string> = {
   high: "High",

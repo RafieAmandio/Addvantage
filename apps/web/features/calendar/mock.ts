@@ -1,4 +1,4 @@
-import type { CalendarEvent, CalendarDayMeta } from "@/lib/mock/types";
+import type { CalendarEvent, CalendarDayMeta } from "@/features/calendar/types";
 
 export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;
 

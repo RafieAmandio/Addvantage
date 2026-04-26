@@ -4,7 +4,7 @@ import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
 import type { NewsListItem } from "@/features/news/queries/news";
-import type { TradingSetup } from "@/lib/mock/types";
+import type { TradingSetup } from "@/features/plan/types";
 import { cn } from "@/lib/cn";
 
 export function WatchlistSection({

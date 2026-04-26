@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CalendarEvent } from "@/lib/mock/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import { CURRENCIES } from "@/features/calendar/mock";
 import { formatTime } from "@/lib/cn";
 
