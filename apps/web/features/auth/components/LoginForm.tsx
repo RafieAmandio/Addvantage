@@ -34,7 +34,7 @@ export function LoginForm() {
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/signup"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             No clearance? Request access →
           </Link>
@@ -79,7 +79,7 @@ export function LoginForm() {
         </Button>
         <Link
           href="/signup"
-          className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
+          className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           No clearance? Request access →
         </Link>
