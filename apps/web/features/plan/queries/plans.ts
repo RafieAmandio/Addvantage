@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import { requireAdmin } from "@/lib/auth/session";
@@ -54,7 +55,7 @@ export async function listPublishedPlans(
   return parsed.data;
 }
 
-export async function getPlanById(id: string): Promise<Plan | null> {
+export const getPlanById = cache(async function getPlanById(id: string): Promise<Plan | null> {
   if (isMockMode()) return mockPlanById(id);
   const supabase = supabaseServer();
   const { data, error } = await supabase
@@ -81,7 +82,7 @@ export async function getPlanById(id: string): Promise<Plan | null> {
     return null;
   }
   return parsed.data;
-}
+});
 
 export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
   await requireAdmin();

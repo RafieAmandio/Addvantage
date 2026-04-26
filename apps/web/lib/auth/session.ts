@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { supabaseServer } from "@/lib/supabase/server";
 import { isMockMode } from "@/lib/config/public";
 
@@ -15,10 +16,10 @@ const MOCK_PROFILE: ProfileSummary = {
   signed_liability: true,
 };
 
-export async function getSession() {
+export const getSession = cache(async function getSession() {
   if (isMockMode()) return MOCK_USER as unknown as Awaited<ReturnType<typeof realGetUser>>;
   return realGetUser();
-}
+});
 
 async function realGetUser() {
   const supabase = supabaseServer();
@@ -36,7 +37,7 @@ interface ProfileSummary {
   signed_liability: boolean;
 }
 
-export async function getProfile(): Promise<ProfileSummary | null> {
+export const getProfile = cache(async function getProfile(): Promise<ProfileSummary | null> {
   if (isMockMode()) return MOCK_PROFILE;
   const user = await getSession();
   if (!user) return null;
@@ -47,7 +48,7 @@ export async function getProfile(): Promise<ProfileSummary | null> {
     .eq("id", user.id)
     .maybeSingle();
   return (data as ProfileSummary | null) ?? null;
-}
+});
 
 export async function requireAdmin(): Promise<ProfileSummary> {
   const profile = await getProfile();

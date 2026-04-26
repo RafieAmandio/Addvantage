@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { z } from "zod";
 import { IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -110,7 +111,7 @@ export async function listApprovedNews(): Promise<NewsListItem[]> {
   return parsed.data.map(toNewsListItem);
 }
 
-export async function getApprovedNewsById(id: string): Promise<NewsListItem | null> {
+export const getApprovedNewsById = cache(async function getApprovedNewsById(id: string): Promise<NewsListItem | null> {
   if (isMockMode()) return mockApprovedNewsById(id);
   const supabase = supabaseServer();
   const { data } = await supabase
@@ -130,7 +131,7 @@ export async function getApprovedNewsById(id: string): Promise<NewsListItem | nu
     return null;
   }
   return toNewsListItem(parsed.data);
-}
+});
 
 interface AdminListPage {
   limit?: number;
@@ -169,7 +170,7 @@ export async function listRejectedNews(
   return NewsAdminListRowSchema.array().parse(data ?? []);
 }
 
-export async function getNewsItemById(id: string): Promise<NewsRow | null> {
+export const getNewsItemById = cache(async function getNewsItemById(id: string): Promise<NewsRow | null> {
   const supabase = supabaseServer();
   const { data } = await supabase
     .from("news_items")
@@ -178,4 +179,4 @@ export async function getNewsItemById(id: string): Promise<NewsRow | null> {
     .maybeSingle();
   if (!data) return null;
   return NewsRowSchema.parse(data);
-}
+});

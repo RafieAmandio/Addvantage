@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import {
@@ -72,7 +73,7 @@ export async function listTimelineEvents(
   return parsed.data;
 }
 
-export async function getTimelineEventById(
+export const getTimelineEventById = cache(async function getTimelineEventById(
   id: string
 ): Promise<TimelineEvent | null> {
   const supabase = supabaseServer();
@@ -102,4 +103,4 @@ export async function getTimelineEventById(
     return null;
   }
   return parsed.data;
-}
+});
