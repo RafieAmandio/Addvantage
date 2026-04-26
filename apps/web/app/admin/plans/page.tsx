@@ -20,7 +20,7 @@ export default async function AdminPlansPage() {
           </div>
           <Link
             href="/admin/plans/new"
-            className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white"
+            className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             + New plan
           </Link>

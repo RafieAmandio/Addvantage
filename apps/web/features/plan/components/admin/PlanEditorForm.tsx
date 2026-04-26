@@ -28,7 +28,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40"
+      className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       {pending ? "…" : label}
     </button>
@@ -56,7 +56,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/plans"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Plans
           </Link>
@@ -216,7 +216,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               <form action={publishPlan.bind(null, plan.id)}>
                 <button
                   type="submit"
-                  className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white"
+                  className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   ✓ Publish
                 </button>
@@ -248,7 +248,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 />
                 <button
                   type="submit"
-                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black"
+                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   ✕ Close
                 </button>
@@ -257,7 +257,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <form action={deletePlan.bind(null, plan.id)}>
               <button
                 type="submit"
-                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
+                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Delete
               </button>
