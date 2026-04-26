@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ConsultMessage } from "@/lib/mock/types";
+import type { ConsultMessage } from "@/features/consult/types";
 
 export function ScrollableConversation({
   children,

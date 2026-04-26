@@ -1,7 +1,9 @@
-import { channelPosts } from "@/features/channel/mock";
+import type { ChannelPost } from "@/features/channel/types";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate, formatTime } from "@/lib/cn";
 import Link from "next/link";
+
+const posts: ChannelPost[] = [];
 
 export default function ChannelPage() {
   return (
@@ -29,10 +31,21 @@ export default function ChannelPage() {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-        <SectionNumber n="—" label={`${channelPosts.length} POSTS`} />
+        <SectionNumber n="—" label={`${posts.length} POSTS`} />
+
+        {posts.length === 0 && (
+          <div className="mt-10 border border-gray-3 bg-gray-2/30 px-6 py-12 text-center">
+            <p className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+              NO BROADCASTS YET
+            </p>
+            <p className="mt-2 font-display text-lg text-white/60">
+              Channel posts will appear here once broadcasting begins.
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 space-y-10">
-          {channelPosts.map((p, i) => (
+          {posts.map((p) => (
             <article
               key={p.id}
               className="relative border-l-2 border-brand/40 pl-6"

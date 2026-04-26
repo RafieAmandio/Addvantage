@@ -1,5 +1,22 @@
 import { z } from "zod";
-import type { ConsultMessage } from "@/lib/mock/types";
+
+export interface ConsultMessage {
+  id: string;
+  role: "user" | "ai" | "team";
+  author?: string;
+  ts: string;
+  body: string;
+  tags: string[];
+}
+
+export interface ConsultSession {
+  id: string;
+  title: string;
+  startedAt: string;
+  lastAt: string;
+  messages: ConsultMessage[];
+  tags: string[];
+}
 
 export interface LocalSession {
   id: string;

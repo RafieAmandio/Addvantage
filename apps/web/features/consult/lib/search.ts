@@ -1,4 +1,4 @@
-import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
+import type { ConsultMessage, ConsultSession } from "@/features/consult/types";
 
 export function sessionMatchesQuery(
   s: ConsultSession,

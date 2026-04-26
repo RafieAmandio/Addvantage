@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { consultSessions as mockSessions } from "@/features/consult/mock";
 import {
   CONSULT_STORAGE_KEY,
+  type ConsultMessage,
   type LocalSession,
   type PersistedConsult,
 } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
-import type { ConsultMessage } from "@/lib/mock/types";
 
 export interface InitialConsultData {
   sessions: LocalSession[];

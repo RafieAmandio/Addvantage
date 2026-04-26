@@ -16,7 +16,7 @@ import { useConsultActions } from "@/features/consult/hooks/useConsultActions";
 import { useAppState, isPaid } from "@/lib/state";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import type { ConsultSession } from "@/lib/mock/types";
+import type { ConsultSession } from "@/features/consult/types";
 
 export function ConsultPageView({
   initialData,

@@ -9,9 +9,8 @@ import {
   renameConsultSession,
   deleteConsultSession,
 } from "@/features/consult/actions";
-import type { LocalSession } from "@/features/consult/types";
+import type { ConsultMessage, ConsultSession, LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
-import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
 
 export function useConsultActions({
   active,

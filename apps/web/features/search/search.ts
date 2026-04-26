@@ -1,5 +1,5 @@
 import { allHashtags, hashtagMeta } from "@/features/tags/constants";
-import type { ConsultMessage } from "@/lib/mock/types";
+import type { ConsultMessage } from "@/features/consult/types";
 import { logger } from "@/lib/logger";
 
 export type ResultKind =

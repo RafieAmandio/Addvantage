@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn, formatDate } from "@/lib/cn";
-import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
+import type { ConsultMessage, ConsultSession } from "@/features/consult/types";
 import { SectionNumber } from "@/components/ui/Marker";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { Bubble } from "@/features/consult/components/Bubble";

@@ -6,7 +6,7 @@ import {
 } from "@/features/consult/queries/messages";
 import type { InitialConsultData } from "@/features/consult/hooks/useConsultPersistence";
 import type { LocalSession } from "@/features/consult/types";
-import type { ConsultMessage } from "@/lib/mock/types";
+import type { ConsultMessage } from "@/features/consult/types";
 
 export const dynamic = "force-dynamic";
 

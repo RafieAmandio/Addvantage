@@ -1,5 +1,5 @@
 import { formatTime } from "@/lib/cn";
-import type { ConsultMessage } from "@/lib/mock/types";
+import type { ConsultMessage } from "@/features/consult/types";
 
 export function Bubble({ msg }: { msg: ConsultMessage }) {
   const isUser = msg.role === "user";

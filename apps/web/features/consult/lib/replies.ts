@@ -1,4 +1,4 @@
-import type { ConsultMessage } from "@/lib/mock/types";
+import type { ConsultMessage } from "@/features/consult/types";
 
 const CANNED_REPLIES: Array<{ body: string; tags: ConsultMessage["tags"] }> = [
   {
