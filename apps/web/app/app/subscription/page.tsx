@@ -32,7 +32,7 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <DataLabel>Operator account · Tier control</DataLabel>
@@ -43,7 +43,6 @@ export default function SubscriptionPage() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {/* Status panel */}
         <section className="border border-brand/40 bg-gray-2/30 p-8">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-4">
@@ -84,7 +83,6 @@ export default function SubscriptionPage() {
           </div>
         </section>
 
-        {/* Plans */}
         <section className="mt-12">
           <SectionNumber n="01 /" label="AVAILABLE TIERS" />
           <div className="mt-6 grid grid-cols-12 gap-6">
@@ -95,7 +93,7 @@ export default function SubscriptionPage() {
                 <div
                   key={p.id}
                   className={cn(
-                    "col-span-12 border text-black p-8 lg:col-span-6",
+                    "col-span-12 border bg-black p-8 lg:col-span-6",
                     p.highlight
                       ? "border-brand"
                       : "border-gray-3"
@@ -173,7 +171,6 @@ export default function SubscriptionPage() {
           </div>
         </section>
 
-        {/* Payment history */}
         <section className="mt-12">
           <SectionNumber n="02 /" label="PAYMENT LEDGER" />
           <div className="mt-4 border border-gray-3">
@@ -219,7 +216,7 @@ export default function SubscriptionPage() {
                     key={row.id}
                     className={cn(
                       "border-t border-gray-3",
-                      i % 2 === 0 ? "text-black" : "bg-gray-2/30"
+                      i % 2 === 0 ? "bg-black" : "bg-gray-2/30"
                     )}
                   >
                     <td className="px-4 py-3 text-brand">{row.id}</td>

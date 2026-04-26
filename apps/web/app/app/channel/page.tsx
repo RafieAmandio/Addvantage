@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function ChannelPage() {
   return (
-    <div>
+    <div className="stagger">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-baseline justify-between">

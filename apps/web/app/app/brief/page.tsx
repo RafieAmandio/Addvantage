@@ -34,8 +34,7 @@ export default function BriefPage() {
     : 0;
 
   return (
-    <div className="bg-grid">
-      {/* Hero strip */}
+    <div className="stagger bg-grid">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-baseline justify-between">
@@ -55,7 +54,6 @@ export default function BriefPage() {
       </div>
 
       <div className="mx-auto grid max-w-7xl grid-cols-12 gap-6 p-6">
-        {/* News column */}
         <section className="col-span-12 lg:col-span-8">
           <div className="flex items-center justify-between">
             <SectionNumber n="01 /" label="LIVE NEWS" />
@@ -81,7 +79,7 @@ export default function BriefPage() {
                 key={n.id}
                 href={`/app/news/${n.id}`}
                 className={
-                  "group block text-black p-5 transition-colors hover:bg-gray-2 " +
+                  "group block bg-black p-5 transition-colors hover:bg-gray-2 " +
                   (seen ? "opacity-60 hover:opacity-100" : "")
                 }
               >
@@ -131,9 +129,7 @@ export default function BriefPage() {
           </Link>
         </section>
 
-        {/* Right column */}
         <aside className="col-span-12 space-y-8 lg:col-span-4">
-          {/* Trading plan teaser */}
           <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
             <div className="flex items-center justify-between">
               <DataLabel>Trading Plan · TX-03</DataLabel>
@@ -154,7 +150,7 @@ export default function BriefPage() {
               {plan.setups.map((s) => (
                 <div
                   key={s.id}
-                  className="border border-gray-3 text-black p-2"
+                  className="border border-gray-3 bg-black p-2"
                 >
                   <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                     {s.instrument}
@@ -178,7 +174,6 @@ export default function BriefPage() {
             </Link>
           </div>
 
-          {/* Calendar peek */}
           <div>
             <SectionNumber n="02 /" label="CALENDAR · 48H" />
             <div className="mt-4 space-y-px bg-gray-3">
@@ -188,10 +183,9 @@ export default function BriefPage() {
             </div>
           </div>
 
-          {/* Channel */}
           <div>
             <SectionNumber n="03 /" label="MY CHANNEL" />
-            <div className="mt-4 border border-gray-3 text-black p-4">
+            <div className="mt-4 border border-gray-3 bg-black p-4">
               <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                 {channelPosts[0].id} · {formatTime(channelPosts[0].ts)}Z
               </div>
