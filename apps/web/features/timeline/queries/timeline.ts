@@ -1,7 +1,6 @@
 import { supabaseServer } from "@/lib/supabase/server";
 import { logger } from "@/lib/logger";
 import {
-  TIMELINE_KINDS,
   TimelineEventSchema,
   type TimelineEvent,
   type TimelineKind,
