@@ -1,10 +1,11 @@
-import type { Primer } from "@/lib/mock/types";
+import type { Primer } from "@/features/education/types";
 
 export function pickFeaturedPrimer(
   primers: Primer[],
   readIds: string[],
   paid: boolean
-): Primer {
+): Primer | null {
+  if (primers.length === 0) return null;
   const accessible = primers.filter((p) => !p.locked || paid);
   return (
     accessible.find((p) => !readIds.includes(p.id)) ??

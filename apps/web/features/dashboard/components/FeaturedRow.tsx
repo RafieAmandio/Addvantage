@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { CalendarPeekRow } from "@/features/calendar/components/CalendarPeekRow";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
 import { formatTime, cn } from "@/lib/cn";
-import type {
-  NewsItem,
-  CalendarEvent,
-  TradingPlan,
-} from "@/lib/mock/types";
+import type { NewsListItem } from "@/features/news/queries/news";
+import type { TradingPlan } from "@/lib/mock/types";
 
 export function FeaturedRow({
   topNews,
@@ -15,15 +11,13 @@ export function FeaturedRow({
   seenHydrated,
   plan,
   paid,
-  upcoming,
   className,
 }: {
-  topNews: NewsItem[];
+  topNews: NewsListItem[];
   seenNewsIds: string[];
   seenHydrated: boolean;
   plan: TradingPlan;
   paid: boolean;
-  upcoming: CalendarEvent[];
   className?: string;
 }) {
   return (
@@ -34,7 +28,7 @@ export function FeaturedRow({
             <SectionHeader
               n="01 /"
               label="Top of the wire"
-              right="3 most-impact items"
+              right={`${topNews.length} most-impact items`}
             >
               <Link
                 href="/app/news"
@@ -43,51 +37,63 @@ export function FeaturedRow({
                 Full feed →
               </Link>
             </SectionHeader>
-            <div className="mt-4 space-y-px bg-gray-3">
-              {topNews.map((n) => {
-                const seen = seenHydrated && seenNewsIds.includes(n.id);
-                return (
-                  <Link
-                    key={n.id}
-                    href={`/app/news/${n.id}`}
-                    className={cn(
-                      "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2",
-                      seen && "opacity-60 hover:opacity-100"
-                    )}
-                  >
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                        {n.id}
-                      </span>
-                      <ImpactPill level={n.impact} />
-                      <BiasBadge bias={n.bias} />
-                      {seen && (
-                        <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/40">
-                          ✓ SEEN
-                        </span>
-                      )}
-                      <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
-                        {formatTime(n.ts)}Z · BY {n.author.toUpperCase()}
-                      </span>
-                    </div>
-                    <h3
+            {topNews.length === 0 ? (
+              <div className="mt-4 border border-gray-3 bg-black p-8 text-center">
+                <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                  No approved news items yet
+                </div>
+                <div className="mt-2 font-display text-sm text-white/30">
+                  Items will appear here once approved by the desk.
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-px bg-gray-3">
+                {topNews.map((n) => {
+                  const seen = seenHydrated && seenNewsIds.includes(n.id);
+                  const ts = n.published_at ?? n.fetched_at;
+                  return (
+                    <Link
+                      key={n.id}
+                      href={`/app/news/${n.id}`}
                       className={cn(
-                        "mt-3 font-display text-xl leading-snug transition-colors group-hover:text-brand sm:text-2xl",
-                        seen ? "text-white/70" : "text-white"
+                        "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2",
+                        seen && "opacity-60 hover:opacity-100"
                       )}
                     >
-                      {n.headline}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-white/60">
-                      {n.analysis}
-                    </p>
-                  </Link>
-                );
-              })}
-            </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+                          [{n.source_code}]
+                        </span>
+                        <ImpactPill level={n.impact} />
+                        <BiasBadge bias={n.bias} />
+                        {seen && (
+                          <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/40">
+                            ✓ SEEN
+                          </span>
+                        )}
+                        <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
+                          {formatTime(ts)}Z · BY {n.author.toUpperCase()}
+                        </span>
+                      </div>
+                      <h3
+                        className={cn(
+                          "mt-3 font-display text-xl leading-snug transition-colors group-hover:text-brand sm:text-2xl",
+                          seen ? "text-white/70" : "text-white"
+                        )}
+                      >
+                        {n.headline}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-sm text-white/60">
+                        {n.analysis}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <aside className="col-span-12 space-y-8 lg:col-span-4">
+          <aside className="col-span-12 lg:col-span-4">
             <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
               <div className="flex items-center justify-between">
                 <DataLabel>Trading Plan · TX-03</DataLabel>
@@ -129,22 +135,6 @@ export function FeaturedRow({
               >
                 {paid ? "Open plan →" : "Unlock plan →"}
               </Link>
-            </div>
-
-            <div>
-              <SectionHeader n="02 /" label="Calendar · 48h">
-                <Link
-                  href="/app/calendar"
-                  className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
-                >
-                  Full →
-                </Link>
-              </SectionHeader>
-              <div className="mt-4 space-y-px bg-gray-3">
-                {upcoming.map((c) => (
-                  <CalendarPeekRow key={c.id} event={c} />
-                ))}
-              </div>
             </div>
           </aside>
         </div>

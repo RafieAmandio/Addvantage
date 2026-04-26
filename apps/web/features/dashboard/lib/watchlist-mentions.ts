@@ -1,10 +1,14 @@
-import type { NewsItem, TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { TradingPlan, TradingSetup } from "@/lib/mock/types";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
 
-export function filterNewsByWatch(
-  items: NewsItem[],
+interface NewsWithAffects {
+  affects: string[];
+}
+
+export function filterNewsByWatch<T extends NewsWithAffects>(
+  items: T[],
   tickers: string[]
-): NewsItem[] {
+): T[] {
   return items.filter((n) => n.affects.some((a) => tickers.includes(a)));
 }
 

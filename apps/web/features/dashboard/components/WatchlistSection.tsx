@@ -3,7 +3,8 @@ import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
-import type { NewsItem, TradingSetup } from "@/lib/mock/types";
+import type { NewsListItem } from "@/features/news/queries/news";
+import type { TradingSetup } from "@/lib/mock/types";
 import { cn } from "@/lib/cn";
 
 export function WatchlistSection({
@@ -15,7 +16,7 @@ export function WatchlistSection({
   className,
 }: {
   tickers: string[];
-  watchNewsMentions: NewsItem[];
+  watchNewsMentions: NewsListItem[];
   watchSetupMentions: TradingSetup[];
   watchArchiveSetups: WatchArchiveEntry[];
   planId: string;
@@ -72,7 +73,7 @@ export function WatchlistSection({
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                          {n.id}
+                          [{n.source_code}]
                         </span>
                         <ImpactPill level={n.impact} />
                         <BiasBadge bias={n.bias} />

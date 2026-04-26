@@ -15,7 +15,6 @@ export function DashboardHero({
   isMac,
   highImpactToday,
   openSetups,
-  highCalendar,
   className,
 }: {
   stamp: string;
@@ -25,7 +24,6 @@ export function DashboardHero({
   isMac: boolean;
   highImpactToday: number;
   openSetups: number;
-  highCalendar: number;
   className?: string;
 }) {
   const { setSearchOpen } = useAppState();
@@ -50,10 +48,8 @@ export function DashboardHero({
             <p className="mt-4 max-w-xl font-display text-base text-white/60 sm:mt-6 sm:text-xl">
               The DOMAIN has been transmitting overnight.{" "}
               <span className="text-white">{highImpactToday}</span> high-impact
-              items, <span className="text-white">{openSetups}</span> open
-              setups on the Trading Plan, and{" "}
-              <span className="text-white">{highCalendar}</span> high-impact
-              events on the calendar in the next 48h.
+              items and <span className="text-white">{openSetups}</span> open
+              setups on the Trading Plan.
             </p>
 
             <button
@@ -120,10 +116,9 @@ export function DashboardHero({
                 {OPERATOR_ID} · {paid ? "VIP+ Trader" : "Free access"}
               </div>
 
-              <div className="mt-5 grid grid-cols-3 gap-px bg-gray-3">
+              <div className="mt-5 grid grid-cols-2 gap-px bg-gray-3">
                 <Stat label="High news" value={highImpactToday} />
                 <Stat label="Setups" value={openSetups} />
-                <Stat label="Cal · 48h" value={highCalendar} />
               </div>
 
               <Link
