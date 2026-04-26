@@ -84,7 +84,7 @@ export function PrimerDetailView({
                   }
                 }}
                 className={
-                  "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand " +
+                  "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
                   (isRead
                     ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-blood-bright"
                     : "border-brand/60 text-brand hover:bg-brand hover:text-black")
@@ -131,7 +131,7 @@ export function PrimerDetailView({
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   #{t}
                 </Link>
@@ -144,7 +144,7 @@ export function PrimerDetailView({
           <Link
             href={prev ? `/app/education/${prev.id}` : "/app/education"}
             className={
-              "block bg-black p-4 transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -158,7 +158,7 @@ export function PrimerDetailView({
           <Link
             href={next ? `/app/education/${next.id}` : "/app/education"}
             className={
-              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >

@@ -60,7 +60,7 @@ function EventCardInner({
   );
   if (!href) return body;
   return (
-    <Link href={href} className="block">
+    <Link href={href} className="block focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
       {body}
     </Link>
   );

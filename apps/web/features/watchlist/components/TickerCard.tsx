@@ -57,7 +57,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           )}
           <button
             onClick={() => onUnpin(ticker)}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand"
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ✕ Unpin
           </button>
@@ -79,7 +79,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   <Link
                     key={n.id}
                     href={`/app/news/${n.id}`}
-                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
+                    className="group block bg-black p-3 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -110,7 +110,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   <Link
                     key={`${p.id}-${s.id}`}
                     href={`/app/plan/${p.id}#${s.id}`}
-                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
+                    className="group block bg-black p-3 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -152,7 +152,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                     <Link
                       key={`${p.id}-${s.id}`}
                       href={`/app/plan/${p.id}#${s.id}`}
-                      className="group block bg-black p-3 transition-colors hover:bg-gray-2"
+                      className="group block bg-black p-3 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">

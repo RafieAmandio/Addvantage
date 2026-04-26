@@ -17,7 +17,7 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
   return (
     <Link
       href={`/app/education/${p.id}`}
-      className="group relative col-span-12 bg-black p-8 transition-all hover:-translate-y-px hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
+      className="group relative col-span-12 bg-black p-8 transition-all hover:-translate-y-px hover:bg-gray-2 sm:col-span-6 lg:col-span-4 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       {read && !locked && (
         <div className="absolute right-0 top-0 bg-moss/15 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">

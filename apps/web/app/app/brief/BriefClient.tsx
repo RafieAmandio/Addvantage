@@ -97,7 +97,7 @@ export function BriefClient({ news, plan }: Props) {
                     key={n.id}
                     href={`/app/news/${n.id}`}
                     className={
-                      "group block bg-black p-5 transition-colors hover:bg-gray-2 " +
+                      "group block bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
                       (seen ? "opacity-60 hover:opacity-100" : "")
                     }
                   >

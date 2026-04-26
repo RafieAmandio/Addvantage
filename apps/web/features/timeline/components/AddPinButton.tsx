@@ -33,7 +33,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="border border-brand bg-brand px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-50"
+      className="border border-brand bg-brand px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       {pending ? "Pinning…" : "Pin event →"}
     </button>
@@ -98,7 +98,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus:border-brand focus:text-brand focus:outline-none"
+        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
       >
         + Pin event
       </button>
@@ -222,7 +222,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   onClick={close}
                   className={cn(
                     "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60",
-                    "hover:border-brand hover:text-brand focus:border-brand focus:text-brand focus:outline-none",
+                    "hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                   )}
                 >
                   Cancel · esc

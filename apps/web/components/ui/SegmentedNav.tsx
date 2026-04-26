@@ -26,7 +26,7 @@ export function SegmentedNav<T extends string>({
           key={item}
           href={hrefFor(item)}
           className={cn(
-            "border px-2 py-1 transition-colors",
+            "border px-2 py-1 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
             item === current
               ? "border-brand bg-brand text-black"
               : "border-gray-3 text-white/60 hover:border-brand hover:text-brand",

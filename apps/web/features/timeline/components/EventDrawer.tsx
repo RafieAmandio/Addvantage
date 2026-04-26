@@ -72,7 +72,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
         type="button"
         aria-label="Close event details"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-black/70"
+        className="absolute inset-0 cursor-default bg-black/70 focus-visible:outline-none"
       />
 
       <aside
@@ -106,7 +106,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 hover:bg-gray-3 hover:text-white"
+            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 hover:bg-gray-3 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ×
           </button>
@@ -173,7 +173,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
               href={event.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
+              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               View source →
             </a>
