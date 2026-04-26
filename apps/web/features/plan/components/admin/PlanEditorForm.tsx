@@ -248,7 +248,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 />
                 <button
                   type="submit"
-                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright transition-colors hover:bg-blood hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   ✕ Close
                 </button>
@@ -257,7 +257,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <form action={deletePlan.bind(null, plan.id)}>
               <button
                 type="submit"
-                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Delete
               </button>

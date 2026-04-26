@@ -74,7 +74,7 @@ export function PlanDetailSetupCard({
           onClick={copySetupLink}
           title={`Copy deep link to ${s.id}`}
           aria-label={`Copy link to setup ${s.id}`}
-          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           ⌯ LINK
         </button>
@@ -82,7 +82,7 @@ export function PlanDetailSetupCard({
           onClick={copySetup}
           title={`Copy ${s.id} as text`}
           aria-label={`Copy setup ${s.id} text`}
-          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           ⧉ TEXT
         </button>

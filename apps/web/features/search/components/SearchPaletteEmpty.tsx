@@ -57,7 +57,7 @@ export function SearchPaletteEmpty({
               <button
                 key={q}
                 onClick={() => onPick(q)}
-                className="border border-gray-3 bg-black px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="border border-gray-3 bg-black px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {q}
               </button>

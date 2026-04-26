@@ -57,7 +57,7 @@ export function TopBar() {
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
-            className="border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="border border-gray-3 p-2 text-white/70 transition-colors hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <svg
               width="14"
@@ -76,7 +76,7 @@ export function TopBar() {
               onClick={() => setSidebarCollapsed(false)}
               aria-label="Expand sidebar"
               title="Expand sidebar · \\"
-              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 transition-colors hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               <svg
                 width="14"

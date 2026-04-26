@@ -222,7 +222,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   onClick={close}
                   className={cn(
                     "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60",
-                    "hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                    "transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                   )}
                 >
                   Cancel · esc

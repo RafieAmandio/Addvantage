@@ -147,7 +147,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
               {readCount > 0 && (
                 <button
                   onClick={() => setConfirmingReset(true)}
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   Reset
                 </button>

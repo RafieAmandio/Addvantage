@@ -90,7 +90,7 @@ export function DashboardHero({
                   <button
                     key={s}
                     onClick={() => setSearchOpen(true)}
-                    className="border-b border-transparent text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                    className="border-b border-transparent text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     {s}
                   </button>

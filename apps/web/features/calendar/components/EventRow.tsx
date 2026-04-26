@@ -19,7 +19,7 @@ export function EventRow({
         <div className="flex flex-wrap items-baseline gap-2">
           <Link
             href={`/app/calendar/${event.id}`}
-            className="font-display text-base leading-tight text-white group-hover:text-brand hover:text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-display text-base leading-tight text-white transition-colors group-hover:text-brand hover:text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {event.title}
           </Link>
