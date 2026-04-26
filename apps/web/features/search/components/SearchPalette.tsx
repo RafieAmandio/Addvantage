@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/lib/state";
 import {
@@ -23,11 +23,14 @@ export function SearchPalette() {
   const { searchOpen, setSearchOpen } = useAppState();
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [searching, setSearching] = useState(false);
   const [active, setActive] = useState(0);
   const [recent, setRecent] = useState<string[]>([]);
   const [visits, setVisits] = useState<RecentVisit[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     setRecent(loadRecentSearches());
@@ -40,6 +43,7 @@ export function SearchPalette() {
   useEffect(() => {
     if (searchOpen) {
       setQuery("");
+      setResults([]);
       setActive(0);
       requestAnimationFrame(() => inputRef.current?.focus());
       document.body.style.overflow = "hidden";
@@ -51,9 +55,30 @@ export function SearchPalette() {
     };
   }, [searchOpen]);
 
-  const results = useMemo(() => search(query, 30), [query]);
-  const grouped = useMemo(() => groupResults(results), [results]);
-  const flat = useMemo(() => grouped.flatMap(([, items]) => items), [grouped]);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const q = query.trim();
+    if (!q) {
+      setResults([]);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      const r = await search(q, 30);
+      setResults(r);
+      setSearching(false);
+    }, 150);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query]);
+
+  const grouped = groupResults(results);
+  const flat = grouped.flatMap(([, items]) => items);
 
   useEffect(() => {
     if (active >= flat.length) setActive(0);
@@ -144,12 +169,20 @@ export function SearchPalette() {
             />
           )}
 
-          {query && results.length === 0 && (
+          {query && !searching && results.length === 0 && (
             <SearchPaletteNoResults
               query={query}
               recent={recent}
               onPick={pickQuery}
             />
+          )}
+
+          {query && searching && results.length === 0 && (
+            <div className="px-5 py-8 text-center">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                Searching…
+              </div>
+            </div>
           )}
 
           {query &&
