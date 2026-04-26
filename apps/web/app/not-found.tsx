@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ClassificationStripe } from "@/components/ui/Classification";
-import { Button } from "@/components/ui/Button";
 
 export default function NotFound() {
   return (
@@ -35,13 +34,17 @@ export default function NotFound() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link href="/">
-              <Button size="lg">← RETURN TO BRIEF</Button>
+            <Link
+              href="/"
+              className="group relative inline-flex h-14 items-center justify-center gap-2 border border-brand bg-brand px-8 font-mono text-[12px] uppercase tracking-widest2 text-black transition-all duration-200 hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              ← RETURN TO BRIEF
             </Link>
-            <Link href="/app">
-              <Button variant="outline" size="lg">
-                OPERATOR DASHBOARD
-              </Button>
+            <Link
+              href="/app"
+              className="group relative inline-flex h-14 items-center justify-center gap-2 border border-brand/60 px-8 font-mono text-[12px] uppercase tracking-widest2 text-brand transition-all duration-200 hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              OPERATOR DASHBOARD
             </Link>
           </div>
 
