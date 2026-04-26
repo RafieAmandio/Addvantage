@@ -16,9 +16,12 @@ export default function AuthLayout({
             <Link href="/" className="font-display text-2xl text-white">
               ANTS<span className="text-brand">.</span>
             </Link>
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            <Link
+              href="/"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
+            >
               ← Return to brief
-            </div>
+            </Link>
           </div>
         </header>
         {children}

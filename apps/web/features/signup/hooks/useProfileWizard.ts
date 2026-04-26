@@ -105,6 +105,12 @@ export function useProfileWizard() {
   // Keyboard navigation: number keys to select tiles, Enter to advance.
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (e.key === "Enter" && canAdvance) {
+        e.preventDefault();
+        next();
+        return;
+      }
+
       const num = parseInt(e.key);
       if (isNaN(num) || num < 1) return;
 
@@ -127,11 +133,6 @@ export function useProfileWizard() {
           ...prev,
           faultAttribution: FAULT_OPTIONS[num - 1].value,
         }));
-      }
-
-      if (e.key === "Enter" && canAdvance) {
-        e.preventDefault();
-        next();
       }
     },
     [step, form, canAdvance, toggleMarket, next]
