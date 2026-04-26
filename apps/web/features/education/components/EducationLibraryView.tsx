@@ -76,7 +76,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
   }, [primers]);
 
   return (
-    <div>
+    <div className="stagger">
       <BackToTop />
       <ConfirmDialog
         open={confirmingReset}
@@ -106,7 +106,6 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {/* Search input */}
         <div className="mb-6">
           <PageSearchInput
             value={query}

@@ -42,12 +42,6 @@ function toPrimer(row: PrimerRow): Primer | null {
 
 const DEFAULT_PRIMER_LIMIT = 100;
 
-/**
- * Public education library feed. RLS only returns `published = true` rows
- * to non-admins (see migration 0020). Ordering matches the old static
- * array: `sort_order asc` with `created_at` as tie-breaker. Bounded by
- * `.range()` so content-authored growth doesn't quietly bloat the page.
- */
 export async function listPublishedPrimers(
   input: { limit?: number } = {},
 ): Promise<Primer[]> {
@@ -70,25 +64,4 @@ export async function listPublishedPrimers(
   return (data ?? [])
     .map((row) => toPrimer(row as PrimerRow))
     .filter((p): p is Primer => p !== null);
-}
-
-/** Single primer by slug (the legacy `P-001` style id). RLS still applies. */
-export async function getPrimerBySlug(slug: string): Promise<Primer | null> {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("education_primers")
-    .select(PRIMER_COLUMNS)
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
-  if (error) {
-    logger.error("getPrimerBySlug failed", {
-      slug,
-      error,
-      scope: "education.getPrimerBySlug",
-    });
-    return null;
-  }
-  if (!data) return null;
-  return toPrimer(data as PrimerRow);
 }

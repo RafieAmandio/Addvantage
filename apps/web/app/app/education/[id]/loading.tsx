@@ -1,7 +1,7 @@
 export default function EducationDetailLoading() {
   return (
     <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-3xl animate-pulse">
+      <div className="mx-auto max-w-4xl animate-pulse">
         <div className="mb-4 h-3 w-28 rounded bg-gray-2" />
         <div className="mb-2 h-8 w-5/6 rounded bg-gray-2" />
         <div className="mb-6 flex gap-3">

@@ -30,7 +30,7 @@ export function PrimerDetailView({
   const isRead = readIds.includes(primer.id);
 
   return (
-    <div>
+    <div className="stagger">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
           <Breadcrumbs
