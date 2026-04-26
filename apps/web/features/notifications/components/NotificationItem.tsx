@@ -35,7 +35,7 @@ export function NotificationItem({
       data-notif-idx={idx}
       className={cn(
         "group relative",
-        isActive && "outline outline-1 outline-lime -outline-offset-1",
+        isActive && "outline outline-1 outline-brand -outline-offset-1",
         className
       )}
     >
@@ -59,7 +59,7 @@ export function NotificationItem({
         className={cn(
           "group block border-b border-gray-3 px-4 py-3 transition-colors last:border-b-0",
           pinMatch && !isRead
-            ? "border-l-2 border-l-lime bg-brand/5 hover:bg-brand/10"
+            ? "border-l-2 border-l-brand bg-brand/5 hover:bg-brand/10"
             : isRead
               ? "bg-black hover:bg-gray-2"
               : "bg-gray-2/40 hover:bg-gray-2"

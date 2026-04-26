@@ -13,7 +13,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
         type="submit"
         className={
           className ??
-          "font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-lime/40 hover:text-brand"
+          "font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 hover:text-brand"
         }
       >
         Logout →

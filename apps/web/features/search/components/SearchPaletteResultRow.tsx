@@ -36,7 +36,7 @@ function SearchPaletteResultRowImpl({
       className={cn(
         "block w-full border-b border-gray-3 px-5 py-4 text-left transition-colors",
         active
-          ? "border-l-2 border-l-lime bg-brand/10"
+          ? "border-l-2 border-l-brand bg-brand/10"
           : "border-l-2 border-l-transparent bg-black hover:bg-gray-2",
       )}
     >

@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 import type { TradingPlan } from "@/lib/mock/types";
 import type { CompareSummary } from "@/features/plan/lib/compare-helpers";
 
-type Tone = "moss" | "blood" | "lime" | "paper" | "muted";
+type Tone = "moss" | "blood" | "brand" | "white" | "muted";
 
 function SummaryCell({
   label,
@@ -20,9 +20,9 @@ function SummaryCell({
       ? "text-moss"
       : valueTone === "blood"
       ? "text-blood-bright"
-      : valueTone === "lime"
+      : valueTone === "brand"
       ? "text-brand"
-      : valueTone === "paper"
+      : valueTone === "white"
       ? "text-white"
       : "text-white/30";
   return (
@@ -94,7 +94,7 @@ export function PlanCompareSummary({
             ? String(commonInstruments.length)
             : "—"
         }
-        valueTone={commonInstruments.length > 0 ? "lime" : "muted"}
+        valueTone={commonInstruments.length > 0 ? "brand" : "muted"}
         sub={
           commonInstruments.length > 0
             ? commonInstruments.join(" · ")
@@ -104,7 +104,7 @@ export function PlanCompareSummary({
       <SummaryCell
         label="Setup counts"
         value={`${planA.setups.length} / ${planB.setups.length}`}
-        valueTone="paper"
+        valueTone="white"
         sub={`${planA.setups.length} in A · ${planB.setups.length} in B`}
       />
     </div>

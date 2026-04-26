@@ -73,10 +73,7 @@ export function MonthGrid({
                 inMonth
                   ? "bg-black hover:bg-gray-2"
                   : "bg-gray-2/30 hover:bg-gray-2/60",
-                // Non-anchor hover gets a faint lime preview outline
                 !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-brand/30",
-                // Anchor (keyboard cursor) — inset lime border, overridden
-                // visually by the today ring below when they coincide.
                 isAnchor && !isToday && "bg-brand/5 ring-2 ring-inset ring-brand/60",
                 isToday && "ring-1 ring-inset ring-brand",
                 isAnchor && isToday && "ring-2 ring-brand bg-brand/10"

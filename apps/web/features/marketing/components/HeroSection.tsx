@@ -10,7 +10,7 @@ import { heroTicker } from "@/features/marketing/lib/data";
 export function HeroSection() {
   return (
     <section className="px-3 pt-3">
-      <div className="relative h-[min(1024px,92vh)] min-h-[820px] overflow-hidden rounded-[32px] bg-[#1F1F1F]">
+      <div className="relative h-[min(1024px,92vh)] min-h-[820px] overflow-hidden rounded-[32px] bg-gray">
         <div className="relative z-20 flex items-center justify-between px-6 py-8 md:px-[140px] md:py-[50px]">
           <Link href="/" className="flex items-center gap-[7.78px]">
             <LogoMark size={30} />

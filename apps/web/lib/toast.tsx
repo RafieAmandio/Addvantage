@@ -128,7 +128,7 @@ const TONE_STYLES: Record<
   info: {
     border: "border-brand/50",
     bar: "bg-brand",
-    led: "lime",
+    led: "",
     text: "text-brand",
   },
   success: {
@@ -140,7 +140,7 @@ const TONE_STYLES: Record<
   warn: {
     border: "border-brand",
     bar: "bg-brand-dim",
-    led: "lime",
+    led: "",
     text: "text-brand",
   },
   error: {

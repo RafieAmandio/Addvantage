@@ -22,8 +22,8 @@ export default function GlobalError({
         style={{
           margin: 0,
           minHeight: "100vh",
-          background: "#0b0f14",
-          color: "#e7ecef",
+          background: "#111111",
+          color: "#EEEEEE",
           fontFamily:
             "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
           display: "flex",
@@ -39,7 +39,7 @@ export default function GlobalError({
               fontSize: 10,
               textTransform: "uppercase",
               letterSpacing: "0.2em",
-              color: "#c6ff4d",
+              color: "#FFD400",
             }}
           >
             STATUS · 500 · ROOT FAULT
@@ -54,7 +54,7 @@ export default function GlobalError({
           >
             The DOMAIN is offline.
           </h1>
-          <p style={{ marginTop: "1rem", color: "rgba(231,236,239,0.6)" }}>
+          <p style={{ marginTop: "1rem", color: "rgba(238,238,238,0.6)" }}>
             A root-level fault took down the shell. Reload to retry.
           </p>
           <button
@@ -62,8 +62,8 @@ export default function GlobalError({
             style={{
               marginTop: "1.5rem",
               padding: "0.75rem 1.25rem",
-              background: "#c6ff4d",
-              color: "#0b0f14",
+              background: "#FFD400",
+              color: "#111111",
               border: 0,
               fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
               fontSize: 12,
@@ -80,7 +80,7 @@ export default function GlobalError({
                 marginTop: "2rem",
                 fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
                 fontSize: 10,
-                color: "rgba(231,236,239,0.4)",
+                color: "rgba(238,238,238,0.4)",
               }}
             >
               DIGEST · {error.digest}
