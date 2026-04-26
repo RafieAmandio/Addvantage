@@ -54,6 +54,7 @@ export function DashboardHero({
 
             <button
               onClick={() => setSearchOpen(true)}
+              aria-label="Search news, plans, primers, channels"
               className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-gray-2/60 px-5 py-4 text-left transition-colors hover:border-brand"
             >
               <svg

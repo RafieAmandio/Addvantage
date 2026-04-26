@@ -112,7 +112,7 @@ export function DashboardClient({ news, primers }: Props) {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-6 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30 animate-[revealUp_0.6s_ease-out_both] sm:px-6 sm:py-8">
-        ANTS // DOMAIN // OPERATOR HOME<span className="hidden sm:inline"> · Press ⌘K or / to search · Press ? for shortcuts</span>
+        ANTS // DOMAIN // OPERATOR HOME<span className="hidden sm:inline"> · Press {isMac ? "⌘" : "Ctrl+"}K or / to search · Press ? for shortcuts</span>
       </div>
     </div>
   );
