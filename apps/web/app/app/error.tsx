@@ -1,0 +1,55 @@
+"use client";
+
+import { useEffect } from "react";
+import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
+
+export default function AppError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
+  return (
+    <div
+      className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-20"
+      data-testid="error-boundary"
+    >
+      <div className="w-full max-w-md text-center">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-400">
+          ● TRANSMISSION FAULT
+        </div>
+        <h1 className="mt-4 font-display text-4xl text-white">
+          Something went <span className="italic text-brand">wrong</span>
+        </h1>
+        <p className="mt-4 font-display text-lg text-white/60">
+          An error interrupted this page. It has been logged automatically.
+        </p>
+        {error.digest && (
+          <p className="mt-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+            Ref: {error.digest}
+          </p>
+        )}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => reset()}
+            className="border border-brand/60 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black"
+          >
+            ↻ Retry
+          </button>
+          <Link
+            href="/app"
+            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white"
+          >
+            ← Dashboard
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

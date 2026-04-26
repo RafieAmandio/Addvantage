@@ -46,7 +46,7 @@
 | 0.16 | Admin sources + plans + archive | [x] | All old color tokens already removed by global pivot |
 | 0.17 | All pages — loading states | [x] | 21 loading.tsx skeleton screens added across all app + admin routes |
 | 0.18 | All pages — empty states | [x] | Education zero-primers state, admin sources empty state added, tags/[tag] improved with CTAs, admin review/archive improved with context + links, bg-black bug fixed on grid rows |
-| 0.19 | All pages — error states | [ ] | |
+| 0.19 | All pages — error states | [x] | Segment error.tsx for /app/* and /admin/*; contextual not-found.tsx for all 6 dynamic segments; unit tests for all 10 modules |
 | 0.20 | All pages — mobile responsive | [ ] | |
 
 ---
