@@ -1,22 +1,14 @@
-import { news } from "@/features/news/mock";
 import { getAllPlans } from "@/features/plan/mock";
-import { calendar, CURRENCIES } from "@/features/calendar/mock";
-import type { CalendarEvent, TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { TradingPlan, TradingSetup } from "@/lib/mock/types";
+import type { NewsListItem } from "@/features/news/queries/news";
 import type { TickerRollup } from "@/features/watchlist/types";
 
-function calendarEventsFor(ticker: string): CalendarEvent[] {
-  const t = ticker.toUpperCase();
-  const currencyIdx = (CURRENCIES as ReadonlyArray<string>).indexOf(t);
-  return calendar.filter((e) => {
-    if (currencyIdx >= 0 && e.scores[currencyIdx] >= 5) return true;
-    if (e.notes && e.notes.toUpperCase().includes(t)) return true;
-    if (e.title.toUpperCase().includes(t)) return true;
-    return false;
-  });
-}
-
-export function rollupTicker(ticker: string, latestId: string): TickerRollup {
-  const newsItems = news.filter((n) => n.affects.includes(ticker));
+export function rollupTicker(
+  ticker: string,
+  latestId: string,
+  allNews: NewsListItem[],
+): TickerRollup {
+  const newsItems = allNews.filter((n) => n.affects.includes(ticker));
   const allPlans = getAllPlans();
 
   const liveSetups: Array<{ plan: TradingPlan; setup: TradingSetup }> = [];
@@ -50,7 +42,6 @@ export function rollupTicker(ticker: string, latestId: string): TickerRollup {
     newsItems,
     liveSetups,
     archiveSetups,
-    calendarEvents: calendarEventsFor(ticker),
     totalR,
     closedCount,
   };

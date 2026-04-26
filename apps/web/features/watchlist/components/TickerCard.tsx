@@ -16,7 +16,6 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
     newsItems,
     liveSetups,
     archiveSetups,
-    calendarEvents,
     totalR,
     closedCount,
   } = rollup;
@@ -32,8 +31,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
             </div>
             <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
               {newsItems.length} news · {liveSetups.length} live ·{" "}
-              {archiveSetups.length} historical · {calendarEvents.length}{" "}
-              upcoming
+              {archiveSetups.length} historical
             </div>
           </div>
         </div>
@@ -75,27 +73,30 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
             </div>
           ) : (
             <div className="mt-3 space-y-px bg-gray-3">
-              {newsItems.slice(0, 4).map((n) => (
-                <Link
-                  key={n.id}
-                  href={`/app/news/${n.id}`}
-                  className="group block bg-black p-3 transition-colors hover:bg-gray-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                      {n.id}
-                    </span>
-                    <ImpactPill level={n.impact} />
-                    <BiasBadge bias={n.bias} />
-                    <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                      {formatDate(n.ts)} · {formatTime(n.ts)}Z
-                    </span>
-                  </div>
-                  <div className="mt-1 font-display text-base leading-snug text-white transition-colors group-hover:text-brand">
-                    {n.headline}
-                  </div>
-                </Link>
-              ))}
+              {newsItems.slice(0, 4).map((n) => {
+                const ts = n.published_at ?? n.fetched_at;
+                return (
+                  <Link
+                    key={n.id}
+                    href={`/app/news/${n.id}`}
+                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
+                        [{n.source_code}]
+                      </span>
+                      <ImpactPill level={n.impact} />
+                      <BiasBadge bias={n.bias} />
+                      <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                        {formatDate(ts)} · {formatTime(ts)}Z
+                      </span>
+                    </div>
+                    <div className="mt-1 font-display text-base leading-snug text-white transition-colors group-hover:text-brand">
+                      {n.headline}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -202,45 +203,6 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
               <DataLabel>Setups</DataLabel>
               <div className="mt-3 border border-gray-3 bg-black p-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                 ● No setups on {ticker} in the current plan or archive.
-              </div>
-            </div>
-          )}
-
-          {calendarEvents.length > 0 && (
-            <div>
-              <DataLabel>Upcoming events · {calendarEvents.length}</DataLabel>
-              <div className="mt-3 space-y-px bg-gray-3">
-                {calendarEvents.slice(0, 3).map((e) => (
-                  <Link
-                    key={e.id}
-                    href="/app/calendar"
-                    className="group block bg-black p-3 transition-colors hover:bg-gray-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        {e.id}
-                      </span>
-                      <span
-                        className={
-                          "font-mono text-[9px] uppercase tracking-widest2 " +
-                          (e.impact === "high"
-                            ? "text-blood-bright"
-                            : e.impact === "medium"
-                            ? "text-brand"
-                            : "text-moss")
-                        }
-                      >
-                        {e.impact.toUpperCase()}
-                      </span>
-                      <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                        {formatDate(e.ts)} · {formatTime(e.ts)}Z
-                      </span>
-                    </div>
-                    <div className="mt-1 font-display text-sm text-white transition-colors group-hover:text-brand">
-                      {e.title}
-                    </div>
-                  </Link>
-                ))}
               </div>
             </div>
           )}
