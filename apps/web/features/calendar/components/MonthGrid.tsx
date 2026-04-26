@@ -20,7 +20,6 @@ export function MonthGrid({
   const monthStart = startOfMonth(anchor);
   const monthPrefix = monthStart.slice(0, 7);
 
-  // Events grouped by WIB day
   const byDay = new Map<string, CalendarEvent[]>();
   for (const e of events) {
     const ymd = wibYmd(e.ts);
@@ -28,7 +27,6 @@ export function MonthGrid({
     list.push(e);
     byDay.set(ymd, list);
   }
-  // Sort events inside each day by timestamp for consistent overflow
   for (const [, list] of byDay) {
     list.sort((a, b) => a.ts.localeCompare(b.ts));
   }

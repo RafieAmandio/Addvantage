@@ -8,53 +8,21 @@ import {
   type NewsListItem,
 } from "@/features/news/queries/news";
 
-// Server-only guard: this file is a thin wrapper around `supabaseServer()`
-// and must never land in a client bundle. We can't use the `server-only`
-// package (not installed in this repo — see prior ticks), so fall back to
-// the runtime-window sentinel pattern used across features/*/queries.
 if (typeof window !== "undefined") {
   throw new Error(
     "features/calendar/queries/correlation.ts is server-only",
   );
 }
 
-/**
- * Narrow projection of the timeline_events row the correlation query needs.
- * We only read the fields required to compute the window + overlap set —
- * not the full TimelineEvent — so schema drift on unrelated columns won't
- * break this file.
- */
 const EventShapeSchema = z.object({
   id: z.string(),
   occurred_at: z.string(),
-  // `symbols` is the overlap axis on `timeline_events`; `news_items.affects`
-  // is the mirroring array. EN1 copy in ROADMAP calls this `affects[]` on
-  // the event for consistency, but the actual column is `symbols` (see
-  // packages/db/src/types.ts). Overlap is computed in SQL against
-  // `news_items.affects` using this value.
   symbols: z.array(z.string()),
 });
 
 const CORRELATION_WINDOW_MS = 2 * 60 * 60 * 1000; // ±2h
 const MAX_RESULTS = 20;
 
-/**
- * Returns published news items plausibly related to the given calendar
- * event. Two simple filters, composed server-side:
- *
- *   1. `news_items.published_at` falls within ±2h of the event's
- *      `occurred_at`.
- *   2. `news_items.affects[]` overlaps the event's `symbols[]` by at least
- *      one string.
- *
- * RLS on `news_items` already restricts public reads to `status='approved'`
- * — the explicit `.eq("status","approved")` is belt-and-braces so a future
- * policy relax doesn't silently leak pending/rejected rows into the UI.
- *
- * Errors (network, shape mismatch, missing event, empty `symbols`) all
- * return `[]` rather than throwing, matching the house convention in
- * `listApprovedNews` / `listTimelineEvents`.
- */
 export async function listNewsForEvent(
   eventId: string,
 ): Promise<NewsListItem[]> {
@@ -87,9 +55,6 @@ export async function listNewsForEvent(
   }
   const event = eventParsed.data;
 
-  // No symbols → no useful overlap axis. Short-circuit rather than run a
-  // scan that will return everything or nothing depending on PG operator
-  // semantics for empty arrays.
   if (event.symbols.length === 0) return [];
 
   const occurredMs = Date.parse(event.occurred_at);

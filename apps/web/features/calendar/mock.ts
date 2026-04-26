@@ -1,7 +1,6 @@
 import type { CalendarEvent, CalendarDayMeta } from "@/lib/mock/types";
 
 export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;
-type CurrencyCode = (typeof CURRENCIES)[number];
 
 export const calendarDayMeta: CalendarDayMeta[] = [
   { date: "2026-04-03", summary: "NFP + Unemployment" },
@@ -23,7 +22,6 @@ export const calendarDayMeta: CalendarDayMeta[] = [
 ];
 
 export const calendar: CalendarEvent[] = [
-  // ─── FRIDAY APR 3 — NFP WEEK ───
   {
     id: "C-001",
     ts: "2026-04-03T12:30:00Z",
@@ -66,7 +64,6 @@ export const calendar: CalendarEvent[] = [
     previous: "3.9%",
   },
 
-  // ─── MONDAY APR 6 ───
   {
     id: "C-005",
     ts: "2026-04-06T14:00:00Z",
@@ -79,7 +76,6 @@ export const calendar: CalendarEvent[] = [
     notes: "Services PMI is the tell on whether the Fed gets the inflation it wants.",
   },
 
-  // ─── TUESDAY APR 7 ───
   {
     id: "C-006",
     ts: "2026-04-07T12:30:00Z",
@@ -91,7 +87,6 @@ export const calendar: CalendarEvent[] = [
     previous: "1.4%",
   },
 
-  // ─── WEDNESDAY APR 8 — BI DAY ───
   {
     id: "C-007",
     ts: "2026-04-08T07:00:00Z",
@@ -128,7 +123,6 @@ export const calendar: CalendarEvent[] = [
     relatedNewsId: "N-2604-014",
   },
 
-  // ─── THURSDAY APR 9 ───
   {
     id: "C-010",
     ts: "2026-04-09T01:50:00Z",
@@ -192,7 +186,6 @@ export const calendar: CalendarEvent[] = [
     previous: "0.8%",
   },
 
-  // ─── FRIDAY APR 10 ───
   {
     id: "C-016",
     ts: "2026-04-10T12:30:00Z",
@@ -225,7 +218,6 @@ export const calendar: CalendarEvent[] = [
     previous: "0.7%",
   },
 
-  // ─── MONDAY APR 13 ───
   {
     id: "C-019",
     ts: "2026-04-13T12:30:00Z",
@@ -237,7 +229,6 @@ export const calendar: CalendarEvent[] = [
     previous: "-20.9",
   },
 
-  // ─── TUESDAY APR 14 ───
   {
     id: "C-020",
     ts: "2026-04-14T12:30:00Z",
@@ -260,7 +251,6 @@ export const calendar: CalendarEvent[] = [
     previous: "-3.2%",
   },
 
-  // ─── WEDNESDAY APR 15 ───
   {
     id: "C-022",
     ts: "2026-04-15T06:00:00Z",
@@ -283,7 +273,6 @@ export const calendar: CalendarEvent[] = [
     previous: "5.8M",
   },
 
-  // ─── THURSDAY APR 16 ───
   {
     id: "C-024",
     ts: "2026-04-16T12:30:00Z",
@@ -316,7 +305,6 @@ export const calendar: CalendarEvent[] = [
     previous: "5.2%",
   },
 
-  // ─── TUESDAY APR 21 — TODAY (flash PMIs) ───
   {
     id: "C-027",
     ts: "2026-04-21T07:30:00Z",
@@ -349,7 +337,6 @@ export const calendar: CalendarEvent[] = [
     previous: "51.7",
   },
 
-  // ─── WEDNESDAY APR 22 ───
   {
     id: "C-030",
     ts: "2026-04-22T14:00:00Z",
@@ -361,7 +348,6 @@ export const calendar: CalendarEvent[] = [
     previous: "4.38M",
   },
 
-  // ─── THURSDAY APR 23 ───
   {
     id: "C-031",
     ts: "2026-04-23T12:30:00Z",
@@ -373,7 +359,6 @@ export const calendar: CalendarEvent[] = [
     previous: "1.3%",
   },
 
-  // ─── FRIDAY APR 24 ───
   {
     id: "C-032",
     ts: "2026-04-24T12:30:00Z",
@@ -386,7 +371,6 @@ export const calendar: CalendarEvent[] = [
     notes: "First read of Q1. Revisions are routine but the headline drives the dollar open.",
   },
 
-  // ─── TUESDAY APR 28 ───
   {
     id: "C-033",
     ts: "2026-04-28T14:00:00Z",
@@ -408,7 +392,6 @@ export const calendar: CalendarEvent[] = [
     previous: "104.7",
   },
 
-  // ─── WEDNESDAY APR 29 — FOMC ───
   {
     id: "C-035",
     ts: "2026-04-29T03:00:00Z",
@@ -441,7 +424,6 @@ export const calendar: CalendarEvent[] = [
     notes: "Powell's tone on 'balance of risks' is the tell for June.",
   },
 
-  // ─── THURSDAY APR 30 ───
   {
     id: "C-038",
     ts: "2026-04-30T09:00:00Z",
@@ -463,7 +445,6 @@ export const calendar: CalendarEvent[] = [
     previous: "2.4%",
   },
 
-  // ─── FRIDAY MAY 1 ───
   {
     id: "C-040",
     ts: "2026-05-01T14:00:00Z",
@@ -475,7 +456,6 @@ export const calendar: CalendarEvent[] = [
     previous: "50.3",
   },
 
-  // ─── MONDAY MAY 2 — NFP WEEK ───
   {
     id: "C-041",
     ts: "2026-05-02T12:30:00Z",
@@ -508,7 +488,6 @@ export const calendar: CalendarEvent[] = [
     previous: "51.4",
   },
 
-  // ─── THURSDAY MAY 8 — BoE ───
   {
     id: "C-044",
     ts: "2026-05-08T11:00:00Z",
@@ -531,7 +510,6 @@ export const calendar: CalendarEvent[] = [
     previous: "-0.3%",
   },
 
-  // ─── TUESDAY MAY 13 — CPI WEEK ───
   {
     id: "C-046",
     ts: "2026-05-13T12:30:00Z",
@@ -543,7 +521,6 @@ export const calendar: CalendarEvent[] = [
     previous: "2.1%",
   },
 
-  // ─── WEDNESDAY MAY 14 ───
   {
     id: "C-047",
     ts: "2026-05-14T12:30:00Z",
@@ -566,7 +543,6 @@ export const calendar: CalendarEvent[] = [
     previous: "3.8%",
   },
 
-  // ─── THURSDAY MAY 15 ───
   {
     id: "C-049",
     ts: "2026-05-15T12:30:00Z",
@@ -588,7 +564,6 @@ export const calendar: CalendarEvent[] = [
     previous: "77.2",
   },
 
-  // ─── THURSDAY MAY 21 ───
   {
     id: "C-051",
     ts: "2026-05-21T18:00:00Z",

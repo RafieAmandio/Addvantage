@@ -29,29 +29,18 @@ export function CalendarEmptyState({
 }: Props) {
   const isMonth = variant === "month";
   const size = isMonth ? "text-[9px]" : "text-[10px]";
-  const bodySize = isMonth ? "text-2xl" : "text-2xl";
   const gap = isMonth ? "gap-2" : "gap-3";
   const btnPad = "px-3 py-1.5";
 
   return (
     <div className={cn(isMonth ? "max-w-md text-center" : "text-center", className)}>
-      <div
-        className={cn(
-          "font-mono uppercase tracking-widest2 text-blood-bright",
-          isMonth ? "text-[10px]" : "text-[10px]"
-        )}
-      >
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
         ● NULL TRANSMISSION
       </div>
-      <div className={cn("mt-3 font-display text-white", bodySize)}>
+      <div className="mt-3 font-display text-2xl text-white">
         {title}
       </div>
-      <div
-        className={cn(
-          "mt-2 font-mono uppercase tracking-widest2 text-white/40",
-          "text-[10px]"
-        )}
-      >
+      <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
         {isMonth
           ? filtersActive
             ? "Filters are excluding everything in this month."

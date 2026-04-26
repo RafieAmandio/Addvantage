@@ -56,7 +56,6 @@ export function rangeLabel(view: ViewMode, anchorYmd: string): string {
         });
     return `${left} — ${right}`;
   }
-  // month
   return ymdToDate(anchorYmd).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",

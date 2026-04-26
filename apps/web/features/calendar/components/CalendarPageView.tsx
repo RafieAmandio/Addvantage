@@ -34,7 +34,6 @@ interface CalendarPageViewProps {
 }
 
 export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
-  const calendar = events;
   const searchParams = useSearchParams();
 
   const [view, setView] = useState<ViewMode>(() =>
@@ -63,14 +62,14 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   const { start, end } = useMemo(() => rangeForView(view, anchor), [view, anchor]);
 
   const filtered = useMemo(() => {
-    return calendar.filter((e) => {
+    return events.filter((e) => {
       const ymd = wibYmd(e.ts);
       if (ymd < start || ymd > end) return false;
       if (impactFilter !== "all" && e.impact !== impactFilter) return false;
       if (regionFilter !== "all" && e.region !== regionFilter) return false;
       return true;
     });
-  }, [start, end, impactFilter, regionFilter]);
+  }, [events, start, end, impactFilter, regionFilter]);
 
   const groups = useMemo(() => groupByDay(filtered), [filtered]);
 
@@ -82,7 +81,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   }, []);
 
   const nearestEventDate = useMemo(() => {
-    const matching = calendar.filter((e) => {
+    const matching = events.filter((e) => {
       if (impactFilter !== "all" && e.impact !== impactFilter) return false;
       if (regionFilter !== "all" && e.region !== regionFilter) return false;
       return true;
@@ -103,7 +102,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
       forward: forwardEvents[0] ?? null,
       backward: backwardEvents[0] ?? null,
     };
-  }, [start, end, impactFilter, regionFilter]);
+  }, [events, start, end, impactFilter, regionFilter]);
 
   const jumpToNearest = useCallback(
     (dir: 1 | -1) => {
