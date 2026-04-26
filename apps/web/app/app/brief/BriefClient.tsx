@@ -10,7 +10,7 @@ import {
   ImpactPill,
   BiasBadge,
 } from "@/components/ui/Marker";
-import { formatTime, formatDate } from "@/lib/cn";
+import { cn, formatTime, formatDate } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TradingPlan } from "@/features/plan/types";
 
@@ -65,12 +65,12 @@ export function BriefClient({ news, plan }: Props) {
             {seenInTop > 0 && (
               <button
                 onClick={() => setHideSeen((v) => !v)}
-                className={
-                  "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                  (hideSeen
+                className={cn(
+                  "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                  hideSeen
                     ? "border-brand bg-brand/10 text-brand"
-                    : "border-gray-3 text-white/60 transition-colors hover:border-brand hover:text-brand")
-                }
+                    : "border-gray-3 text-white/60 hover:border-brand hover:text-brand"
+                )}
               >
                 {hideSeen
                   ? `✓ HIDING ${seenInTop} SEEN`
@@ -96,10 +96,10 @@ export function BriefClient({ news, plan }: Props) {
                   <Link
                     key={n.id}
                     href={`/app/news/${n.id}`}
-                    className={
-                      "group block bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                      (seen ? "opacity-60 hover:opacity-100" : "")
-                    }
+                    className={cn(
+                      "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                      seen && "opacity-60 hover:opacity-100"
+                    )}
                   >
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -112,19 +112,21 @@ export function BriefClient({ news, plan }: Props) {
                           ✓ SEEN
                         </span>
                       )}
-                      <span className="ml-auto font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                      <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
                         {formatTime(ts)}Z · BY {n.author.toUpperCase()}
                       </span>
                     </div>
                     <h3
-                      className={
-                        "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-brand " +
-                        (seen ? "text-white/70" : "text-white")
-                      }
+                      className={cn(
+                        "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-brand",
+                        seen ? "text-white/70" : "text-white"
+                      )}
                     >
                       {n.headline}
                     </h3>
-                    <p className="mt-2 text-sm text-white/70">{n.analysis}</p>
+                    <p className="mt-2 line-clamp-2 text-sm text-white/60">
+                      {n.analysis}
+                    </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {n.affects.map((a) => (
                         <span
@@ -166,7 +168,9 @@ export function BriefClient({ news, plan }: Props) {
                 </div>
                 <h3 className="mt-3 font-display text-2xl text-white">
                   {paid
+                    ? plan.thesis.length > 100
                     ? plan.thesis.slice(0, 100) + "…"
+                    : plan.thesis
                     : "Latest plan published. Upgrade to view."}
                 </h3>
                 <div className="mt-4 grid grid-cols-2 gap-2 text-center">
@@ -179,10 +183,10 @@ export function BriefClient({ news, plan }: Props) {
                         {s.instrument}
                       </div>
                       <div
-                        className={
-                          "font-display text-sm " +
-                          (s.direction === "long" ? "text-moss" : "text-brand")
-                        }
+                        className={cn(
+                          "font-display text-sm",
+                          s.direction === "long" ? "text-moss" : "text-brand"
+                        )}
                       >
                         {s.direction === "long" ? "LONG" : "SHORT"}
                       </div>

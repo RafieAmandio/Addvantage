@@ -36,15 +36,6 @@ export default function BriefLoading() {
               ))}
             </div>
           </div>
-          <div className="space-y-3">
-            <div className="h-3 w-28 rounded bg-gray-2" />
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-black px-4 py-3 space-y-1">
-                <div className="h-3 w-16 rounded bg-gray-2" />
-                <div className="h-4 w-3/4 rounded bg-gray-2" />
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
