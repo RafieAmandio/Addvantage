@@ -50,4 +50,3 @@ if (!parsed.success) {
 }
 
 export const serverConfig = parsed.data;
-type ServerConfig = typeof serverConfig;
