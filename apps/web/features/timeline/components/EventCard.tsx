@@ -1,22 +1,8 @@
 import { memo } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { kindBadge } from "@/features/timeline/types";
 import type { TimelineEvent } from "@/features/timeline/queries/timeline";
-
-function kindBadge(kind: TimelineEvent["kind"]): string {
-  switch (kind) {
-    case "news":
-      return "bg-brand/15 text-brand";
-    case "tweet":
-      return "bg-brand/10 text-brand/70";
-    case "macro":
-      return "bg-blood/15 text-blood-bright";
-    case "earnings":
-      return "bg-moss/15 text-moss";
-    case "user_pin":
-      return "bg-white/15 text-white/70";
-  }
-}
 
 function formatTime(iso: string): string {
   return iso.slice(0, 16).replace("T", " ");
@@ -36,7 +22,7 @@ function EventCardInner({
 }) {
   const href = eventHref(event);
   const body = (
-    <div className={cn("px-4 py-3 hover:bg-gray-3", className)}>
+    <div className={cn("px-4 py-3 transition-colors hover:bg-gray-3", className)}>
       <div className="flex items-center gap-2">
         <span
           className={cn(

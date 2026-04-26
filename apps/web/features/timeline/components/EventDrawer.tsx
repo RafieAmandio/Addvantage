@@ -2,26 +2,12 @@
 
 import { useEffect } from "react";
 import { cn } from "@/lib/cn";
+import { kindBadge } from "@/features/timeline/types";
 import type { TimelineEvent } from "@/features/timeline/types";
 
 interface EventDrawerProps {
   event: TimelineEvent | null;
   onClose: () => void;
-}
-
-function kindBadge(kind: TimelineEvent["kind"]): string {
-  switch (kind) {
-    case "news":
-      return "bg-brand/15 text-brand";
-    case "tweet":
-      return "bg-brand/10 text-brand/70";
-    case "macro":
-      return "bg-blood/15 text-blood-bright";
-    case "earnings":
-      return "bg-moss/15 text-moss";
-    case "user_pin":
-      return "bg-white/15 text-white/70";
-  }
 }
 
 function biasColor(bias: TimelineEvent["bias"]): string {
@@ -106,7 +92,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 hover:bg-gray-3 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 transition-colors hover:bg-gray-3 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ×
           </button>
