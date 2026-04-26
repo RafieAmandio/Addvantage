@@ -72,7 +72,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
         type="button"
         aria-label="Close event details"
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-gray-1/70"
+        className="absolute inset-0 cursor-default bg-black/70"
       />
 
       <aside
