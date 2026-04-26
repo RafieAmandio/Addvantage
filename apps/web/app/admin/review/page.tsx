@@ -19,7 +19,7 @@ export default async function AdminReviewQueuePage() {
           </span>
           <Link
             href="/admin/review/new"
-            className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+            className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             + New item
           </Link>
@@ -41,13 +41,13 @@ export default async function AdminReviewQueuePage() {
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
               href="/admin/logs"
-              className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               View pipeline logs →
             </Link>
             <Link
               href="/admin/sources"
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               Check sources
             </Link>
@@ -60,7 +60,7 @@ export default async function AdminReviewQueuePage() {
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">

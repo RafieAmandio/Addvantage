@@ -25,7 +25,7 @@ export function NewsCreateForm() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/review"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Queue
           </Link>
@@ -177,7 +177,7 @@ export function NewsCreateForm() {
                       if (current.includes(h)) return;
                       setTags([...current, h].join(", "));
                     }}
-                    className="border border-gray-3 px-1.5 py-0.5 hover:border-brand hover:text-brand"
+                    className="border border-gray-3 px-1.5 py-0.5 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     +{h}
                   </button>
@@ -199,14 +199,14 @@ export function NewsCreateForm() {
         <div className="mt-6 flex items-center justify-end gap-3">
           <Link
             href="/admin/review"
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
+            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={pending}
-            className="border border-brand bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40"
+            className="border border-brand bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {pending ? "Creating…" : "Create → Review queue"}
           </button>
