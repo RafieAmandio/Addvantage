@@ -133,7 +133,7 @@ export default function LiabilityPage() {
           ].map((a) => (
             <label
               key={a.k}
-              className="flex cursor-pointer items-start gap-3 border border-gray-3 p-4 transition-colors hover:border-brand/40"
+              className="flex cursor-pointer items-start gap-3 border border-gray-3 p-4 transition-colors hover:border-brand/40 focus-within:border-brand"
             >
               <input
                 type="checkbox"
@@ -141,7 +141,7 @@ export default function LiabilityPage() {
                 onChange={(e) =>
                   setAcks({ ...acks, [a.k]: e.target.checked })
                 }
-                className="mt-1 h-4 w-4 accent-[#FFD400]"
+                className="mt-1 h-4 w-4 accent-brand"
               />
               <span className="font-mono text-[11px] uppercase tracking-widest2 text-white/80">
                 {a.label}

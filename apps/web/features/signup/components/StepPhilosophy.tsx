@@ -31,7 +31,7 @@ export function StepPhilosophy({ form, setForm }: Props) {
             key={opt.value}
             onClick={() => setForm({ ...form, faultAttribution: opt.value })}
             className={
-              "relative w-full border p-5 text-left transition-all " +
+              "relative w-full border p-5 text-left transition-all focus-visible:ring-1 focus-visible:ring-brand " +
               (form.faultAttribution === opt.value
                 ? "border-brand bg-brand/10"
                 : "border-gray-3 hover:border-brand/40")

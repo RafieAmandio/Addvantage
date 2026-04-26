@@ -39,7 +39,7 @@ export default function ProfilePage() {
             <button
               key={i}
               onClick={() => goToStep(i)}
-              className="group flex items-center gap-2"
+              className="group flex items-center gap-2 focus-visible:outline-1 focus-visible:outline-brand focus-visible:outline-offset-2"
               disabled={i > step}
             >
               <div
@@ -88,14 +88,14 @@ export default function ProfilePage() {
           <button
             onClick={back}
             disabled={step === 0}
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand disabled:opacity-30"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:text-brand disabled:opacity-30"
           >
             ← Back
           </button>
           <div className="flex items-center gap-4">
             <button
               onClick={skip}
-              className="font-mono text-[10px] uppercase tracking-widest2 text-white/30 hover:text-white/60 transition-colors"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/30 hover:text-white/60 focus-visible:text-white/60 transition-colors"
             >
               Skip for now
             </button>

@@ -28,7 +28,7 @@ export function StepMarketsGoal({ form, setForm, toggleMarket }: Props) {
                 key={opt.value}
                 onClick={() => toggleMarket(opt.value)}
                 className={
-                  "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
+                  "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand " +
                   (selected
                     ? "border-brand bg-brand/10 text-brand"
                     : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")

@@ -28,7 +28,7 @@ export function StepExperience({ form, setForm }: Props) {
                 setForm({ ...form, tradingLength: opt.value })
               }
               className={
-                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
+                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand " +
                 (form.tradingLength === opt.value
                   ? "border-brand bg-brand/10 text-brand"
                   : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
@@ -56,7 +56,7 @@ export function StepExperience({ form, setForm }: Props) {
                 setForm({ ...form, longestProfitable: opt.value })
               }
               className={
-                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all " +
+                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand " +
                 (form.longestProfitable === opt.value
                   ? "border-brand bg-brand/10 text-brand"
                   : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
