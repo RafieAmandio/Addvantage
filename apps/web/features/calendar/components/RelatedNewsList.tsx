@@ -3,13 +3,6 @@ import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { formatTime } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
-/**
- * Renders the `listNewsForEvent` result as a list of deeplinks to
- * `/app/news/[id]`. Visual is a trimmed variant of `NewsListClient`'s row:
- * source code, timestamp, impact/bias badges, headline, affects chips.
- * Empty-state copy tells the user *why* there's nothing — the ±2h window,
- * not "no news today".
- */
 export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   if (news.length === 0) {
     return (

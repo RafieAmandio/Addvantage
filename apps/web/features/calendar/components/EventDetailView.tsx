@@ -5,13 +5,6 @@ import type { TimelineEvent } from "@/features/timeline/types";
 import type { NewsListItem } from "@/features/news/queries/news";
 import { RelatedNewsList } from "@/features/calendar/components/RelatedNewsList";
 
-/**
- * Server-rendered detail view for a single `timeline_events` row (any kind,
- * though the /app/calendar/[id] route is the only current entry point and
- * in practice events here are kind='macro'). Header carries enough
- * identifying info (title, occurred_at, badges, symbols) to orient the user,
- * then hands off to `RelatedNewsList`.
- */
 export function EventDetailView({
   event,
   news,
@@ -20,7 +13,7 @@ export function EventDetailView({
   news: NewsListItem[];
 }) {
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-center gap-3">

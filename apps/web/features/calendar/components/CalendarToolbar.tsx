@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { DEMO_TODAY_YMD, type ViewMode } from "@/features/calendar/types";
+import { TODAY_YMD, type ViewMode } from "@/features/calendar/types";
 import { rangeLabel, stepAnchor } from "@/features/calendar/lib/view";
 
 type Props = {
@@ -75,11 +75,11 @@ export function CalendarToolbar({
           →
         </button>
         <button
-          onClick={() => onAnchorChange(DEMO_TODAY_YMD)}
-          disabled={anchor === DEMO_TODAY_YMD}
+          onClick={() => onAnchorChange(TODAY_YMD)}
+          disabled={anchor === TODAY_YMD}
           className={cn(
             "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
-            anchor === DEMO_TODAY_YMD
+            anchor === TODAY_YMD
               ? "cursor-default border-gray-3 text-white/30"
               : "border-brand/60 text-brand hover:bg-brand hover:text-black"
           )}

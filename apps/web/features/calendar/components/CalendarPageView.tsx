@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import type { CalendarEvent } from "@/lib/mock/types";
 import {
-  DEMO_TODAY_YMD,
+  TODAY_YMD,
   type ImpactFilter,
   type RegionFilter,
   type ViewMode,
@@ -30,11 +30,6 @@ import { CalendarLegend } from "@/features/calendar/components/CalendarLegend";
 import { useCalendarKeyboard } from "@/features/calendar/hooks/useCalendarKeyboard";
 
 export interface CalendarPageViewProps {
-  /**
-   * Real macro events (from `timeline_events WHERE kind='macro'`) projected
-   * into the calendar shape by `features/calendar/lib/fromTimeline`. Server
-   * always passes; default here is a safety net for Storybook/tests.
-   */
   events?: CalendarEvent[];
 }
 
@@ -55,10 +50,9 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
     parseRegion(searchParams.get("region"))
   );
 
-  // Push state to URL (replace, not push — no history pollution when stepping)
   useUrlSyncedState({
     view: view !== "week" ? view : null,
-    d: anchor !== DEMO_TODAY_YMD ? anchor : null,
+    d: anchor !== TODAY_YMD ? anchor : null,
     impact: impactFilter !== "all" ? impactFilter : null,
     region: regionFilter !== "all" ? regionFilter : null,
   });
@@ -87,11 +81,6 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
     setRegionFilter("all");
   }, []);
 
-  /**
-   * Find the nearest event matching current filters (ignoring date range).
-   * Returns the WIB date of the closest event, or null if no events match.
-   * dir = 1 means forward in time, dir = -1 means backward.
-   */
   const nearestEventDate = useMemo(() => {
     const matching = calendar.filter((e) => {
       if (impactFilter !== "all" && e.impact !== impactFilter) return false;
@@ -125,10 +114,10 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
     [nearestEventDate]
   );
 
-  const goToday = useCallback(() => setAnchor(DEMO_TODAY_YMD), []);
+  const goToday = useCallback(() => setAnchor(TODAY_YMD), []);
 
   return (
-    <div>
+    <div className="stagger">
       <CalendarHero />
 
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

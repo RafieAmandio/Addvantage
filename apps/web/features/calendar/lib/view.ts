@@ -1,5 +1,5 @@
 import {
-  DEMO_TODAY_YMD,
+  TODAY_YMD,
   REGIONS,
   type ImpactFilter,
   type RegionFilter,
@@ -80,7 +80,7 @@ export function parseRegion(v: string | null): RegionFilter {
 }
 
 export function parseAnchor(v: string | null): string {
-  if (!v) return DEMO_TODAY_YMD;
+  if (!v) return TODAY_YMD;
   if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-  return DEMO_TODAY_YMD;
+  return TODAY_YMD;
 }

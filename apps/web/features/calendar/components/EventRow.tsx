@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { CalendarEvent } from "@/lib/mock/types";
-import { news } from "@/features/news/mock";
 import { formatCalendarTime } from "@/features/calendar/lib/format";
 import { IMPACT_LABEL, IMPACT_STYLE } from "@/features/calendar/lib/style";
 import { ScoreCell } from "@/features/calendar/components/ScoreCell";
@@ -14,10 +13,6 @@ export function EventRow({
   anchorYmd: string;
   showTimeOffset?: boolean;
 }) {
-  const related = event.relatedNewsId
-    ? news.find((n) => n.id === event.relatedNewsId)
-    : null;
-
   return (
     <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-black px-3 py-3 transition-colors hover:bg-gray-2">
       <div className="min-w-0">
@@ -28,13 +23,12 @@ export function EventRow({
           >
             {event.title}
           </Link>
-          {related && (
+          {event.relatedNewsId && (
             <Link
-              href={`/app/news/${related.id}`}
-              title={related.headline}
+              href={`/app/news/${event.relatedNewsId}`}
               className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
-              ↗ {related.id}
+              ↗ NEWS
             </Link>
           )}
         </div>

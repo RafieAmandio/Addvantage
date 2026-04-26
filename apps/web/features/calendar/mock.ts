@@ -1,16 +1,8 @@
 import type { CalendarEvent, CalendarDayMeta } from "@/lib/mock/types";
 
-/**
- * Fixed currency order used by every `scores` tuple on a calendar event.
- * Matches the column layout of /app/calendar.
- */
 export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;
 export type CurrencyCode = (typeof CURRENCIES)[number];
 
-/**
- * Curated per-day headline summaries. If a date is not listed, the calendar
- * page derives a summary from the day's highest-impact events.
- */
 export const calendarDayMeta: CalendarDayMeta[] = [
   { date: "2026-04-03", summary: "NFP + Unemployment" },
   { date: "2026-04-06", summary: "ISM Services PMI" },

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { DEMO_TODAY_YMD } from "@/features/calendar/types";
+import { TODAY_YMD } from "@/features/calendar/types";
 import { formatDayHeader } from "@/features/calendar/lib/format";
 
 type Props = {
@@ -15,10 +15,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * Empty state panel for both month grid (overlay) and day/week table (inline).
- * Offers navigation to nearest event matching current filters + today + reset.
- */
 export function CalendarEmptyState({
   variant,
   title,
@@ -79,12 +75,12 @@ export function CalendarEmptyState({
         )}
         <button
           onClick={onToday}
-          disabled={anchor === DEMO_TODAY_YMD}
+          disabled={anchor === TODAY_YMD}
           className={cn(
             "border font-mono uppercase tracking-widest2",
             btnPad,
             size,
-            anchor === DEMO_TODAY_YMD
+            anchor === TODAY_YMD
               ? "cursor-default border-gray-3 text-white/30"
               : "border-brand/60 text-brand hover:bg-brand hover:text-black"
           )}

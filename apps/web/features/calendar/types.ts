@@ -1,15 +1,10 @@
 import type { CalendarEvent, Impact } from "@/lib/mock/types";
 
-// ─────────────────────────────────────────────────────────────
-// Anchor / "today" for the demo. The mock data is dated April
-// 2026, so we anchor on the day inside that window where the
-// dashboard / brief already pivot.
-// ─────────────────────────────────────────────────────────────
-export const DEMO_TODAY_YMD = "2026-04-07";
+// WIB (UTC+7) today — used as default anchor for the calendar view
+export const TODAY_YMD = new Date(Date.now() + 7 * 60 * 60 * 1000)
+  .toISOString()
+  .slice(0, 10);
 
-// ─────────────────────────────────────────────────────────────
-// View / filter types
-// ─────────────────────────────────────────────────────────────
 export type ViewMode = "day" | "week" | "month";
 export type ImpactFilter = "all" | Impact;
 export type RegionFilter = "all" | CalendarEvent["region"];

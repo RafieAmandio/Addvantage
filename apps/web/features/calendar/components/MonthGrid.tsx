@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import { monthGridDays, startOfMonth, wibYmd, ymdToDate } from "@/features/calendar/lib/date";
 import { formatDayHeader, shortName } from "@/features/calendar/lib/format";
 import { IMPACT_DOT, MAX_EVENTS_IN_CELL } from "@/features/calendar/lib/style";
-import { DEMO_TODAY_YMD } from "@/features/calendar/types";
+import { TODAY_YMD } from "@/features/calendar/types";
 
 export function MonthGrid({
   anchor,
@@ -33,7 +33,7 @@ export function MonthGrid({
     list.sort((a, b) => a.ts.localeCompare(b.ts));
   }
 
-  const todayYmd = DEMO_TODAY_YMD;
+  const todayYmd = TODAY_YMD;
 
   const weekdayHeaders = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 

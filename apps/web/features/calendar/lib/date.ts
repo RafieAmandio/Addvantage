@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// Date helpers — all anchor / range math is done in WIB (UTC+7)
-// because that's what the rest of the table uses.
-// ─────────────────────────────────────────────────────────────
-
 export function ymdToDate(ymd: string): Date {
   return new Date(ymd + "T00:00:00Z");
 }
@@ -42,11 +37,6 @@ export function endOfMonth(ymd: string): string {
   return dateToYmd(d);
 }
 
-/**
- * For the month grid: return 42 consecutive YYYY-MM-DD strings starting
- * from the Monday of the week containing the 1st of the anchor's month.
- * Always yields 6 full weeks so the grid footprint is stable.
- */
 export function monthGridDays(anchorYmd: string): string[] {
   const first = startOfMonth(anchorYmd);
   const gridStart = startOfWeek(first);
@@ -59,7 +49,6 @@ export function monthGridDays(anchorYmd: string): string[] {
   return days;
 }
 
-/** WIB date for an ISO timestamp (the operator's local calendar day). */
 export function wibYmd(iso: string): string {
   const d = new Date(new Date(iso).getTime() + 7 * 60 * 60 * 1000);
   return d.toISOString().slice(0, 10);
