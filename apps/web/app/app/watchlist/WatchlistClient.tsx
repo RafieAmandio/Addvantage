@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { tradingPlans } from "@/features/plan/mock";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { DataLabel } from "@/components/ui/Marker";
@@ -14,22 +13,24 @@ import { WatchlistStatsStrip } from "@/features/watchlist/components/WatchlistSt
 import { WatchlistSortBar } from "@/features/watchlist/components/WatchlistSortBar";
 import type { SortMode } from "@/features/watchlist/types";
 import type { NewsListItem } from "@/features/news/queries/news";
+import type { TradingPlan } from "@/features/plan/types";
 
 interface Props {
   news: NewsListItem[];
+  plans: TradingPlan[];
 }
 
-export function WatchlistClient({ news }: Props) {
+export function WatchlistClient({ news, plans }: Props) {
   const { tickers, hydrated, remove, clear } = useWatchlist();
   const toast = useToast();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>("pinned");
   const [query, setQuery] = useState("");
-  const latestId = tradingPlans[0].id;
+  const latestId = plans[0]?.id ?? "";
 
   const rollupsRaw = useMemo(
-    () => (hydrated ? tickers.map((t) => rollupTicker(t, latestId, news)) : []),
-    [hydrated, tickers, latestId, news],
+    () => (hydrated ? tickers.map((t) => rollupTicker(t, latestId, news, plans)) : []),
+    [hydrated, tickers, latestId, news, plans],
   );
   const rollupsFiltered = query
     ? rollupsRaw.filter((r) =>
@@ -99,7 +100,7 @@ export function WatchlistClient({ news }: Props) {
             {tickers.length > 0 && (
               <button
                 onClick={() => setConfirmingClear(true)}
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand"
               >
                 ✕ Clear all
               </button>

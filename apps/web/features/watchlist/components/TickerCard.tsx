@@ -57,7 +57,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           )}
           <button
             onClick={() => onUnpin(ticker)}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand"
           >
             ✕ Unpin
           </button>

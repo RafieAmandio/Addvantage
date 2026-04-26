@@ -1,4 +1,3 @@
-import { getAllPlans } from "@/features/plan/mock";
 import type { TradingPlan, TradingSetup } from "@/features/plan/types";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TickerRollup } from "@/features/watchlist/types";
@@ -7,9 +6,9 @@ export function rollupTicker(
   ticker: string,
   latestId: string,
   allNews: NewsListItem[],
+  allPlans: TradingPlan[],
 ): TickerRollup {
   const newsItems = allNews.filter((n) => n.affects.includes(ticker));
-  const allPlans = getAllPlans();
 
   const liveSetups: Array<{ plan: TradingPlan; setup: TradingSetup }> = [];
   const archiveSetups: Array<{ plan: TradingPlan; setup: TradingSetup }> = [];
