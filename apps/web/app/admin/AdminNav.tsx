@@ -16,7 +16,7 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest2">
+    <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-widest2">
       {LINKS.map(({ href, label }) => {
         const active = pathname.startsWith(href);
         return (
@@ -34,6 +34,6 @@ export function AdminNav() {
           </Link>
         );
       })}
-    </nav>
+    </div>
   );
 }
