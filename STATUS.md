@@ -44,7 +44,7 @@
 | 0.14 | Signup flow (`/signup/*`) | [x] | All old color tokens already removed by global pivot |
 | 0.15 | Admin review queue (`/admin/review/*`) — full polish | [x] | All old color tokens already removed by global pivot |
 | 0.16 | Admin sources + plans + archive | [x] | All old color tokens already removed by global pivot |
-| 0.17 | All pages — loading states | [ ] | |
+| 0.17 | All pages — loading states | [x] | 21 loading.tsx skeleton screens added across all app + admin routes |
 | 0.18 | All pages — empty states | [ ] | |
 | 0.19 | All pages — error states | [ ] | |
 | 0.20 | All pages — mobile responsive | [ ] | |
