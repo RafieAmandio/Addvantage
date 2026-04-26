@@ -66,6 +66,5 @@ export const publicConfig = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY:
     parsed.data.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? MOCK_PLACEHOLDER_ANON_KEY,
 };
-type PublicConfig = typeof publicConfig;
 
 export const isMockMode = (): boolean => MOCK_MODE;
