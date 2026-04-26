@@ -34,7 +34,7 @@ export default function TagPage({
     matchedChannel.length;
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <Link
@@ -68,7 +68,7 @@ export default function TagPage({
                 <Link
                   key={p.id}
                   href={`/app/education/${p.id}`}
-                  className="text-black p-5 hover:bg-gray-2"
+                  className="bg-black p-5 hover:bg-gray-2"
                 >
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id}
@@ -90,7 +90,7 @@ export default function TagPage({
           <Group n="02 /" label="NEWS">
             <div className="space-y-px bg-gray-3">
               {matchedNews.map((n) => (
-                <div key={n.id} className="text-black p-4 hover:bg-gray-2">
+                <div key={n.id} className="bg-black p-4 hover:bg-gray-2">
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {n.id}
                   </div>
@@ -108,7 +108,7 @@ export default function TagPage({
           <Group n="03 /" label="CONSULTATION LOGS">
             <div className="space-y-px bg-gray-3">
               {matchedSessions.map((s) => (
-                <div key={s.id} className="text-black p-4 hover:bg-gray-2">
+                <div key={s.id} className="bg-black p-4 hover:bg-gray-2">
                   <div className="flex items-baseline justify-between">
                     <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                       {s.id}
@@ -133,7 +133,7 @@ export default function TagPage({
           <Group n="04 /" label="CHANNEL POSTS">
             <div className="space-y-px bg-gray-3">
               {matchedChannel.map((p) => (
-                <div key={p.id} className="text-black p-4 hover:bg-gray-2">
+                <div key={p.id} className="bg-black p-4 hover:bg-gray-2">
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id} · {formatDate(p.ts)}
                   </div>

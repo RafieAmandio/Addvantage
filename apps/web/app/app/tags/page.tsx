@@ -132,7 +132,7 @@ function TagsView() {
   }, [counts, query]);
 
   return (
-    <div>
+    <div className="stagger">
       <BackToTop />
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
@@ -148,7 +148,6 @@ function TagsView() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {/* Search */}
         <div className="mb-6">
           <PageSearchInput
             value={query}
@@ -227,9 +226,8 @@ function TagsView() {
               <Link
                 key={tag}
                 href={`/app/tags/${tag}`}
-                className="group relative col-span-12 overflow-hidden text-black p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
+                className="group relative col-span-12 overflow-hidden bg-black p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
               >
-                {/* Density bar — bottom edge, scaled to count */}
                 <div
                   className="absolute bottom-0 left-0 h-0.5 bg-brand/70 transition-all group-hover:h-1"
                   style={{ width: `${Math.max(4, density * 100)}%` }}
