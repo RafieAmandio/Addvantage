@@ -31,7 +31,6 @@ export function NotificationBell({ className }: NotificationBellProps) {
   const toast = useToast();
   const [filter, setFilterState] = useState<NotifFilter>("all");
 
-  // Hydrate filter from localStorage once
   useEffect(() => {
     setFilterState(loadFilter());
   }, []);
@@ -58,7 +57,6 @@ export function NotificationBell({ className }: NotificationBellProps) {
   const { open, setOpen, activeIdx, setActiveIdx, panelRef, buttonRef } =
     useNotificationBell({ visible, markRead });
 
-  // Reset active index when the panel opens or the visible list changes
   useEffect(() => {
     if (open) setActiveIdx(0);
   }, [open, filter, setActiveIdx]);

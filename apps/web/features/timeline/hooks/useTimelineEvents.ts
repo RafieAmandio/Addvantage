@@ -59,11 +59,9 @@ export function useTimelineEvents({
           }
           const row = parsed.data;
 
-          // symbol intersection
           const matches = row.symbols.some((s) => symbolsSet.has(s));
           if (!matches) return;
 
-          // window (inclusive)
           if (from && row.occurred_at < from) return;
           if (to && row.occurred_at > to) return;
 

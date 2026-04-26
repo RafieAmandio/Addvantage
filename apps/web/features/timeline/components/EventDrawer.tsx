@@ -51,13 +51,10 @@ function impactColor(impact: TimelineEvent["impact"]): string {
 }
 
 function formatOccurredAt(iso: string): string {
-  // Show ISO minute precision in UTC — consistent with EventCard style.
   return iso.slice(0, 16).replace("T", " ") + " UTC";
 }
 
 export function EventDrawer({ event, onClose }: EventDrawerProps) {
-  // Escape-to-close. Bound only while open so a background drawer doesn't
-  // steal key events from whatever else is on screen.
   useEffect(() => {
     if (!event) return;
     const onKey = (e: KeyboardEvent) => {

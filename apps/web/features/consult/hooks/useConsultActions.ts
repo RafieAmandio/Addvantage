@@ -165,7 +165,6 @@ export function useConsultActions({
           setTyping(false);
           return;
         }
-        // First token arrives → create the bubble and hide the typing dots.
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let acc = "";

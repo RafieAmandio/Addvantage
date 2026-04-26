@@ -73,7 +73,6 @@ export async function POST(request: Request) {
         { status: 400, headers: { "Cache-Control": "no-store" } }
       );
     }
-    // bad_token (or no token header)
     logger.warn("xendit webhook bad signature", {
       scope: "api.webhooks.xendit",
       ip,

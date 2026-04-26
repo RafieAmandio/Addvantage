@@ -29,22 +29,18 @@ export function SearchPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Hydrate recents
   useEffect(() => {
     setRecent(loadRecentSearches());
   }, []);
 
-  // Refresh visit list whenever the palette opens
   useEffect(() => {
     if (searchOpen) setVisits(getRecentVisits());
   }, [searchOpen]);
 
-  // Reset on open
   useEffect(() => {
     if (searchOpen) {
       setQuery("");
       setActive(0);
-      // Defer focus until after the modal mounts
       requestAnimationFrame(() => inputRef.current?.focus());
       document.body.style.overflow = "hidden";
     } else {
@@ -59,12 +55,10 @@ export function SearchPalette() {
   const grouped = useMemo(() => groupResults(results), [results]);
   const flat = useMemo(() => grouped.flatMap(([, items]) => items), [grouped]);
 
-  // Clamp active when results change
   useEffect(() => {
     if (active >= flat.length) setActive(0);
   }, [flat.length, active]);
 
-  // Scroll active into view
   useEffect(() => {
     if (!listRef.current) return;
     const el = listRef.current.querySelector<HTMLElement>(

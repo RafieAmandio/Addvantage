@@ -50,8 +50,6 @@ export async function GET(request: Request) {
   const to = parsed.data.to ?? new Date();
   const from = parsed.data.from ?? new Date(to.getTime() - THIRTY_DAYS_MS);
 
-  // RT4: tier-aware bucket for authed callers; anon falls back to IP-keyed
-  // free bucket.
   const profile = await getProfile();
   let rl;
   if (profile) {
@@ -104,10 +102,7 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          // `timeline_events` RLS returns per-user rows (user_pin kind is
-          // filtered to `created_by = auth.uid()`), so a shared-cache
-          // (`public, s-maxage`) entry could leak one caller's pins to
-          // another. Keep the caching private to the caller's browser.
+          // Private — user_pin RLS is per-user, so shared cache would leak pins across callers.
           "Cache-Control":
             "private, max-age=60, stale-while-revalidate=300",
         },

@@ -122,7 +122,6 @@ export async function sendConsultMessageImpl(
         scope: "consult.sendConsultMessage",
       });
       assistantContent = pickReply(body, history.length).body;
-      // metadata stays at fallback defaults
     }
   }
 

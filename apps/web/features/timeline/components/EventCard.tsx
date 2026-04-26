@@ -66,8 +66,4 @@ function EventCardInner({
   );
 }
 
-// Memoized so that when EventFeed re-renders on a realtime INSERT,
-// only the newly-prepended card renders — the other up-to-499 cards
-// bail out via referential-equality on the event object (rows come
-// straight from useTimelineEvents state, never rebuilt).
 export const EventCard = memo(EventCardInner);

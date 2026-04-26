@@ -33,8 +33,6 @@ export async function GET(request: Request) {
   const to = parsed.data.to ?? new Date();
   const from = parsed.data.from ?? new Date(to.getTime() - THIRTY_DAYS_MS);
 
-  // RT4: tier-aware bucket for authed callers; anon falls back to IP-keyed
-  // free bucket. getProfile() is a no-op for anon requests (returns null).
   const profile = await getProfile();
   let rl;
   if (profile) {

@@ -57,7 +57,6 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
 
   useUrlSyncedState({ q: query || null });
 
-  // Only count primers the user can actually access
   const accessible = primers.filter((p) => !(p.locked && !paid));
   const readCount = accessible.filter((p) => readIds.includes(p.id)).length;
   const pct = accessible.length
