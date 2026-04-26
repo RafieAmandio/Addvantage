@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabaseServer } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/cn";
 import type { Database } from "@tradevantage/db";
 
@@ -7,7 +7,7 @@ type IngestionRun = Database["public"]["Tables"]["ingestion_runs"]["Row"];
 export const dynamic = "force-dynamic";
 
 async function getRuns(): Promise<IngestionRun[]> {
-  const { data, error } = await supabaseAdmin()
+  const { data, error } = await supabaseServer()
     .from("ingestion_runs")
     .select("*")
     .order("started_at", { ascending: false })
@@ -18,7 +18,7 @@ async function getRuns(): Promise<IngestionRun[]> {
 }
 
 async function getSources() {
-  const { data } = await supabaseAdmin().from("sources").select("code, name");
+  const { data } = await supabaseServer().from("sources").select("code, name");
   return data ?? [];
 }
 
