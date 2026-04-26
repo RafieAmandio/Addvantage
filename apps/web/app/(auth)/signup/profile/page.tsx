@@ -22,7 +22,6 @@ export default function ProfilePage() {
 
   return (
     <main className="stagger relative mx-auto grid max-w-7xl grid-cols-12 gap-6 px-4 py-12 sm:px-6 sm:py-20">
-      {/* Left column — context + progress */}
       <div className="col-span-12 lg:col-span-5">
         <SectionNumber n="05 /" label="TRADER PROFILE" />
         <h1 className="mt-8 font-display text-6xl leading-[0.9] text-white">
@@ -35,7 +34,6 @@ export default function ProfilePage() {
           what it surfaces, how it speaks, what it assumes you already know.
         </p>
 
-        {/* Progress dots */}
         <div className="mt-12 flex items-center gap-4">
           {[0, 1, 2].map((i) => (
             <button
@@ -75,7 +73,6 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      {/* Right column — form */}
       <div className="col-span-12 border border-gray-3 p-10 lg:col-span-7">
         {step === 0 && <StepExperience form={form} setForm={setForm} />}
         {step === 1 && (
@@ -87,7 +84,6 @@ export default function ProfilePage() {
         )}
         {step === 2 && <StepPhilosophy form={form} setForm={setForm} />}
 
-        {/* Navigation */}
         <div className="mt-10 flex items-center justify-between">
           <button
             onClick={back}

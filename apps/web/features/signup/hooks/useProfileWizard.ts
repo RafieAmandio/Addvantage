@@ -102,7 +102,6 @@ export function useProfileWizard() {
     router.push("/app");
   }, [router]);
 
-  // Keyboard navigation: number keys to select tiles, Enter to advance.
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Enter" && canAdvance) {

@@ -1,7 +1,3 @@
-// Feature-local types + closed-set option arrays for the trader profile wizard.
-// Kept as a leaf module so both client components and the hook can import from
-// it without pulling server-only code into the client bundle.
-
 export type ProfileForm = {
   tradingLength: string;
   longestProfitable: string;
