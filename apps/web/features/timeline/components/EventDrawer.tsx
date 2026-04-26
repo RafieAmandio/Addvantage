@@ -55,11 +55,6 @@ function formatOccurredAt(iso: string): string {
   return iso.slice(0, 16).replace("T", " ") + " UTC";
 }
 
-/**
- * Slide-in right drawer for a single timeline event. Controlled via `event`:
- * a non-null value opens the drawer, null closes it. Dismisses on Escape,
- * backdrop click, and the top-right close button.
- */
 export function EventDrawer({ event, onClose }: EventDrawerProps) {
   // Escape-to-close. Bound only while open so a background drawer doesn't
   // steal key events from whatever else is on screen.
@@ -76,7 +71,6 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
-      {/* Backdrop */}
       <button
         type="button"
         aria-label="Close event details"
@@ -84,7 +78,6 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
         className="absolute inset-0 cursor-default bg-gray-1/70"
       />
 
-      {/* Panel */}
       <aside
         className={cn(
           "absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-gray-3 bg-gray-2",

@@ -17,7 +17,6 @@ import { cn } from "@/lib/cn";
 type MarkerPosition = "aboveBar" | "belowBar";
 
 export interface Bar {
-  /** ISO timestamp. Daily bars can also be 'YYYY-MM-DD'. */
   time: string;
   open: number;
   high: number;
@@ -26,21 +25,10 @@ export interface Bar {
   volume?: number;
 }
 
-/**
- * Timeline-event dot overlaid on the chart. Kind drives shape/color so the
- * viewer can distinguish a tweet from a news item at a glance without a legend.
- *
- * Optional fields (sourceCode, body, bias, impact) aren't used by the native
- * marker plugin — they feed the hover-card overlay layer so a user can read
- * the event without clicking through to the drawer.
- */
 export interface ChartMarker {
-  /** Stable id — used by onMarkerClick to deref the source event. */
   id: string;
-  /** ISO timestamp — converted via toChartTime() to the series time type. */
   time: string;
   kind: "news" | "tweet" | "macro" | "earnings" | "user_pin";
-  /** Shown in the marker's hover tooltip (maps to SeriesMarker.text). */
   title?: string;
   sourceCode?: string | null;
   body?: string | null;
@@ -50,22 +38,13 @@ export interface ChartMarker {
 
 export interface PriceChartProps {
   bars: Bar[];
-  /** "candlestick" (default) or "area". */
   seriesType?: "candlestick" | "area";
-  /** Container height in px. Default 480. Width fills parent. */
   height?: number;
-  /** Optional className for layout/spacing. */
   className?: string;
-  /** Optional timeline-event dots rendered over the series. */
   markers?: ChartMarker[];
-  /** Fires with the clicked marker's id when a marker dot is clicked. */
   onMarkerClick?: (id: string) => void;
 }
 
-/**
- * Per-kind visual style for timeline-event markers. Keep in sync with the
- * closed `TIMELINE_KINDS` set in `features/timeline/types.ts`.
- */
 const MARKER_STYLE: Record<
   ChartMarker["kind"],
   { color: string; position: MarkerPosition; glyph: string }
@@ -255,9 +234,6 @@ export function PriceChart({
   return (
     <div className={cn("relative w-full", className)} style={{ height }}>
       <div ref={containerRef} className="absolute inset-0" />
-      {/* Hover-card overlay. pointer-events-none on the layer so mouse events
-          only land on the individual hitboxes. z-10 lifts it above the chart
-          canvas; no overflow-hidden — would clip dots near the plot edges. */}
       <div className="pointer-events-none absolute inset-0 z-10">
         {markerLayouts.map((l) => (
           <MarkerHoverCard
@@ -299,7 +275,6 @@ function MarkerHoverCard({
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {/* Visible dot. Border ring lifts it off the candle body. */}
       <span
         className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-black shadow transition-transform duration-150 group-hover:scale-[1.6]"
         style={{ background: style.color }}

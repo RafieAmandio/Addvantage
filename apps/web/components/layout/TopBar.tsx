@@ -51,12 +51,10 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-3 bg-black/95 backdrop-blur">
-      {/* Classification stripe */}
       <div className="classification-stripe h-1" />
 
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3 sm:gap-6">
-          {/* Mobile hamburger */}
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
@@ -74,7 +72,6 @@ export function TopBar() {
             </svg>
           </button>
 
-          {/* Desktop expand sidebar — only when collapsed */}
           {sidebarCollapsed && (
             <button
               onClick={() => setSidebarCollapsed(false)}
@@ -91,7 +88,6 @@ export function TopBar() {
                 strokeWidth="1.5"
                 aria-hidden
               >
-                {/* Chevron right — distinct from the mobile hamburger */}
                 <path
                   d="M5 2l5 5-5 5"
                   strokeLinecap="round"
@@ -115,7 +111,6 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Dev tier toggle */}
           <div className="flex items-center gap-1 border border-gray-3 bg-black-2 p-1">
             <button
               onClick={() => flipTier("free")}
@@ -141,7 +136,6 @@ export function TopBar() {
             </button>
           </div>
 
-          {/* Search trigger — visible on all sizes */}
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Search the DOMAIN"

@@ -2,18 +2,6 @@
 
 import { useEffect } from "react";
 
-/**
- * Shared inline page-search input. Used by plan archive, education
- * library, news feed, and any future searchable list page.
- *
- * Features:
- * - Amber search icon
- * - Clear (×) button when populated
- * - Optional live match-count strip below
- * - Escape to blur from inside the input
- * - Opt-in `s` keyboard shortcut to focus from anywhere on the page
- *   (skipped inside inputs/textareas so it doesn't hijack text entry)
- */
 export function PageSearchInput({
   value,
   onChange,
@@ -25,9 +13,7 @@ export function PageSearchInput({
   value: string;
   onChange: (next: string) => void;
   placeholder: string;
-  /** When set, renders a live match-count strip under the input. */
   matchLabel?: string | null;
-  /** Key that focuses the input from anywhere on the page. Default: "s". */
   focusKey?: string;
   ariaLabel?: string;
 }) {

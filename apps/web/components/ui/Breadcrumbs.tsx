@@ -1,12 +1,5 @@
 import Link from "next/link";
 
-/**
- * Inline breadcrumb trail used on detail pages. The last crumb is
- * rendered as plain text (current location), earlier ones as links.
- *
- * Styling: terminal-style mono text with lime separators, fits above
- * the hero block of a page so the user can retrace their path.
- */
 export function Breadcrumbs({
   items,
 }: {

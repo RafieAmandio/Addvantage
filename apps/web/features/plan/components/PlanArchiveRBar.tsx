@@ -9,10 +9,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * Horizontal R sparkline — each closed plan as a bar (oldest → newest),
- * with the live plan rendered as a dashed placeholder on the far right.
- */
 export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
   if (allClosed.length === 0) return null;
 
@@ -41,7 +37,6 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
         </div>
       </div>
       <div className="relative mt-3 h-24">
-        {/* Center zero line */}
         <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-white/20" />
         <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           0

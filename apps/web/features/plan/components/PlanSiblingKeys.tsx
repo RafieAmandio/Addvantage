@@ -3,11 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-/**
- * Vim-style j/k navigation between trading plans. Mounted inside the
- * server-rendered plan detail page with pre-resolved newer/older IDs.
- * j → older, k → newer, wraps at the ends with a small flash hint.
- */
 export function PlanSiblingKeys({
   newerId,
   olderId,

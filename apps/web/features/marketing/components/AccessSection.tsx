@@ -10,7 +10,6 @@ export function AccessSection() {
       <SectionHeader num="04" label="Access" />
       <div className="w-full border-y border-white">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Tier 00 — Free */}
           <div className="flex flex-col gap-6 border border-white p-12">
             <div className="flex items-center justify-between font-mono text-base">
               <span className="font-light text-white">Tier 00</span>
@@ -30,7 +29,6 @@ export function AccessSection() {
             </ul>
           </div>
 
-          {/* Tier 01 — VIP+ Trader */}
           <div className="flex flex-col gap-6 bg-white p-12 text-black">
             <div className="flex items-center justify-between font-mono text-base">
               <span className="font-light">Tier 01</span>

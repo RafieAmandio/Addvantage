@@ -7,11 +7,6 @@ import type {
   ChannelPost,
 } from "@/lib/mock/types";
 
-/**
- * Bottom "discovery" band on the operator home: featured primer of the day,
- * last consultation session, and the latest channel post. All three tiles
- * are static cards — no client state here.
- */
 export function DiscoveryRow({
   featuredPrimer,
   recentSession,
@@ -29,7 +24,6 @@ export function DiscoveryRow({
     <section className={cn("border-b border-gray-3 bg-gray-2/20", className)}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="grid grid-cols-12 gap-4 sm:gap-6">
-          {/* Featured primer */}
           <div className="col-span-12 md:col-span-6 lg:col-span-4">
             <SectionHeader n="03 /" label="Primer of the day" />
             <Link
@@ -54,7 +48,6 @@ export function DiscoveryRow({
             </Link>
           </div>
 
-          {/* Recent consult */}
           <div className="col-span-12 md:col-span-6 lg:col-span-4">
             <SectionHeader n="04 /" label="Last consultation" />
             <Link
@@ -87,7 +80,6 @@ export function DiscoveryRow({
             </Link>
           </div>
 
-          {/* Channel */}
           <div className="col-span-12 lg:col-span-4">
             <SectionHeader n="05 /" label="From the channel">
               <Link

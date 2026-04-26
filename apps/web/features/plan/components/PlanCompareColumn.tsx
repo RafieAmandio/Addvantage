@@ -87,7 +87,6 @@ export function PlanCompareColumn({
 
   return (
     <article className={cn("border border-gray-3 bg-gray-2/20", className)}>
-      {/* Header */}
       <div className="border-b border-gray-3 bg-gray-2/60 p-5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -135,7 +134,6 @@ export function PlanCompareColumn({
         </div>
       </div>
 
-      {/* Thesis */}
       <div className="border-b border-gray-3 p-5">
         <DataLabel>Thesis</DataLabel>
         <p className="mt-2 font-display text-base leading-relaxed text-white/90">
@@ -143,7 +141,6 @@ export function PlanCompareColumn({
         </p>
       </div>
 
-      {/* Setups list — compact for side-by-side */}
       <div className="p-5">
         <DataLabel>Setups · {plan.setups.length}</DataLabel>
         <div className="mt-3 space-y-2">
@@ -158,7 +155,6 @@ export function PlanCompareColumn({
         </div>
       </div>
 
-      {/* Risks */}
       {plan.risks.length > 0 && (
         <div className="border-t border-gray-3 bg-gray-2/30 p-5">
           <DataLabel>Risks · {plan.risks.length}</DataLabel>

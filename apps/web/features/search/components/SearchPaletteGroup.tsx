@@ -17,11 +17,6 @@ interface SearchPaletteGroupProps {
   onCommit: (r: SearchResult) => void;
 }
 
-/**
- * Renders a single kind-grouped section (sticky header + rows) inside the
- * search palette. `startIndex` is the flat-list index of the first row in
- * this group so keyboard-nav highlighting matches across groups.
- */
 export function SearchPaletteGroup({
   kind,
   items,

@@ -1,13 +1,5 @@
 import type { ReactNode } from "react";
 
-/**
- * Wraps matches of `query` tokens in the given `text` with a <mark> element.
- * Case-insensitive, whole-string (not word-boundary). Tokens of 1 character
- * are ignored to avoid highlighting every vowel when the user is mid-type.
- *
- * The shared implementation so the search palette, plan archive, and
- * anything else with a text search can all render the same visual marker.
- */
 export function Highlight({
   text,
   query,

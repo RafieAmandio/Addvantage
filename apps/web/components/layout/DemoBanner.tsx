@@ -1,10 +1,5 @@
 import { isMockMode } from "@/lib/config/public";
 
-/**
- * Sticky "demo mode" ribbon shown across the dashboard when
- * `NEXT_PUBLIC_MOCK_MODE=1`. Static fixture-backed pages are: news, plan,
- * watchlist, calendar. Other surfaces will show empty states.
- */
 export function DemoBanner() {
   if (!isMockMode()) return null;
   return (

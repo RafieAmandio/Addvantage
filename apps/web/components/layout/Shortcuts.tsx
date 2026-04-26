@@ -204,14 +204,12 @@ export function Shortcuts() {
 
   return (
     <>
-      {/* Floating hint pill */}
       {hint && (
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-brand bg-black-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-brand shadow-[0_0_30px_rgba(245,158,11,0.3)]">
           {hint}
         </div>
       )}
 
-      {/* Help overlay */}
       {showHelp && (
         <div
           onClick={() => setShowHelp(false)}

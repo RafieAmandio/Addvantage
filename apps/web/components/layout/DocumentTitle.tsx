@@ -4,12 +4,6 @@ import { useEffect, useState } from "react";
 import { notifications } from "@/features/notifications/mock";
 import { useReadNotifications } from "@/features/notifications/notifications";
 
-/**
- * Reflects the unread notification count in the browser tab title.
- * When the tab is hidden and there are unread items, prefix with a
- * blinking `• ` to catch the operator's eye when they come back.
- * Mounts once in the app layout.
- */
 export function DocumentTitle() {
   const { readIds, hydrated } = useReadNotifications();
   const [tabHidden, setTabHidden] = useState(false);

@@ -7,7 +7,6 @@ export function FaqSection() {
       <SectionHeader num="03" label="Frequent Interrogations" />
       <div className="w-full border-y border-white">
         <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Left — headline w/ discord */}
           <div className="relative overflow-hidden border-x border-white p-12">
             <div className="pointer-events-none absolute left-[-256px] top-[224px] h-[1073px] w-[1073px] blur-[2.5px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -28,7 +27,6 @@ export function FaqSection() {
             </div>
           </div>
 
-          {/* Right — 4 reasons stack */}
           <div className="flex flex-col border-x border-white">
             {faq.map((f, i) => (
               <div

@@ -7,12 +7,6 @@ import { useAppState } from "@/lib/state";
 import { cn } from "@/lib/cn";
 import { OPERATOR_ID } from "@/features/dashboard/types";
 
-/**
- * Top hero band of the operator home page: date stamp, greeting, big search
- * trigger, and the right-side operator card with quick stats + links. Pure
- * presentation — all counts and tier info are passed in; search open state
- * is read from `useAppState` (cross-cutting app shell).
- */
 export function DashboardHero({
   stamp,
   greet,
@@ -62,7 +56,6 @@ export function DashboardHero({
               events on the calendar in the next 48h.
             </p>
 
-            {/* Big search bar */}
             <button
               onClick={() => setSearchOpen(true)}
               className="group mt-10 flex w-full max-w-xl items-center gap-4 border border-brand/40 bg-gray-2/60 px-5 py-4 text-left transition-colors hover:border-brand"
@@ -109,7 +102,6 @@ export function DashboardHero({
             </div>
           </div>
 
-          {/* Operator card */}
           <aside className="col-span-12 lg:col-span-4">
             <div className="border border-gray-3 bg-black/60 p-5">
               <div className="flex items-baseline justify-between">

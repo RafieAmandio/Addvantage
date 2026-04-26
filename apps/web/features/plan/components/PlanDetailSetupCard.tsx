@@ -9,11 +9,6 @@ import {
   setupToText,
 } from "@/features/plan/lib/detail-helpers";
 
-/**
- * Full per-setup card on the plan detail page — entry/stop/targets, rationale,
- * invalidation, confidence bar, outcome notes, plus "copy link" and "copy
- * text" actions. Extracted from `PlanDetail.tsx`.
- */
 export function PlanDetailSetupCard({
   setup: s,
   planId,

@@ -3,10 +3,6 @@ import type { CalendarEvent } from "@/lib/mock/types";
 import { CURRENCIES } from "@/features/calendar/mock";
 import { formatTime } from "@/lib/cn";
 
-/**
- * Compact calendar row used in sidebars / dashboard peeks.
- * Shows time, region, impact, and the single highest-scored currency.
- */
 export function CalendarPeekRow({ event }: { event: CalendarEvent }) {
   const topIdx = event.scores.reduce(
     (best, v, i, arr) => (v > arr[best] ? i : best),

@@ -3,14 +3,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 
-/**
- * Floating "back to top" button. Appears when the user has scrolled
- * further than `threshold` pixels from the top. Smooth-scrolls on click.
- *
- * Sized and positioned to not overlap the existing bottom-right toast
- * viewport (z-[95]) — this sits at z-[55] on the bottom-LEFT to stay
- * out of the way.
- */
 export function BackToTop({
   threshold = 600,
   label = "TOP",

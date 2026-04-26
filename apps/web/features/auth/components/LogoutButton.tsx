@@ -6,10 +6,6 @@ interface LogoutButtonProps {
   className?: string;
 }
 
-/**
- * Sidebar/header logout trigger. Wraps a real <form action={…}> so it
- * works without JS and respects the server action redirect contract.
- */
 export function LogoutButton({ className }: LogoutButtonProps) {
   return (
     <form action={logoutAction}>

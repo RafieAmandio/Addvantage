@@ -39,7 +39,6 @@ export function MonthGrid({
 
   return (
     <div className="border border-gray-3">
-      {/* Weekday header row */}
       <div className="grid grid-cols-7 border-b-2 border-brand/40 bg-gray-2/95">
         {weekdayHeaders.map((w) => (
           <div
@@ -51,7 +50,6 @@ export function MonthGrid({
         ))}
       </div>
 
-      {/* 6 weeks × 7 days */}
       <div className="grid grid-cols-7">
         {days.map((ymd, i) => {
           const date = ymdToDate(ymd);
@@ -84,7 +82,6 @@ export function MonthGrid({
                 isAnchor && isToday && "ring-2 ring-brand bg-brand/10"
               )}
             >
-              {/* Day number */}
               <div className="flex items-baseline justify-between">
                 <span
                   className={cn(
@@ -118,7 +115,6 @@ export function MonthGrid({
                 )}
               </div>
 
-              {/* Event chips */}
               <div className="mt-1 flex-1 space-y-0.5">
                 {dayEvents.slice(0, MAX_EVENTS_IN_CELL).map((e) => (
                   <div

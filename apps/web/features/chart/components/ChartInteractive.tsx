@@ -14,17 +14,11 @@ export interface ChartInteractiveProps {
   bars: ChartBar[];
   events: TimelineEvent[];
   markers: ChartMarker[];
-  /** Current chart symbol — used to pre-fill user-pin inserts. */
   symbol: string;
   seriesType?: "candlestick" | "area";
   height?: number;
 }
 
-/**
- * Client shell that owns the "which event is selected" state and wires the
- * chart's marker-click path into a shared `EventDrawer`. The server page
- * stays thin — it just fetches bars + events and passes them in.
- */
 export function ChartInteractive({
   bars,
   events,

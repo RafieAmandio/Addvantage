@@ -10,10 +10,6 @@ import type {
   TradingPlan,
 } from "@/lib/mock/types";
 
-/**
- * Middle band of the dashboard: top-of-the-wire news on the left, and a
- * right rail with the Trading Plan card + 48h calendar peek.
- */
 export function FeaturedRow({
   topNews,
   seenNewsIds,
@@ -35,7 +31,6 @@ export function FeaturedRow({
     <section className={cn("border-b border-gray-3", className)}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="grid grid-cols-12 gap-4 sm:gap-6">
-          {/* Featured news */}
           <div className="col-span-12 lg:col-span-8">
             <SectionHeader
               n="01 /"
@@ -93,9 +88,7 @@ export function FeaturedRow({
             </div>
           </div>
 
-          {/* Right rail */}
           <aside className="col-span-12 space-y-8 lg:col-span-4">
-            {/* Plan */}
             <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
               <div className="flex items-center justify-between">
                 <DataLabel>Trading Plan · TX-03</DataLabel>
@@ -139,7 +132,6 @@ export function FeaturedRow({
               </Link>
             </div>
 
-            {/* Calendar peek */}
             <div>
               <SectionHeader n="02 /" label="Calendar · 48h">
                 <Link

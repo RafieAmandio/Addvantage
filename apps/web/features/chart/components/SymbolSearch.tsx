@@ -4,22 +4,6 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/cn";
 
-/**
- * Terminal-style combobox over a closed symbol list. Mirrors the shape of
- * IntervalPicker/SymbolNav so it can live alongside them in the chart header.
- *
- * Keyboard contract:
- * - "/" focuses the input from anywhere on the page (skipped when the user is
- *   typing in another input/textarea/contenteditable).
- * - ArrowUp/Down moves the active option within the filtered list.
- * - Enter routes to the active option's href.
- * - Escape blurs and closes the popover.
- *
- * Rolled with a plain <input> + filtered list. We considered reusing
- * `components/ui/PageSearchInput.tsx` but its shape (single value + optional
- * match-count strip) doesn't expose the keydown/active-index hooks a combobox
- * needs — forcing it would have meant gutting that primitive.
- */
 export function SymbolSearch({
   symbols,
   current,

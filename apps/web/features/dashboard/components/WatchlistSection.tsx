@@ -6,12 +6,6 @@ import type { WatchArchiveEntry } from "@/features/dashboard/types";
 import type { NewsItem, TradingSetup } from "@/lib/mock/types";
 import { cn } from "@/lib/cn";
 
-/**
- * Watchlist surface on the operator home: pinned tickers, today's news
- * touching those tickers, live setups on them, and a rolled-up archive
- * of historical setups on the same instruments. Caller gates on
- * `watchHydrated && tickers.length > 0` before rendering.
- */
 export function WatchlistSection({
   tickers,
   watchNewsMentions,
@@ -53,7 +47,6 @@ export function WatchlistSection({
         </SectionHeader>
 
         <div className="mt-4 grid grid-cols-12 gap-4 sm:gap-6">
-          {/* News mentioning watched tickers */}
           <div className="col-span-12 lg:col-span-7">
             <DataLabel>News touching your pins</DataLabel>
             {watchNewsMentions.length === 0 ? (
@@ -104,7 +97,6 @@ export function WatchlistSection({
             )}
           </div>
 
-          {/* Trading plan setups on watched instruments */}
           <div className="col-span-12 lg:col-span-5">
             <DataLabel>Live setups on your pins</DataLabel>
             {watchSetupMentions.length === 0 ? (

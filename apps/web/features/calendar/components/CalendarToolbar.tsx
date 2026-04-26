@@ -26,7 +26,6 @@ export function CalendarToolbar({
         className
       )}
     >
-      {/* View selector */}
       <div
         className="flex gap-px bg-gray-3"
         role="tablist"
@@ -50,7 +49,6 @@ export function CalendarToolbar({
         ))}
       </div>
 
-      {/* Date stepper */}
       <div className="flex items-center justify-center gap-2 lg:gap-3">
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))}
@@ -88,7 +86,6 @@ export function CalendarToolbar({
         </button>
       </div>
 
-      {/* Counts */}
       <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         <span className="text-brand">{eventCount}</span>
         <span>events in view</span>

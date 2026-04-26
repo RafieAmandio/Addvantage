@@ -10,7 +10,6 @@ export function PositioningSection() {
       <SectionHeader num="01" label="Positioning" />
       <div className="w-full border-y border-white">
         <div className="grid grid-cols-1 md:grid-cols-3">
-          {/* What this is — white card */}
           <div className="relative flex h-full min-h-[560px] flex-col gap-3 overflow-hidden border-x border-white bg-white p-12">
             <h2 className="font-mono text-[36px] font-bold leading-none text-black">
               What this is
@@ -29,7 +28,6 @@ export function PositioningSection() {
             </div>
           </div>
 
-          {/* Who this is not for */}
           <div className="flex flex-col gap-9 p-12">
             <h3 className="font-mono text-2xl font-bold text-white">
               Who this is not for
@@ -51,7 +49,6 @@ export function PositioningSection() {
             </ul>
           </div>
 
-          {/* Who this is for */}
           <div className="flex flex-col gap-9 border-x border-white p-12">
             <h3 className="font-mono text-2xl font-bold text-white">
               Who this is for

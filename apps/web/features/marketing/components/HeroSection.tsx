@@ -11,7 +11,6 @@ export function HeroSection() {
   return (
     <section className="px-3 pt-3">
       <div className="relative h-[min(1024px,92vh)] min-h-[820px] overflow-hidden rounded-[32px] bg-[#1F1F1F]">
-        {/* Top nav: Logo + Join */}
         <div className="relative z-20 flex items-center justify-between px-6 py-8 md:px-[140px] md:py-[50px]">
           <Link href="/" className="flex items-center gap-[7.78px]">
             <LogoMark size={30} />
@@ -25,7 +24,6 @@ export function HeroSection() {
           </Link>
         </div>
 
-        {/* Hero content — top-aligned */}
         <div className="relative z-20 mx-auto flex max-w-[1100px] flex-col items-center gap-12 px-6 pt-8 text-center md:pt-[80px]">
           <h1 className="font-sans leading-none text-white">
             <span className="block text-[clamp(3rem,10vw,128px)] font-normal">
@@ -56,7 +54,6 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Earth backdrop — huge sphere rising from bottom, only top curve visible */}
         <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -64,11 +61,9 @@ export function HeroSection() {
             alt=""
             className="absolute left-1/2 top-[30%] w-[2600px] max-w-none -translate-x-1/2 select-none"
           />
-          {/* bottom fade so the ticker sits cleanly over the earth */}
           <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-[#1F1F1F] via-[rgba(31,31,31,0.6)] to-transparent" />
         </div>
 
-        {/* Bottom ticker — infinite marquee, left → right */}
         <div className="absolute inset-x-0 bottom-0 z-30 overflow-hidden py-[50px]">
           <div className="flex w-max animate-ticker gap-[50px] [animation-direction:reverse] will-change-transform">
             {[...heroTicker, ...heroTicker].map((t, i) => (

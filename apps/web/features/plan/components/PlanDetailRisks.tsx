@@ -1,9 +1,5 @@
 import { SectionNumber } from "@/components/ui/Marker";
 
-/**
- * Risks list on the plan detail page — numbered R0N entries with blood-tone
- * bar. Extracted from `PlanDetail.tsx`.
- */
 export function PlanDetailRisks({
   risks,
   sectionNumber,

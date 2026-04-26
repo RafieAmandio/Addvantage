@@ -14,11 +14,6 @@ interface Props {
   onCancel: () => void;
 }
 
-/**
- * Themed confirm() replacement. Amber-bordered modal with optional
- * destructive (blood) styling on the confirm button. Esc cancels,
- * Enter confirms, clicking the backdrop cancels.
- */
 export function ConfirmDialog({
   open,
   title,
