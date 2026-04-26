@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") ?? "/app";
+  const rawNext = url.searchParams.get("next") ?? "/app";
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/app";
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=missing_code", url));
