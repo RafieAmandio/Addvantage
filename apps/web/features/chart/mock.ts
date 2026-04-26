@@ -1,10 +1,5 @@
 import type { Bar } from "./components/PriceChart";
 
-/**
- * Deterministic mock OHLC bars. Phase A skeleton uses these until the market
- * data adapter (Phase B) populates `instrument_bars`. Seeded by symbol so
- * different routes look different but each route is stable across reloads.
- */
 export function generateMockBars(
   symbol: string,
   opts: { hours?: number; basePrice?: number } = {}
@@ -39,7 +34,6 @@ export function generateMockBars(
 }
 
 function seededBase(symbol: string): number {
-  // Picks a plausible starting price per symbol so SPX ≈ 5000, BTC ≈ 60000, etc.
   switch (symbol.toUpperCase()) {
     case "SPX":
       return 5000;
@@ -52,7 +46,6 @@ function seededBase(symbol: string): number {
     case "GOLD":
       return 2400;
     default:
-      // Anything else: derive a number 50–500 from the symbol hash.
       return 50 + (hashString(symbol) % 450);
   }
 }

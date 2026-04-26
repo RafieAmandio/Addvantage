@@ -64,16 +64,12 @@ const KIND_LABEL: Record<ChartMarker["kind"], string> = {
   user_pin: "PIN",
 };
 
-// Lightweight Charts v5 accepts 'YYYY-MM-DD' strings for daily bars and
-// UTCTimestamp (seconds since epoch) for intraday. Anything with a time
-// component gets converted to epoch seconds; pure dates pass through.
 function toChartTime(iso: string): Time {
   if (iso.length === 10 && iso[4] === "-" && iso[7] === "-") {
     return iso as Time;
   }
   const ms = Date.parse(iso);
   if (Number.isNaN(ms)) {
-    // Fallback: trust the caller — Lightweight Charts will throw if invalid.
     return iso as Time;
   }
   return Math.floor(ms / 1000) as UTCTimestamp;
@@ -102,8 +98,6 @@ export function PriceChart({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | ISeriesApi<"Area"> | null>(null);
-  // Bumped whenever the visible range changes or the chart rebuilds, to
-  // force the marker-overlay layout to recompute against fresh coordinates.
   const [layoutTick, setLayoutTick] = useState(0);
 
   useEffect(() => {
@@ -157,17 +151,12 @@ export function PriceChart({
     chartRef.current = chart;
     seriesRef.current = series;
 
-    // Recompute overlay coordinates whenever the visible range shifts (pan,
-    // zoom, fit) or the data rebuilds. One state-bump drives the whole layer.
     const bumpLayout = () => setLayoutTick((t) => t + 1);
     chart.timeScale().subscribeVisibleTimeRangeChange(bumpLayout);
     chart.timeScale().subscribeSizeChange(bumpLayout);
 
     chart.timeScale().fitContent();
-    // Bump layout repeatedly over the first ~200ms. Chart painting and
-    // coordinate resolution is async and its timing isn't fully observable
-    // through the public API; a few cheap bumps guarantee we land after the
-    // ResizeObserver has delivered dimensions and the pane has painted.
+    // Chart painting is async; repeated bumps ensure coordinates resolve after resize+paint.
     const rafs: number[] = [];
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     rafs.push(
@@ -190,19 +179,12 @@ export function PriceChart({
     };
   }, [bars, seriesType]);
 
-  // Per-marker pixel coordinates, rebuilt on every layout tick. The native
-  // dots are drawn by the lightweight-charts plugin; these coordinates power
-  // a sibling HTML layer that renders invisible hover hitboxes + an expanded
-  // card on hover.
   const markerLayouts: MarkerLayout[] = useMemo(() => {
-    void layoutTick; // dep — re-run when the chart tells us to
+    void layoutTick;
     const chart = chartRef.current;
     const series = seriesRef.current;
     if (!chart || !series || !markers || markers.length === 0) return [];
 
-    // Bar times as epoch seconds, once, so per-marker nearest-bar lookup is
-    // cheap. Chart coordinates come from timeScale.timeToCoordinate(time) +
-    // the nearest bar's high/low for the vertical pin.
     const barIndex = bars
       .map((b) => ({ bar: b, t: toEpochSec(b.time) }))
       .sort((a, b) => a.t - b.t);
@@ -212,10 +194,7 @@ export function PriceChart({
     for (const m of markers) {
       const t = toEpochSec(m.time);
       const near = nearestBar(barIndex, t);
-      // Snap to the nearest bar's time — timeToCoordinate resolves reliably
-      // only for times that match the data set, not arbitrary timestamps
-      // between bars. One-hour snap granularity is imperceptible at the
-      // default zoom.
+      // timeToCoordinate only resolves for times in the data set.
       const x = chart.timeScale().timeToCoordinate(toChartTime(near.time));
       if (x === null) continue;
 
@@ -258,8 +237,6 @@ function MarkerHoverCard({
 }) {
   const { x, y, marker } = layout;
   const style = MARKER_STYLE[marker.kind];
-  // Dot is 14px; hitbox is 28px (doubled for forgiving hover). Card flips
-  // to the other side of the anchor so it never covers the candles.
   const cardAbove = style.position === "aboveBar";
   return (
     <div
@@ -358,7 +335,6 @@ function nearestBar(
   index: Array<{ bar: Bar; t: number }>,
   t: number
 ): Bar {
-  // Binary search would shave cycles but O(n) is fine at n≈5000 × ≤50 markers.
   let best = index[0];
   let bestDiff = Math.abs(index[0].t - t);
   for (let i = 1; i < index.length; i++) {

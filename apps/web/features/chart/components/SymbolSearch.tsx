@@ -38,12 +38,10 @@ export function SymbolSearch({
     return symbols.filter((s) => s.toUpperCase().includes(q));
   }, [symbols, query]);
 
-  // Clamp active index when filter shrinks the list.
   useEffect(() => {
     if (activeIdx >= filtered.length) setActiveIdx(0);
   }, [filtered.length, activeIdx]);
 
-  // Global "/" shortcut to focus the input.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -68,7 +66,6 @@ export function SymbolSearch({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Reset to current when route changes under us.
   useEffect(() => {
     setQuery("");
   }, [pathname]);
@@ -104,7 +101,6 @@ export function SymbolSearch({
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => {
-            // Delay close so click on option still registers.
             window.setTimeout(() => setOpen(false), 120);
           }}
           onKeyDown={(e) => {
@@ -152,7 +148,6 @@ export function SymbolSearch({
                 role="option"
                 aria-selected={active}
                 onMouseDown={(e) => {
-                  // Prevent input blur before click handler runs.
                   e.preventDefault();
                   selectAt(idx);
                 }}

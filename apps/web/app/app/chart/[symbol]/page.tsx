@@ -58,9 +58,6 @@ export default async function ChartPage({
   const to = new Date();
   const from = new Date(to.getTime() - DEFAULT_WINDOW_DAYS * 24 * 3600 * 1000);
   const canonical = routeSymbolToCanonical(symbol);
-  // Bars + timeline are independent reads — fan out so total wait = max(t1, t2)
-  // instead of t1 + t2. Both scope to the same window so the page tells one
-  // consistent story.
   const [realBars, events] = await Promise.all([
     listBars({
       symbol: canonical,
@@ -80,8 +77,6 @@ export default async function ChartPage({
   const usingMock = chartBars.length === 0;
   const bars: ChartBar[] = usingMock ? generateMockBars(symbol) : chartBars;
 
-  // Project timeline events onto the chart as kind-styled dots. Show all
-  // kinds — filtering lives in the sidebar feed, not here.
   const markers: ChartMarker[] = events.map((e) => ({
     id: e.id,
     time: e.occurred_at,

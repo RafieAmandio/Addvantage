@@ -29,8 +29,6 @@ export function ChartInteractive({
 }: ChartInteractiveProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Index events by id so marker-click → event is O(1) instead of scanning
-  // on every click. Rebuilds only when the event list actually changes.
   const byId = useMemo(() => {
     const m = new Map<string, TimelineEvent>();
     for (const e of events) m.set(e.id, e);

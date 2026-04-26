@@ -5,18 +5,6 @@ import { getCache, setCache } from "@/lib/cache";
 import { logger } from "@/lib/logger";
 import { isMockMode } from "@/lib/config/public";
 
-/**
- * OHLCV bar shape for the chart feature. Source of truth on the write side
- * is `apps/worker/src/adapters/bars/base.ts` (Bar interface) — redeclared
- * here because worker code is not cleanly importable from the web app
- * (separate package boundaries, no build step bridging them). Keep the two
- * in sync; both mirror the `public.instrument_bars` columns in
- * `packages/db/src/types.ts`.
- *
- * Columns in DB are nullable (Row.open/high/low/close/volume), so the schema
- * matches that. Callers can drop rows with null OHLC if they need a strict
- * series.
- */
 export const BarSchema = z.object({
   ts: z.string(),
   open: z.number().nullable(),
@@ -68,22 +56,7 @@ async function listBarsFromDb(input: ListBarsInput): Promise<Bar[]> {
   return parsed.data;
 }
 
-/**
- * Read OHLCV bars for a given symbol/interval in a time window.
- *
- * Layered caching:
- *  - `React.cache` dedupes multiple calls with the same args within a single
- *    Server Component request.
- *  - Upstash Redis (`getCache`/`setCache`, no-op when env unset) dedupes
- *    across requests for 60s.
- *  - On miss, the Supabase read is the source of truth.
- *
- * Returns `[]` on DB error or schema mismatch (logged via `logger.error`).
- */
 export const listBars = cache(async (input: ListBarsInput): Promise<Bar[]> => {
-  // Mock mode: return [] so the chart page falls back to generateMockBars().
-  // That path already exists for Phase B before real bars were ingested; we
-  // just hitch a ride on it.
   if (isMockMode()) return [];
   const { symbol, interval, from, to } = input;
   const limit = input.limit ?? DEFAULT_LIMIT;
