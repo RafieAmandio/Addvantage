@@ -1,6 +1,5 @@
 import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
 
-/** Case-insensitive substring search across id/title/tags/all message bodies. */
 export function sessionMatchesQuery(
   s: ConsultSession,
   extras: ConsultMessage[],

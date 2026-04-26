@@ -8,14 +8,6 @@ import { pickReply } from "@/features/consult/lib/replies";
 import { listConsultMessages } from "@/features/consult/queries/messages";
 import { appendConsultMessage } from "@/features/consult/actions";
 
-/**
- * Core send pipeline for a consult turn: validate input, persist user turn,
- * load recent history, call OpenAI (or canned fallback), persist assistant
- * turn, revalidate. Auth + tier + daily-token gates are enforced upstream in
- * `sendConsultMessage` (actions.ts) — this helper assumes the caller has
- * already cleared them and passes the verified `userId` in `ctx`.
- */
-
 const SendConsultMessageSchema = z.object({
   sessionId: z.string().uuid(),
   body: z.string().trim().min(1).max(10000),
@@ -43,8 +35,6 @@ export async function sendConsultMessageImpl(
 
   const { sessionId, body } = parsed.data;
 
-  // 1. Persist the user turn via the existing helper (handles auth/RLS/rate
-  //    limiting at its own layer — we rely on its return shape).
   const userAppend = await appendConsultMessage({
     sessionId,
     role: "user",
@@ -54,18 +44,11 @@ export async function sendConsultMessageImpl(
     return { ok: false, error: userAppend.error ?? "append_user_failed" };
   }
 
-  // 2. Load recent history (already ordered ascending by created_at). Slice
-  //    to the last 20 turns — enough for context without blowing the prompt.
   const allMessages = await listConsultMessages(sessionId);
   const history = allMessages.slice(-20);
 
-  // 3. Decide: LLM or canned fallback.
   const client = getOpenAI();
   let assistantContent: string | null = null;
-  // Metadata written alongside the assistant row so the consult_messages.metadata
-  // jsonb (migration 0022) carries token usage + model for cost dashboards.
-  // Fallback paths record `fallback.pickReply` so usage dashboards can slice
-  // canned vs LLM turns cleanly.
   let assistantMetadata: Record<string, unknown> = {
     model: "fallback.pickReply",
     streamed: false,
@@ -97,7 +80,6 @@ export async function sendConsultMessageImpl(
           scope: "consult.sendConsultMessage",
         });
         assistantContent = pickReply(body, history.length).body;
-        // metadata stays at fallback defaults
       } else {
         assistantContent = text;
         assistantMetadata = {
@@ -144,7 +126,6 @@ export async function sendConsultMessageImpl(
     }
   }
 
-  // 4. Persist the assistant turn.
   const assistantAppend = await appendConsultMessage({
     sessionId,
     role: "assistant",

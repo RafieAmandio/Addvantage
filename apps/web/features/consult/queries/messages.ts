@@ -10,11 +10,6 @@ import {
 const SESSION_COLUMNS = "id,title,created_at,updated_at";
 const MESSAGE_COLUMNS = "id,session_id,role,content,created_at";
 
-/**
- * Returns the authenticated user's consult sessions ordered by most-recent
- * activity. Returns `[]` on any error (also returned when unauthenticated
- * since RLS filters the read). Caller slices to a viewport.
- */
 export async function listConsultSessions(
   limit = 50
 ): Promise<ConsultSessionRow[]> {
@@ -47,12 +42,6 @@ export async function listConsultSessions(
 
 const DEFAULT_MESSAGE_LIMIT = 200;
 
-/**
- * Returns the last `limit` messages for a session in chronological order. RLS
- * ensures only the owner can read; unauthenticated / foreign-session reads
- * return []. We fetch newest-first then reverse in-memory so long-running
- * sessions don't balloon the payload or the LLM history window.
- */
 export async function listConsultMessages(
   sessionId: string,
   input: { limit?: number } = {}

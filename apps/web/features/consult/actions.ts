@@ -19,14 +19,6 @@ import {
 } from "@/features/consult/queries/usage";
 import type { Json } from "@tradevantage/db";
 
-
-/**
- * Consult session / message server actions. Auth-gated — middleware already
- * blocks `/app/*` to unauthenticated users, but we re-check `getSession()`
- * as defence-in-depth and rely on RLS (migration 0019) to enforce ownership
- * at the DB layer.
- */
-
 interface ActionState {
   ok: boolean;
   error?: string;
@@ -87,9 +79,6 @@ const AppendMessageSchema = z.object({
   sessionId: z.string().uuid(),
   role: z.enum(CONSULT_MESSAGE_ROLES),
   content: z.string().trim().min(1).max(10000),
-  // Optional per-message metadata — currently token usage + model + streamed
-  // flag for assistant turns (L4). Loose shape on purpose so we can add
-  // latency_ms / cached / etc. later without schema churn.
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -120,8 +109,6 @@ export async function appendConsultMessage(input: {
   }
 
   const supabase = supabaseServer();
-  // tick-148 pattern: round-trip through JSON to coerce unknown→Json before
-  // the Supabase client sees it.
   const metadataJson: Json | null = parsed.data.metadata
     ? (JSON.parse(JSON.stringify(parsed.data.metadata)) as Json)
     : null;
@@ -203,13 +190,6 @@ export async function renameConsultSession(input: {
   return { ok: true };
 }
 
-/**
- * LLM-backed consult turn. Thin facade: enforces auth + tier rate limit +
- * daily token cap here, then delegates the persist/history/OpenAI/persist
- * pipeline to `sendConsultMessageImpl` in `features/consult/lib/send-message.ts`.
- * Falls back to the canned `pickReply` path inside the helper when the key is
- * unset or the LLM call fails — the user's turn is never dropped.
- */
 export async function sendConsultMessage(input: {
   sessionId: string;
   body: string;
@@ -217,9 +197,6 @@ export async function sendConsultMessage(input: {
   const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
 
-  // RT2: tier-aware bucket (free 5/60s, vip 30/60s). Default to "free" if the
-  // profile row is missing or carries an unexpected tier value — safer than
-  // accidentally granting VIP budget.
   const profile = await getProfile();
   let tier: Tier = "free";
   if (profile?.tier === "vip" || profile?.tier === "free") {
@@ -239,8 +216,6 @@ export async function sendConsultMessage(input: {
   if (!rl.success)
     return { ok: false, error: "rate_limited", reason: "rate_limited" };
 
-  // RT3: daily token budget. Free tier gated at FREE_DAILY_TOKEN_CAP per 24h;
-  // VIP unbounded. Distinct `reason` lets the UI show a copy-specific toast.
   if (tier === "free") {
     const used = await getDailyTokensUsed(user.id);
     if (used >= FREE_DAILY_TOKEN_CAP) {

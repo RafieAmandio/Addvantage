@@ -2,16 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-/**
- * Vim-style focus keybindings for the consult composer.
- * - `i` focuses the message textarea (insert mode) unless the operator is already
- *   typing somewhere else.
- * - The textarea dispatches `ants:consult-normal-mode` on Escape; we flash a
- *   NORMAL hint in response.
- *
- * Returns `modeHint` so the caller can render both a screen-reader live region
- * and a fixed visual overlay.
- */
 export function useConsultKeyboard() {
   const [modeHint, setModeHint] = useState<string | null>(null);
 

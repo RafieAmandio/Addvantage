@@ -2,12 +2,6 @@
 
 import { cn } from "@/lib/cn";
 
-/**
- * Fixed-position mode indicator overlay ("INSERT" / "NORMAL") plus a paired
- * sr-only live region so keyboard-only operators get the same feedback as
- * sighted users. The live region always renders (empty when idle) so screen
- * readers can subscribe from mount.
- */
 export function ConsultModeHint({
   modeHint,
   className,

@@ -1,6 +1,5 @@
 import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
 
-/** Render a session (plus any locally-appended `extras`) as Markdown. */
 export function sessionToMarkdown(
   session: ConsultSession,
   extras: ConsultMessage[]

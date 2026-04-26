@@ -13,21 +13,6 @@ import type { LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
 import type { ConsultMessage, ConsultSession } from "@/lib/mock/types";
 
-/**
- * Encapsulates the write-side of a consult session: new/send/rename/delete/
- * export, plus the pending-delete confirm dialog state.
- *
- * Supabase is the source of truth for user-owned sessions — every mutation
- * fires the matching server action (see `features/consult/actions.ts`,
- * migration 0019) in addition to updating the localStorage-backed client
- * state. New sessions use the server-minted UUID as their local id, so a
- * subsequent page load re-hydrates the same session from Supabase.
- *
- * The localStorage path is retained as an offline-cache + a fallback for
- * when the user briefly loses connectivity. Mock/desk sessions
- * (`mockSessions`) are read-only reference material and are never persisted
- * to the DB.
- */
 export function useConsultActions({
   active,
   activeId,
@@ -60,7 +45,6 @@ export function useConsultActions({
       String(now.getMinutes()).padStart(2, "0");
     const title = `New session · ${hhmm}`;
 
-    // Server-mint the UUID so the local cache stays consistent with the DB.
     const res = await createConsultSession(title);
     if (!res.ok || !res.sessionId) {
       toast.push({
@@ -95,10 +79,6 @@ export function useConsultActions({
   const send = () => {
     if (!draft.trim()) return;
     const sessionId = active.id;
-    // Supabase-backed sessions are user-owned (UUID); mock sessions are not.
-    // Only persist if we're in a user-owned session. The UI prevents starting
-    // a send from a mock session implicitly because `startNewSession` is the
-    // only path to create a new persistable session.
     const isPersistable = !mockSessions.some((s) => s.id === sessionId);
 
     const nowIso = new Date().toISOString();
@@ -110,7 +90,6 @@ export function useConsultActions({
       tags: [],
     };
 
-    // Pick a stable reply variant based on prior user-message count
     const priorUserCount = [
       ...(active.messages ?? []),
       ...(extrasBySession[sessionId] ?? []),
@@ -150,9 +129,6 @@ export function useConsultActions({
     };
 
     if (isPersistable) {
-      // Streaming path (L3): POST to /api/consult/stream and progressively
-      // append tokens into a placeholder assistant bubble. Server persists
-      // the full final message after the stream closes.
       const bubbleId = `M-x${Date.now() + 1}`;
       const streamMessage = async () => {
         const res = await fetch("/api/consult/stream", {
@@ -232,7 +208,6 @@ export function useConsultActions({
             }));
           }
         }
-        // Flush any buffered bytes.
         const tail = decoder.decode();
         if (tail) {
           acc += tail;
@@ -245,7 +220,6 @@ export function useConsultActions({
           }));
         }
         if (!bubbleCreated) {
-          // Stream closed with zero bytes — surface as error.
           setTyping(false);
           toast.push({
             tone: "error",
@@ -265,8 +239,6 @@ export function useConsultActions({
         });
       });
     } else {
-      // Mock/desk read-only sessions: keep the canned reply UX so the demo
-      // content stays interactive without hitting the DB or LLM.
       setTimeout(() => {
         const variant = pickReply(userBody, priorUserCount);
         appendAssistantLocal(variant.body, variant.tags);
@@ -315,7 +287,6 @@ export function useConsultActions({
     });
     if (activeId === id) setActiveId(mockSessions[0].id);
     setPendingDelete(null);
-    // Persist deletion. Mock sessions are never in Supabase so we guard.
     if (isUserSession(id)) {
       deleteConsultSession(id).catch(() => {
         /* telemetry handled server-side */

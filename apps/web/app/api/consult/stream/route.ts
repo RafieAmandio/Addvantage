@@ -1,23 +1,3 @@
-/**
- * Streaming consult route handler (L3 of the consult LLM carve-up).
- *
- * Runtime: Node.js. `getSession()` (and `supabaseServer()`) depend on
- * `next/headers` cookies + the service-role-free SSR client. Edge would work
- * with extra plumbing but we keep one code path — perf is not the bottleneck
- * here (LLM dominates). L4 (usage accounting) builds on this file.
- *
- * Wire format: plain UTF-8 text (no SSE framing). Client reads chunks via
- * `ReadableStream` and appends to the assistant bubble as they arrive. Full
- * assistant content is persisted post-stream via `appendConsultMessage` —
- * server stays the source of truth even though the client rendered tokens
- * progressively.
- *
- * Error policy: auth/rate-limit/validation errors return JSON (4xx) BEFORE
- * streaming starts. Once the stream is open, any LLM error mid-flight swaps
- * to the `pickReply` canned fallback and we persist that — the user never
- * sees a half-bubble.
- */
-
 import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -60,8 +40,6 @@ export async function POST(req: Request): Promise<Response> {
   const user = await getSession();
   if (!user) return jsonError(401, "unauthorized");
 
-  // RT2: tier-aware bucket (free 5/60s, vip 30/60s). Defaults to "free" on
-  // missing/unexpected tier to avoid accidentally granting VIP budget.
   const profile = await getProfile();
   let tier: Tier = "free";
   if (profile?.tier === "vip" || profile?.tier === "free") {
@@ -80,9 +58,6 @@ export async function POST(req: Request): Promise<Response> {
   });
   if (!rl.success) return jsonError(429, "rate_limited", "rate_limited");
 
-  // RT3: daily token budget. Free tier gated at FREE_DAILY_TOKEN_CAP per 24h;
-  // VIP unbounded. Uses 429 to mirror the per-minute breach shape so existing
-  // client error handling stays uniform; the `reason` field disambiguates.
   if (tier === "free") {
     const used = await getDailyTokensUsed(user.id);
     if (used >= FREE_DAILY_TOKEN_CAP) {
@@ -113,8 +88,6 @@ export async function POST(req: Request): Promise<Response> {
   }
   const { sessionId, body } = parsed.data;
 
-  // 1. Persist the user turn first — if this fails we haven't streamed
-  //    anything yet and can return a clean 500.
   const userAppend = await appendConsultMessage({
     sessionId,
     role: "user",
@@ -124,15 +97,12 @@ export async function POST(req: Request): Promise<Response> {
     return jsonError(500, userAppend.error ?? "append_user_failed");
   }
 
-  // 2. Load recent history (includes the turn we just inserted).
   const allMessages = await listConsultMessages(sessionId);
   const history = allMessages.slice(-20);
 
   const encoder = new TextEncoder();
   const client = getOpenAI();
 
-  // 3a. No key → canned fallback. Still return a ReadableStream so the
-  //     client reader path is identical.
   if (!client) {
     const canned = pickReply(body, history.length).body;
     const assistantAppend = await appendConsultMessage({
@@ -159,7 +129,6 @@ export async function POST(req: Request): Promise<Response> {
     });
   }
 
-  // 3b. LLM streaming path.
   const userId = user.id;
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -171,8 +140,7 @@ export async function POST(req: Request): Promise<Response> {
           model: OPENAI_MODEL,
           temperature: 0.4,
           stream: true,
-          // include_usage: OpenAI emits a terminal chunk with cumulative usage
-          // totals. Without this flag, chunk.usage is undefined end-to-end.
+          // Without include_usage, chunk.usage is always undefined
           stream_options: { include_usage: true },
           messages: [
             { role: "system", content: DESK_SYSTEM_PROMPT },
@@ -191,7 +159,6 @@ export async function POST(req: Request): Promise<Response> {
           if (chunk.usage) usage = chunk.usage;
         }
         if (!fullText.trim()) {
-          // Empty completion — swap to canned so the bubble isn't blank.
           const canned = pickReply(body, history.length).body;
           fullText = canned;
           fellBack = true;
@@ -209,9 +176,6 @@ export async function POST(req: Request): Promise<Response> {
           scope: "consult.stream",
         });
         const canned = pickReply(body, history.length).body;
-        // If we already streamed partial tokens, drop them mentally — but we
-        // can't un-enqueue. Append a newline separator and the canned body so
-        // the final DB row is canonical and the user sees *something* coherent.
         if (fullText.length > 0) {
           controller.enqueue(encoder.encode("\n\n"));
           fullText += "\n\n" + canned;
@@ -222,9 +186,6 @@ export async function POST(req: Request): Promise<Response> {
         fellBack = true;
       }
 
-      // Observability: token usage + model snapshot (L4). fellBack path has
-      // no usage numbers; we still record model=fallback.pickReply so cost
-      // dashboards can slice canned vs LLM turns.
       const metadata: Record<string, unknown> = fellBack
         ? { model: "fallback.pickReply", streamed: true }
         : {
@@ -257,7 +218,6 @@ export async function POST(req: Request): Promise<Response> {
         });
       }
 
-      // Persist the final assistant turn before closing the stream.
       try {
         const assistantAppend = await appendConsultMessage({
           sessionId,

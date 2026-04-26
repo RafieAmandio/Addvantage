@@ -1,10 +1,5 @@
 import type { ConsultMessage } from "@/lib/mock/types";
 
-/**
- * Canned AI desk replies, eight variants so back-to-back replies don't read
- * identically. Picked deterministically by message count + keyword bucket so
- * a session replays consistently.
- */
 const CANNED_REPLIES: Array<{ body: string; tags: ConsultMessage["tags"] }> = [
   {
     body: "Acknowledged. What's the current state of your position size relative to your account, and what's your hard invalidation level? Without those two numbers I can't give you a directional answer, only a process answer.",
@@ -40,7 +35,6 @@ const CANNED_REPLIES: Array<{ body: string; tags: ConsultMessage["tags"] }> = [
   },
 ];
 
-/** Keyword → CANNED_REPLIES indices that fit. First match wins. */
 const REPLY_KEYWORDS: Array<{ pattern: RegExp; replies: number[] }> = [
   { pattern: /\b(size|sizing|position|risk|stop|invalidat)/i, replies: [0, 3, 4] },
   { pattern: /\b(loss|losing|drawdown|down|hurt|pain|red|underwater)/i, replies: [2, 6, 4] },

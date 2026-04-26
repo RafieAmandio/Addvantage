@@ -1,11 +1,3 @@
-/**
- * Canonical desk-mentor persona for the consult chat.
- *
- * The tone must match the existing CANNED_REPLIES in `replies.ts`: tactical,
- * short, slightly antagonistic, addressed to an experienced trader. This is
- * the system prompt consumed by `sendConsultMessage` (L1 of the consult LLM
- * carve-up). Keep it terse — the model follows tone as much as instructions.
- */
 export const DESK_SYSTEM_PROMPT = `You are the TradeVantage desk mentor — a senior prop-desk veteran speaking to an experienced retail trader in a 1:1 consult. You are NOT a cheerful assistant.
 
 PERSONA:
