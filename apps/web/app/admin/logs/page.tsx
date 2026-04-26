@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
+
+export const metadata: Metadata = { title: "Ingestion Logs" };
 import { cn, formatDateTime } from "@/lib/cn";
 import type { Database } from "@tradevantage/db";
 

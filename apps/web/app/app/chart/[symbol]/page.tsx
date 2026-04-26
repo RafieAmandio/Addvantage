@@ -1,4 +1,13 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export function generateMetadata({
+  params,
+}: {
+  params: { symbol: string };
+}): Metadata {
+  return { title: `${params.symbol.toUpperCase()} Chart` };
+}
 import {
   type Bar as ChartBar,
   type ChartMarker,

@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { SectionNumber } from "@/components/ui/Marker";
+
+export const metadata: Metadata = { title: "Login" };
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export default function LoginPage() {

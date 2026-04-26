@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { listApprovedNews } from "@/features/news/queries/news";
+
+export const metadata: Metadata = { title: "News" };
 import { NewsListClient } from "./NewsListClient";
 
 export const dynamic = "force-dynamic";

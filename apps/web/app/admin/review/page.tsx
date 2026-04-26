@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listPendingNews } from "@/features/news/queries/news";
+
+export const metadata: Metadata = { title: "Review Queue" };
 import { formatDateTime } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";

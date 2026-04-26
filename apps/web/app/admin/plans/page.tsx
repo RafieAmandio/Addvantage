@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listAllPlansForAdmin } from "@/features/plan/queries/plans";
+
+export const metadata: Metadata = { title: "Plans" };
 import { PlanAdminListTable } from "@/features/plan/components/admin/PlanAdminListTable";
 
 export const dynamic = "force-dynamic";

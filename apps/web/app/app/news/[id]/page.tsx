@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getApprovedNewsById, listApprovedNews } from "@/features/news/queries/news";
 import { NewsDetailClient } from "./NewsDetailClient";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const item = await getApprovedNewsById(params.id);
+  if (!item) return { title: "Not Found" };
+  return { title: item.headline };
+}
 
 export default async function NewsDetailPage({
   params,

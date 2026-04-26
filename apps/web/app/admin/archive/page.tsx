@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { listRejectedNews } from "@/features/news/queries/news";
+
+export const metadata: Metadata = { title: "Archive" };
 import { formatDate } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";

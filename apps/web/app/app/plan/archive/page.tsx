@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { listPublishedPlans } from "@/features/plan/queries/plans";
+
+export const metadata: Metadata = { title: "Plan Archive" };
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { PlanArchiveView } from "@/features/plan/components/PlanArchiveView";
 

@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { listApprovedNews } from "@/features/news/queries/news";
+
+export const metadata: Metadata = { title: "Brief" };
 import { listPublishedPlans } from "@/features/plan/queries/plans";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { BriefClient } from "./BriefClient";

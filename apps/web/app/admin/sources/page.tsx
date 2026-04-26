@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { listSources } from "@/features/sources/queries/sources";
+
+export const metadata: Metadata = { title: "Sources" };
 import { cn, formatDateTime } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";

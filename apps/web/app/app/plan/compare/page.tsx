@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import {
   getPlanById,
   listPublishedPlans,
 } from "@/features/plan/queries/plans";
+
+export const metadata: Metadata = { title: "Compare Plans" };
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { PlanCompareView } from "@/features/plan/components/PlanCompareView";
 

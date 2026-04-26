@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { listApprovedNews } from "@/features/news/queries/news";
 import { listPublishedPrimers } from "@/features/education/queries/primers";
 import { listPublishedPlans } from "@/features/plan/queries/plans";
 import { DashboardClient } from "./DashboardClient";
 
+export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

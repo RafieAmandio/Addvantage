@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import type { ChannelPost } from "@/features/channel/types";
+
+export const metadata: Metadata = { title: "Channel" };
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate, formatTime } from "@/lib/cn";
 import Link from "next/link";

@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CalendarFallback } from "@/features/calendar/components/CalendarFallback";
+
+export const metadata: Metadata = { title: "Calendar" };
 import { CalendarPageView } from "@/features/calendar/components/CalendarPageView";
 import { timelineEventToCalendarEvent } from "@/features/calendar/lib/fromTimeline";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";

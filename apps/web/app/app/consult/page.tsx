@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = { title: "Consult" };
 import { ConsultPageView } from "@/features/consult/components/ConsultPageView";
 import {
   listConsultSessions,

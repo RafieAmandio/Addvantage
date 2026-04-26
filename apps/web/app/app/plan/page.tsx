@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = { title: "Trading Plan" };
 import { listPublishedPlans } from "@/features/plan/queries/plans";
 import { getClosedPlanStats } from "@/features/plan/queries/stats";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
