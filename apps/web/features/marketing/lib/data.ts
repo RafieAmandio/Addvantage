@@ -4,12 +4,10 @@ export const heroTicker = [
   { sym: "BBNI", val: "4.320", chg: "-4.2%", dir: "down" as const },
   { sym: "BBCA", val: "6.500", chg: "-4.2%", dir: "down" as const },
   { sym: "BBRI", val: "3.110", chg: "-1.2%", dir: "down" as const },
-  { sym: "WBSA", val: "456", chg: "-24.2%", dir: "up" as const },
+  { sym: "WBSA", val: "456", chg: "+24.2%", dir: "up" as const },
   { sym: "TPIA", val: "2.123", chg: "-1.2%", dir: "down" as const },
   { sym: "DGWA", val: "806", chg: "-0.1%", dir: "down" as const },
 ];
-
-type HeroTickerItem = (typeof heroTicker)[number];
 
 export const pillars = [
   {
