@@ -35,7 +35,7 @@ export function NotificationPanelHeader({
           "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
           unreadCount === 0
             ? "cursor-default border-gray-3 text-white/30"
-            : "border-brand/60 text-brand hover:bg-brand hover:text-black"
+            : "border-brand/60 text-brand transition-colors hover:bg-brand hover:text-black"
         )}
       >
         Mark all read

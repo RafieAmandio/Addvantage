@@ -69,7 +69,7 @@ export default function ChannelPage() {
                     <Link
                       key={t}
                       href={`/app/tags/${t}`}
-                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       #{t}
                     </Link>

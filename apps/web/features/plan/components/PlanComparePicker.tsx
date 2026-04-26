@@ -59,7 +59,7 @@ export function PlanCompareSwapButton({
         disabled={!a || !b}
         title="Swap A and B"
         aria-label="Swap plans"
-        className="flex items-center gap-2 border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand disabled:cursor-default disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+        className="flex items-center gap-2 border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand disabled:cursor-default disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
       >
         <span className="text-base leading-none">⇄</span>
         <span className="sm:hidden">Swap</span>

@@ -56,7 +56,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/plans"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Plans
           </Link>
