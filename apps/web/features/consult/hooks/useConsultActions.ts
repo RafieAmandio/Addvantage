@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { consultSessions as mockSessions } from "@/features/consult/mock";
-import { pickReply } from "@/features/consult/lib/replies";
 import { sessionToMarkdown } from "@/features/consult/lib/export";
 import {
   createConsultSession,
@@ -78,8 +76,6 @@ export function useConsultActions({
   const send = () => {
     if (!draft.trim()) return;
     const sessionId = active.id;
-    const isPersistable = !mockSessions.some((s) => s.id === sessionId);
-
     const nowIso = new Date().toISOString();
     const userMsg: ConsultMessage = {
       id: `M-x${Date.now()}`,
@@ -88,11 +84,6 @@ export function useConsultActions({
       body: draft,
       tags: [],
     };
-
-    const priorUserCount = [
-      ...(active.messages ?? []),
-      ...(extrasBySession[sessionId] ?? []),
-    ].filter((m) => m.role === "user").length;
 
     setExtrasBySession((prev) => ({
       ...prev,
@@ -106,109 +97,74 @@ export function useConsultActions({
     setDraft("");
     setTyping(true);
 
-    const appendAssistantLocal = (body: string, tags: ConsultMessage["tags"]) => {
-      const replyMsg: ConsultMessage = {
-        id: `M-x${Date.now() + 1}`,
-        role: "ai",
-        ts: new Date().toISOString(),
-        body,
-        tags,
-      };
-      setExtrasBySession((prev) => ({
-        ...prev,
-        [sessionId]: [...(prev[sessionId] ?? []), replyMsg],
-      }));
-      setLocalSessions((prev) =>
-        prev.map((s) =>
-          s.id === sessionId
-            ? { ...s, lastAt: new Date().toISOString() }
-            : s
-        )
-      );
-    };
-
-    if (isPersistable) {
-      const bubbleId = `M-x${Date.now() + 1}`;
-      const streamMessage = async () => {
-        const res = await fetch("/api/consult/stream", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sessionId, body: userBody }),
+    const bubbleId = `M-x${Date.now() + 1}`;
+    const streamMessage = async () => {
+      const res = await fetch("/api/consult/stream", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ sessionId, body: userBody }),
+      });
+      if (!res.ok || !res.body) {
+        let errCode: string | undefined;
+        let reason: string | undefined;
+        try {
+          const j = (await res.json()) as {
+            error?: string;
+            reason?: string;
+          };
+          errCode = j.error;
+          reason = j.reason;
+        } catch {
+          /* non-JSON body */
+        }
+        const description =
+          reason === "daily_token_cap"
+            ? "Daily token cap reached — upgrade for more."
+            : errCode === "rate_limited"
+              ? "Slow down — too many messages per minute."
+              : "Desk didn't respond. Try again.";
+        toast.push({
+          tone: "error",
+          title: "Message not sent",
+          description,
+          duration: 3500,
         });
-        if (!res.ok || !res.body) {
-          let errCode: string | undefined;
-          let reason: string | undefined;
-          try {
-            const j = (await res.json()) as {
-              error?: string;
-              reason?: string;
-            };
-            errCode = j.error;
-            reason = j.reason;
-          } catch {
-            /* non-JSON body */
-          }
-          // RT3: distinguish daily-cap breaches from per-minute throttles.
-          const description =
-            reason === "daily_token_cap"
-              ? "Daily token cap reached — upgrade for more."
-              : errCode === "rate_limited"
-                ? "Slow down — too many messages per minute."
-                : "Desk didn't respond. Try again.";
-          toast.push({
-            tone: "error",
-            title: "Message not sent",
-            description,
-            duration: 3500,
-          });
+        setTyping(false);
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      let bubbleCreated = false;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const delta = decoder.decode(value, { stream: true });
+        if (!delta) continue;
+        acc += delta;
+        if (!bubbleCreated) {
+          bubbleCreated = true;
           setTyping(false);
-          return;
-        }
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let acc = "";
-        let bubbleCreated = false;
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          const delta = decoder.decode(value, { stream: true });
-          if (!delta) continue;
-          acc += delta;
-          if (!bubbleCreated) {
-            bubbleCreated = true;
-            setTyping(false);
-            const replyMsg: ConsultMessage = {
-              id: bubbleId,
-              role: "ai",
-              ts: new Date().toISOString(),
-              body: acc,
-              tags: [],
-            };
-            setExtrasBySession((prev) => ({
-              ...prev,
-              [sessionId]: [...(prev[sessionId] ?? []), replyMsg],
-            }));
-            setLocalSessions((prev) =>
-              prev.map((s) =>
-                s.id === sessionId
-                  ? { ...s, lastAt: new Date().toISOString() }
-                  : s
-              )
-            );
-          } else {
-            const bodyNow = acc;
-            setExtrasBySession((prev) => ({
-              ...prev,
-              [sessionId]: (prev[sessionId] ?? []).map((m) =>
-                m.id === bubbleId ? { ...m, body: bodyNow } : m
-              ),
-            }));
-          }
-        }
-        const tail = decoder.decode();
-        if (tail) {
-          acc += tail;
+          const replyMsg: ConsultMessage = {
+            id: bubbleId,
+            role: "ai",
+            ts: new Date().toISOString(),
+            body: acc,
+            tags: [],
+          };
+          setExtrasBySession((prev) => ({
+            ...prev,
+            [sessionId]: [...(prev[sessionId] ?? []), replyMsg],
+          }));
+          setLocalSessions((prev) =>
+            prev.map((s) =>
+              s.id === sessionId
+                ? { ...s, lastAt: new Date().toISOString() }
+                : s
+            )
+          );
+        } else {
           const bodyNow = acc;
           setExtrasBySession((prev) => ({
             ...prev,
@@ -217,32 +173,37 @@ export function useConsultActions({
             ),
           }));
         }
-        if (!bubbleCreated) {
-          setTyping(false);
-          toast.push({
-            tone: "error",
-            title: "Message not sent",
-            description: "Desk didn't respond. Try again.",
-            duration: 3500,
-          });
-        }
-      };
-      streamMessage().catch(() => {
+      }
+      const tail = decoder.decode();
+      if (tail) {
+        acc += tail;
+        const bodyNow = acc;
+        setExtrasBySession((prev) => ({
+          ...prev,
+          [sessionId]: (prev[sessionId] ?? []).map((m) =>
+            m.id === bubbleId ? { ...m, body: bodyNow } : m
+          ),
+        }));
+      }
+      if (!bubbleCreated) {
         setTyping(false);
         toast.push({
           tone: "error",
           title: "Message not sent",
-          description: "Network error reaching the desk. Try again.",
+          description: "Desk didn't respond. Try again.",
           duration: 3500,
         });
+      }
+    };
+    streamMessage().catch(() => {
+      setTyping(false);
+      toast.push({
+        tone: "error",
+        title: "Message not sent",
+        description: "Network error reaching the desk. Try again.",
+        duration: 3500,
       });
-    } else {
-      setTimeout(() => {
-        const variant = pickReply(userBody, priorUserCount);
-        appendAssistantLocal(variant.body, variant.tags);
-        setTyping(false);
-      }, 1400);
-    }
+    });
   };
 
   const renameSession = (id: string, newTitle: string) => {
@@ -251,12 +212,9 @@ export function useConsultActions({
     setLocalSessions((prev) =>
       prev.map((s) => (s.id === id ? { ...s, title: trimmed } : s))
     );
-    const isPersistable = !mockSessions.some((s) => s.id === id);
-    if (isPersistable) {
-      renameConsultSession({ sessionId: id, title: trimmed }).catch(() => {
-        /* telemetry handled server-side */
-      });
-    }
+    renameConsultSession({ sessionId: id, title: trimmed }).catch(() => {
+      /* telemetry handled server-side */
+    });
     toast.push({
       tone: "info",
       title: "Session renamed",
@@ -265,11 +223,9 @@ export function useConsultActions({
     });
   };
 
-  const isUserSession = (id: string): boolean =>
-    !mockSessions.some((s) => s.id === id);
+  const isUserSession = () => true;
 
   const requestDeleteSession = (id: string, title: string) => {
-    if (!isUserSession(id)) return;
     setPendingDelete({ id, title });
   };
 
@@ -283,13 +239,11 @@ export function useConsultActions({
       delete next[id];
       return next;
     });
-    if (activeId === id) setActiveId(mockSessions[0].id);
+    if (activeId === id) setActiveId("");
     setPendingDelete(null);
-    if (isUserSession(id)) {
-      deleteConsultSession(id).catch(() => {
-        /* telemetry handled server-side */
-      });
-    }
+    deleteConsultSession(id).catch(() => {
+      /* telemetry handled server-side */
+    });
     toast.push({
       tone: "warn",
       title: "Session deleted",

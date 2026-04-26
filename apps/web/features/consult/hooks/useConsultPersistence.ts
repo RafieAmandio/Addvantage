@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { consultSessions as mockSessions } from "@/features/consult/mock";
 import {
   CONSULT_STORAGE_KEY,
   type ConsultMessage,
@@ -28,7 +27,7 @@ export function useConsultPersistence(
     Record<string, ConsultMessage[]>
   >(initial.extras);
   const [activeId, setActiveId] = useState(
-    initial.sessions[0]?.id ?? mockSessions[0].id
+    initial.sessions[0]?.id ?? ""
   );
   const [hydrated, setHydrated] = useState(false);
 
@@ -48,17 +47,14 @@ export function useConsultPersistence(
         if (parsed.extras && typeof parsed.extras === "object") {
           setExtrasBySession((prev) => ({ ...parsed.extras, ...prev }));
         }
-        if (parsed.lastActiveId && parsed.lastActiveId !== mockSessions[0].id) {
-          const fromMock = mockSessions.find(
-            (s) => s.id === parsed.lastActiveId
-          );
+        if (parsed.lastActiveId) {
           const fromLocal = parsed.sessions?.find(
             (s) => s.id === parsed.lastActiveId
           );
           const fromServer = initial.sessions.find(
             (s) => s.id === parsed.lastActiveId
           );
-          const resumed = fromMock ?? fromServer ?? fromLocal;
+          const resumed = fromServer ?? fromLocal;
           if (resumed) {
             setActiveId(parsed.lastActiveId);
             const RESTORE_SHOWN_KEY = "ants-domain-consult-restore-shown";
@@ -71,7 +67,7 @@ export function useConsultPersistence(
               try {
                 sessionStorage.setItem(RESTORE_SHOWN_KEY, "1");
               } catch {}
-              const defaultId = mockSessions[0].id;
+              const defaultId = "";
               toast.push({
                 tone: "info",
                 title: "Resumed last session",

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { consultSessions as mockSessions } from "@/features/consult/mock";
 import { sessionMatchesQuery } from "@/features/consult/lib/search";
 import { ConsultLayout } from "@/features/consult/components/ConsultLayout";
 import { ConsultHeroHeader } from "@/features/consult/components/ConsultHeroHeader";
@@ -17,6 +16,15 @@ import { useAppState, isPaid } from "@/lib/state";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { ConsultSession } from "@/features/consult/types";
+
+const EMPTY_SESSION: ConsultSession = {
+  id: "",
+  title: "",
+  startedAt: "",
+  lastAt: "",
+  messages: [],
+  tags: [],
+};
 
 export function ConsultPageView({
   initialData,
@@ -39,20 +47,18 @@ export function ConsultPageView({
   const modeHint = useConsultKeyboard();
   const endRef = useRef<HTMLDivElement>(null);
 
-  const allSessions: ConsultSession[] = useMemo(
-    () => [...localSessions, ...mockSessions],
-    [localSessions]
-  );
-
-  const visibleSessions: ConsultSession[] = useMemo(
+  const visibleSessions = useMemo(
     () =>
-      allSessions.filter((s) =>
+      localSessions.filter((s) =>
         sessionMatchesQuery(s, extrasBySession[s.id] ?? [], sessionQuery)
       ),
-    [allSessions, extrasBySession, sessionQuery]
+    [localSessions, extrasBySession, sessionQuery]
   );
 
-  const active = allSessions.find((s) => s.id === activeId) ?? allSessions[0];
+  const active =
+    localSessions.find((s) => s.id === activeId) ??
+    localSessions[0] ??
+    EMPTY_SESSION;
   const extras = extrasBySession[active.id] ?? [];
   const messages = [...active.messages, ...extras];
 
@@ -88,7 +94,7 @@ export function ConsultPageView({
 
   const layoutProps = {
     sessions: visibleSessions,
-    totalSessions: allSessions.length,
+    totalSessions: localSessions.length,
     sessionQuery,
     setSessionQuery,
     extrasBySession,
@@ -114,7 +120,7 @@ export function ConsultPageView({
       <ConfirmDialog
         open={pendingDelete !== null}
         title={`Delete "${pendingDelete?.title ?? ""}"?`}
-        description="This local session and all its messages will be permanently removed. Mock sessions from the desk are not affected."
+        description="This session and all its messages will be permanently removed. This cannot be undone."
         confirmLabel="Delete session"
         cancelLabel="Keep"
         destructive

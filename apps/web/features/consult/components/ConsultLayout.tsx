@@ -84,7 +84,7 @@ export function ConsultLayout({
         </div>
         <button
           onClick={onNewSession}
-          className="mt-3 flex w-full items-center justify-center gap-2 border border-brand bg-brand/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+          className="mt-3 flex w-full items-center justify-center gap-2 border border-brand bg-brand/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand"
         >
           <span className="text-base leading-none">+</span>
           New session
@@ -99,7 +99,7 @@ export function ConsultLayout({
             </div>
             <button
               onClick={() => setSessionQuery("")}
-              className="mt-3 border border-brand/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="mt-3 border border-brand/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand"
             >
               ✕ Clear
             </button>
@@ -121,7 +121,7 @@ export function ConsultLayout({
               >
                 <button
                   onClick={() => !isRenaming && setActiveId(s.id)}
-                  className="block w-full p-3 text-left"
+                  className="block w-full p-3 text-left focus-visible:ring-1 focus-visible:ring-brand focus-visible:ring-inset"
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -180,7 +180,7 @@ export function ConsultLayout({
                         setRenamingId(s.id);
                       }}
                       title="Rename session"
-                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-brand hover:text-brand"
+                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand"
                     >
                       ✎
                     </button>
@@ -190,7 +190,7 @@ export function ConsultLayout({
                         onDeleteSession(s.id, s.title);
                       }}
                       title="Delete session"
-                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright"
+                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand"
                     >
                       ✕
                     </button>
@@ -227,7 +227,7 @@ export function ConsultLayout({
               onClick={onExportSession}
               title="Copy this session as markdown"
               aria-label="Export session as markdown"
-              className="shrink-0 border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
+              className="shrink-0 border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand"
             >
               ⇩ EXPORT MD
             </button>
@@ -285,7 +285,7 @@ export function ConsultLayout({
             />
             <button
               onClick={send}
-              className="bg-brand px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-brand-dim hover:text-white"
+              className="bg-brand px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand"
             >
               Transmit →
             </button>
