@@ -94,7 +94,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
   return (
     <div className="bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-4xl px-6 py-10">
+        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/app" },
@@ -119,21 +119,21 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             </span>
           </div>
 
-          <h1 className="mt-4 font-display text-5xl leading-[1.05] text-white">
+          <h1 className="mt-4 font-display text-3xl leading-[1.05] text-white sm:text-4xl md:text-5xl">
             {item.headline}
           </h1>
         </div>
       </div>
 
-      <div className="mx-auto max-w-4xl px-6 py-10">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
         <SectionNumber n="01 /" label="WHAT THIS MEANS FOR PRICE" />
-        <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
-          <p className="font-display text-xl leading-relaxed text-white/90">
+        <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-4 sm:p-6">
+          <p className="font-display text-base leading-relaxed text-white/90 sm:text-xl">
             {item.analysis}
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-12 gap-6">
+        <div className="mt-8 grid grid-cols-12 gap-4 sm:mt-12 sm:gap-6">
           <div className="col-span-12 md:col-span-7">
             <SectionNumber n="02 /" label="AFFECTS" />
             <div className="mt-4 flex flex-wrap gap-2">
@@ -163,11 +163,11 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
         <RelatedPlansChips
           planIds={item.related_plan_ids}
-          className="mt-12"
+          className="mt-8 sm:mt-12"
         />
 
         {item.tags.length > 0 && (
-          <div className="mt-12">
+          <div className="mt-8 sm:mt-12">
             <SectionNumber n="04 /" label="TAGGED" />
             <div className="mt-4 flex flex-wrap gap-2">
               {item.tags.map((t) => (
@@ -184,7 +184,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
         )}
 
         {hasRelated && (
-          <div className="mt-12 border-t border-gray-3 pt-10">
+          <div className="mt-8 border-t border-gray-3 pt-8 sm:mt-12 sm:pt-10">
             <SectionNumber n="05 /" label="RELATED · BY HASHTAG" />
             <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Other items in the DOMAIN that share at least one tag with this article.
@@ -198,7 +198,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group text-black p-4 transition-colors hover:bg-gray-2"
+                      className="group bg-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -240,7 +240,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={p.id}
                       href={`/app/education/${p.id}`}
-                      className="group text-black p-4 transition-colors hover:bg-gray-2"
+                      className="group bg-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         {p.id} · {p.readingMin} min
@@ -265,7 +265,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={c.id}
                       href="/app/channel"
-                      className="group block text-black p-4 transition-colors hover:bg-gray-2"
+                      className="group block bg-black p-4 transition-colors hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2">
                         <span className="text-brand">{c.id}</span>
@@ -284,11 +284,11 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         )}
 
-        <nav className="mt-16 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
+        <nav className="mt-10 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3 sm:mt-16">
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={
-              "block text-black p-4 transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 transition-colors hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -302,7 +302,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
             className={
-              "block text-black p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >

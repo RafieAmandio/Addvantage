@@ -111,19 +111,19 @@ function View({ items }: { items: NewsListItem[] }) {
         onCancel={() => setConfirmingResetSeen(false)}
       />
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <DataLabel>Transmission TX-01 · Free pillar</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-white">
+          <h1 className="mt-2 font-display text-4xl text-white sm:text-5xl">
             Live <span className="italic text-brand">News</span>
           </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
+          <p className="mt-2 max-w-2xl font-display text-base text-white/60 sm:text-lg">
             Raw market-moving news, annotated with what it actually means for
             price. No "analysts say". No "experts believe".
           </p>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6">
           <PageSearchInput
             value={query}
@@ -180,7 +180,7 @@ function View({ items }: { items: NewsListItem[] }) {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={
-                  "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
+                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors sm:px-4 sm:py-2 " +
                   (filter === f
                     ? "bg-brand text-black"
                     : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white")
