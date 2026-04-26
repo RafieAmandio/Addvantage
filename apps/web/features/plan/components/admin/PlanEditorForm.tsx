@@ -10,6 +10,7 @@ import {
   deletePlan,
   type PlanActionState,
 } from "@/features/plan/actions";
+import { cn } from "@/lib/cn";
 import type { Plan } from "@/features/plan/types";
 
 const INITIAL: PlanActionState = { ok: false };
@@ -68,7 +69,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
           </span>
           {plan && (
             <span
-              className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 ${statusChip}`}
+              className={cn("border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2", statusChip)}
             >
               {plan.status}
               {plan.status === "closed" && plan.outcome

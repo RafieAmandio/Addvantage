@@ -67,7 +67,7 @@ function OutcomeStat({
       <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
         {label}
       </div>
-      <div className={`font-display text-2xl ${color}`}>{value}</div>
+      <div className={cn("font-display text-2xl", color)}>{value}</div>
     </div>
   );
 }

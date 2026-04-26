@@ -1,5 +1,5 @@
 import { supabaseServer } from "@/lib/supabase/server";
-import { formatDateTime } from "@/lib/cn";
+import { cn, formatDateTime } from "@/lib/cn";
 import type { Database } from "@tradevantage/db";
 
 type IngestionRun = Database["public"]["Tables"]["ingestion_runs"]["Row"];
@@ -48,7 +48,7 @@ function statusBadge(status: string) {
 function countCell(n: number) {
   return (
     <span
-      className={`font-mono text-[10px] tabular-nums ${n > 0 ? "text-brand" : "text-white/30"}`}
+      className={cn("font-mono text-[10px] tabular-nums", n > 0 ? "text-brand" : "text-white/30")}
     >
       {n}
     </span>

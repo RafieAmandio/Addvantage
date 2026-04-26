@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { cn } from "@/lib/cn";
 
 type ToastTone = "info" | "success" | "warn" | "error";
 
@@ -158,17 +159,17 @@ function ToastCard({
   const styles = TONE_STYLES[toast.tone];
   return (
     <div
-      className={`pointer-events-auto relative w-full border ${styles.border} bg-gray-2 shadow-[0_0_30px_rgba(245,158,11,0.18)]`}
+      className={cn("pointer-events-auto relative w-full border bg-gray-2 shadow-[0_0_30px_rgba(245,158,11,0.18)]", styles.border)}
       role="status"
     >
       {/* Top accent bar */}
-      <div className={`h-0.5 w-full ${styles.bar}`} />
+      <div className={cn("h-0.5 w-full", styles.bar)} />
 
       <div className="flex items-start gap-3 px-4 py-3">
-        <span className={`led mt-1 ${styles.led}`} aria-hidden />
+        <span className={cn("led mt-1", styles.led)} aria-hidden />
         <div className="min-w-0 flex-1">
           <div
-            className={`font-mono text-[10px] uppercase tracking-widest2 ${styles.text}`}
+            className={cn("font-mono text-[10px] uppercase tracking-widest2", styles.text)}
           >
             ● {toast.tone === "success" ? "ACK" : toast.tone === "error" ? "DENIED" : toast.tone === "warn" ? "WARN" : "INFO"}
           </div>
@@ -202,7 +203,7 @@ function ToastCard({
       {/* Auto-dismiss progress bar — keyframes live in globals.css */}
       <div className="h-px w-full bg-gray-3">
         <div
-          className={`h-full ${styles.bar}`}
+          className={cn("h-full", styles.bar)}
           style={{
             animation: `toastBar ${toast.duration}ms linear forwards`,
           }}

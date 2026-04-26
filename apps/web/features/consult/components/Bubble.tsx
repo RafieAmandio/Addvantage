@@ -1,4 +1,4 @@
-import { formatTime } from "@/lib/cn";
+import { cn, formatTime } from "@/lib/cn";
 import type { ConsultMessage } from "@/features/consult/types";
 
 export function Bubble({ msg }: { msg: ConsultMessage }) {
@@ -17,10 +17,10 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
     : "bg-gray-2 border-brand/40";
 
   return (
-    <div className={`flex flex-col ${align}`}>
+    <div className={cn("flex flex-col", align)}>
       <div className="flex items-center gap-2">
         <span
-          className={`font-mono text-[9px] uppercase tracking-widest2 ${tagColor}`}
+          className={cn("font-mono text-[9px] uppercase tracking-widest2", tagColor)}
         >
           ● {isUser ? "OPERATOR" : isAi ? "ANTS · AI" : `DESK · ${msg.author ?? "TEAM"}`}
         </span>
@@ -29,7 +29,7 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
         </span>
       </div>
       <div
-        className={`mt-1 max-w-[80%] whitespace-pre-line border ${bg} p-4 text-sm leading-relaxed text-white/90`}
+        className={cn("mt-1 max-w-[80%] whitespace-pre-line border p-4 text-sm leading-relaxed text-white/90", bg)}
       >
         {msg.body}
       </div>

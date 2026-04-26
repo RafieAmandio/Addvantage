@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { HASHTAGS, IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
+import { cn } from "@/lib/cn";
 import { approveItem, rejectItem, saveDraft } from "./actions";
 import type { Database } from "@tradevantage/db";
 
@@ -86,7 +87,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             [{item.source_code}]
           </span>
           <span
-            className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 ${statusChip}`}
+            className={cn("border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2", statusChip)}
           >
             {item.status}
           </span>

@@ -9,14 +9,15 @@ export function TransmissionsSection() {
       <div className="w-full border-y border-white bg-gray-2">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {pillars.map((p, i) => {
-            // columns 1 and 3 on each row get left/right borders
             const col = i % 3;
-            const borderX = col !== 1 ? "border-x border-white" : "";
-            const borderTop = i >= 3 ? "md:border-t border-white" : "";
             return (
               <div
                 key={p.code}
-                className={`flex flex-col gap-9 p-12 ${borderX} ${borderTop}`}
+                className={cn(
+                  "flex flex-col gap-9 p-12",
+                  col !== 1 && "border-x border-white",
+                  i >= 3 && "md:border-t border-white"
+                )}
               >
                 <div className="flex items-center justify-between font-mono text-base">
                   <span className="font-light text-white">{p.code}</span>

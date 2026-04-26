@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import type { Plan, PlanStatus } from "@/features/plan/types";
 
 const STATUS_CHIP: Record<PlanStatus, string> = {
@@ -63,7 +64,7 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
           </div>
           <div className="col-span-12 flex justify-end lg:col-span-2">
             <span
-              className={`border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 ${STATUS_CHIP[p.status]}`}
+              className={cn("border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2", STATUS_CHIP[p.status])}
             >
               {p.status}
               {p.status === "closed" && p.outcome ? ` · ${p.outcome}` : ""}

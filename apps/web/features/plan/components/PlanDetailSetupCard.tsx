@@ -99,7 +99,7 @@ export function PlanDetailSetupCard({
               meta.style
             )}
           >
-            <span className={`h-1.5 w-1.5 ${meta.dot}`} />
+            <span className={cn("h-1.5 w-1.5", meta.dot)} />
             {meta.label}
             {s.outcomeR && status !== "skipped" && (
               <span className="ml-1">· {s.outcomeR}</span>
