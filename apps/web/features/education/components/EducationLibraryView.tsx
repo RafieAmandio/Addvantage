@@ -147,7 +147,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
               {readCount > 0 && (
                 <button
                   onClick={() => setConfirmingReset(true)}
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand"
                 >
                   Reset
                 </button>
@@ -180,7 +180,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand"
             >
               ✕ Clear search
             </button>
