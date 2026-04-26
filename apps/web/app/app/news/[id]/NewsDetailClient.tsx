@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
@@ -64,16 +64,20 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, router, relatedFeed]);
 
-  const relatedNews = relatedFeed
-    .filter((n) => n.id !== item.id)
-    .map((n) => ({
-      n,
-      shared: n.tags.filter((t) => item.tags.includes(t)).length,
-    }))
-    .filter((x) => x.shared > 0)
-    .sort((a, b) => b.shared - a.shared)
-    .slice(0, 4)
-    .map((x) => x.n);
+  const relatedNews = useMemo(
+    () =>
+      relatedFeed
+        .filter((n) => n.id !== item.id)
+        .map((n) => ({
+          n,
+          shared: n.tags.filter((t) => item.tags.includes(t)).length,
+        }))
+        .filter((x) => x.shared > 0)
+        .sort((a, b) => b.shared - a.shared)
+        .slice(0, 4)
+        .map((x) => x.n),
+    [relatedFeed, item.id, item.tags]
+  );
 
   const hasRelated = relatedNews.length > 0;
 
