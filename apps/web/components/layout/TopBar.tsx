@@ -186,7 +186,7 @@ export function TopBar() {
           </Link>
 
           <div className="flex items-center gap-2 border-l border-gray-3 pl-4 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-            <span className="led" />
+            <span className="led" aria-hidden />
             <span className="hidden sm:inline">{operatorName.toUpperCase()}</span>
             <span className="text-white/30 hidden lg:inline">·</span>
             <span className="text-white/40 hidden lg:inline">U-00417</span>

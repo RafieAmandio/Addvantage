@@ -74,7 +74,7 @@ export function SignupWizard() {
               <span>{s.n}</span>
               <span className="h-px flex-1 bg-current opacity-30" />
               <span>{s.label}</span>
-              {i === step && !state.sent && <span className="led" />}
+              {i === step && !state.sent && <span className="led" aria-hidden />}
               {s.done && <span className="text-moss">✓</span>}
             </div>
           ))}

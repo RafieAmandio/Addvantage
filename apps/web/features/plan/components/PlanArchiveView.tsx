@@ -38,7 +38,7 @@ export function PlanArchiveView(props: PlanArchiveViewProps) {
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
           <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <span className="led" />
+            <span className="led" aria-hidden />
             DECODING ARCHIVE
           </div>
         </div>

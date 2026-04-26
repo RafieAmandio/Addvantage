@@ -180,6 +180,7 @@ export function ConsultLayout({
                         setRenamingId(s.id);
                       }}
                       title="Rename session"
+                      aria-label="Rename session"
                       className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       ✎
@@ -190,6 +191,7 @@ export function ConsultLayout({
                         onDeleteSession(s.id, s.title);
                       }}
                       title="Delete session"
+                      aria-label="Delete session"
                       className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       ✕
