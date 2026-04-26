@@ -44,11 +44,18 @@ const RESPONSE_SCHEMA = {
   },
 } as const;
 
+export interface RephraseResult {
+  output: RephraseOutput;
+  systemPrompt: string;
+  userMessage: string;
+  rawResponse: string;
+}
+
 export async function rephrase(
   sourceCode: string,
   rawText: string,
   meta?: Record<string, string | number>
-): Promise<RephraseOutput> {
+): Promise<RephraseResult> {
   const metaBlock = meta
     ? `\n\nMETA (adapter hints, not content):\n${JSON.stringify(meta, null, 2)}`
     : "";
@@ -103,5 +110,10 @@ Return the rewritten item as structured JSON matching the schema.`;
     logger.error({ errors: parsed.error.format(), raw: text }, "rephrase: invalid output");
     throw new Error("rephrase output failed schema validation");
   }
-  return parsed.data;
+  return {
+    output: parsed.data,
+    systemPrompt: SYSTEM_PROMPT,
+    userMessage: user,
+    rawResponse: text,
+  };
 }

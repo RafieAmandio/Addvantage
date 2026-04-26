@@ -56,13 +56,13 @@
 | # | Task | Status | Notes |
 |---|------|--------|-------|
 | 1.1 | Admin: insert news form — manual entry | [x] | /admin/review/new — form with source, headline, analysis, impact, bias, affects, tags; creates pending item and redirects to review |
-| 1.2 | Admin: show raw text on review page | [ ] | Raw input visible alongside AI output |
-| 1.3 | Admin: show AI system prompt + user message | [ ] | What was sent to OpenAI |
-| 1.4 | Admin: show AI raw response (before schema parsing) | [ ] | Full JSON output from model |
-| 1.5 | Admin: show diff: raw text → headline, rephrased, analysis | [ ] | Side-by-side or inline diff |
+| 1.2 | Admin: show raw text on review page | [x] | ReviewEditor left column shows raw_text alongside rephrased output |
+| 1.3 | Admin: show AI system prompt + user message | [x] | Migration 0025 adds ai_system_prompt, ai_user_message, ai_raw_response columns; worker stores them; ReviewEditor shows collapsible audit trail |
+| 1.4 | Admin: show AI raw response (before schema parsing) | [x] | Collapsible raw JSON viewer with pretty-print in ReviewEditor |
+| 1.5 | Admin: show diff: raw text → headline, rephrased, analysis | [x] | Side-by-side layout: left column (original/raw), right column (rephrased/editable) |
 | 1.6 | Admin: ingestion logs page | [x] | Built /admin/logs — summary stats, desktop table, mobile cards, error banner, linked in admin nav |
-| 1.7 | Admin: show `ingestion_runs` data (fetched, new, rephrased counts) | [ ] | |
-| 1.8 | Admin: `raw_text` column surfaced in review UI | [ ] | |
+| 1.7 | Admin: show `ingestion_runs` data (fetched, new, rephrased counts) | [x] | Logs page shows fetched/new/rephrased counts per run + aggregate stats |
+| 1.8 | Admin: `raw_text` column surfaced in review UI | [x] | raw_text shown in ReviewEditor left panel + NewsCreateForm raw_text input |
 
 ---
 

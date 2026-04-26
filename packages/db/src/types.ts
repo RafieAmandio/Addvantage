@@ -263,6 +263,9 @@ export type Database = {
       news_items: {
         Row: {
           affects: string[]
+          ai_raw_response: string | null
+          ai_system_prompt: string | null
+          ai_user_message: string | null
           analysis: string
           author: string
           bias: string
@@ -286,6 +289,9 @@ export type Database = {
         }
         Insert: {
           affects?: string[]
+          ai_raw_response?: string | null
+          ai_system_prompt?: string | null
+          ai_user_message?: string | null
           analysis: string
           author: string
           bias: string
@@ -309,6 +315,9 @@ export type Database = {
         }
         Update: {
           affects?: string[]
+          ai_raw_response?: string | null
+          ai_system_prompt?: string | null
+          ai_user_message?: string | null
           analysis?: string
           author?: string
           bias?: string

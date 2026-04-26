@@ -80,6 +80,9 @@ const NewsRowSchema = z.object({
   reviewed_at: z.string().nullable(),
   reviewed_by: z.string().nullable(),
   related_plan_ids: z.array(z.string()),
+  ai_system_prompt: z.string().nullable(),
+  ai_user_message: z.string().nullable(),
+  ai_raw_response: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -91,7 +94,7 @@ export const NEWS_LIST_COLUMNS =
 // Full detail projection consumed by /admin/review/[id]. Explicit list (never
 // `select('*')`) shields the route from column drift on news_items.
 const NEWS_DETAIL_COLUMNS =
-  "id,source_code,source_url,raw_text,content_hash,fetched_at,published_at,status,headline,rephrased,analysis,impact,bias,affects,tags,author,reviewed_at,reviewed_by,related_plan_ids,created_at,updated_at";
+  "id,source_code,source_url,raw_text,content_hash,fetched_at,published_at,status,headline,rephrased,analysis,impact,bias,affects,tags,author,reviewed_at,reviewed_by,related_plan_ids,ai_system_prompt,ai_user_message,ai_raw_response,created_at,updated_at";
 
 export function toNewsListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
   // Drop status from the public projection.

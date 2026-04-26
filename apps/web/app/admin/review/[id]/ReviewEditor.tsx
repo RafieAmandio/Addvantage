@@ -8,6 +8,27 @@ import type { Database } from "@tradevantage/db";
 
 type NewsRow = Database["public"]["Tables"]["news_items"]["Row"];
 
+function Collapsible({ label, children }: { label: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border border-gray-3">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-3 py-2 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:bg-gray-2 hover:text-white/70"
+      >
+        <span>{label}</span>
+        <span className="text-brand">{open ? "▼" : "▶"}</span>
+      </button>
+      {open && (
+        <div className="border-t border-gray-3 bg-black p-3">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ReviewEditor({ item }: { item: NewsRow }) {
   const [pending, startTransition] = useTransition();
   const [draft, setDraft] = useState({
@@ -233,8 +254,48 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
           </Field>
         </div>
       </div>
+
+      {/* AI Pipeline Audit Trail */}
+      {(item.ai_system_prompt || item.ai_user_message || item.ai_raw_response) && (
+        <div className="mt-6">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            AI PIPELINE · AUDIT TRAIL
+          </div>
+          <div className="space-y-px">
+            {item.ai_system_prompt && (
+              <Collapsible label="System prompt">
+                <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
+                  {item.ai_system_prompt}
+                </pre>
+              </Collapsible>
+            )}
+            {item.ai_user_message && (
+              <Collapsible label="User message (sent to OpenAI)">
+                <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
+                  {item.ai_user_message}
+                </pre>
+              </Collapsible>
+            )}
+            {item.ai_raw_response && (
+              <Collapsible label="Raw AI response (before parsing)">
+                <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
+                  {formatJson(item.ai_raw_response)}
+                </pre>
+              </Collapsible>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function formatJson(raw: string): string {
+  try {
+    return JSON.stringify(JSON.parse(raw), null, 2);
+  } catch {
+    return raw;
+  }
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

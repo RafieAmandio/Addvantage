@@ -50,15 +50,16 @@ async function runOne(adapter: SourceAdapter, doRephrase: boolean): Promise<Resu
           candidates[0].rawText,
           candidates[0].meta
         );
+        const r = out.output;
         result.rephrased = {
-          headline: out.headline,
-          impact: out.impact,
-          bias: out.bias,
-          tags: out.tags,
+          headline: r.headline,
+          impact: r.impact,
+          bias: r.bias,
+          tags: r.tags,
         };
-        console.log(`         └─ rephrased: ${out.headline}`);
+        console.log(`         └─ rephrased: ${r.headline}`);
         console.log(
-          `         └─ impact=${out.impact} bias=${out.bias} tags=[${out.tags.join(", ")}] affects=[${out.affects.join(", ")}]`
+          `         └─ impact=${r.impact} bias=${r.bias} tags=[${r.tags.join(", ")}] affects=[${r.affects.join(", ")}]`
         );
       } catch (err) {
         console.log(`         └─ rephrase FAILED: ${String(err)}`);

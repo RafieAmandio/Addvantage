@@ -42,15 +42,17 @@ export async function persistCandidates(
     }
     existingHashes.add(hash);
 
-    let rephrased;
+    let rephraseResult;
     try {
-      rephrased = await rephrase(sourceCode, c.rawText, c.meta);
+      rephraseResult = await rephrase(sourceCode, c.rawText, c.meta);
       result.rephrased++;
     } catch (err) {
       logger.error({ err: String(err), externalId: c.externalId }, "rephrase failed");
       result.errors++;
       continue;
     }
+
+    const { output: rephrased } = rephraseResult;
 
     // Prefer adapter-level canonical hints (e.g. FF indicator map) over
     // LLM-derived affects/impact when present — deterministic taxonomy beats
@@ -77,6 +79,9 @@ export async function persistCandidates(
             tags: rephrased.tags,
             author: `[${sourceCode}]`,
             status: "pending",
+            ai_system_prompt: rephraseResult.systemPrompt,
+            ai_user_message: rephraseResult.userMessage,
+            ai_raw_response: rephraseResult.rawResponse,
           })
           .select("id")
           .single(),
