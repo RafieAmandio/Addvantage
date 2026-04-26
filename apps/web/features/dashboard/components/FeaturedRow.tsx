@@ -2,8 +2,7 @@ import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { CalendarPeekRow } from "@/features/calendar/components/CalendarPeekRow";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
-import { formatTime } from "@/lib/cn";
-import { cn } from "@/lib/cn";
+import { formatTime, cn } from "@/lib/cn";
 import type {
   NewsItem,
   CalendarEvent,

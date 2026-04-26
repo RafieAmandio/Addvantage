@@ -6,7 +6,6 @@ export default function AppLoading() {
           ● ESTABLISHING TRANSMISSION
         </div>
 
-        {/* Bar loader */}
         <div className="flex items-end gap-1.5">
           {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
             <span
