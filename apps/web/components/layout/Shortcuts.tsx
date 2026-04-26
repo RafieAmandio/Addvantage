@@ -231,7 +231,7 @@ export function Shortcuts() {
               </div>
               <button
                 onClick={() => setShowHelp(false)}
-                className="border border-gray-3 p-2 text-white/60 hover:border-brand hover:text-brand"
+                className="border border-gray-3 p-2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 aria-label="Close"
               >
                 <svg

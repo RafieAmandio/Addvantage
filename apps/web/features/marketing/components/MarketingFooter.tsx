@@ -23,10 +23,10 @@ export function MarketingFooter() {
       </div>
       <div className="flex w-full max-w-[227px] flex-col gap-[17px] font-mono text-base text-white">
         <p className="font-bold">Operator</p>
-        <Link href="/login" className="hover:text-brand">
+        <Link href="/login" className="hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
           Login
         </Link>
-        <Link href="/signup" className="hover:text-brand">
+        <Link href="/signup" className="hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
           Request Access
         </Link>
       </div>

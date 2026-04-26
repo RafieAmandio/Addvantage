@@ -49,7 +49,7 @@ export function NotificationItem({
         }}
         aria-label={isRead ? "Mark as unread" : "Mark as read"}
         title={isRead ? "Mark as unread" : "Mark as read"}
-        className="absolute right-2 top-2 z-10 border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-opacity hover:border-brand hover:text-brand opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+        className="absolute right-2 top-2 z-10 border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-opacity hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
       >
         {isRead ? "↶ UNREAD" : "✓ READ"}
       </button>
@@ -57,7 +57,7 @@ export function NotificationItem({
         href={n.href}
         onClick={onNavigate}
         className={cn(
-          "group block border-b border-gray-3 px-4 py-3 transition-colors last:border-b-0",
+          "group block border-b border-gray-3 px-4 py-3 transition-colors last:border-b-0 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
           pinMatch && !isRead
             ? "border-l-2 border-l-brand bg-brand/5 hover:bg-brand/10"
             : isRead

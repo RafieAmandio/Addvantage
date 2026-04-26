@@ -28,7 +28,7 @@ export function SearchPaletteEmpty({
               <button
                 key={v.href}
                 onClick={() => onJump(v.href)}
-                className="group flex items-center justify-between bg-black p-3 text-left transition-colors hover:bg-gray-2"
+                className="group flex items-center justify-between bg-black p-3 text-left transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 <div className="min-w-0 flex-1">
                   <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -57,7 +57,7 @@ export function SearchPaletteEmpty({
               <button
                 key={q}
                 onClick={() => onPick(q)}
-                className="border border-gray-3 bg-black px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70 hover:border-brand hover:text-brand"
+                className="border border-gray-3 bg-black px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {q}
               </button>
@@ -75,7 +75,7 @@ export function SearchPaletteEmpty({
             <button
               key={q}
               onClick={() => onPick(q)}
-              className="border border-brand/30 bg-brand/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="border border-brand/30 bg-brand/5 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               {q}
             </button>

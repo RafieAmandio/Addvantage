@@ -57,7 +57,7 @@ export function TopBar() {
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
-            className="border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:hidden"
+            className="border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <svg
               width="14"
@@ -76,7 +76,7 @@ export function TopBar() {
               onClick={() => setSidebarCollapsed(false)}
               aria-label="Expand sidebar"
               title="Expand sidebar · \\"
-              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:flex"
+              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               <svg
                 width="14"
@@ -114,7 +114,7 @@ export function TopBar() {
             <button
               onClick={() => flipTier("free")}
               className={cn(
-                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 !paid
                   ? "bg-brand text-black"
                   : "text-white/40 hover:text-white"
@@ -125,7 +125,7 @@ export function TopBar() {
             <button
               onClick={() => flipTier("vip")}
               className={cn(
-                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 paid
                   ? "bg-brand text-black"
                   : "text-white/40 hover:text-white"
@@ -138,7 +138,7 @@ export function TopBar() {
           <button
             onClick={() => setSearchOpen(true)}
             aria-label="Search the DOMAIN"
-            className="group flex items-center gap-2 border border-gray-3 bg-black-2 px-3 py-1.5 text-white/50 transition-colors hover:border-brand hover:text-brand sm:gap-3"
+            className="group flex items-center gap-2 border border-gray-3 bg-black-2 px-3 py-1.5 text-white/50 transition-colors hover:border-brand hover:text-brand sm:gap-3 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <svg
               width="13"
@@ -173,14 +173,14 @@ export function TopBar() {
             }
             aria-label="Show keyboard shortcuts and help"
             title="Press ? for keyboard shortcuts"
-            className="border border-gray-3 bg-black-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand"
+            className="border border-gray-3 bg-black-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ?
           </button>
 
           <Link
             href="/app/subscription"
-            className="hidden border border-brand/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black sm:block"
+            className="hidden border border-brand/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black sm:block focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {paid ? "Manage tier" : "Upgrade →"}
           </Link>

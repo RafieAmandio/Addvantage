@@ -81,7 +81,7 @@ export function Sidebar() {
         <div>
           <Link
             href="/"
-            className="group font-display text-3xl text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="group font-display text-3xl text-white transition-transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ANTS<span className="text-brand">.</span>
           </Link>
@@ -94,7 +94,7 @@ export function Sidebar() {
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
             title="Collapse sidebar · \"
-            className="hidden items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:flex"
+            className="hidden items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
               <path d="M9 2L4 7l5 5" strokeLinecap="round" strokeLinejoin="round" />
@@ -103,7 +103,7 @@ export function Sidebar() {
           <button
             onClick={() => setNavOpen(false)}
             aria-label="Close navigation"
-            className="flex items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:hidden"
+            className="flex items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
               <path d="M2 2l10 10M12 2L2 12" />
@@ -149,7 +149,7 @@ export function Sidebar() {
           {!paid && (
             <Link
               href="/app/subscription"
-              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand hover:decoration-brand"
+              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand hover:decoration-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               Upgrade access →
             </Link>
@@ -223,7 +223,7 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "group flex items-center justify-between px-3 py-2 transition-all duration-150",
+        "group flex items-center justify-between px-3 py-2 transition-all duration-150 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
         active
           ? "border-l-2 border-brand bg-brand/10 text-brand"
           : "border-l-2 border-transparent text-white/60 hover:border-brand/40 hover:bg-gray-2 hover:text-white"

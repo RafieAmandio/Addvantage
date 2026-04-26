@@ -34,7 +34,7 @@ export const SearchPaletteHeader = forwardRef<
         <button
           onClick={onClose}
           aria-label="Close search"
-          className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           esc
         </button>

@@ -15,7 +15,7 @@ export function NotificationEmpty({ onResetFilter, className }: Props) {
       </div>
       <button
         onClick={onResetFilter}
-        className="mt-3 border border-brand/60 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+        className="mt-3 border border-brand/60 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
       >
         ← Show all
       </button>

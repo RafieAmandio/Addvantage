@@ -37,7 +37,7 @@ export function NotificationFilterTabs({
           key={f.v}
           onClick={() => onChange(f.v)}
           className={cn(
-            "whitespace-nowrap px-2.5 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+            "whitespace-nowrap px-2.5 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
             filter === f.v
               ? "bg-brand text-black"
               : "bg-black text-white/60 hover:text-white"

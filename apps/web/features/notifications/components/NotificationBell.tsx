@@ -91,7 +91,7 @@ export function NotificationBell({ notifications = EMPTY, className }: Notificat
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={open}
         className={cn(
-          "relative border bg-gray-2 px-2.5 py-1.5 text-white/60 transition-colors hover:border-brand hover:text-brand",
+          "relative border bg-gray-2 px-2.5 py-1.5 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
           open ? "border-brand text-brand" : "border-gray-3"
         )}
       >
