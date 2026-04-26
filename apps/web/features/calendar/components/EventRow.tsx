@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import type { CalendarEvent } from "@/features/calendar/types";
 import { formatCalendarTime } from "@/features/calendar/lib/format";
 import { IMPACT_LABEL, IMPACT_STYLE } from "@/features/calendar/lib/style";
@@ -45,10 +46,10 @@ export function EventRow({
 
       <div className="flex justify-center">
         <span
-          className={
-            "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 " +
+          className={cn(
+            "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
             IMPACT_STYLE[event.impact]
-          }
+          )}
         >
           {IMPACT_LABEL[event.impact]}
         </span>

@@ -42,14 +42,14 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                 Edge · {closedCount} closed
               </div>
               <div
-                className={
-                  "font-display text-2xl " +
-                  (totalR > 0
+                className={cn(
+                  "font-display text-2xl",
+                  totalR > 0
                     ? "text-moss"
                     : totalR < 0
                     ? "text-blood-bright"
-                    : "text-white/60")
-                }
+                    : "text-white/60"
+                )}
               >
                 {(totalR >= 0 ? "+" : "") + totalR.toFixed(1)}R
               </div>
@@ -117,10 +117,10 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                         {p.id} · {s.id}
                       </span>
                       <span
-                        className={
-                          "font-mono text-[9px] uppercase tracking-widest2 " +
-                          (s.direction === "long" ? "text-moss" : "text-brand")
-                        }
+                        className={cn(
+                          "font-mono text-[9px] uppercase tracking-widest2",
+                          s.direction === "long" ? "text-moss" : "text-brand"
+                        )}
                       >
                         {s.direction}
                       </span>
@@ -159,12 +159,12 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                           {p.id} · {s.id}
                         </span>
                         <span
-                          className={
-                            "font-mono text-[9px] uppercase tracking-widest2 " +
-                            (s.direction === "long"
+                          className={cn(
+                            "font-mono text-[9px] uppercase tracking-widest2",
+                            s.direction === "long"
                               ? "text-moss"
-                              : "text-brand")
-                          }
+                              : "text-brand"
+                          )}
                         >
                           {s.direction}
                         </span>

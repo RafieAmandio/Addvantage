@@ -13,7 +13,7 @@ import {
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { RelatedPlansChips } from "@/features/news/components/RelatedPlansChips";
-import { formatDate, formatTime } from "@/lib/cn";
+import { formatDate, formatTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 interface Props {
@@ -211,12 +211,12 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                       {n.tags.map((t) => (
                         <span
                           key={t}
-                          className={
-                            "font-mono text-[9px] uppercase tracking-widest2 " +
-                            (item.tags.includes(t)
+                          className={cn(
+                            "font-mono text-[9px] uppercase tracking-widest2",
+                            item.tags.includes(t)
                               ? "text-brand"
-                              : "text-white/30")
-                          }
+                              : "text-white/30"
+                          )}
                         >
                           #{t}
                         </span>
@@ -232,10 +232,10 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
         <nav className="mt-10 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3 sm:mt-16">
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
-            className={
-              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (prev ? "" : "pointer-events-none opacity-30")
-            }
+            className={cn(
+              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              !prev && "pointer-events-none opacity-30"
+            )}
           >
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Newer
@@ -246,10 +246,10 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </Link>
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
-            className={
-              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (next ? "" : "pointer-events-none opacity-30")
-            }
+            className={cn(
+              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              !next && "pointer-events-none opacity-30"
+            )}
           >
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Older →

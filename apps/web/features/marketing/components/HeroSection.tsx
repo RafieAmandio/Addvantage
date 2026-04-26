@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import {
   LogoMark,
   TriangleDown,
@@ -83,10 +84,10 @@ export function HeroSection() {
                   <TriangleDown className="h-[10px] w-[15px] text-blood-bright" />
                 )}
                 <span
-                  className={
-                    "font-mono text-base " +
-                    (t.dir === "up" ? "text-brand" : "text-blood-bright")
-                  }
+                  className={cn(
+                    "font-mono text-base",
+                    t.dir === "up" ? "text-brand" : "text-blood-bright"
+                  )}
                 >
                   {t.chg}
                 </span>

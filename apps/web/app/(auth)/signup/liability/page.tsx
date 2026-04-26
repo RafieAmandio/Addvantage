@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { DataLabel } from "@/components/ui/Marker";
+import { cn } from "@/lib/cn";
 import { useAppState } from "@/lib/state";
 
 export default function LiabilityPage() {
@@ -157,14 +158,14 @@ export default function LiabilityPage() {
             value={signature}
             onChange={(e) => setSignature(e.target.value)}
             placeholder="Your full legal name"
-            className={
-              "mt-2 w-full border-b-2 bg-transparent py-3 font-display text-3xl italic outline-none transition-colors " +
-              (signatureError
+            className={cn(
+              "mt-2 w-full border-b-2 bg-transparent py-3 font-display text-3xl italic outline-none transition-colors",
+              signatureError
                 ? "border-blood text-blood-bright"
                 : looksLikeFullName
                 ? "border-moss text-moss"
-                : "border-brand/40 text-brand focus-visible:border-brand")
-            }
+                : "border-brand/40 text-brand focus-visible:border-brand"
+            )}
           />
           {signatureError && (
             <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">

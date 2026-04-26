@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { cn } from "@/lib/cn";
 import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/Button";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
@@ -62,14 +63,14 @@ export function SignupWizard() {
           ].map((s, i) => (
             <div
               key={s.n}
-              className={
-                "flex items-center gap-3 " +
-                (i === step && !state.sent
+              className={cn(
+                "flex items-center gap-3",
+                i === step && !state.sent
                   ? "text-brand"
                   : s.done
                   ? "text-white/70"
-                  : "text-white/30")
-              }
+                  : "text-white/30"
+              )}
             >
               <span>{s.n}</span>
               <span className="h-px flex-1 bg-current opacity-30" />
@@ -163,12 +164,12 @@ export function SignupWizard() {
                       key={opt}
                       type="button"
                       onClick={() => setForm({ ...form, experience: opt })}
-                      className={
-                        "border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                        (form.experience === opt
+                      className={cn(
+                        "border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                        form.experience === opt
                           ? "border-brand bg-brand/10 text-brand"
-                          : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
-                      }
+                          : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white"
+                      )}
                     >
                       {opt}
                     </button>

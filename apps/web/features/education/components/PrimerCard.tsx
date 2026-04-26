@@ -3,6 +3,7 @@
 import { memo } from "react";
 import Link from "next/link";
 import { Highlight } from "@/components/ui/Highlight";
+import { cn } from "@/lib/cn";
 import type { Primer } from "@/features/education/types";
 
 interface PrimerCardProps {
@@ -29,19 +30,19 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
           <Highlight text={p.id} query={query} />
         </div>
         <div
-          className={
-            "font-mono text-[9px] uppercase tracking-widest2 " +
-            (locked ? "text-blood-bright" : "text-moss")
-          }
+          className={cn(
+            "font-mono text-[9px] uppercase tracking-widest2",
+            locked ? "text-blood-bright" : "text-moss"
+          )}
         >
           ● {locked ? "LOCKED" : "OPEN"}
         </div>
       </div>
       <h3
-        className={
-          "mt-6 font-display text-3xl leading-tight transition-colors " +
-          (read && !locked ? "text-white/60" : "text-white")
-        }
+        className={cn(
+          "mt-6 font-display text-3xl leading-tight transition-colors",
+          read && !locked ? "text-white/60" : "text-white"
+        )}
       >
         <Highlight text={p.title} query={query} />
       </h3>

@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
 import {
   PROFITABLE_PERIODS,
@@ -27,12 +28,12 @@ export function StepExperience({ form, setForm }: Props) {
               onClick={() =>
                 setForm({ ...form, tradingLength: opt.value })
               }
-              className={
-                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                (form.tradingLength === opt.value
+              className={cn(
+                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                form.tradingLength === opt.value
                   ? "border-brand bg-brand/10 text-brand"
-                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
-              }
+                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white"
+              )}
             >
               <span className="absolute right-3 top-3 text-[9px] text-white/20">
                 {i + 1}
@@ -55,12 +56,12 @@ export function StepExperience({ form, setForm }: Props) {
               onClick={() =>
                 setForm({ ...form, longestProfitable: opt.value })
               }
-              className={
-                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                (form.longestProfitable === opt.value
+              className={cn(
+                "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                form.longestProfitable === opt.value
                   ? "border-brand bg-brand/10 text-brand"
-                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
-              }
+                  : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white"
+              )}
             >
               <span className="absolute right-3 top-3 text-[9px] text-white/20">
                 {i + 1}

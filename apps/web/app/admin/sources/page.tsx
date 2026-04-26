@@ -1,4 +1,5 @@
 import { listSources } from "@/features/sources/queries/sources";
+import { cn } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -43,10 +44,10 @@ export default async function AdminSourcesPage() {
                   [{s.code}]
                 </div>
                 <div
-                  className={
-                    "mt-1 font-mono text-[9px] uppercase tracking-widest2 " +
-                    (s.enabled ? "text-moss" : "text-white/40")
-                  }
+                  className={cn(
+                    "mt-1 font-mono text-[9px] uppercase tracking-widest2",
+                    s.enabled ? "text-moss" : "text-white/40"
+                  )}
                 >
                   {s.enabled ? "● ENABLED" : "○ DISABLED"}
                 </div>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { SectionNumber } from "@/components/ui/Marker";
+import { cn } from "@/lib/cn";
 import { StepExperience } from "@/features/signup/components/StepExperience";
 import { StepMarketsGoal } from "@/features/signup/components/StepMarketsGoal";
 import { StepPhilosophy } from "@/features/signup/components/StepPhilosophy";
@@ -43,24 +44,24 @@ export default function ProfilePage() {
               disabled={i > step}
             >
               <div
-                className={
-                  "h-2.5 w-2.5 rounded-full transition-all " +
-                  (i === step
+                className={cn(
+                  "h-2.5 w-2.5 rounded-full transition-all",
+                  i === step
                     ? "bg-brand scale-125"
                     : i < step
                     ? "bg-moss"
-                    : "bg-white/20")
-                }
+                    : "bg-white/20"
+                )}
               />
               <span
-                className={
-                  "font-mono text-[9px] uppercase tracking-widest2 " +
-                  (i === step
+                className={cn(
+                  "font-mono text-[9px] uppercase tracking-widest2",
+                  i === step
                     ? "text-brand"
                     : i < step
                     ? "text-white/50"
-                    : "text-white/20")
-                }
+                    : "text-white/20"
+                )}
               >
                 {i + 1}/3
               </span>

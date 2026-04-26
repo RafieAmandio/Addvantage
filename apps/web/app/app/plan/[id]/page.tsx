@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cn } from "@/lib/cn";
 import {
   getPlanById,
   listPublishedPlans,
@@ -79,10 +80,10 @@ export default async function PlanDetailPage({
         <nav className="grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}
-            className={
-              "block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (newer ? "" : "pointer-events-none opacity-30")
-            }
+            className={cn(
+              "block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              !newer && "pointer-events-none opacity-30"
+            )}
           >
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               ← Newer plan
@@ -93,10 +94,10 @@ export default async function PlanDetailPage({
           </Link>
           <Link
             href={older ? `/app/plan/${older.id}` : "/app/plan/archive"}
-            className={
-              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (older ? "" : "pointer-events-none opacity-30")
-            }
+            className={cn(
+              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              !older && "pointer-events-none opacity-30"
+            )}
           >
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Older plan →

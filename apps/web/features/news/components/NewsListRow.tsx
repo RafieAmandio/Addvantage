@@ -8,7 +8,7 @@ import {
   BiasBadge,
 } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
-import { formatTime } from "@/lib/cn";
+import { formatTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 interface NewsListRowProps {
@@ -22,10 +22,10 @@ function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
   return (
     <Link
       href={`/app/news/${item.id}`}
-      className={
-        "group grid grid-cols-12 gap-3 bg-black p-4 transition-all hover:-translate-y-px hover:bg-black-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6 sm:p-6 " +
-        (isSeen ? "opacity-60 hover:opacity-100" : "")
-      }
+      className={cn(
+        "group grid grid-cols-12 gap-3 bg-black p-4 transition-all hover:-translate-y-px hover:bg-black-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6 sm:p-6",
+        isSeen && "opacity-60 hover:opacity-100"
+      )}
     >
       <div className="col-span-12 lg:col-span-2">
         <div className="flex items-center gap-2">
@@ -53,10 +53,10 @@ function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
       </div>
       <div className="col-span-12 lg:col-span-10">
         <h3
-          className={
-            "font-display text-2xl leading-snug transition-colors group-hover:text-brand " +
-            (isSeen ? "text-white/70" : "text-white")
-          }
+          className={cn(
+            "font-display text-2xl leading-snug transition-colors group-hover:text-brand",
+            isSeen ? "text-white/70" : "text-white"
+          )}
         >
           <Highlight text={item.headline} query={query} />
         </h3>

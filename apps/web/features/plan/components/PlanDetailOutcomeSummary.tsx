@@ -1,3 +1,4 @@
+import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
 import type { TradingPlan } from "@/features/plan/types";
 import type { PlanOutcomeDigest } from "@/features/plan/lib/detail-helpers";
@@ -18,14 +19,14 @@ export function PlanDetailOutcomeSummary({
             Total R
           </div>
           <div
-            className={
-              "font-display text-2xl sm:text-4xl " +
-              (outcome.totalR > 0
+            className={cn(
+              "font-display text-2xl sm:text-4xl",
+              outcome.totalR > 0
                 ? "text-moss"
                 : outcome.totalR < 0
                 ? "text-blood-bright"
-                : "text-white/70")
-            }
+                : "text-white/70"
+            )}
           >
             {outcome.totalRLabel}
           </div>

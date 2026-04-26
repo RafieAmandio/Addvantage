@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/cn";
 
 const LINKS = [
   { href: "/admin/review", label: "Review" },
@@ -22,12 +23,12 @@ export function AdminNav() {
           <Link
             key={href}
             href={href}
-            className={
-              "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (active
+            className={cn(
+              "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              active
                 ? "text-brand"
-                : "text-white/60 transition-colors hover:text-brand")
-            }
+                : "text-white/60 transition-colors hover:text-brand"
+            )}
           >
             {label}
           </Link>

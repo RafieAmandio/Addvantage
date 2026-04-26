@@ -55,14 +55,14 @@ export function PlanArchiveStatsStrip({
           Aggregate R · closed
         </div>
         <div
-          className={
-            "mt-1 font-display text-3xl " +
-            (aggregateR > 0
+          className={cn(
+            "mt-1 font-display text-3xl",
+            aggregateR > 0
               ? "text-moss"
               : aggregateR < 0
               ? "text-blood-bright"
-              : "text-white")
-          }
+              : "text-white"
+          )}
         >
           {(aggregateR >= 0 ? "+" : "") + aggregateR.toFixed(1)}R
         </div>

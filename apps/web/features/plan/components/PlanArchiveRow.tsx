@@ -1,9 +1,9 @@
 import { memo } from "react";
 import Link from "next/link";
+import { cn, formatDate } from "@/lib/cn";
 import type { TradingPlan } from "@/features/plan/types";
 import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import { Highlight } from "@/components/ui/Highlight";
-import { formatDate } from "@/lib/cn";
 
 type Props = {
   plan: TradingPlan;
@@ -46,14 +46,14 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
         {outcome && !isLatest && (
           <div className="mt-3 flex items-baseline gap-3 border-t border-gray-3 pt-3">
             <div
-              className={
-                "font-display text-2xl " +
-                (outcome.totalR > 0
+              className={cn(
+                "font-display text-2xl",
+                outcome.totalR > 0
                   ? "text-moss"
                   : outcome.totalR < 0
                   ? "text-blood-bright"
-                  : "text-white/70")
-              }
+                  : "text-white/70"
+              )}
             >
               {outcome.totalRLabel}
             </div>
@@ -82,12 +82,12 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
           {plan.setups.map((s) => (
             <span
               key={s.id}
-              className={
-                "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 " +
-                (s.direction === "long"
+              className={cn(
+                "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
+                s.direction === "long"
                   ? "border-moss/50 text-moss"
-                  : "border-brand/50 text-brand")
-              }
+                  : "border-brand/50 text-brand"
+              )}
             >
               {s.direction === "long" ? "▲" : "▼"}{" "}
               <Highlight text={s.instrument} query={query} />

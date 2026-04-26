@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import { NewsListRow } from "@/features/news/components/NewsListRow";
 import { useToast } from "@/lib/toast";
+import { cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 type Filter = "all" | "high" | "medium" | "low" | "bullish" | "bearish";
@@ -145,12 +146,12 @@ function View({ items }: { items: NewsListItem[] }) {
             </span>
             <button
               onClick={() => setHideSeen((v) => !v)}
-              className={
-                "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                (hideSeen
+              className={cn(
+                "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                hideSeen
                   ? "border-brand bg-brand/10 text-brand"
-                  : "border-gray-3 text-white/60 transition-colors hover:border-brand hover:text-brand")
-              }
+                  : "border-gray-3 text-white/60 transition-colors hover:border-brand hover:text-brand"
+              )}
             >
               {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}
             </button>
@@ -179,12 +180,12 @@ function View({ items }: { items: NewsListItem[] }) {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={
-                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:px-4 sm:py-2 " +
-                  (filter === f
+                className={cn(
+                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:px-4 sm:py-2",
+                  filter === f
                     ? "bg-brand text-black"
-                    : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white")
-                }
+                    : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white"
+                )}
               >
                 {f}
               </button>

@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { cn } from "@/lib/cn";
 import type { PlanMonthGroup } from "@/features/plan/types";
 import { PlanArchiveRow } from "@/features/plan/components/PlanArchiveRow";
 import { monthTotalR } from "@/features/plan/lib/archive-stats";
@@ -29,14 +30,14 @@ function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
           <div className="flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
             <span>Month R ·</span>
             <span
-              className={
-                "font-display text-xl " +
-                (mR > 0
+              className={cn(
+                "font-display text-xl",
+                mR > 0
                   ? "text-moss"
                   : mR < 0
                   ? "text-blood-bright"
-                  : "text-white/70")
-              }
+                  : "text-white/70"
+              )}
             >
               {(mR >= 0 ? "+" : "") + mR.toFixed(1)}R
             </span>

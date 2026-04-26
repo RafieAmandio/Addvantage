@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
 import { FAULT_OPTIONS, type ProfileForm } from "@/features/signup/types";
 
@@ -30,12 +31,12 @@ export function StepPhilosophy({ form, setForm }: Props) {
           <button
             key={opt.value}
             onClick={() => setForm({ ...form, faultAttribution: opt.value })}
-            className={
-              "relative w-full border p-5 text-left transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-              (form.faultAttribution === opt.value
+            className={cn(
+              "relative w-full border p-5 text-left transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              form.faultAttribution === opt.value
                 ? "border-brand bg-brand/10"
-                : "border-gray-3 hover:border-brand/40")
-            }
+                : "border-gray-3 hover:border-brand/40"
+            )}
           >
             <span className="absolute right-4 top-4 font-mono text-[9px] text-white/20">
               {i + 1}

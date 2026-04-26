@@ -1,3 +1,5 @@
+import { cn } from "@/lib/cn";
+
 interface Props {
   pinnedCount: number;
   totalNews: number;
@@ -41,14 +43,14 @@ export function WatchlistStatsStrip({
           Archive R · {totalClosed} closed
         </div>
         <div
-          className={
-            "mt-1 font-display text-3xl " +
-            (aggregateR > 0
+          className={cn(
+            "mt-1 font-display text-3xl",
+            aggregateR > 0
               ? "text-moss"
               : aggregateR < 0
               ? "text-blood-bright"
-              : "text-white/70")
-          }
+              : "text-white/70"
+          )}
         >
           {totalClosed === 0
             ? "—"

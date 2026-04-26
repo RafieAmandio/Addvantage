@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
 import { MARKETS, type ProfileForm } from "@/features/signup/types";
 
@@ -27,24 +28,24 @@ export function StepMarketsGoal({ form, setForm, toggleMarket }: Props) {
               <button
                 key={opt.value}
                 onClick={() => toggleMarket(opt.value)}
-                className={
-                  "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
-                  (selected
+                className={cn(
+                  "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                  selected
                     ? "border-brand bg-brand/10 text-brand"
-                    : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white")
-                }
+                    : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white"
+                )}
               >
                 <span className="absolute right-3 top-3 text-[9px] text-white/20">
                   {i + 1}
                 </span>
                 <span className="flex items-center gap-2">
                   <span
-                    className={
-                      "flex h-4 w-4 items-center justify-center border text-[10px] " +
-                      (selected
+                    className={cn(
+                      "flex h-4 w-4 items-center justify-center border text-[10px]",
+                      selected
                         ? "border-brand bg-brand text-black"
-                        : "border-white/30")
-                    }
+                        : "border-white/30"
+                    )}
                   >
                     {selected && "✓"}
                   </span>

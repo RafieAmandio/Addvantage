@@ -52,16 +52,16 @@ export function PlanArchiveHorizonPanel({
             ALL
           </div>
           <div
-            className={
-              "mt-1 font-display text-2xl " +
-              (allClosedCount === 0
+            className={cn(
+              "mt-1 font-display text-2xl",
+              allClosedCount === 0
                 ? "text-white/30"
                 : aggregateR > 0
                 ? "text-moss"
                 : aggregateR < 0
                 ? "text-blood-bright"
-                : "text-white/70")
-            }
+                : "text-white/70"
+            )}
           >
             {allClosedCount === 0
               ? "—"
@@ -92,16 +92,16 @@ export function PlanArchiveHorizonPanel({
                 {h}
               </div>
               <div
-                className={
-                  "mt-1 font-display text-2xl " +
-                  (noData
+                className={cn(
+                  "mt-1 font-display text-2xl",
+                  noData
                     ? "text-white/30"
                     : data.r > 0
                     ? "text-moss"
                     : data.r < 0
                     ? "text-blood-bright"
-                    : "text-white/70")
-                }
+                    : "text-white/70"
+                )}
               >
                 {noData
                   ? "—"

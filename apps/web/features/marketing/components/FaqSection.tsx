@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/features/marketing/components/icons";
 import { faq } from "@/features/marketing/lib/data";
+import { cn } from "@/lib/cn";
 
 export function FaqSection() {
   return (
@@ -31,10 +32,10 @@ export function FaqSection() {
             {faq.map((f, i) => (
               <div
                 key={f.q}
-                className={
-                  "flex flex-col gap-2 p-12" +
-                  (i < faq.length - 1 ? " border-b border-white" : "")
-                }
+                className={cn(
+                  "flex flex-col gap-2 p-12",
+                  i < faq.length - 1 && "border-b border-white"
+                )}
               >
                 <p className="font-mono text-base font-light leading-[1.4] text-white">
                   Reason {String(i + 1).padStart(2, "0")}

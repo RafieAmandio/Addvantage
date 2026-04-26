@@ -1,5 +1,6 @@
 import { SectionHeader } from "@/features/marketing/components/icons";
 import { pillars } from "@/features/marketing/lib/data";
+import { cn } from "@/lib/cn";
 
 export function TransmissionsSection() {
   return (
@@ -20,10 +21,10 @@ export function TransmissionsSection() {
                 <div className="flex items-center justify-between font-mono text-base">
                   <span className="font-light text-white">{p.code}</span>
                   <span
-                    className={
-                      "font-bold " +
-                      (p.locked ? "text-blood-bright" : "text-brand")
-                    }
+                    className={cn(
+                      "font-bold",
+                      p.locked ? "text-blood-bright" : "text-brand"
+                    )}
                   >
                     {p.locked ? "Locked" : "Free"}
                   </span>

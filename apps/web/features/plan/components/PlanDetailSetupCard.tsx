@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { DataLabel, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { useToast } from "@/lib/toast";
@@ -93,10 +94,10 @@ export function PlanDetailSetupCard({
         </span>
         <div className="flex items-center gap-2 pr-24">
           <span
-            className={
-              "inline-flex items-center gap-1 border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 " +
+            className={cn(
+              "inline-flex items-center gap-1 border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
               meta.style
-            }
+            )}
           >
             <span className={`h-1.5 w-1.5 ${meta.dot}`} />
             {meta.label}
@@ -111,10 +112,10 @@ export function PlanDetailSetupCard({
         <h3 className="font-display text-3xl text-white">{s.instrument}</h3>
         <WatchPin ticker={s.instrument} size="md" />
         <span
-          className={
-            "font-mono text-sm uppercase tracking-widest2 " +
-            (s.direction === "long" ? "text-moss" : "text-brand")
-          }
+          className={cn(
+            "font-mono text-sm uppercase tracking-widest2",
+            s.direction === "long" ? "text-moss" : "text-brand"
+          )}
         >
           {s.direction}
         </span>
@@ -154,9 +155,10 @@ export function PlanDetailSetupCard({
           {[1, 2, 3, 4, 5].map((i) => (
             <span
               key={i}
-              className={
-                "h-2 w-4 " + (i <= s.confidence ? "bg-brand" : "bg-gray-3")
-              }
+              className={cn(
+                "h-2 w-4",
+                i <= s.confidence ? "bg-brand" : "bg-gray-3"
+              )}
             />
           ))}
         </div>
@@ -165,14 +167,14 @@ export function PlanDetailSetupCard({
       {s.outcomeNotes && (
         <div className="mt-4 border-t border-gray-3 pt-3">
           <div
-            className={
-              "font-mono text-[9px] uppercase tracking-widest2 " +
-              (status === "win"
+            className={cn(
+              "font-mono text-[9px] uppercase tracking-widest2",
+              status === "win"
                 ? "text-moss"
                 : status === "loss" || status === "stopped"
                 ? "text-blood-bright"
-                : "text-white/60")
-            }
+                : "text-white/60"
+            )}
           >
             Outcome · {meta.label}
           </div>
@@ -194,9 +196,10 @@ function Field({
 }) {
   return (
     <div
-      className={
-        "border-l-2 pl-3 " + (highlight ? "border-blood" : "border-white/20")
-      }
+      className={cn(
+        "border-l-2 pl-3",
+        highlight ? "border-blood" : "border-white/20"
+      )}
     >
       <DataLabel>{label}</DataLabel>
       <div className="font-mono text-white">{children}</div>
