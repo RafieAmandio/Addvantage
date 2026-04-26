@@ -39,7 +39,7 @@ export default function ProfilePage() {
             <button
               key={i}
               onClick={() => goToStep(i)}
-              className="group flex items-center gap-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="group flex items-center gap-2 hover:opacity-80 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               disabled={i > step}
             >
               <div
