@@ -3,11 +3,6 @@
 import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
 
-/**
- * The page-wide title band above the consult workspace. Reads session state
- * from a single `paid` flag and renders the "SESSION OPEN" / "ACCESS DENIED"
- * status pill on the right.
- */
 export function ConsultHeroHeader({
   paid,
   className,

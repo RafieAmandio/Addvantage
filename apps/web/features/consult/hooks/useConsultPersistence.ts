@@ -11,27 +11,12 @@ import { useToast } from "@/lib/toast";
 import type { ConsultMessage } from "@/lib/mock/types";
 
 export interface InitialConsultData {
-  /**
-   * Supabase-backed sessions for the current user, newest-first. Seeded
-   * from `listConsultSessions()` at the page/server boundary.
-   */
   sessions: LocalSession[];
-  /**
-   * Optionally pre-populated messages for one or more sessions (typically
-   * just the active one resolved from `?sq=`). Keyed by session id.
-   */
   extras: Record<string, ConsultMessage[]>;
 }
 
 const EMPTY_INITIAL: InitialConsultData = { sessions: [], extras: {} };
 
-/**
- * Hydrates + persists consult sessions. Supabase is the source of truth
- * when the user is authenticated; localStorage acts as an offline cache +
- * a soft fallback. The hook merges server-seeded sessions with any
- * locally-cached ones on mount, giving precedence to Supabase rows (they
- * are the canonical record).
- */
 export function useConsultPersistence(
   initial: InitialConsultData = EMPTY_INITIAL
 ) {
@@ -47,14 +32,12 @@ export function useConsultPersistence(
   );
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount — merged with server-seeded state.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(CONSULT_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedConsult;
 
-        // Merge sessions: Supabase rows win, local-only fills in the tail.
         if (Array.isArray(parsed.sessions)) {
           setLocalSessions((prev) => {
             const seen = new Set(prev.map((s) => s.id));
@@ -109,7 +92,6 @@ export function useConsultPersistence(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Persist on any change, after hydration
   useEffect(() => {
     if (!hydrated) return;
     try {

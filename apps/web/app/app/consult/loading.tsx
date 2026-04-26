@@ -6,7 +6,6 @@ export default function ConsultLoading() {
         <div className="h-4 w-32 rounded bg-gray-2" />
       </div>
       <div className="flex-1 px-4 sm:px-6 py-8 space-y-6 max-w-3xl w-full mx-auto animate-pulse">
-        {/* AI message */}
         <div className="flex gap-3">
           <div className="h-6 w-6 rounded-full bg-gray-2 shrink-0" />
           <div className="space-y-2 flex-1">
@@ -14,7 +13,6 @@ export default function ConsultLoading() {
             <div className="h-4 w-1/2 rounded bg-gray-2" />
           </div>
         </div>
-        {/* User message */}
         <div className="flex gap-3 justify-end">
           <div className="space-y-2 max-w-sm">
             <div className="h-4 w-48 rounded bg-gray-2" />

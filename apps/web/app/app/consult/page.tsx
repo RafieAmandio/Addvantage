@@ -10,12 +10,6 @@ import type { ConsultMessage } from "@/lib/mock/types";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Maps a `consult_messages` row to the in-app `ConsultMessage` shape used
- * by the chat UI. DB role 'assistant' is surfaced as 'ai' to match the
- * existing client type; tags are empty because the DB schema doesn't yet
- * store them (canned-reply tags are re-derived client-side).
- */
 function rowToMessage(row: {
   id: string;
   role: string;
@@ -36,9 +30,6 @@ export default async function ConsultPage({
 }: {
   searchParams?: { sq?: string };
 }) {
-  // Pull the user's sessions (newest-first) from Supabase. RLS gates to the
-  // authenticated user; `/app/*` is already auth-guarded by middleware so
-  // this is safe. Returns [] on any error — UI degrades to localStorage.
   const rows = await listConsultSessions(50);
 
   const sessions: LocalSession[] = rows.map((r) => ({
@@ -50,9 +41,6 @@ export default async function ConsultPage({
     messages: [],
   }));
 
-  // Pre-fetch messages for the session hinted at by `?sq=` (if any — the
-  // search param doubles as both filter query and "activate this session").
-  // Other sessions load on demand via the client mutation flow.
   const activeId = searchParams?.sq;
   const extras: Record<string, ConsultMessage[]> = {};
   if (activeId && rows.some((r) => r.id === activeId)) {

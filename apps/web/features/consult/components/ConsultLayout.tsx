@@ -9,11 +9,6 @@ import { Bubble } from "@/features/consult/components/Bubble";
 import { TypingIndicator } from "@/features/consult/components/TypingIndicator";
 import { ScrollableConversation } from "@/features/consult/components/ScrollableConversation";
 
-/**
- * Formats a session id for the sidebar header / conversation header. Mock /
- * desk session ids (e.g. `CS-014`) are short — show as-is. Supabase UUIDs
- * are shown as the short prefix `CS-LOC-xxxx` so the sidebar stays compact.
- */
 function shortSessionCode(id: string): string {
   if (id.length <= 10) return id;
   return `CS-LOC-${id.slice(0, 4).toUpperCase()}`;
@@ -58,13 +53,11 @@ export function ConsultLayout({
   onRenameSession: (id: string, newTitle: string) => void;
   onDeleteSession: (id: string, title: string) => void;
   onExportSession: () => void;
-  /** Returns true for user-owned sessions (editable); false for mock/desk. */
   isLocalSession: (id: string) => boolean;
 }) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   return (
     <div className="grid grid-cols-12 gap-4">
-      {/* Sessions sidebar */}
       <aside className="col-span-12 lg:col-span-3">
         <div className="flex items-center justify-between">
           <SectionNumber
@@ -209,7 +202,6 @@ export function ConsultLayout({
         </div>
       </aside>
 
-      {/* Conversation */}
       <section className="col-span-12 flex h-[75vh] flex-col border border-gray-3 lg:col-span-9">
         <div className="border-b border-gray-3 bg-gray-2/40 px-5 py-3">
           <div className="flex items-start justify-between gap-3">

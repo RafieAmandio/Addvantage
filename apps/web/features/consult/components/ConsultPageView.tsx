@@ -21,11 +21,6 @@ import type { ConsultSession } from "@/lib/mock/types";
 export function ConsultPageView({
   initialData,
 }: {
-  /**
-   * Server-fetched initial snapshot from Supabase. When omitted (tests,
-   * storybook) the component falls back to an empty seed and the user-owned
-   * session list is discovered purely from localStorage.
-   */
   initialData?: InitialConsultData;
 }) {
   const { tier } = useAppState();
@@ -44,7 +39,6 @@ export function ConsultPageView({
   const modeHint = useConsultKeyboard();
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Combined session list for the sidebar: local first (newest), then mocks.
   const allSessions: ConsultSession[] = useMemo(
     () => [
       ...localSessions.map((s) => ({
@@ -90,12 +84,10 @@ export function ConsultPageView({
     setLocalSessions,
   });
 
-  // Instant snap to bottom on session swap (before paint, no race)
   useLayoutEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeId]);
 
-  // Smooth scroll for new messages and typing indicator in active session
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [extras, typing]);
@@ -123,7 +115,7 @@ export function ConsultPageView({
   };
 
   return (
-    <div className="relative">
+    <div className="stagger relative">
       <ConsultModeHint modeHint={modeHint} />
       <ConfirmDialog
         open={pendingDelete !== null}
