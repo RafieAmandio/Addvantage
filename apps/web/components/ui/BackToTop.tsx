@@ -31,7 +31,7 @@ export function BackToTop({
         visible
           ? "opacity-100 translate-y-0"
           : "pointer-events-none opacity-0 translate-y-2",
-        "hover:bg-brand hover:text-black"
+        "hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
       )}
     >
       <span aria-hidden>↑</span>

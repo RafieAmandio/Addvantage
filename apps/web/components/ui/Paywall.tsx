@@ -25,10 +25,10 @@ export function PaywallOverlay({
             "This surface is restricted to VIP+ Trader tier. Upgrade to access."}
         </p>
         <div className="mt-6 flex gap-3">
-          <Link href="/app/subscription">
+          <Link href="/app/subscription" className="focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
             <Button size="md">Upgrade access →</Button>
           </Link>
-          <Link href="/app">
+          <Link href="/app" className="focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
             <Button variant="outline" size="md">
               ← Return to brief
             </Button>

@@ -17,7 +17,7 @@ export function Breadcrumbs({
             {it.href && !isLast ? (
               <Link
                 href={it.href}
-                className="text-white/60 transition-colors hover:text-brand"
+                className="text-white/60 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {it.label}
               </Link>

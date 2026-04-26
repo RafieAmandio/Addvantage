@@ -184,7 +184,7 @@ function ToastCard({
                 toast.action!.onClick();
                 onDismiss();
               }}
-              className="mt-2 border border-brand/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="mt-2 border border-brand/60 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               {toast.action.label}
             </button>
@@ -193,7 +193,7 @@ function ToastCard({
         <button
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           ✕
         </button>

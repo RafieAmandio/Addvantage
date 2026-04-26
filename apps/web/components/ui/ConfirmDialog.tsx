@@ -87,14 +87,14 @@ export function ConfirmDialog({
         <div className="flex items-center justify-between gap-3 p-5">
           <button
             onClick={onCancel}
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
+            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {cancelLabel} · esc
           </button>
           <button
             onClick={onConfirm}
             className={cn(
-              "border px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
+              "border px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               destructive
                 ? "border-blood bg-blood/10 text-blood-text hover:bg-blood hover:text-white"
                 : "border-brand bg-brand text-black hover:bg-brand-dim hover:text-white"
