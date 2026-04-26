@@ -23,7 +23,7 @@ function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
     <Link
       href={`/app/news/${item.id}`}
       className={
-        "group grid grid-cols-12 gap-3 bg-black p-4 transition-all hover:-translate-y-px hover:bg-black-2 sm:gap-6 sm:p-6 " +
+        "group grid grid-cols-12 gap-3 bg-black p-4 transition-all hover:-translate-y-px hover:bg-black-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6 sm:p-6 " +
         (isSeen ? "opacity-60 hover:opacity-100" : "")
       }
     >

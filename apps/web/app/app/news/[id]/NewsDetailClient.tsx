@@ -171,7 +171,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   #{t}
                 </Link>
@@ -194,7 +194,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                   <Link
                     key={n.id}
                     href={`/app/news/${n.id}`}
-                    className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
+                    className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -233,7 +233,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={
-              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 " +
+              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -247,7 +247,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
             className={
-              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >

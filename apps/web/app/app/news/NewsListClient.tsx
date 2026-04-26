@@ -146,7 +146,7 @@ function View({ items }: { items: NewsListItem[] }) {
             <button
               onClick={() => setHideSeen((v) => !v)}
               className={
-                "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
+                "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
                 (hideSeen
                   ? "border-brand bg-brand/10 text-brand"
                   : "border-gray-3 text-white/60 hover:border-brand hover:text-brand")
@@ -156,7 +156,7 @@ function View({ items }: { items: NewsListItem[] }) {
             </button>
             <button
               onClick={() => setConfirmingResetSeen(true)}
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ↶ Reset seen
             </button>
@@ -180,7 +180,7 @@ function View({ items }: { items: NewsListItem[] }) {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={
-                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors sm:px-4 sm:py-2 " +
+                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:px-4 sm:py-2 " +
                   (filter === f
                     ? "bg-brand text-black"
                     : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white")
