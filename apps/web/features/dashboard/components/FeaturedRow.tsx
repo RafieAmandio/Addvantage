@@ -57,7 +57,7 @@ export function FeaturedRow({
                     key={n.id}
                     href={`/app/news/${n.id}`}
                     className={cn(
-                      "group block bg-black p-5 transition-colors hover:bg-gray-2",
+                      "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2",
                       seen && "opacity-60 hover:opacity-100"
                     )}
                   >

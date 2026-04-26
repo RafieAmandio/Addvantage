@@ -80,44 +80,44 @@ export default function HomePage() {
   return (
     <div className="bg-grid">
       <div className="stagger">
-      <DashboardHero
-        stamp={stamp}
-        greet={greet}
-        operatorName={operatorName}
-        paid={paid}
-        isMac={isMac}
-        highImpactToday={highImpactToday}
-        openSetups={openSetups}
-        highCalendar={highCalendar}
-      />
-
-      <PillarShortcuts paid={paid} />
-
-      {watchHydrated && tickers.length > 0 && (
-        <WatchlistSection
-          tickers={tickers}
-          watchNewsMentions={watchNewsMentions}
-          watchSetupMentions={watchSetupMentions}
-          watchArchiveSetups={watchArchiveSetups}
-          planId={plan.id}
+        <DashboardHero
+          stamp={stamp}
+          greet={greet}
+          operatorName={operatorName}
+          paid={paid}
+          isMac={isMac}
+          highImpactToday={highImpactToday}
+          openSetups={openSetups}
+          highCalendar={highCalendar}
         />
-      )}
 
-      <FeaturedRow
-        topNews={topNews}
-        seenNewsIds={seenNewsIds}
-        seenHydrated={seenHydrated}
-        plan={plan}
-        paid={paid}
-        upcoming={upcoming}
-      />
+        <PillarShortcuts paid={paid} />
 
-      <DiscoveryRow
-        featuredPrimer={featuredPrimer}
-        recentSession={recentSession}
-        paid={paid}
-        channelTop={channelTop}
-      />
+        {watchHydrated && tickers.length > 0 && (
+          <WatchlistSection
+            tickers={tickers}
+            watchNewsMentions={watchNewsMentions}
+            watchSetupMentions={watchSetupMentions}
+            watchArchiveSetups={watchArchiveSetups}
+            planId={plan.id}
+          />
+        )}
+
+        <FeaturedRow
+          topNews={topNews}
+          seenNewsIds={seenNewsIds}
+          seenHydrated={seenHydrated}
+          plan={plan}
+          paid={paid}
+          upcoming={upcoming}
+        />
+
+        <DiscoveryRow
+          featuredPrimer={featuredPrimer}
+          recentSession={recentSession}
+          paid={paid}
+          channelTop={channelTop}
+        />
       </div>
 
       {/* ─── FOOTER NOTE ─── */}

@@ -34,7 +34,7 @@ export function DiscoveryRow({
             <SectionHeader n="03 /" label="Primer of the day" />
             <Link
               href={`/app/education/${featuredPrimer.id}`}
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-all hover:-translate-y-px hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {featuredPrimer.id} · {featuredPrimer.readingMin} min
@@ -59,7 +59,7 @@ export function DiscoveryRow({
             <SectionHeader n="04 /" label="Last consultation" />
             <Link
               href="/app/consult"
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-all hover:-translate-y-px hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {recentSession.id} · {recentSession.messages.length} messages
@@ -99,7 +99,7 @@ export function DiscoveryRow({
             </SectionHeader>
             <Link
               href="/app/channel"
-              className="mt-4 block border border-gray-3 bg-black p-6 transition-colors hover:border-brand/40 hover:bg-gray-2"
+              className="mt-4 block border border-gray-3 bg-black p-6 transition-all hover:-translate-y-px hover:border-brand/40 hover:bg-gray-2"
             >
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 {channelTop.id} · BY {channelTop.author.toUpperCase()}

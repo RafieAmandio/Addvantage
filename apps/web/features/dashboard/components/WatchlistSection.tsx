@@ -75,7 +75,7 @@ export function WatchlistSection({
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group block bg-black p-4 transition-colors hover:bg-gray-2"
+                      className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -117,7 +117,7 @@ export function WatchlistSection({
                   <Link
                     key={s.id}
                     href={`/app/plan/${planId}#${s.id}`}
-                    className="group block bg-black p-4 transition-colors hover:bg-gray-2"
+                    className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -153,7 +153,7 @@ export function WatchlistSection({
                       <Link
                         key={`${p.id}-${s.id}`}
                         href={`/app/plan/${p.id}#${s.id}`}
-                        className="group block bg-black p-3 transition-colors hover:bg-gray-2"
+                        className="group block bg-black p-3 transition-all hover:-translate-y-px hover:bg-gray-2"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0 flex-1">
