@@ -24,20 +24,12 @@ import {
 } from "@/features/plan/components/PlanCompareEmpty";
 
 export interface PlanCompareViewProps {
-  /** All plans available in the picker list (newest-first). */
   allPlans: TradingPlan[];
-  /** The latest (most-recently published) plan, used to badge the "latest" row in the picker. */
   latest: TradingPlan | null;
-  /** Adapted plan for query param `?a=`, if found. */
   planA: TradingPlan | null;
-  /** Adapted plan for query param `?b=`, if found. */
   planB: TradingPlan | null;
 }
 
-/**
- * Client island for `/app/plan/compare`. Receives already-adapted plans
- * from the server shell; owns URL-param state and picker interactions.
- */
 export function PlanCompareView(props: PlanCompareViewProps) {
   return (
     <Suspense
@@ -68,8 +60,6 @@ function PlanCompareViewInner({
 
   useUrlSyncedState({ a, b });
 
-  // Prefer the server-fetched + adapted plans (covers cases where a plan is
-  // outside the in-memory `allPlans` picker window). Fall back to picker list.
   const resolvePlan = (id: string | null): TradingPlan | null => {
     if (!id) return null;
     if (initialA && initialA.id === id) return initialA;
@@ -93,7 +83,7 @@ function PlanCompareViewInner({
   const latestForPicker = latest ?? allPlans[0] ?? null;
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <PlanCompareHero />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">

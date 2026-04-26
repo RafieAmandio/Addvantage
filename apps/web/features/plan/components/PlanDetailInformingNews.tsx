@@ -3,11 +3,6 @@ import { SectionNumber, ImpactPill } from "@/components/ui/Marker";
 import { formatTime } from "@/lib/cn";
 import type { NewsItem } from "@/lib/mock/types";
 
-/**
- * "Informed by" rail on the plan detail page — news items that directly cite
- * this plan via `relatedPlanIds`. Distinct from `NewsMentioningPlan` which is
- * rendered by the route, not by `PlanDetail`.
- */
 export function PlanDetailInformingNews({
   news,
   sectionNumber,

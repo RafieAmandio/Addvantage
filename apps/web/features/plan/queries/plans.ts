@@ -5,11 +5,6 @@ import { PlanRowSchema, type Plan } from "@/features/plan/types";
 import { isMockMode } from "@/lib/config/public";
 import { mockPublishedPlans, mockPlanById } from "@/lib/mock/fixtures";
 
-/**
- * Explicit SELECT column list for `trading_plans`. Never use `select('*')` —
- * a schema drift would otherwise silently poison the view. Keep aligned with
- * `PlanRowSchema` in `features/plan/types.ts`.
- */
 const PLAN_COLUMNS =
   "id,symbol,thesis,direction,entry,stop,target,r_multiple,setups,tags,tier,status,outcome,close_price,realized_r,author_id,created_at,updated_at,published_at,closed_at";
 
@@ -20,11 +15,6 @@ export interface ListPublishedPlansInput {
   symbol?: string;
 }
 
-/**
- * Public plan feed: `status='published'`, newest first. RLS already restricts
- * non-admins to published rows; the explicit `.eq` is kept for intent + to
- * exclude drafts/closed when an admin hits this function.
- */
 export async function listPublishedPlans(
   input: ListPublishedPlansInput = {},
 ): Promise<Plan[]> {
@@ -64,10 +54,6 @@ export async function listPublishedPlans(
   return parsed.data;
 }
 
-/**
- * Single plan by id. Returns null on miss or parse failure. Admins see any
- * status (RLS); non-admins only see `published` rows (policy in 0021).
- */
 export async function getPlanById(id: string): Promise<Plan | null> {
   if (isMockMode()) return mockPlanById(id);
   const supabase = supabaseServer();
@@ -97,11 +83,6 @@ export async function getPlanById(id: string): Promise<Plan | null> {
   return parsed.data;
 }
 
-/**
- * Admin-only: every plan across all authors and statuses, newest-updated
- * first. RLS permits admins to SELECT all rows via `is_admin()`. Used by the
- * `/admin/plans` list view (P3).
- */
 export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
   await requireAdmin();
   const supabase = supabaseServer();
@@ -132,12 +113,6 @@ export interface ListMyDraftPlansInput {
   limit?: number;
 }
 
-/**
- * Admin-only: drafts + closed plans authored by the current admin user.
- * Calls `requireAdmin()` up front so non-admins throw `Forbidden` before any
- * DB round-trip. Used by the authoring UI (P3) — `published` plans are
- * excluded because those are owned by the public feed route.
- */
 export async function listMyDraftPlans(
   input: ListMyDraftPlansInput = {},
 ): Promise<Plan[]> {

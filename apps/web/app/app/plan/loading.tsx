@@ -1,7 +1,7 @@
 export default function PlanLoading() {
   return (
     <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8 animate-pulse space-y-2">
           <div className="h-3 w-24 rounded bg-gray-2" />
           <div className="h-10 w-40 rounded bg-gray-2" />

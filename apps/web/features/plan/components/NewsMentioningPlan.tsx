@@ -7,11 +7,6 @@ interface Props {
   className?: string;
 }
 
-/**
- * Server-rendered rail of approved news items whose `related_plan_ids`
- * contain this plan's id. Renders nothing when empty — the column is
- * currently unpopulated; admin tooling to set it is a future tick.
- */
 export async function NewsMentioningPlan({ planId, className }: Props) {
   const rows = await getNewsForPlan(planId);
   if (rows.length === 0) return null;

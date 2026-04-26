@@ -4,11 +4,6 @@ import type { computePlanOutcome } from "@/features/plan/mock";
 
 type PlanOutcome = NonNullable<ReturnType<typeof computePlanOutcome>>;
 
-/**
- * Plan-level outcome strip (total R, wins/losses/flat/skipped). Only renders
- * when the plan has closed setups — gating is done by the caller. Extracted
- * from `PlanDetail.tsx`.
- */
 export function PlanDetailOutcomeSummary({
   outcome,
   plan,

@@ -232,10 +232,6 @@ export const tradingPlans: TradingPlan[] = [
   },
 ];
 
-/**
- * Compute a simple outcome summary for a plan: counts + total R.
- * Ignores live/open setups. Returns null if no closed setups.
- */
 export function computePlanOutcome(plan: TradingPlan) {
   const closed = plan.setups.filter(
     (s) => s.outcome && s.outcome !== "live" && s.outcome !== "open"
@@ -269,12 +265,10 @@ export function computePlanOutcome(plan: TradingPlan) {
   };
 }
 
-/** Returns the most recent trading plan (first in the array). */
 export function getLatestPlan(): TradingPlan {
   return tradingPlans[0];
 }
 
-/** Returns all past plans sorted newest-first. */
 export function getAllPlans(): TradingPlan[] {
   return [...tradingPlans].sort((a, b) => b.date.localeCompare(a.date));
 }

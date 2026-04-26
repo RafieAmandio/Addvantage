@@ -32,10 +32,6 @@ export interface PlanArchiveViewProps {
   latest: TradingPlan | null;
 }
 
-/**
- * Client island for `/app/plan/archive`. Receives already-adapted plans
- * from the server shell; owns URL-param filter state + clipboard export.
- */
 export function PlanArchiveView(props: PlanArchiveViewProps) {
   return (
     <Suspense
@@ -106,7 +102,7 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
   };
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <BackToTop />
       <PlanArchiveHeader onExportDigest={exportDigest} />
 

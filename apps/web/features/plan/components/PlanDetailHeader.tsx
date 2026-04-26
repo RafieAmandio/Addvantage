@@ -6,10 +6,6 @@ import { useToast } from "@/lib/toast";
 import type { TradingPlan } from "@/lib/mock/types";
 import { planToMarkdown } from "@/features/plan/lib/detail-helpers";
 
-/**
- * Top banner for `PlanDetail` — breadcrumbs, title, access indicator, and
- * the "export markdown" action (paid only). Extracted from `PlanDetail.tsx`.
- */
 export function PlanDetailHeader({
   plan,
   paid,

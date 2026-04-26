@@ -6,22 +6,12 @@ import { SectionNumber } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { formatDate } from "@/lib/cn";
 import { computePlanOutcome } from "@/features/plan/mock";
-import { news } from "@/features/news/mock";
 import type { TradingPlan } from "@/lib/mock/types";
 import { PlanDetailHeader } from "@/features/plan/components/PlanDetailHeader";
 import { PlanDetailOutcomeSummary } from "@/features/plan/components/PlanDetailOutcomeSummary";
 import { PlanDetailSetupCard } from "@/features/plan/components/PlanDetailSetupCard";
-import { PlanDetailInformingNews } from "@/features/plan/components/PlanDetailInformingNews";
 import { PlanDetailRisks } from "@/features/plan/components/PlanDetailRisks";
 
-/**
- * Shared renderer for a single trading plan. Used by /app/plan (latest),
- * /app/plan/[id] (archive detail), and anywhere else a plan needs to show
- * with paywall gating, thesis, setups, and risks.
- *
- * Composition-only — all chunks live in sibling `PlanDetail<X>.tsx` files
- * and pure helpers in `features/plan/lib/detail-helpers.ts`.
- */
 export function PlanDetail({
   plan,
   headerExtra,
@@ -37,12 +27,7 @@ export function PlanDetail({
   const paid = isPaid(tier);
   const outcome = computePlanOutcome(plan);
 
-  // News items that directly cite this plan via relatedPlanIds
-  const informingNews = news.filter((n) =>
-    n.relatedPlanIds?.includes(plan.id)
-  );
-
-  // Scroll to hash on mount and on popstate (back/forward navigation)
+  // Scroll to hash on mount and on popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -78,10 +63,9 @@ export function PlanDetail({
   }, [plan.id]);
 
   const showOutcome = outcome && !isLatest;
-  const risksSectionNumber = informingNews.length > 0 ? "04 /" : "03 /";
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <PlanDetailHeader
         plan={plan}
         paid={paid}
@@ -101,7 +85,6 @@ export function PlanDetail({
         <div
           className={!paid ? "pointer-events-none select-none blur-sm" : ""}
         >
-          {/* Thesis */}
           <section>
             <SectionNumber n="01 /" label="DIRECTIONAL THESIS" />
             <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
@@ -111,12 +94,10 @@ export function PlanDetail({
             </div>
           </section>
 
-          {/* Plan outcome summary — only for archived plans with closed setups */}
           {showOutcome && outcome && (
             <PlanDetailOutcomeSummary outcome={outcome} plan={plan} />
           )}
 
-          {/* Setups */}
           <section className="mt-12">
             <SectionNumber
               n="02 /"
@@ -134,18 +115,9 @@ export function PlanDetail({
             </div>
           </section>
 
-          {/* Informed by — news articles that cite this plan */}
-          {informingNews.length > 0 && (
-            <PlanDetailInformingNews
-              news={informingNews}
-              sectionNumber="03 /"
-            />
-          )}
-
-          {/* Risks */}
           <PlanDetailRisks
             risks={plan.risks}
-            sectionNumber={risksSectionNumber}
+            sectionNumber="03 /"
           />
 
           <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-white/40">

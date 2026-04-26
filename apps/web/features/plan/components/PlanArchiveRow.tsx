@@ -19,9 +19,8 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
   return (
     <Link
       href={`/app/plan/${plan.id}`}
-      className="group grid grid-cols-12 gap-6 bg-black p-6 transition-colors hover:bg-gray-2"
+      className="group grid grid-cols-12 gap-6 bg-black p-6 transition-all hover:-translate-y-px hover:bg-gray-2"
     >
-      {/* Meta column */}
       <div className="col-span-12 lg:col-span-3">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -72,7 +71,6 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
         )}
       </div>
 
-      {/* Thesis column */}
       <div className="col-span-12 lg:col-span-9">
         <p
           className="line-clamp-3 font-display text-lg leading-relaxed text-white/85 transition-colors group-hover:text-white"

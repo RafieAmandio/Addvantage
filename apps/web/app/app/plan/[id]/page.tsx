@@ -28,8 +28,6 @@ export default async function PlanDetailPage({
   const latestId = all[0]?.id ?? plan.id;
   const isLatest = plan.id === latestId;
   const idx = all.findIndex((p) => p.id === plan.id);
-  // If the requested plan isn't in the recent list (e.g. older than the
-  // 100-row window), leave sibling keys disabled — still fall back to first/last.
   const newer = idx > 0 ? all[idx - 1] : null;
   const older = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
   const firstId = all[0]?.id ?? plan.id;
@@ -82,7 +80,7 @@ export default async function PlanDetailPage({
           <Link
             href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}
             className={
-              "block text-black p-4 transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 transition-colors hover:bg-gray-2 " +
               (newer ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -96,7 +94,7 @@ export default async function PlanDetailPage({
           <Link
             href={older ? `/app/plan/${older.id}` : "/app/plan/archive"}
             className={
-              "block text-black p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 " +
               (older ? "" : "pointer-events-none opacity-30")
             }
           >
