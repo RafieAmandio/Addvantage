@@ -90,7 +90,7 @@ function View({ items }: { items: NewsListItem[] }) {
   );
 
   return (
-    <div className="bg-grid-fine">
+    <div className="bg-grid-fine stagger">
       <BackToTop />
       <ConfirmDialog
         open={confirmingResetSeen}

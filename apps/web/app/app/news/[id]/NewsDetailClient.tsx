@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { isMockMode } from "@/lib/config/public";
 import { primers } from "@/features/education/mock";
 import { channelPosts } from "@/features/channel/mock";
-import { getPlanById } from "@/features/plan/mock";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
   DataLabel,
@@ -78,13 +78,18 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
     .slice(0, 4)
     .map((x) => x.n);
 
-  const relatedPrimers = primers
-    .filter((p) => p.tags.some((t) => item.tags.includes(t as (typeof p.tags)[number])))
-    .slice(0, 2);
+  const mock = isMockMode();
+  const relatedPrimers = mock
+    ? primers
+        .filter((p) => p.tags.some((t) => item.tags.includes(t as (typeof p.tags)[number])))
+        .slice(0, 2)
+    : [];
 
-  const relatedChannel = channelPosts
-    .filter((c) => c.tags.some((t) => item.tags.includes(t as (typeof c.tags)[number])))
-    .slice(0, 2);
+  const relatedChannel = mock
+    ? channelPosts
+        .filter((c) => c.tags.some((t) => item.tags.includes(t as (typeof c.tags)[number])))
+        .slice(0, 2)
+    : [];
 
   const hasRelated =
     relatedNews.length + relatedPrimers.length + relatedChannel.length > 0;
@@ -92,7 +97,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
   const ts = item.published_at ?? item.fetched_at;
 
   return (
-    <div className="bg-grid-fine">
+    <div className="bg-grid-fine stagger">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
           <Breadcrumbs
@@ -198,7 +203,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={n.id}
                       href={`/app/news/${n.id}`}
-                      className="group bg-black p-4 transition-colors hover:bg-gray-2"
+                      className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
@@ -240,7 +245,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={p.id}
                       href={`/app/education/${p.id}`}
-                      className="group bg-black p-4 transition-colors hover:bg-gray-2"
+                      className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
                     >
                       <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                         {p.id} · {p.readingMin} min
@@ -265,7 +270,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                     <Link
                       key={c.id}
                       href="/app/channel"
-                      className="group block bg-black p-4 transition-colors hover:bg-gray-2"
+                      className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
                     >
                       <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2">
                         <span className="text-brand">{c.id}</span>
@@ -288,7 +293,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={
-              "block bg-black p-4 transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 " +
               (prev ? "" : "pointer-events-none opacity-30")
             }
           >
@@ -302,7 +307,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <Link
             href={next ? `/app/news/${next.id}` : "/app/news"}
             className={
-              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 " +
+              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 " +
               (next ? "" : "pointer-events-none opacity-30")
             }
           >
