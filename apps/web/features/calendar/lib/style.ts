@@ -21,13 +21,13 @@ export const IMPACT_DOT: Record<Impact, string> = {
 export const MAX_EVENTS_IN_CELL = 3;
 
 export function scoreStyle(n: number): string {
-  if (n >= 9) return "bg-[#7f1d1d] text-[#fecaca]";
-  if (n >= 8) return "bg-[#991b1b] text-[#fee2e2]";
-  if (n >= 7) return "bg-[#b45309] text-[#fef3c7]";
-  if (n >= 6) return "bg-[#b45309]/80 text-[#fef3c7]";
-  if (n >= 5) return "bg-[#78350f] text-[#fef3c7]";
-  if (n >= 4) return "bg-[#57330a] text-[#f5d478]";
-  if (n >= 3) return "bg-[#3f6212] text-[#d9f99d]";
-  if (n >= 2) return "bg-[#365314] text-[#d9f99d]";
-  return "bg-[#1a2e05] text-[#a3e635]";
+  if (n >= 9) return "bg-blood/80 text-blood-text";
+  if (n >= 8) return "bg-blood/60 text-blood-text";
+  if (n >= 7) return "bg-blood-bright/30 text-blood-text";
+  if (n >= 6) return "bg-brand/30 text-brand";
+  if (n >= 5) return "bg-brand/25 text-brand";
+  if (n >= 4) return "bg-brand/15 text-brand";
+  if (n >= 3) return "bg-moss/30 text-moss";
+  if (n >= 2) return "bg-moss/20 text-moss";
+  return "bg-moss/10 text-moss";
 }

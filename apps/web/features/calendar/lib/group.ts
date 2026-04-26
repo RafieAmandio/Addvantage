@@ -1,12 +1,8 @@
 import type { CalendarEvent } from "@/features/calendar/types";
-import { calendarDayMeta } from "@/features/calendar/mock";
 import { wibYmd } from "./date";
 import { shortName } from "./format";
 
 export function deriveSummary(events: CalendarEvent[]): string {
-  const ymd = wibYmd(events[0].ts);
-  const curated = calendarDayMeta.find((m) => m.date === ymd);
-  if (curated) return curated.summary;
   const highs = events.filter((e) => e.impact === "high");
   if (highs.length > 0) {
     return highs.slice(0, 3).map((e) => shortName(e.title)).join(" + ");
