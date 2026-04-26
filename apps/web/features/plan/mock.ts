@@ -1,4 +1,4 @@
-import type { TradingPlan, SubscriptionPlan } from "@/features/plan/types";
+import type { TradingPlan } from "@/features/plan/types";
 
 export const tradingPlans: TradingPlan[] = [
   {
@@ -235,34 +235,3 @@ export const tradingPlans: TradingPlan[] = [
 export function getAllPlans(): TradingPlan[] {
   return [...tradingPlans].sort((a, b) => b.date.localeCompare(a.date));
 }
-
-export const subscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: "free",
-    name: "Free",
-    priceIDR: 0,
-    cadence: "3-month",
-    features: [
-      "Unfiltered news + impact analysis",
-      "Economic calendar",
-      "My Channel (founder broadcast)",
-      "Public psychology primers",
-      "Limited hashtag explorer",
-    ],
-  },
-  {
-    id: "vip-trader",
-    name: "VIP+ Trader",
-    priceIDR: 4_500_000,
-    cadence: "3-month",
-    highlight: true,
-    features: [
-      "Everything in Free",
-      "Daily / weekly Trading Plan",
-      "1v1 Consultation (AI + team)",
-      "Full Education library",
-      "Full Hashtag explorer",
-      "Access to all collab channels",
-    ],
-  },
-];

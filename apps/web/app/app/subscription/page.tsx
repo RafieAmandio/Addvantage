@@ -1,11 +1,50 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { subscriptionPlans } from "@/features/plan/mock";
 import { useAppState, isPaid } from "@/lib/state";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Button } from "@/components/ui/Button";
 import { formatIDR, cn } from "@/lib/cn";
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  priceIDR: number;
+  cadence: "3-month";
+  features: string[];
+  highlight?: boolean;
+}
+
+const PLANS: SubscriptionPlan[] = [
+  {
+    id: "free",
+    name: "Free",
+    priceIDR: 0,
+    cadence: "3-month",
+    features: [
+      "Unfiltered news + impact analysis",
+      "Economic calendar",
+      "My Channel (founder broadcast)",
+      "Public psychology primers",
+      "Limited hashtag explorer",
+    ],
+  },
+  {
+    id: "vip-trader",
+    name: "VIP+ Trader",
+    priceIDR: 4_500_000,
+    cadence: "3-month",
+    highlight: true,
+    features: [
+      "Everything in Free",
+      "Daily / weekly Trading Plan",
+      "1v1 Consultation (AI + team)",
+      "Full Education library",
+      "Full Hashtag explorer",
+      "Access to all collab channels",
+    ],
+  },
+];
 
 export default function SubscriptionPage() {
   const { tier, setTier, liabilitySigned } = useAppState();
@@ -109,7 +148,7 @@ export default function SubscriptionPage() {
         <section className="mt-12">
           <SectionNumber n="01 /" label="AVAILABLE TIERS" />
           <div className="mt-6 grid grid-cols-12 gap-6">
-            {subscriptionPlans.map((p, i) => {
+            {PLANS.map((p, i) => {
               const isCurrent =
                 (p.id === "free" && !paid) || (p.id === "vip-trader" && paid);
               return (

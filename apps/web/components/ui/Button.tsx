@@ -11,7 +11,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
   ref
 ) {
   const base =
-    "group relative inline-flex items-center justify-center gap-2 font-mono uppercase tracking-widest2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40";
+    "group relative inline-flex items-center justify-center gap-2 font-mono uppercase tracking-widest2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none";
   const variants = {
     primary:
       "bg-brand text-black hover:bg-brand-dim hover:text-white border border-brand",

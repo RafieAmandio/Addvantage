@@ -120,12 +120,3 @@ export const ClosedPlanStatsSchema = z.object({
 });
 
 export type ClosedPlanStats = z.infer<typeof ClosedPlanStatsSchema>;
-
-export interface SubscriptionPlan {
-  id: string;
-  name: string;
-  priceIDR: number;
-  cadence: "3-month";
-  features: string[];
-  highlight?: boolean;
-}
