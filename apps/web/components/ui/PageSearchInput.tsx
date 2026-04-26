@@ -49,7 +49,7 @@ export function PageSearchInput({
   }, [focusKey, inputId]);
 
   return (
-    <div className="border border-gray-3 bg-gray-2/40">
+    <div className="border border-gray-3 bg-gray-2/40 transition-colors focus-within:border-brand">
       <div className="flex items-center gap-3 px-4 py-3">
         <svg
           width="16"

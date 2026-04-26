@@ -17,7 +17,7 @@ export function Highlight({
   const re = new RegExp(`(${escaped.join("|")})`, "ig");
   const parts = text.split(re);
   return parts.map((part, i) =>
-    re.test(part) ? (
+    i % 2 === 1 ? (
       <mark key={i} className="bg-brand/30 text-white">
         {part}
       </mark>

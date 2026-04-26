@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "./Button";
 import { DataLabel } from "./Marker";
 
 export function PaywallOverlay({
@@ -25,13 +24,17 @@ export function PaywallOverlay({
             "This surface is restricted to VIP+ Trader tier. Upgrade to access."}
         </p>
         <div className="mt-6 flex gap-3">
-          <Link href="/app/subscription" className="focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
-            <Button size="md">Upgrade access →</Button>
+          <Link
+            href="/app/subscription"
+            className="inline-flex h-10 items-center justify-center gap-2 border border-brand bg-brand px-5 font-mono text-[11px] uppercase tracking-widest2 text-black transition-all hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          >
+            Upgrade access →
           </Link>
-          <Link href="/app" className="focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
-            <Button variant="outline" size="md">
-              ← Return to brief
-            </Button>
+          <Link
+            href="/app"
+            className="inline-flex h-10 items-center justify-center gap-2 border border-brand/60 px-5 font-mono text-[11px] uppercase tracking-widest2 text-brand transition-all hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          >
+            ← Return to brief
           </Link>
         </div>
       </div>
