@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { notifications } from "@/features/notifications/mock";
 import { useReadNotifications } from "@/features/notifications/notifications";
+import type { Notification } from "@/features/notifications/types";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/cn";
@@ -20,11 +20,14 @@ import { NotificationFilterTabs } from "./NotificationFilterTabs";
 import { NotificationEmpty } from "./NotificationEmpty";
 import { BucketLabel, NotificationItem } from "./NotificationItem";
 
+const EMPTY: Notification[] = [];
+
 interface NotificationBellProps {
+  notifications?: Notification[];
   className?: string;
 }
 
-export function NotificationBell({ className }: NotificationBellProps) {
+export function NotificationBell({ notifications = EMPTY, className }: NotificationBellProps) {
   const { readIds, hydrated, markRead, markUnread, markAllRead, restore } =
     useReadNotifications();
   const { tickers, hydrated: watchHydrated } = useWatchlist();

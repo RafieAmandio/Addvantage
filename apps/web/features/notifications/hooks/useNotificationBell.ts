@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { useRouter } from "next/navigation";
-import type { MockNotification } from "@/features/notifications/mock";
+import type { Notification } from "@/features/notifications/types";
 
 interface UseNotificationBellArgs {
-  visible: MockNotification[];
+  visible: Notification[];
   markRead: (id: string) => void;
 }
 

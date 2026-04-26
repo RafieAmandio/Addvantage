@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { cn, formatDate, formatTime } from "@/lib/cn";
-import type { MockNotification } from "@/features/notifications/mock";
+import type { Notification } from "@/features/notifications/types";
 import {
   KIND_COLOR,
   KIND_LABEL,
@@ -10,7 +10,7 @@ import {
 } from "@/features/notifications/lib/filters";
 
 interface Props {
-  n: MockNotification;
+  n: Notification;
   idx: number;
   isRead: boolean;
   isActive: boolean;

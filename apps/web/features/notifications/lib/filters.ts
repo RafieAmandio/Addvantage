@@ -1,7 +1,7 @@
-import type { NotificationKind, MockNotification } from "@/features/notifications/mock";
+import type { NotificationKind, Notification } from "@/features/notifications/types";
 
 export function notificationMatchesPin(
-  n: MockNotification,
+  n: Notification,
   tickers: string[]
 ): string | null {
   if (tickers.length === 0) return null;
@@ -62,13 +62,13 @@ export function saveFilter(f: NotifFilter): void {
 export type BucketId = 0 | 1 | 2;
 
 interface NotificationWithBucket {
-  n: MockNotification;
+  n: Notification;
   idx: number;
   bucket: BucketId;
 }
 
 export function buildVisibleNotifications(
-  all: MockNotification[],
+  all: Notification[],
   filter: NotifFilter,
   readIds: string[],
   tickers: string[],
