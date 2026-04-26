@@ -17,11 +17,17 @@ export default function AppLayout({
     <AppStateProvider>
       <ToastProvider>
         <DemoBanner />
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-brand focus:bg-black focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest2 focus:text-brand"
+        >
+          Skip to content
+        </a>
         <div className="flex min-h-screen bg-black text-white">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             <TopBar />
-            <main className="min-w-0 flex-1">{children}</main>
+            <main id="main-content" className="min-w-0 flex-1">{children}</main>
           </div>
           <Shortcuts />
           <SearchPalette />

@@ -298,11 +298,11 @@ function formatJson(raw: string): string {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mb-4">
-      <div className="mb-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+    <label className="mb-4 block">
+      <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
         {label}
-      </div>
+      </span>
       {children}
-    </div>
+    </label>
   );
 }

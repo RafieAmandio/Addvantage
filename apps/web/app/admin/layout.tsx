@@ -19,7 +19,13 @@ export default async function AdminLayout({
   }
   return (
     <div className="min-h-screen bg-black">
-      <div className="border-b border-gray-3 bg-gray-2/40">
+      <a
+        href="#admin-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-brand focus:bg-black focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest2 focus:text-brand"
+      >
+        Skip to content
+      </a>
+      <nav className="border-b border-gray-3 bg-gray-2/40" aria-label="Admin navigation">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-6">
             <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -34,8 +40,8 @@ export default async function AdminLayout({
             ← Back to DOMAIN
           </Link>
         </div>
-      </div>
-      {children}
+      </nav>
+      <main id="admin-content">{children}</main>
     </div>
   );
 }
