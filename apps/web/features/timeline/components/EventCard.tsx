@@ -22,7 +22,7 @@ function formatTime(iso: string): string {
   return iso.slice(0, 16).replace("T", " ");
 }
 
-export function eventHref(e: TimelineEvent): string | null {
+function eventHref(e: TimelineEvent): string | null {
   if (e.news_item_id) return `/app/news/${e.news_item_id}`;
   return e.url ?? null;
 }

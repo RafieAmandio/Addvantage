@@ -2,7 +2,7 @@ export function ymdToDate(ymd: string): Date {
   return new Date(ymd + "T00:00:00Z");
 }
 
-export function dateToYmd(d: Date): string {
+function dateToYmd(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 

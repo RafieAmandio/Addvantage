@@ -5,7 +5,7 @@ import type { ConsultMessage } from "@/lib/mock/types";
  * identically. Picked deterministically by message count + keyword bucket so
  * a session replays consistently.
  */
-export const CANNED_REPLIES: Array<{ body: string; tags: ConsultMessage["tags"] }> = [
+const CANNED_REPLIES: Array<{ body: string; tags: ConsultMessage["tags"] }> = [
   {
     body: "Acknowledged. What's the current state of your position size relative to your account, and what's your hard invalidation level? Without those two numbers I can't give you a directional answer, only a process answer.",
     tags: ["risk-management"],

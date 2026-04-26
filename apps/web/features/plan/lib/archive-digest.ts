@@ -2,7 +2,7 @@ import type { TradingPlan } from "@/lib/mock/types";
 import { computePlanOutcome } from "@/features/plan/mock";
 import { formatDate } from "@/lib/cn";
 
-export function planToDigestMarkdown(plan: TradingPlan): string {
+function planToDigestMarkdown(plan: TradingPlan): string {
   const out = computePlanOutcome(plan);
   const header = `## ${plan.id} · ${formatDate(plan.date)} · ${plan.horizon}`;
   const totalLine = out

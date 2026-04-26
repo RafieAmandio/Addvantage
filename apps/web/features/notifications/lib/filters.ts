@@ -38,7 +38,7 @@ export type NotifFilter = "all" | "unread" | NotificationKind;
 
 const FILTER_STORAGE_KEY = "ants-domain-notif-filter";
 
-export const VALID_FILTERS: NotifFilter[] = [
+const VALID_FILTERS: NotifFilter[] = [
   "all",
   "unread",
   "alert",

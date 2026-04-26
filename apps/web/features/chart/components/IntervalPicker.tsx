@@ -1,6 +1,6 @@
 import { SegmentedNav } from "@/components/ui/SegmentedNav";
 
-export const CHART_INTERVALS = ["1m", "5m", "1h", "1d"] as const;
+const CHART_INTERVALS = ["1m", "5m", "1h", "1d"] as const;
 export type ChartInterval = (typeof CHART_INTERVALS)[number];
 
 export function isChartInterval(v: string): v is ChartInterval {

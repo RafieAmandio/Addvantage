@@ -9,8 +9,7 @@ import {
 import { isMockMode } from "@/lib/config/public";
 import { mockTimelineEvents } from "@/lib/mock/fixtures";
 
-export { TIMELINE_KINDS };
-export type { TimelineEvent, TimelineKind };
+export type { TimelineEvent };
 
 const TIMELINE_EVENT_COLUMNS =
   "id,kind,source_code,occurred_at,symbols,title,body,url,bias,impact,news_item_id";

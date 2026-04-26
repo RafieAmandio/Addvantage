@@ -265,16 +265,8 @@ export function computePlanOutcome(plan: TradingPlan) {
   };
 }
 
-export function getLatestPlan(): TradingPlan {
-  return tradingPlans[0];
-}
-
 export function getAllPlans(): TradingPlan[] {
   return [...tradingPlans].sort((a, b) => b.date.localeCompare(a.date));
-}
-
-export function getPlanById(id: string): TradingPlan | undefined {
-  return tradingPlans.find((p) => p.id === id);
 }
 
 export const subscriptionPlans: Plan[] = [

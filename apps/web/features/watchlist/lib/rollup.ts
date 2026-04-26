@@ -4,7 +4,7 @@ import { calendar, CURRENCIES } from "@/features/calendar/mock";
 import type { CalendarEvent, TradingPlan, TradingSetup } from "@/lib/mock/types";
 import type { TickerRollup } from "@/features/watchlist/types";
 
-export function calendarEventsFor(ticker: string): CalendarEvent[] {
+function calendarEventsFor(ticker: string): CalendarEvent[] {
   const t = ticker.toUpperCase();
   const currencyIdx = (CURRENCIES as ReadonlyArray<string>).indexOf(t);
   return calendar.filter((e) => {

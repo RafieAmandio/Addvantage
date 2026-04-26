@@ -30,7 +30,7 @@ interface Bucket {
  * desk. Keep this the single source of truth — tests and dashboards can
  * import `TIER_BUCKETS` for visibility.
  */
-export const TIER_BUCKETS: Record<TierAction, Record<Tier, Bucket>> = {
+const TIER_BUCKETS: Record<TierAction, Record<Tier, Bucket>> = {
   "consult:send": {
     free: { limit: 5, windowSec: 60 },
     vip: { limit: 30, windowSec: 60 },
