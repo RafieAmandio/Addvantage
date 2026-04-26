@@ -29,7 +29,7 @@ export default async function AdminLayout({
           </div>
           <Link
             href="/app"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Back to DOMAIN
           </Link>

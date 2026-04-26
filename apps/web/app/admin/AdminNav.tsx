@@ -23,9 +23,10 @@ export function AdminNav() {
             key={href}
             href={href}
             className={
-              active
+              "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
+              (active
                 ? "text-brand"
-                : "text-white/60 transition-colors hover:text-brand"
+                : "text-white/60 transition-colors hover:text-brand")
             }
           >
             {label}
