@@ -224,7 +224,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
               {state.error ? (
                 <div
                   role="alert"
-                  className="border border-blood/60 bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-[#fda4af]"
+                  className="border border-blood/60 bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-text"
                 >
                   {ERROR_MESSAGES[state.error] ?? state.error}
                 </div>

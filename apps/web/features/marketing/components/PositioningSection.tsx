@@ -35,8 +35,8 @@ export function PositioningSection() {
             <ul className="flex flex-col gap-4">
               {["Beginners", "Gamblers", "Hobbyists"].map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <IconCloseSquare className="h-6 w-6 shrink-0 text-[#E03C3C]" />
-                  <span className="font-mono text-base font-light leading-[1.4] text-[#E03C3C] line-through">
+                  <IconCloseSquare className="h-6 w-6 shrink-0 text-blood-bright" />
+                  <span className="font-mono text-base font-light leading-[1.4] text-blood-bright line-through">
                     {item}
                   </span>
                 </li>

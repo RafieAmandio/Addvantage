@@ -109,12 +109,12 @@ export const OUTCOME_META: Record<SetupOutcome, OutcomeMeta> = {
   },
   loss: {
     label: "LOSS",
-    style: "border-blood text-[#fda4af] bg-blood/15",
+    style: "border-blood text-blood-text bg-blood/15",
     dot: "bg-blood",
   },
   stopped: {
     label: "STOPPED",
-    style: "border-blood/70 text-[#fda4af] bg-blood/10",
+    style: "border-blood/70 text-blood-text bg-blood/10",
     dot: "bg-blood/80",
   },
   invalidated: {

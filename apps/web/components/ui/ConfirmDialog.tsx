@@ -96,7 +96,7 @@ export function ConfirmDialog({
             className={cn(
               "border px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
               destructive
-                ? "border-blood bg-blood/10 text-[#fda4af] hover:bg-blood hover:text-white"
+                ? "border-blood bg-blood/10 text-blood-text hover:bg-blood hover:text-white"
                 : "border-brand bg-brand text-black hover:bg-brand-dim hover:text-white"
             )}
           >

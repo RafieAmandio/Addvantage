@@ -22,7 +22,7 @@ export function TransmissionsSection() {
                   <span
                     className={
                       "font-bold " +
-                      (p.locked ? "text-[#E03C3C]" : "text-brand")
+                      (p.locked ? "text-blood-bright" : "text-brand")
                     }
                   >
                     {p.locked ? "Locked" : "Free"}

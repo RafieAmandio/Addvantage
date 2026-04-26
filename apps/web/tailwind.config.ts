@@ -36,7 +36,11 @@ const config: Config = {
           3: "#B8B8B8",
         },
         // Status colors
-        blood: "#991B1B",
+        blood: {
+          DEFAULT: "#991B1B",
+          bright: "#E03C3C",
+          text: "#fda4af",
+        },
         moss: "#65A30D",
         steel: "#6B7280",
         wire: "#383E47",

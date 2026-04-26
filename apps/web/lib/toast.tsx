@@ -147,7 +147,7 @@ const TONE_STYLES: Record<
     border: "border-blood/70",
     bar: "bg-blood",
     led: "red",
-    text: "text-[#fda4af]",
+    text: "text-blood-text",
   },
 };
 

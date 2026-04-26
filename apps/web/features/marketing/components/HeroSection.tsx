@@ -61,7 +61,7 @@ export function HeroSection() {
             alt=""
             className="absolute left-1/2 top-[30%] w-[2600px] max-w-none -translate-x-1/2 select-none"
           />
-          <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-[#1F1F1F] via-[rgba(31,31,31,0.6)] to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-gray via-gray/60 to-transparent" />
         </div>
 
         <div className="absolute inset-x-0 bottom-0 z-30 overflow-hidden py-[50px]">
@@ -80,12 +80,12 @@ export function HeroSection() {
                 {t.dir === "up" ? (
                   <TriangleUp className="h-[10px] w-[15px] text-brand" />
                 ) : (
-                  <TriangleDown className="h-[10px] w-[15px] text-[#E03C3C]" />
+                  <TriangleDown className="h-[10px] w-[15px] text-blood-bright" />
                 )}
                 <span
                   className={
                     "font-mono text-base " +
-                    (t.dir === "up" ? "text-brand" : "text-[#E03C3C]")
+                    (t.dir === "up" ? "text-brand" : "text-blood-bright")
                   }
                 >
                   {t.chg}

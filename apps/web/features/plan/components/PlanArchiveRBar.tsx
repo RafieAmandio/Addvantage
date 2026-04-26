@@ -84,7 +84,7 @@ export function PlanArchiveRBar({ allClosed, latest, className }: Props) {
                       ? "border-brand/60 text-brand"
                       : positive
                       ? "border-moss/60 text-moss"
-                      : "border-blood/60 text-[#fda4af]",
+                      : "border-blood/60 text-blood-text",
                     "bottom-full mb-1"
                   )}
                 >
