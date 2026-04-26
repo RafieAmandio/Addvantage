@@ -150,7 +150,7 @@ function View({ items }: { items: NewsListItem[] }) {
                 "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 hideSeen
                   ? "border-brand bg-brand/10 text-brand"
-                  : "border-gray-3 text-white/60 transition-colors hover:border-brand hover:text-brand"
+                  : "border-gray-3 text-white/60 hover:border-brand hover:text-brand"
               )}
             >
               {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}

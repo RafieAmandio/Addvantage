@@ -27,8 +27,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
   useEffect(() => {
     markSeen(item.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item.id]);
+  }, [item.id, markSeen]);
 
   const idx = relatedFeed.findIndex((n) => n.id === item.id);
   const prev = idx > 0 ? relatedFeed[idx - 1] : null;
@@ -229,7 +228,13 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         )}
 
-        <nav className="mt-10 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3 sm:mt-16">
+        <div className="mt-10 text-right font-mono text-[9px] uppercase tracking-widest2 text-white/30 sm:mt-16">
+          <kbd className="hidden sm:inline">j</kbd>
+          <span className="hidden sm:inline"> / </span>
+          <kbd className="hidden sm:inline">k</kbd>
+          <span className="hidden sm:inline"> to navigate</span>
+        </div>
+        <nav className="mt-2 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={prev ? `/app/news/${prev.id}` : "/app/news"}
             className={cn(
