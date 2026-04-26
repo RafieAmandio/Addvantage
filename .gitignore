@@ -17,3 +17,4 @@ tsconfig.tsbuildinfo
 coverage/
 .claude/scheduled_tasks.lock
 .screenshots/
+test-results/
