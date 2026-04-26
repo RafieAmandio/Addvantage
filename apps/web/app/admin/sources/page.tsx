@@ -1,5 +1,5 @@
 import { listSources } from "@/features/sources/queries/sources";
-import { cn } from "@/lib/cn";
+import { cn, formatDateTime } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -62,14 +62,14 @@ export default async function AdminSourcesPage() {
                 >
                   {s.url}
                 </a>
-                <div className="mt-3 grid grid-cols-3 gap-4 font-mono text-[9px] uppercase tracking-widest2">
+                <div className="mt-3 grid grid-cols-1 gap-4 font-mono text-[9px] uppercase tracking-widest2 sm:grid-cols-3">
                   <Stat
                     label="Last poll"
-                    value={s.last_polled_at?.slice(0, 16).replace("T", " ") ?? "—"}
+                    value={s.last_polled_at ? formatDateTime(s.last_polled_at) : "—"}
                   />
                   <Stat
                     label="Last success"
-                    value={s.last_success_at?.slice(0, 16).replace("T", " ") ?? "—"}
+                    value={s.last_success_at ? formatDateTime(s.last_success_at) : "—"}
                   />
                   <Stat label="Interval" value={`${s.poll_minutes}m`} />
                 </div>
