@@ -32,8 +32,8 @@ function statusBadge(status: string) {
     );
   if (status === "error")
     return (
-      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-red-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
+        <span className="h-1.5 w-1.5 rounded-full bg-blood-bright" />
         error
       </span>
     );
@@ -106,7 +106,7 @@ export default async function IngestionLogsPage() {
         </div>
 
         {errors > 0 && (
-          <div className="mb-6 border border-red-400/30 bg-red-400/5 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-red-400">
+          <div className="mb-6 border border-blood-bright/30 bg-blood-bright/5 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
             {errors} run{errors > 1 ? "s" : ""} with errors in last {runs.length} runs
           </div>
         )}
@@ -162,7 +162,7 @@ export default async function IngestionLogsPage() {
                     <div className="col-span-1 text-center">
                       {countCell(run.items_rephrased)}
                     </div>
-                    <div className="col-span-3 truncate font-mono text-[10px] text-red-400">
+                    <div className="col-span-3 truncate font-mono text-[10px] text-blood-bright">
                       {run.error ?? (
                         <span className="text-white/20">—</span>
                       )}
@@ -199,7 +199,7 @@ export default async function IngestionLogsPage() {
                     </div>
                   </div>
                   {run.error && (
-                    <div className="mt-2 truncate font-mono text-[9px] text-red-400">
+                    <div className="mt-2 truncate font-mono text-[9px] text-blood-bright">
                       {run.error}
                     </div>
                   )}
