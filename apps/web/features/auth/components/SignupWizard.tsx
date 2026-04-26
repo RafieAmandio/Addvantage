@@ -226,9 +226,6 @@ export function SignupWizard() {
                     type="submit"
                     size="lg"
                     disabled={!canProceed}
-                    className={
-                      canProceed ? "" : "opacity-30 cursor-not-allowed"
-                    }
                   >
                     Proceed to waiver →
                   </Button>
