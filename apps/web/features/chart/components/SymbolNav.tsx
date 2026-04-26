@@ -17,6 +17,7 @@ export function SymbolNav({
       current={current}
       hrefFor={hrefFor}
       className={className}
+      ariaLabel="Symbol selector"
     />
   );
 }

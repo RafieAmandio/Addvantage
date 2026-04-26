@@ -24,6 +24,7 @@ export function IntervalPicker({
       current={current}
       hrefFor={hrefFor}
       className={className}
+      ariaLabel="Chart interval"
     />
   );
 }

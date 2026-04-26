@@ -9,8 +9,8 @@ export function PaywallOverlay({
   reason?: string;
 }) {
   return (
-    <div className="relative">
-      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/0 via-black/85 to-black" />
+    <div className="relative" role="region" aria-label={`${surface} — upgrade required`}>
+      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/0 via-black/85 to-black" aria-hidden="true" />
       <div className="absolute inset-x-0 top-1/2 z-20 mx-auto max-w-xl -translate-y-1/2 border border-brand bg-gray-2 p-8 shadow-[0_0_60px_rgba(245,158,11,0.15)]">
         <DataLabel>Tier 01 required</DataLabel>
         <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">

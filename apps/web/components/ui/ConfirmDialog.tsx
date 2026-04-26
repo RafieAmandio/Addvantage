@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/cn";
 
 interface Props {
@@ -24,9 +24,10 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  const onKey = useCallback(
+    (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         onCancel();
@@ -34,14 +35,20 @@ export function ConfirmDialog({
         e.preventDefault();
         onConfirm();
       }
-    };
+    },
+    [onCancel, onConfirm],
+  );
+
+  useEffect(() => {
+    if (!open) return;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
+    cancelRef.current?.focus();
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, onCancel, onConfirm]);
+  }, [open, onKey]);
 
   if (!open) return null;
 
@@ -86,6 +93,7 @@ export function ConfirmDialog({
 
         <div className="flex items-center justify-between gap-3 p-5">
           <button
+            ref={cancelRef}
             onClick={onCancel}
             className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
