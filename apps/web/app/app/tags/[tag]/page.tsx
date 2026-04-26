@@ -1,37 +1,34 @@
-"use client";
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { allHashtags, hashtagMeta } from "@/features/tags/mock";
-import { primers } from "@/features/education/mock";
-import { news } from "@/features/news/mock";
-import { consultSessions } from "@/features/consult/mock";
-import { channelPosts } from "@/features/channel/mock";
+import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
+import { allHashtags, hashtagMeta } from "@/features/tags/constants";
+import { listNewsByTag, listPrimersByTag } from "@/features/tags/queries";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
-import type { Hashtag } from "@/lib/mock/types";
 
-export default function TagPage({
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function isHashtag(s: string): s is Hashtag {
+  return (HASHTAGS as readonly string[]).includes(s);
+}
+
+export default async function TagPage({
   params,
 }: {
   params: { tag: string };
 }) {
   const { tag: rawTag } = params;
-  if (!allHashtags.includes(rawTag as Hashtag)) return notFound();
-  const tag = rawTag as Hashtag;
+  if (!isHashtag(rawTag)) return notFound();
+  const tag = rawTag;
   const meta = hashtagMeta[tag];
 
-  const matchedPrimers = primers.filter((p) => p.tags.includes(tag));
-  const matchedNews = news.filter((n) => n.tags.includes(tag));
-  const matchedSessions = consultSessions.filter((s) =>
-    s.tags.includes(tag)
-  );
-  const matchedChannel = channelPosts.filter((c) => c.tags.includes(tag));
-  const total =
-    matchedPrimers.length +
-    matchedNews.length +
-    matchedSessions.length +
-    matchedChannel.length;
+  const [matchedNews, matchedPrimers] = await Promise.all([
+    listNewsByTag(tag),
+    listPrimersByTag(tag),
+  ]);
+
+  const total = matchedPrimers.length + matchedNews.length;
 
   return (
     <div className="stagger bg-grid-fine">
@@ -54,8 +51,7 @@ export default function TagPage({
           <p className="mt-3 max-w-2xl text-white/70">{meta.description}</p>
           <div className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             {total} TOTAL ITEMS · {matchedPrimers.length} PRIMERS ·{" "}
-            {matchedNews.length} NEWS · {matchedSessions.length} CONSULT ·{" "}
-            {matchedChannel.length} CHANNEL
+            {matchedNews.length} NEWS
           </div>
         </div>
       </div>
@@ -68,7 +64,7 @@ export default function TagPage({
                 <Link
                   key={p.id}
                   href={`/app/education/${p.id}`}
-                  className="bg-black p-5 hover:bg-gray-2"
+                  className="bg-black p-5 transition-colors hover:bg-gray-2"
                 >
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id}
@@ -90,55 +86,28 @@ export default function TagPage({
           <Group n="02 /" label="NEWS">
             <div className="space-y-px bg-gray-3">
               {matchedNews.map((n) => (
-                <div key={n.id} className="bg-black p-4 hover:bg-gray-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    {n.id}
+                <Link
+                  key={n.id}
+                  href={`/app/news/${n.id}`}
+                  className="block bg-black p-4 transition-colors hover:bg-gray-2"
+                >
+                  <div className="flex items-baseline justify-between">
+                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+                      [{n.source_code}]
+                    </div>
+                    {n.published_at && (
+                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                        {formatDate(n.published_at)}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-1 font-display text-lg text-white">
                     {n.headline}
                   </div>
-                  <p className="mt-1 text-sm text-white/60">{n.analysis}</p>
-                </div>
-              ))}
-            </div>
-          </Group>
-        )}
-
-        {matchedSessions.length > 0 && (
-          <Group n="03 /" label="CONSULTATION LOGS">
-            <div className="space-y-px bg-gray-3">
-              {matchedSessions.map((s) => (
-                <div key={s.id} className="bg-black p-4 hover:bg-gray-2">
-                  <div className="flex items-baseline justify-between">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                      {s.id}
-                    </div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                      {formatDate(s.lastAt)} · {s.messages.length} msgs
-                    </div>
-                  </div>
-                  <div className="mt-1 font-display text-lg text-white">
-                    {s.title}
-                  </div>
-                  <div className="mt-2 line-clamp-2 text-sm text-white/60">
-                    {s.messages[s.messages.length - 1]?.body}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Group>
-        )}
-
-        {matchedChannel.length > 0 && (
-          <Group n="04 /" label="CHANNEL POSTS">
-            <div className="space-y-px bg-gray-3">
-              {matchedChannel.map((p) => (
-                <div key={p.id} className="bg-black p-4 hover:bg-gray-2">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    {p.id} · {formatDate(p.ts)}
-                  </div>
-                  <p className="mt-2 text-sm text-white/80">{p.body}</p>
-                </div>
+                  <p className="mt-1 line-clamp-2 text-sm text-white/60">
+                    {n.analysis}
+                  </p>
+                </Link>
               ))}
             </div>
           </Group>
@@ -153,8 +122,7 @@ export default function TagPage({
               Nothing tagged #{tag} yet.
             </div>
             <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              This tag will populate as news, primers, and channel posts are
-              published.
+              This tag will populate as news and primers are published.
             </p>
             <div className="mt-6 flex items-center justify-center gap-3">
               <Link

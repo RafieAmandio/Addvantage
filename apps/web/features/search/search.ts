@@ -2,7 +2,7 @@ import { news } from "@/features/news/mock";
 import { primers } from "@/features/education/mock";
 import { channelPosts } from "@/features/channel/mock";
 import { consultSessions } from "@/features/consult/mock";
-import { allHashtags, hashtagMeta } from "@/features/tags/mock";
+import { allHashtags, hashtagMeta } from "@/features/tags/constants";
 import { tradingPlans } from "@/features/plan/mock";
 import type { ConsultMessage } from "@/lib/mock/types";
 import { logger } from "@/lib/logger";

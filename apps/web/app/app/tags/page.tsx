@@ -1,19 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
-import { allHashtags, hashtagMeta } from "@/features/tags/mock";
-import { primers } from "@/features/education/mock";
-import { news } from "@/features/news/mock";
-import { consultSessions } from "@/features/consult/mock";
-import { channelPosts } from "@/features/channel/mock";
+import { allHashtags, hashtagMeta } from "@/features/tags/constants";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { cn } from "@/lib/cn";
+import type { Hashtag } from "@tradevantage/shared";
 
 type SortMode = "density" | "alpha" | "sparse";
 
@@ -31,6 +28,8 @@ function loadPersistedSort(): SortMode {
     return "density";
   }
 }
+
+type TagCountEntry = { tag: Hashtag; c: number };
 
 export default function TagsPage() {
   return (
@@ -52,13 +51,15 @@ export default function TagsPage() {
 function TagsView() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState<string>(
-    () => searchParams.get("q")?.trim() ?? ""
+    () => searchParams.get("q")?.trim() ?? "",
   );
   const [sortMode, setSortModeState] = useState<SortMode>(() => {
     const fromUrl = searchParams.get("sort");
     if (fromUrl) return parseSortMode(fromUrl);
-    return "density"; // hydrated in effect below
+    return "density";
   });
+
+  const [tagCounts, setTagCounts] = useState<TagCountEntry[] | null>(null);
 
   useEffect(() => {
     if (!searchParams.get("sort")) {
@@ -67,6 +68,31 @@ function TagsView() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/tags/counts")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.counts) {
+          setTagCounts(
+            data.counts.map((c: { tag: string; total: number }) => ({
+              tag: c.tag as Hashtag,
+              c: c.total,
+            })),
+          );
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const countsRaw: TagCountEntry[] = useMemo(() => {
+    if (tagCounts) return tagCounts;
+    return allHashtags.map((tag) => ({ tag, c: 0 }));
+  }, [tagCounts]);
 
   const setSortMode = (next: SortMode) => {
     setSortModeState(next);
@@ -79,23 +105,6 @@ function TagsView() {
     q: query || null,
     sort: sortMode !== "density" ? sortMode : null,
   });
-
-  const countsRaw = useMemo(() => {
-    // Single-pass O(items) tally instead of O(tags × items) per-tag filter
-    const tally = new Map<string, number>();
-    for (const tag of allHashtags) tally.set(tag, 0);
-    const bump = (tags: readonly string[]) => {
-      for (const t of tags) {
-        const prev = tally.get(t);
-        if (prev !== undefined) tally.set(t, prev + 1);
-      }
-    };
-    for (const p of primers) bump(p.tags);
-    for (const n of news) bump(n.tags);
-    for (const s of consultSessions) bump(s.tags);
-    for (const c of channelPosts) bump(c.tags);
-    return allHashtags.map((tag) => ({ tag, c: tally.get(tag) ?? 0 }));
-  }, []);
 
   const counts = useMemo(() => {
     const sorted = [...countsRaw];
@@ -131,8 +140,8 @@ function TagsView() {
             Hashtag <span className="italic text-brand">Explorer</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-            The connective tissue of the DOMAIN. Pull every primer, post,
-            consultation log, and broadcast under a tag.
+            The connective tissue of the DOMAIN. Pull every primer and news
+            item under a tag.
           </p>
         </div>
       </div>
@@ -180,7 +189,7 @@ function TagsView() {
                     "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
                     sortMode === opt.v
                       ? "bg-brand text-black"
-                      : "bg-gray-2 text-white/60 hover:text-white"
+                      : "bg-gray-2 text-white/60 hover:text-white",
                   )}
                 >
                   {opt.label}
@@ -196,7 +205,7 @@ function TagsView() {
               ● NULL TRANSMISSION
             </div>
             <div className="mt-3 font-display text-2xl text-white">
-              No tags match "{query}".
+              No tags match &quot;{query}&quot;.
             </div>
             <button
               onClick={() => setQuery("")}
@@ -235,7 +244,7 @@ function TagsView() {
                     )}
                   </div>
                   <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                    {c} items
+                    {tagCounts ? `${c} items` : "…"}
                   </div>
                 </div>
                 <div className="mt-3 font-display text-2xl text-white">
