@@ -109,7 +109,9 @@ export function FeaturedRow({
               </div>
               <h3 className="mt-3 font-display text-2xl text-white">
                 {paid
-                  ? plan.thesis.slice(0, 100) + "…"
+                  ? plan.thesis.length > 100
+                    ? plan.thesis.slice(0, 100) + "…"
+                    : plan.thesis
                   : "Macro is repricing the cut path. Four setups live."}
               </h3>
               <div className="mt-4 grid grid-cols-2 gap-2 text-center">

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { tradingPlans, getAllPlans } from "@/features/plan/mock";
+import { useMemo, useEffect, useState } from "react";
+import { tradingPlans as mockPlans, getAllPlans as getMockPlans } from "@/features/plan/mock";
+import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { useAppState, isPaid } from "@/lib/state";
 import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
@@ -20,13 +21,15 @@ import { FeaturedRow } from "@/features/dashboard/components/FeaturedRow";
 import { DiscoveryRow } from "@/features/dashboard/components/DiscoveryRow";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Primer } from "@/features/education/types";
+import type { Plan } from "@/features/plan/types";
 
 interface Props {
   news: NewsListItem[];
   primers: Primer[];
+  plans: Plan[];
 }
 
-export function DashboardClient({ news, primers }: Props) {
+export function DashboardClient({ news, primers, plans }: Props) {
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
   const { ids: readIds } = useReadPrimers();
@@ -52,8 +55,17 @@ export function DashboardClient({ news, primers }: Props) {
 
   const greet = hour === null ? "Welcome" : greeting(hour);
 
+  const allTradingPlans = useMemo(
+    () => (plans.length > 0 ? plans.map(dbPlanToTradingPlan) : mockPlans),
+    [plans],
+  );
+  const allPlansForArchive = useMemo(
+    () => (plans.length > 0 ? allTradingPlans : getMockPlans()),
+    [plans, allTradingPlans],
+  );
+
   const topNews = news.slice(0, 3);
-  const plan = tradingPlans[0];
+  const plan = allTradingPlans[0];
   const featuredPrimer = pickFeaturedPrimer(primers, readIds, paid);
 
   const watchNewsMentions = watchHydrated
@@ -64,7 +76,7 @@ export function DashboardClient({ news, primers }: Props) {
     : [];
 
   const watchArchiveSetups = watchHydrated
-    ? collectWatchArchiveSetups(getAllPlans(), tickers, plan.id)
+    ? collectWatchArchiveSetups(allPlansForArchive, tickers, plan.id)
     : [];
 
   const highImpactToday = news.filter((n) => n.impact === "high").length;
