@@ -7,21 +7,6 @@ import { logger } from "@/lib/logger";
 import { verifyXenditWebhook } from "@/lib/payment/verify-xendit";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-/**
- * Xendit webhook receiver. Verifies the static `x-callback-token` header,
- * parses the invoice callback, and on `checkout_completed` updates
- * `profiles.tier` via the service-role client (RLS would otherwise block
- * writes against another user's profile).
- *
- * Status codes:
- *   200 → verified, handled (or intentionally ignored non-terminal kinds)
- *   400 → valid signature but missing profile_id / tier metadata
- *   401 → invalid or missing signature header
- *   429 → rate limited (per IP)
- *   500 → DB error while updating profile
- *   503 → XENDIT_WEBHOOK_TOKEN not configured
- */
-
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -101,16 +86,10 @@ export async function POST(request: Request) {
 
   const { event } = result;
 
-  // payment_failed → send a dunning email before 200'ing. All graceful
-  // no-op paths still return 200 so Xendit stops retrying (these are user
-  // / config issues, not transient infra failures).
   if (event.kind === "payment_failed") {
     return handlePaymentFailed(event);
   }
 
-  // Only tier upgrades/downgrades affect profiles; other kinds are logged
-  // and 200'd so Xendit stops retrying. Renewals/cancellations will be
-  // wired in a follow-up tick.
   if (event.kind !== "checkout_completed") {
     logger.info("xendit webhook non-terminal event", {
       scope: "api.webhooks.xendit",
@@ -189,12 +168,7 @@ type VerifiedPaymentEvent = Extract<
   { valid: true }
 >["event"];
 
-/**
- * Handle a verified `payment_failed` event: DM the affected user a dunning
- * email and log the send. Every failure path still returns 200 to prevent
- * Xendit retries — we've already acknowledged receipt, and the user/config
- * issues here aren't fixed by replaying the webhook.
- */
+// All paths return 200 — Xendit retries won't fix user/config issues
 async function handlePaymentFailed(
   event: VerifiedPaymentEvent
 ): Promise<NextResponse> {

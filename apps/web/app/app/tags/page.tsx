@@ -54,20 +54,17 @@ function TagsView() {
   const [query, setQuery] = useState<string>(
     () => searchParams.get("q")?.trim() ?? ""
   );
-  // URL takes priority over localStorage on initial load
   const [sortMode, setSortModeState] = useState<SortMode>(() => {
     const fromUrl = searchParams.get("sort");
     if (fromUrl) return parseSortMode(fromUrl);
     return "density"; // hydrated in effect below
   });
 
-  // After mount, if no URL param, honor the persisted choice
   useEffect(() => {
     if (!searchParams.get("sort")) {
       const persisted = loadPersistedSort();
       if (persisted !== "density") setSortModeState(persisted);
     }
-    // run only on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -78,25 +75,18 @@ function TagsView() {
     } catch {}
   };
 
-  // Sync URL on query / sort changes
   useUrlSyncedState({
     q: query || null,
     sort: sortMode !== "density" ? sortMode : null,
   });
 
   const countsRaw = useMemo(() => {
-    // Single-pass tally. Prior implementation was O(tags × sources × items)
-    // because each tag ran `.filter().length` over all four source arrays.
-    // One pass over each source array, bumping a Map keyed by tag, drops it
-    // to O(items × avg_tags_per_item) regardless of tag count.
+    // Single-pass O(items) tally instead of O(tags × items) per-tag filter
     const tally = new Map<string, number>();
     for (const tag of allHashtags) tally.set(tag, 0);
     const bump = (tags: readonly string[]) => {
       for (const t of tags) {
         const prev = tally.get(t);
-        // Ignore tags that aren't in `allHashtags` — mock sources occasionally
-        // carry tags outside the declared taxonomy; the old `.includes(tag)`
-        // loop would silently drop them too.
         if (prev !== undefined) tally.set(t, prev + 1);
       }
     };
