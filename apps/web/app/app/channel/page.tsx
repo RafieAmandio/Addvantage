@@ -7,7 +7,7 @@ const posts: ChannelPost[] = [];
 
 export default function ChannelPage() {
   return (
-    <div className="stagger">
+    <div className="stagger bg-grid">
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-baseline justify-between">
@@ -69,7 +69,7 @@ export default function ChannelPage() {
                     <Link
                       key={t}
                       href={`/app/tags/${t}`}
-                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 hover:text-brand"
+                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                     >
                       #{t}
                     </Link>
