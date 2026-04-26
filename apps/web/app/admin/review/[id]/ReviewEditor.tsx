@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { HASHTAGS, IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
@@ -43,6 +43,12 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
     author: item.author,
   });
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!saveMsg) return;
+    const t = setTimeout(() => setSaveMsg(null), 3000);
+    return () => clearTimeout(t);
+  }, [saveMsg]);
 
   const statusChip = {
     pending: "bg-brand/10 border-brand text-brand",
