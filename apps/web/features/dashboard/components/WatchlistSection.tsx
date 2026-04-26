@@ -31,7 +31,7 @@ export function WatchlistSection({
     <section
       className={cn("border-b border-gray-3 bg-gray-2/20", className)}
     >
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         <SectionHeader n="—" label="WATCHLIST" right={`${tickers.length} pinned`}>
           <div className="flex flex-wrap items-center gap-1.5">
             {tickers.map((t) => (
@@ -52,7 +52,7 @@ export function WatchlistSection({
           </div>
         </SectionHeader>
 
-        <div className="mt-4 grid grid-cols-12 gap-6">
+        <div className="mt-4 grid grid-cols-12 gap-4 sm:gap-6">
           {/* News mentioning watched tickers */}
           <div className="col-span-12 lg:col-span-7">
             <DataLabel>News touching your pins</DataLabel>

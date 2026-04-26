@@ -15,7 +15,7 @@ export function PillarShortcuts({
 }) {
   return (
     <section className={cn("border-b border-gray-3", className)}>
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <DataLabel>● Jump to</DataLabel>
         <div className="mt-4 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-3 lg:grid-cols-6">
           <PillarTile code="TX-01" label="News" href="/app/news" hint="g n" />
@@ -84,7 +84,7 @@ function PillarTile({
         </div>
       </div>
       <div className="flex flex-col items-end gap-1">
-        <kbd className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-white/40">
+        <kbd className="hidden border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-white/40 sm:block">
           {hint}
         </kbd>
         {locked && (

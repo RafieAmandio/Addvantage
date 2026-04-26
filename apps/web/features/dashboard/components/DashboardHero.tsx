@@ -44,16 +44,16 @@ export function DashboardHero({
       )}
     >
       <div className="absolute -right-24 -top-24 h-[24rem] w-[24rem] rounded-full bg-brand/10 blur-[120px]" />
-      <div className="relative mx-auto max-w-7xl px-6 py-12 lg:py-16">
-        <div className="grid grid-cols-12 gap-6">
+      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-16">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6">
           <div className="col-span-12 lg:col-span-8">
             <DataLabel>{stamp || "—"}</DataLabel>
-            <h1 className="mt-3 font-display text-5xl leading-[0.95] text-white sm:text-6xl lg:text-7xl">
+            <h1 className="mt-3 font-display text-4xl leading-[0.95] text-white sm:text-5xl md:text-6xl lg:text-7xl">
               <span suppressHydrationWarning>{greet}</span>,
               <br />
               <span className="italic text-brand">{operatorName}</span>.
             </h1>
-            <p className="mt-6 max-w-xl font-display text-xl text-white/60">
+            <p className="mt-4 max-w-xl font-display text-base text-white/60 sm:mt-6 sm:text-xl">
               The DOMAIN has been transmitting overnight.{" "}
               <span className="text-white">{highImpactToday}</span> high-impact
               items, <span className="text-white">{openSetups}</span> open

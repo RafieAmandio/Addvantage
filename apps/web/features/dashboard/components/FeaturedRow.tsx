@@ -33,8 +33,8 @@ export function FeaturedRow({
 }) {
   return (
     <section className={cn("border-b border-gray-3", className)}>
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid grid-cols-12 gap-6">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6">
           {/* Featured news */}
           <div className="col-span-12 lg:col-span-8">
             <SectionHeader
@@ -72,13 +72,13 @@ export function FeaturedRow({
                           ✓ SEEN
                         </span>
                       )}
-                      <span className="ml-auto font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                      <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
                         {formatTime(n.ts)}Z · BY {n.author.toUpperCase()}
                       </span>
                     </div>
                     <h3
                       className={cn(
-                        "mt-3 font-display text-2xl leading-snug transition-colors group-hover:text-brand",
+                        "mt-3 font-display text-xl leading-snug transition-colors group-hover:text-brand sm:text-2xl",
                         seen ? "text-white/70" : "text-white"
                       )}
                     >
