@@ -43,9 +43,6 @@ export default function WatchlistPage() {
   const totalLive = rollups.reduce((acc, r) => acc + r.liveSetups.length, 0);
   const totalClosed = rollups.reduce((acc, r) => acc + r.closedCount, 0);
 
-  // Stable so memoized TickerCard bails out on unchanged rollups. Takes the
-  // ticker as an arg; the TickerCard's own `onUnpin: () => void` captures its
-  // rollup.ticker at render and calls this.
   const handleUnpin = useCallback(
     (ticker: string) => {
       remove(ticker);
@@ -60,7 +57,7 @@ export default function WatchlistPage() {
   );
 
   return (
-    <div className="bg-grid-fine">
+    <div className="stagger bg-grid-fine">
       <ConfirmDialog
         open={confirmingClear}
         title="Clear watchlist?"
@@ -80,7 +77,6 @@ export default function WatchlistPage() {
         onCancel={() => setConfirmingClear(false)}
       />
 
-      {/* Hero */}
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -120,7 +116,6 @@ export default function WatchlistPage() {
               aggregateR={aggregateR}
             />
 
-            {/* Filter search */}
             <div className="mb-6">
               <PageSearchInput
                 value={query}

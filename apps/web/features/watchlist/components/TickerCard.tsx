@@ -23,7 +23,6 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
 
   return (
     <section className="border border-gray-3 bg-gray-2/20">
-      {/* Card header */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-gray-3 bg-gray-2/60 px-5 py-4">
         <div className="flex items-center gap-3">
           <WatchPin ticker={ticker} size="md" />
@@ -67,9 +66,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
         </div>
       </div>
 
-      {/* Body */}
       <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-2">
-        {/* Left: recent news */}
         <div>
           <DataLabel>Recent news · {newsItems.length}</DataLabel>
           {newsItems.length === 0 ? (
@@ -103,7 +100,6 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           )}
         </div>
 
-        {/* Right: setups */}
         <div className="space-y-5">
           {liveSetups.length > 0 && (
             <div>

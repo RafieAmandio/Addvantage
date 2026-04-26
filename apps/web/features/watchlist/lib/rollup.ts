@@ -4,13 +4,6 @@ import { calendar, CURRENCIES } from "@/features/calendar/mock";
 import type { CalendarEvent, TradingPlan, TradingSetup } from "@/lib/mock/types";
 import type { TickerRollup } from "@/features/watchlist/types";
 
-/**
- * Decide if a calendar event is "relevant" to a ticker.
- * We check two things:
- *   1. The ticker matches one of the currency codes — take events where
- *      that currency's impact score is >= 5.
- *   2. The ticker appears in the event's notes (e.g. "BBCA" in BI rate note).
- */
 export function calendarEventsFor(ticker: string): CalendarEvent[] {
   const t = ticker.toUpperCase();
   const currencyIdx = (CURRENCIES as ReadonlyArray<string>).indexOf(t);

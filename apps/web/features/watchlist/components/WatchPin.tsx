@@ -4,10 +4,6 @@ import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/cn";
 
-/**
- * Toggle pin button for a ticker. Visible next to every instrument chip
- * where the operator might want to save it for later monitoring.
- */
 export function WatchPin({
   ticker,
   className,
