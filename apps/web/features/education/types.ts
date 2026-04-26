@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const PrimerSchema = z.object({
-  id: z.string(), // slug — used in URLs (/app/education/[id])
+  id: z.string(),
   title: z.string(),
   author: z.string(),
   framework: z.string(),
