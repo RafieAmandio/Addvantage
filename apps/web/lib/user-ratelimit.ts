@@ -1,22 +1,6 @@
 import { rateLimit } from "@/lib/ratelimit";
 import { logger } from "@/lib/logger";
 
-/**
- * Shared user server-action rate-limit gate. Mirrors
- * `enforceAdminRateLimit` (tick 156) for flat per-user limits.
- *
- * Defaults to 10 requests per 60 seconds per `(userId, action)` pair.
- * On breach: emits `logger.warn("user rate-limited", { userId, action, scope })`
- * and throws `Error("rate_limited")` so call sites can `try { ... } catch`
- * and return their own `{ ok: false, error: "rate_limited" }` shape.
- *
- * Graceful no-op when Upstash env is unset (inherited from `rateLimit`).
- *
- * Tier-aware gating (free/vip buckets) lives in `lib/ratelimit-tier.ts`
- * — do not collapse the two. Pure IP-keyed gates use the sibling
- * `enforceIpRateLimit` in `lib/ip-ratelimit.ts`. Compound user+ip keys
- * go through this helper with `keySuffix: ip`.
- */
 export async function enforceUserRateLimit(
   userId: string,
   action: string,

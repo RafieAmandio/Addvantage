@@ -32,10 +32,8 @@ const SURFACE_LABELS: Record<string, { label: string; kind: string }> = {
 function describeRoute(href: string): { label: string; kind: string } | null {
   const [pathname, qs] = href.split("?");
 
-  // Known static surfaces — recognise by pathname only
   if (SURFACE_LABELS[pathname]) {
     const base = SURFACE_LABELS[pathname];
-    // Annotate calendar with its current view when filtered
     if (pathname === "/app/calendar" && qs) {
       const sp = new URLSearchParams(qs);
       const bits: string[] = [];
@@ -47,7 +45,6 @@ function describeRoute(href: string): { label: string; kind: string } | null {
         return { label: `${base.label} · ${bits.join(" · ")}`, kind: base.kind };
       }
     }
-    // Annotate compare with the A/B pair
     if (pathname === "/app/plan/compare" && qs) {
       const sp = new URLSearchParams(qs);
       const a = sp.get("a");
@@ -59,7 +56,6 @@ function describeRoute(href: string): { label: string; kind: string } | null {
         return { label: `Compare · ${a || b}`, kind: base.kind };
       }
     }
-    // Annotate archive with horizon filter
     if (pathname === "/app/plan/archive" && qs) {
       const sp = new URLSearchParams(qs);
       const h = sp.get("h");
@@ -70,7 +66,6 @@ function describeRoute(href: string): { label: string; kind: string } | null {
     return base;
   }
 
-  // /app/news/[id]
   const newsMatch = pathname.match(/^\/app\/news\/(.+)$/);
   if (newsMatch) {
     const item = news.find((n) => n.id === newsMatch[1]);
@@ -84,14 +79,12 @@ function describeRoute(href: string): { label: string; kind: string } | null {
     }
   }
 
-  // /app/education/[id]
   const eduMatch = pathname.match(/^\/app\/education\/(.+)$/);
   if (eduMatch) {
     const p = primers.find((p) => p.id === eduMatch[1]);
     if (p) return { label: p.title, kind: "Primer" };
   }
 
-  // /app/tags/[tag]
   const tagMatch = pathname.match(/^\/app\/tags\/(.+)$/);
   if (tagMatch && allHashtags.includes(tagMatch[1] as Hashtag)) {
     return {
@@ -114,7 +107,6 @@ export function trackVisit(href: string): void {
     if (raw) list = JSON.parse(raw);
   } catch {}
 
-  // Drop any existing entry for this href, then unshift fresh
   list = list.filter((v) => v.href !== href);
   list.unshift({ href, label: desc.label, kind: desc.kind, ts: Date.now() });
   list = list.slice(0, MAX);

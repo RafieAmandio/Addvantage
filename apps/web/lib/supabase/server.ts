@@ -4,10 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@tradevantage/db";
 import { publicConfig } from "@/lib/config/public";
 
-/**
- * Server-side Supabase client — reads the session cookie from next/headers.
- * Use this inside Server Components, Server Actions, and Route Handlers.
- */
 export function supabaseServer(): SupabaseClient<Database> {
   const cookieStore = cookies();
   return createServerClient<Database>(
@@ -26,8 +22,7 @@ export function supabaseServer(): SupabaseClient<Database> {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Called from a Server Component — safe to ignore if middleware
-            // is refreshing sessions.
+            // Safe to ignore — middleware handles session refresh.
           }
         },
       },

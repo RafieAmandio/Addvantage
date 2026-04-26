@@ -3,13 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@tradevantage/db";
 import { publicConfig, isMockMode } from "@/lib/config/public";
 
-/**
- * Refresh Supabase session cookies on every request. Called from
- * app/middleware.ts. Keeps SSR auth fresh without forcing a client round-trip.
- */
 export async function updateSession(request: NextRequest) {
-  // Mock-mode short-circuit: skip Supabase entirely and let every route
-  // through. Used for teammate demos where no Supabase creds are configured.
   if (isMockMode()) {
     return NextResponse.next({ request });
   }
@@ -43,9 +37,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Gate authenticated surfaces. Admin is also gated at the layout level via
-  // getProfile()/requireAdmin; this is defense-in-depth so an unauthenticated
-  // request never reaches a Server Component that might read PII.
+  // Defense-in-depth — layout also gates via requireAdmin, but this prevents unauthenticated RSC renders.
   const { pathname } = request.nextUrl;
   const isProtected =
     pathname.startsWith("/app") || pathname.startsWith("/admin");

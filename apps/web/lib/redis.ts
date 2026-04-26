@@ -6,12 +6,6 @@ if (typeof window !== "undefined") {
 
 let cached: Redis | null | undefined;
 
-/**
- * Returns an Upstash Redis REST client, or `null` when either
- * `UPSTASH_REDIS_REST_URL` or `UPSTASH_REDIS_REST_TOKEN` is unset.
- *
- * Consumers should treat `null` as a graceful no-op (do not throw).
- */
 export function getRedis(): Redis | null {
   if (cached !== undefined) return cached;
 

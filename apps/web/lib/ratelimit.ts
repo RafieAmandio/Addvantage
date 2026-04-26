@@ -38,10 +38,6 @@ function getLimiter(limit: number, windowSec: number): Ratelimit | null {
   return rl;
 }
 
-/**
- * Sliding-window rate limit check. Returns `{ success: true }` as a no-op
- * when Upstash env is unset (see `getRedis()`).
- */
 export async function rateLimit(
   args: RateLimitArgs,
 ): Promise<RateLimitResult> {

@@ -1,11 +1,3 @@
-/**
- * Adapts the legacy prototype mocks (features/[name]/mock.ts) into the DB row
- * shapes returned by the real query functions. Query functions short-circuit
- * here when `NEXT_PUBLIC_MOCK_MODE=1` so the web app renders without Supabase.
- *
- * Every helper returns already-validated, query-shaped data — consumers do
- * not re-parse with Zod, they use the output directly.
- */
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan, ClosedPlanStats } from "@/features/plan/types";
 import type { TimelineEvent } from "@/features/timeline/types";
@@ -14,9 +6,7 @@ import { tradingPlans as mockPlans } from "@/features/plan/mock";
 import { calendar as mockCalendar } from "@/features/calendar/mock";
 
 function deriveSourceCode(author: string): string {
-  // The prototype mocks are signed by ANTS authors (Anthony, etc.), which
-  // isn't a valid source_code in the real schema. The news UI only renders
-  // `source_code` as a small byline chip, so anything short works.
+  // Prototype mocks use ANTS author names, not valid source_codes — truncate to fit the byline chip.
   return author.slice(0, 4).toUpperCase();
 }
 
@@ -41,12 +31,6 @@ export function mockApprovedNewsById(id: string): NewsListItem | null {
   return mockApprovedNews().find((n) => n.id === id) ?? null;
 }
 
-/**
- * Map the prototype `TradingPlan` shape into the DB `Plan` row shape. The
- * mock richness (setups with targets[], confidence, etc.) survives via the
- * `.passthrough()` on `PlanSetupSchema` — the PlanDetail component reads
- * those same keys off the setup entries.
- */
 export function mockPublishedPlans(): Plan[] {
   return mockPlans.map((p, idx): Plan => {
     const primary = p.setups[0];
@@ -165,13 +149,6 @@ function newsTimelineEvents(): TimelineEvent[] {
   );
 }
 
-/**
- * Synthesized tweets so the /app/chart sidebar has something to show against
- * the OHLC candles. Spread across the last 14 days and tagged against the
- * chart surfaces' supported symbols (SPX, BTC, ETH, DXY, GOLD) so markers
- * actually land on the timeline. Deterministic — times are offsets from now
- * so the demo looks fresh even on stale checkouts.
- */
 function tweetEvents(): TimelineEvent[] {
   const now = Date.now();
   const hoursAgo = (h: number) => new Date(now - h * 3600 * 1000).toISOString();
@@ -263,11 +240,6 @@ function tweetEvents(): TimelineEvent[] {
   }));
 }
 
-/**
- * Superset of the three kinds that actually have fixture data. Callers filter
- * by `kinds` / `symbols` / window downstream. Other kinds (earnings,
- * user_pin) return empty — the real app handles that gracefully.
- */
 export function mockTimelineEvents(): TimelineEvent[] {
   return [...macroEvents(), ...newsTimelineEvents(), ...tweetEvents()];
 }

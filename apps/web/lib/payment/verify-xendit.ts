@@ -2,20 +2,7 @@ import { z } from "zod";
 import { serverConfig } from "@/lib/config/server";
 import { logger } from "@/lib/logger";
 
-/**
- * Xendit webhook verification (web-app copy).
- *
- * Parallels `apps/worker/src/adapters/payment/xendit.ts` — deliberately
- * duplicated rather than shared via a package so the worker and web app can
- * evolve their env contracts independently. The worker's copy is the source
- * of truth for schema shape; keep this file's `InvoiceCallbackSchema`
- * aligned.
- *
- * Xendit uses a static `x-callback-token` header (NOT HMAC). Verification
- * is a plain string equality check; the token is configured in the Xendit
- * dashboard and mirrored into `XENDIT_WEBHOOK_TOKEN`.
- */
-
+// Xendit uses a static x-callback-token header (NOT HMAC) — plain string equality check.
 if (typeof window !== "undefined") {
   throw new Error(
     "[web] lib/payment/verify-xendit.ts imported from client bundle"

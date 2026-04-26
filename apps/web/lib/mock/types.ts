@@ -24,15 +24,10 @@ export interface NewsItem {
   affects: string[];   // tickers / instruments
   analysis: string;    // "what this means for price"
   tags: Hashtag[];
-  /** Optional: IDs of TradingPlans this news article directly informs. */
   relatedPlanIds?: string[];
 }
 
-/**
- * Per-currency impact scores, 0-9.
- * Fixed order: USD, EUR, GBP, JPY, CHF, CAD, AUD.
- * Higher = the event is expected to move that currency more.
- */
+// Fixed order: USD, EUR, GBP, JPY, CHF, CAD, AUD. 0-9 impact per currency.
 export type CurrencyScores = [number, number, number, number, number, number, number];
 
 export interface CalendarEvent {
@@ -45,14 +40,9 @@ export interface CalendarEvent {
   forecast?: string;
   previous?: string;
   notes?: string;
-  /** Optional cross-reference: a NewsItem.id the desk wants linked from this row. */
   relatedNewsId?: string;
 }
 
-/**
- * Optional curated summary for a calendar day, keyed by YYYY-MM-DD (UTC).
- * If absent, the calendar page derives one from the day's events.
- */
 export interface CalendarDayMeta {
   date: string;     // "2026-04-08"
   summary: string;  // "NFP + Unemployment"

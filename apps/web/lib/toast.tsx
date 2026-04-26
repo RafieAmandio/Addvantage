@@ -71,9 +71,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    // Snapshot the ref at effect-setup time: the ref value could change
-    // before cleanup runs, and the cleanup should only clear the timers
-    // that existed when this effect was registered.
+    // Snapshot ref at setup — ref.current may change before cleanup runs.
     const timersMap = timers.current;
     return () => {
       timersMap.forEach((t) => clearTimeout(t));
@@ -105,8 +103,7 @@ function ToastViewport({
   toasts: Toast[];
   onDismiss: (id: number) => void;
 }) {
-  // Always render the region so screen readers can subscribe to live updates
-  // even before the first toast arrives.
+  // Always rendered so screen readers subscribe to live updates before the first toast.
   return (
     <div
       className="pointer-events-none fixed bottom-5 right-5 z-[95] flex max-w-sm flex-col items-end gap-2"

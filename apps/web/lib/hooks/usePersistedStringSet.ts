@@ -2,18 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-/**
- * Generic primitive for a localStorage-backed string set that stays in sync
- * across instances in the same tab via a CustomEvent.
- *
- * Three feature hooks share this shape (`useSeenNews`, `useReadPrimers`,
- * `useWatchlist`); this primitive collapses their boilerplate into one place.
- * SSR-safe: hydrates on mount, never reads `localStorage` during render.
- *
- * The returned `add` / `remove` / `toggle` / `clear` / `restore` all persist +
- * dispatch; listeners on the same event in the same tab update their local
- * state via a window listener.
- */
 export function usePersistedStringSet(key: string, eventName: string) {
   const [values, setValues] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -98,7 +86,6 @@ function saveToStorage(key: string, values: string[]) {
   try {
     localStorage.setItem(key, JSON.stringify(values));
   } catch {
-    // Storage full / disabled — swallow; behavior gracefully degrades to
-    // in-memory only for this session.
+    // Storage full/disabled — degrades to in-memory only.
   }
 }

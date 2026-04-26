@@ -5,14 +5,6 @@ if (typeof window !== "undefined") {
   throw new Error("lib/cache.ts is server-only");
 }
 
-/**
- * Fetch a JSON-serialised value from Redis. Returns `null` when:
- *  - Upstash env is unset (no-op)
- *  - the key is missing
- *  - the stored payload fails to parse
- *
- * The caller is responsible for narrowing / validating `T` (e.g. via Zod).
- */
 export async function getCache<T>(key: string): Promise<T | null> {
   const redis = getRedis();
   if (!redis) return null;
@@ -37,10 +29,6 @@ export async function getCache<T>(key: string): Promise<T | null> {
   }
 }
 
-/**
- * Store a JSON-serialised value in Redis with TTL (seconds).
- * No-op when Upstash env is unset.
- */
 export async function setCache<T>(
   key: string,
   value: T,

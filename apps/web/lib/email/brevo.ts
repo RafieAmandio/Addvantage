@@ -2,22 +2,6 @@ import { z } from "zod";
 import { serverConfig } from "@/lib/config/server";
 import { logger } from "@/lib/logger";
 
-/**
- * Brevo transactional email helper (web-side copy).
- *
- * Parallels `apps/worker/src/adapters/email/brevo.ts` — deliberately duplicated
- * rather than shared via a package so web and worker can evolve their env
- * contracts independently. Same precedent as `lib/payment/verify-xendit.ts`.
- *
- * Pattern: graceful no-op. Returns `null` (and logs a warning) when any required
- * env is missing — mirrors the heartbeat / Twelve Data / Upstash approach so web
- * can boot without email wired. Callers handle the null path.
- *
- * Docs: https://developers.brevo.com/reference/sendtransacemail
- * Auth: `api-key` header (raw key, NOT Basic).
- * Response (single recipient): `{ messageId: string }`.
- */
-
 if (typeof window !== "undefined") {
   throw new Error("[web] lib/email/brevo.ts imported from client bundle");
 }

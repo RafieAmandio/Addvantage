@@ -1,14 +1,4 @@
-/**
- * Zero-dep JSON logger for the web app (server-side).
- *
- * Pino is intentionally avoided because its `worker_threads` transports
- * collide with Next.js bundling (especially the edge runtime). When we
- * outgrow this, swap the implementation — keep the `logger` surface.
- *
- * Consumers: server components, server actions, route handlers, and
- * any module under `lib/`. Do NOT import from client components.
- */
-
+// Pino avoided — its worker_threads transports collide with Next.js edge bundling.
 type Level = "debug" | "info" | "warn" | "error";
 type Meta = Record<string, unknown>;
 
@@ -19,7 +9,6 @@ interface Logger {
   error: (msg: string, meta?: Meta) => void;
 }
 
-// browser no-ops; this is a server-only logger
 const noop = () => {};
 const noopLogger: Logger = {
   debug: noop,
