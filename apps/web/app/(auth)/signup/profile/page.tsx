@@ -88,7 +88,7 @@ export default function ProfilePage() {
           <button
             onClick={back}
             disabled={step === 0}
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Back
           </button>

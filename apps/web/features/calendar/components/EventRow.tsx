@@ -26,7 +26,7 @@ export function EventRow({
           {event.relatedNewsId && (
             <Link
               href={`/app/news/${event.relatedNewsId}`}
-              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ↗ NEWS
             </Link>

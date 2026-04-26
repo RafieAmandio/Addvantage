@@ -69,7 +69,7 @@ export function BriefClient({ news, plan }: Props) {
                   "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
                   (hideSeen
                     ? "border-brand bg-brand/10 text-brand"
-                    : "border-gray-3 text-white/60 hover:border-brand hover:text-brand")
+                    : "border-gray-3 text-white/60 transition-colors hover:border-brand hover:text-brand")
                 }
               >
                 {hideSeen
@@ -142,7 +142,7 @@ export function BriefClient({ news, plan }: Props) {
           )}
           <Link
             href="/app/news"
-            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             FULL FEED →
           </Link>
@@ -203,7 +203,7 @@ export function BriefClient({ news, plan }: Props) {
             )}
             <Link
               href="/app/plan"
-              className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               {paid ? "Open plan →" : "Unlock plan →"}
             </Link>

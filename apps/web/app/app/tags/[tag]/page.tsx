@@ -36,7 +36,7 @@ export default async function TagPage({
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <Link
             href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← All hashtags
           </Link>
@@ -127,13 +127,13 @@ export default async function TagPage({
             <div className="mt-6 flex items-center justify-center gap-3">
               <Link
                 href="/app/tags"
-                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 ← All hashtags
               </Link>
               <Link
                 href="/app/news"
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Browse news →
               </Link>

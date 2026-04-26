@@ -95,7 +95,7 @@ export function SignupWizard() {
             </p>
             <div className="mt-8 border-t border-gray-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30">
               Already enrolled?{" "}
-              <Link href="/login" className="text-white/60 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
+              <Link href="/login" className="text-white/60 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
                 Operator login →
               </Link>
             </div>
@@ -204,7 +204,7 @@ export function SignupWizard() {
                 type="button"
                 onClick={() => step > 0 && setStep(step - 1)}
                 disabled={step === 0}
-                className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 ← Back
               </button>
@@ -239,7 +239,7 @@ export function SignupWizard() {
             ) : null}
             <div className="mt-8 border-t border-gray-3 pt-4 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30">
               Already enrolled?{" "}
-              <Link href="/login" className="text-white/60 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
+              <Link href="/login" className="text-white/60 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
                 Operator login →
               </Link>
             </div>

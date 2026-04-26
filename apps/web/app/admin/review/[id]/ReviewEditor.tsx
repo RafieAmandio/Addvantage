@@ -15,7 +15,7 @@ function Collapsible({ label, children }: { label: string; children: React.React
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-3 py-2 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:bg-gray-2 hover:text-white/70 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+        className="flex w-full items-center justify-between px-3 py-2 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:bg-gray-2 hover:text-white/70 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
       >
         <span>{label}</span>
         <span className="text-brand">{open ? "▼" : "▶"}</span>
@@ -75,7 +75,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/review"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Queue
           </Link>
@@ -96,7 +96,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             type="button"
             onClick={onReject}
             disabled={pending || item.status !== "pending"}
-            className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright transition-colors hover:bg-blood hover:text-black disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ✕ Reject
           </button>
@@ -112,7 +112,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             type="button"
             onClick={onApprove}
             disabled={pending || item.status !== "pending"}
-            className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ✓ Approve & publish
           </button>
@@ -135,7 +135,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               href={item.source_url}
               target="_blank"
               rel="noreferrer"
-              className="block truncate border border-gray-3 bg-black px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="block truncate border border-gray-3 bg-black px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ↗ {item.source_url}
             </a>

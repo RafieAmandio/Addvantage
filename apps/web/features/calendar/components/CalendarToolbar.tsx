@@ -53,7 +53,7 @@ export function CalendarToolbar({
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))}
           aria-label={`Previous ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           ←
         </button>
@@ -68,7 +68,7 @@ export function CalendarToolbar({
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, 1))}
           aria-label={`Next ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           →
         </button>

@@ -171,7 +171,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   #{t}
                 </Link>

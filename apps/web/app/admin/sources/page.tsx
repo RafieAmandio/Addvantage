@@ -57,7 +57,7 @@ export default async function AdminSourcesPage() {
                   href={s.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   {s.url}
                 </a>

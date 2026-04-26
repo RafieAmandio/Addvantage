@@ -25,7 +25,7 @@ export function NewsCreateForm() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/review"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Queue
           </Link>
@@ -206,7 +206,7 @@ export function NewsCreateForm() {
           <button
             type="submit"
             disabled={pending}
-            className="border border-brand bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="border border-brand bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {pending ? "Creating…" : "Create → Review queue"}
           </button>
