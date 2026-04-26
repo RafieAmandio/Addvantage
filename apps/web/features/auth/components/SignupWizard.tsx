@@ -119,7 +119,7 @@ export function SignupWizard() {
                       setForm({ ...form, email: e.target.value })
                     }
                     placeholder="operator@domain.local"
-                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus:border-brand"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus-visible:border-brand"
                   />
                 </div>
                 <div>
@@ -133,7 +133,7 @@ export function SignupWizard() {
                       setForm({ ...form, handle: e.target.value })
                     }
                     placeholder="operator-00417"
-                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus:border-brand"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus-visible:border-brand"
                   />
                 </div>
               </div>

@@ -98,14 +98,14 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={plan?.symbol ?? ""}
               required
               placeholder="SPX"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
           <Field label="Direction">
             <select
               name="direction"
               defaultValue={plan?.direction ?? "long"}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
             >
               {DIRECTIONS.map((d) => (
                 <option key={d} value={d}>
@@ -118,7 +118,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <select
               name="tier"
               defaultValue={plan?.tier ?? "free"}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
             >
               {TIERS.map((t) => (
                 <option key={t} value={t}>
@@ -136,7 +136,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             required
             defaultValue={plan?.thesis ?? ""}
             placeholder="Why this trade, what breaks it"
-            className="mt-4 w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus:border-brand focus:outline-none"
+            className="mt-4 w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
           />
         </Field>
 
@@ -147,7 +147,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.entry ?? null)}
               type="number"
               step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
           <Field label="Stop">
@@ -156,7 +156,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.stop ?? null)}
               type="number"
               step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
           <Field label="Target">
@@ -165,7 +165,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.target ?? null)}
               type="number"
               step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
           <Field label="R multiple">
@@ -174,7 +174,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               defaultValue={num(plan?.r_multiple ?? null)}
               type="number"
               step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus:border-brand focus:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
         </div>
@@ -184,7 +184,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             name="tags"
             defaultValue={plan?.tags.join(", ") ?? ""}
             placeholder="risk-management, mean-reversion"
-            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus:border-brand focus:outline-none"
+            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
           />
         </Field>
 
@@ -197,7 +197,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 ? JSON.stringify(plan.setups, null, 2)
                 : "[]"
             }
-            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs leading-relaxed text-white focus:border-brand focus:outline-none"
+            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
           />
         </Field>
 
@@ -230,7 +230,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 <select
                   name="outcome"
                   defaultValue="win"
-                  className="border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus:border-brand focus:outline-none"
+                  className="border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
                 >
                   {OUTCOMES.map((o) => (
                     <option key={o} value={o}>
@@ -244,7 +244,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                   step="any"
                   placeholder="Close price"
                   aria-label="Close price"
-                  className="w-32 border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs text-white focus:border-brand focus:outline-none"
+                  className="w-32 border border-gray-3 bg-gray-2 px-2 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
                 />
                 <button
                   type="submit"

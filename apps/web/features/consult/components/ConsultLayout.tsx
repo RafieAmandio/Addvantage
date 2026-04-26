@@ -281,7 +281,7 @@ export function ConsultLayout({
               }}
               rows={2}
               placeholder="Describe your situation. Include position size, entry, stop, and what you're feeling about it…  (press i to focus, esc to blur)"
-              className="flex-1 resize-none border border-gray-3 bg-black p-3 font-mono text-sm text-white placeholder:text-white/30 outline-none focus:border-brand"
+              className="flex-1 resize-none border border-gray-3 bg-black p-3 font-mono text-sm text-white placeholder:text-white/30 outline-none focus-visible:border-brand"
             />
             <button
               onClick={send}

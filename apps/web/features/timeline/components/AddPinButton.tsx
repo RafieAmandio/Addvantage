@@ -159,7 +159,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="text"
                   required
                   maxLength={200}
-                  className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
+                  className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
                 />
               </div>
 
@@ -175,7 +175,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   name="body"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 w-full resize-none border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
+                  className="mt-2 w-full resize-none border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
                 />
               </div>
 
@@ -201,7 +201,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                     required
                     value={localDt}
                     onChange={(e) => setLocalDt(e.currentTarget.value)}
-                    className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus:border-brand"
+                    className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
                   />
                   <input type="hidden" name="occurredAt" value={occurredAtIso} />
                 </div>

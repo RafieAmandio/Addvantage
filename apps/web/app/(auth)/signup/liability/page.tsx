@@ -163,7 +163,7 @@ export default function LiabilityPage() {
                 ? "border-blood text-blood-bright"
                 : looksLikeFullName
                 ? "border-moss text-moss"
-                : "border-brand/40 text-brand focus:border-brand")
+                : "border-brand/40 text-brand focus-visible:border-brand")
             }
           />
           {signatureError && (
