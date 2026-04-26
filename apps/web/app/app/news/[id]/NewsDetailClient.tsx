@@ -79,8 +79,6 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
     [relatedFeed, item.id, item.tags]
   );
 
-  const hasRelated = relatedNews.length > 0;
-
   const ts = item.published_at ?? item.fetched_at;
 
   return (
@@ -153,14 +151,21 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         </div>
 
-        <RelatedPlansChips
-          planIds={item.related_plan_ids}
-          className="mt-8 sm:mt-12"
-        />
+        {(item.related_plan_ids ?? []).length > 0 && (
+          <>
+            <div className="mt-8 sm:mt-12">
+              <SectionNumber n="04 /" label="LINKED PLANS" />
+            </div>
+            <RelatedPlansChips
+              planIds={item.related_plan_ids}
+              className="mt-4"
+            />
+          </>
+        )}
 
         {item.tags.length > 0 && (
           <div className="mt-8 sm:mt-12">
-            <SectionNumber n="04 /" label="TAGGED" />
+            <SectionNumber n="05 /" label="TAGGED" />
             <div className="mt-4 flex flex-wrap gap-2">
               {item.tags.map((t) => (
                 <Link
@@ -175,55 +180,52 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         )}
 
-        {hasRelated && (
+        {relatedNews.length > 0 && (
           <div className="mt-8 border-t border-gray-3 pt-8 sm:mt-12 sm:pt-10">
-            <SectionNumber n="05 /" label="RELATED · BY HASHTAG" />
+            <SectionNumber n="06 /" label="RELATED · BY HASHTAG" />
             <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               Other items in the DOMAIN that share at least one tag with this article.
             </p>
 
-            {relatedNews.length > 0 && (
-              <div className="mt-6">
-                <DataLabel>News · {relatedNews.length}</DataLabel>
-                <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
-                  {relatedNews.map((n) => (
-                    <Link
-                      key={n.id}
-                      href={`/app/news/${n.id}`}
-                      className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                          [{n.source_code}]
+            <div className="mt-6">
+              <DataLabel>News · {relatedNews.length}</DataLabel>
+              <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
+                {relatedNews.map((n) => (
+                  <Link
+                    key={n.id}
+                    href={`/app/news/${n.id}`}
+                    className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
+                        [{n.source_code}]
+                      </span>
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                        · BY {n.author.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
+                      {n.headline}
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {n.tags.map((t) => (
+                        <span
+                          key={t}
+                          className={
+                            "font-mono text-[9px] uppercase tracking-widest2 " +
+                            (item.tags.includes(t)
+                              ? "text-brand"
+                              : "text-white/30")
+                          }
+                        >
+                          #{t}
                         </span>
-                        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                          · BY {n.author.toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
-                        {n.headline}
-                      </div>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {n.tags.map((t) => (
-                          <span
-                            key={t}
-                            className={
-                              "font-mono text-[9px] uppercase tracking-widest2 " +
-                              (item.tags.includes(t)
-                                ? "text-brand"
-                                : "text-white/30")
-                            }
-                          >
-                            #{t}
-                          </span>
-                        ))}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                      ))}
+                    </div>
+                  </Link>
+                ))}
               </div>
-            )}
-
+            </div>
           </div>
         )}
 

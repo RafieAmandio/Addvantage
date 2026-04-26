@@ -20,8 +20,9 @@ export function RelatedPlansChips({ planIds, className }: Props) {
             key={id}
             href={`/app/plan/${id}`}
             className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+            title={id}
           >
-            {id}
+            PLAN {id.slice(0, 8)}
           </Link>
         ))}
       </div>
