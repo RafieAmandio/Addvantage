@@ -45,7 +45,7 @@ export default function HomePage() {
         year: "numeric",
       })
     );
-    setIsMac(/Mac|iPhone|iPad/.test(navigator.platform));
+    setIsMac(/Mac|iPhone|iPad/.test(navigator.userAgent));
   }, []);
 
   const greet = hour === null ? "Welcome" : greeting(hour);
@@ -57,7 +57,6 @@ export default function HomePage() {
   const featuredPrimer = pickFeaturedPrimer(primers, readIds, paid);
   const channelTop = channelPosts[0];
 
-  // Watchlist mentions — news + plan setups that touch any pinned ticker
   const watchNewsMentions = watchHydrated
     ? filterNewsByWatch(news, tickers)
     : [];
@@ -65,14 +64,10 @@ export default function HomePage() {
     ? filterSetupsByWatch(plan.setups, tickers)
     : [];
 
-  // Historical setups on watched tickers, across all archived plans.
-  // Used to surface "edge on my pins" — wins/losses specific to the user's
-  // watchlist instruments. Ordered newest-first, capped at 6.
   const watchArchiveSetups = watchHydrated
     ? collectWatchArchiveSetups(getAllPlans(), tickers, plan.id)
     : [];
 
-  // Quick stats
   const highImpactToday = news.filter((n) => n.impact === "high").length;
   const highCalendar = calendar.filter((c) => c.impact === "high").length;
   const openSetups = plan.setups.length;
@@ -120,7 +115,6 @@ export default function HomePage() {
         />
       </div>
 
-      {/* ─── FOOTER NOTE ─── */}
       <div className="mx-auto max-w-7xl px-4 py-6 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30 animate-[revealUp_0.6s_ease-out_both] sm:px-6 sm:py-8">
         ANTS // DOMAIN // OPERATOR HOME<span className="hidden sm:inline"> · Press ⌘K or / to search · Press ? for shortcuts</span>
       </div>

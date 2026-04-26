@@ -2,10 +2,6 @@ import Link from "next/link";
 import { DataLabel } from "@/components/ui/Marker";
 import { cn } from "@/lib/cn";
 
-/**
- * Six-tile "jump to" pillar grid — TX-01..TX-06. Static content; `paid`
- * toggles the LOCKED state on premium pillars.
- */
 export function PillarShortcuts({
   paid,
   className,

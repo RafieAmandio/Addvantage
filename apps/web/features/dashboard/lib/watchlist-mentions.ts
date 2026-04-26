@@ -1,9 +1,6 @@
 import type { NewsItem, TradingPlan, TradingSetup } from "@/lib/mock/types";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
 
-/**
- * News items whose `affects` intersect the pinned tickers.
- */
 export function filterNewsByWatch(
   items: NewsItem[],
   tickers: string[]
@@ -11,9 +8,6 @@ export function filterNewsByWatch(
   return items.filter((n) => n.affects.some((a) => tickers.includes(a)));
 }
 
-/**
- * Live setups from the current plan that target a watched instrument.
- */
 export function filterSetupsByWatch(
   setups: TradingSetup[],
   tickers: string[]
@@ -21,10 +15,6 @@ export function filterSetupsByWatch(
   return setups.filter((s) => tickers.includes(s.instrument));
 }
 
-/**
- * Flatten every archived plan's setups down to the ones on watched tickers,
- * skip the currently-live plan, cap to `limit` for UI density.
- */
 export function collectWatchArchiveSetups(
   plans: TradingPlan[],
   tickers: string[],

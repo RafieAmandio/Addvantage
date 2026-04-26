@@ -1,12 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-/**
- * Small numbered section header used across the dashboard surfaces
- * (e.g. "01 / Top of the wire · 3 most-impact items"). Kept internal to
- * the dashboard feature — if a second feature needs the same shape, promote
- * to `components/ui/`.
- */
 export function SectionHeader({
   n,
   label,
