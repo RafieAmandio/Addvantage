@@ -133,7 +133,7 @@ export function FeaturedRow({
               </div>
               <Link
                 href="/app/plan"
-                className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 {paid ? "Open plan →" : "Unlock plan →"}
               </Link>

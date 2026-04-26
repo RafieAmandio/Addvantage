@@ -84,7 +84,7 @@ export function ConsultLayout({
         </div>
         <button
           onClick={onNewSession}
-          className="mt-3 flex w-full items-center justify-center gap-2 border border-brand bg-brand/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          className="mt-3 flex w-full items-center justify-center gap-2 border border-brand bg-brand/5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           <span className="text-base leading-none">+</span>
           New session
