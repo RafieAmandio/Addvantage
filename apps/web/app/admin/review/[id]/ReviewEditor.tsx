@@ -126,7 +126,6 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Left: original */}
         <div className="border border-gray-3 bg-gray-2/20 p-6">
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
             ORIGINAL · [{item.source_code}]
@@ -146,7 +145,6 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
           </pre>
         </div>
 
-        {/* Right: editable rephrase */}
         <div className="border border-brand/40 bg-black p-6">
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             REPHRASED · EDITABLE
@@ -255,7 +253,6 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         </div>
       </div>
 
-      {/* AI Pipeline Audit Trail */}
       {(item.ai_system_prompt || item.ai_user_message || item.ai_raw_response) && (
         <div className="mt-6">
           <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">

@@ -24,8 +24,6 @@ export interface PlanActionState {
   id?: string;
 }
 
-// --- input schemas --------------------------------------------------------
-
 const nullableNumber = z
   .union([z.string(), z.number(), z.null(), z.undefined()])
   .transform((v) => {
@@ -93,13 +91,6 @@ export const PlanCloseInputSchema = z.object({
   close_price: nullableNumber,
 });
 
-/**
- * Compute realized-R from entry/stop risk geometry. Returns null whenever the
- * inputs are incomplete or the risk leg is degenerate (`entry === stop` would
- * divide by zero). Longs: profit relative to the one-R risk leg below entry;
- * shorts: profit relative to the one-R risk leg above entry. Rounded to 2dp
- * so the DB doesn't store noisy floating-point tails.
- */
 function computeRealizedR(input: {
   direction: "long" | "short";
   entry: number | null;
@@ -117,8 +108,6 @@ function computeRealizedR(input: {
   return Math.round(raw * 100) / 100;
 }
 
-// --- form helpers ---------------------------------------------------------
-
 function readPlanForm(fd: FormData) {
   return {
     symbol: fd.get("symbol"),
@@ -133,8 +122,6 @@ function readPlanForm(fd: FormData) {
     tier: fd.get("tier"),
   };
 }
-
-// --- actions --------------------------------------------------------------
 
 export async function createPlan(
   _prev: PlanActionState,

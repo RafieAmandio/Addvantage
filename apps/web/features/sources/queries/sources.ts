@@ -17,7 +17,6 @@ type SourceRow = z.infer<typeof SourceRowSchema>;
 const SOURCE_LIST_COLUMNS =
   "code,name,url,enabled,poll_minutes,last_polled_at,last_success_at,last_error";
 
-/** Admin-facing source registry, ordered by code. RLS gates write access. */
 export async function listSources(): Promise<SourceRow[]> {
   const supabase = supabaseServer();
   const { data, error } = await supabase
