@@ -24,7 +24,7 @@ export function PlanComparePicker({
       <select
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="mt-1 w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white outline-none focus-visible:border-brand"
+        className="mt-1 w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
       >
         <option value="">— pick a plan —</option>
         {plans.map((p) => {

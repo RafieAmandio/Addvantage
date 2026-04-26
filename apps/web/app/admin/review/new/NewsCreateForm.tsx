@@ -55,7 +55,7 @@ export function NewsCreateForm() {
               <select
                 name="source_code"
                 defaultValue="FRED"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               >
                 {SOURCE_CODES.map((code) => (
                   <option key={code} value={code}>
@@ -70,7 +70,7 @@ export function NewsCreateForm() {
                 name="source_url"
                 type="url"
                 placeholder="https://..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
 
@@ -79,7 +79,7 @@ export function NewsCreateForm() {
                 name="raw_text"
                 rows={8}
                 placeholder="Paste the original text here..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
           </div>
@@ -95,7 +95,7 @@ export function NewsCreateForm() {
                 required
                 maxLength={240}
                 placeholder="Terse, tactical headline — no clickbait"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-display text-xl text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-display text-xl text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
 
@@ -105,7 +105,7 @@ export function NewsCreateForm() {
                 rows={5}
                 required
                 placeholder="Full rephrase of the source material..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
 
@@ -115,7 +115,7 @@ export function NewsCreateForm() {
                 rows={4}
                 required
                 placeholder="One paragraph: what this means for price action..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
 
@@ -124,7 +124,7 @@ export function NewsCreateForm() {
                 <select
                   name="impact"
                   defaultValue="medium"
-                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
                 >
                   {IMPACT_LEVELS.map((v) => (
                     <option key={v} value={v}>
@@ -137,7 +137,7 @@ export function NewsCreateForm() {
                 <select
                   name="bias"
                   defaultValue="neutral"
-                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
                 >
                   {BIAS_LEVELS.map((v) => (
                     <option key={v} value={v}>
@@ -152,7 +152,7 @@ export function NewsCreateForm() {
               <input
                 name="affects"
                 placeholder="SPX, DXY, US10Y"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
 
@@ -162,7 +162,7 @@ export function NewsCreateForm() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="risk-management, mean-reversion"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
               <div className="mt-1 flex flex-wrap gap-1 font-mono text-[8px] uppercase tracking-widest2 text-white/40">
                 {HASHTAGS.map((h) => (
@@ -190,7 +190,7 @@ export function NewsCreateForm() {
                 name="author"
                 required
                 defaultValue="DESK"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </Field>
           </div>

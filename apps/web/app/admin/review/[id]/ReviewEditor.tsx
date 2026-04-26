@@ -154,7 +154,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             <input
               value={draft.headline}
               onChange={(e) => setDraft((d) => ({ ...d, headline: e.target.value }))}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-display text-xl text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-display text-xl text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
 
@@ -163,7 +163,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               rows={5}
               value={draft.rephrased}
               onChange={(e) => setDraft((d) => ({ ...d, rephrased: e.target.value }))}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
 
@@ -172,7 +172,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               rows={4}
               value={draft.analysis}
               onChange={(e) => setDraft((d) => ({ ...d, analysis: e.target.value }))}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
 
@@ -183,7 +183,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, impact: e.target.value as typeof draft.impact }))
                 }
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               >
                 {IMPACT_LEVELS.map((v) => (
                   <option key={v} value={v}>
@@ -198,7 +198,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, bias: e.target.value as typeof draft.bias }))
                 }
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               >
                 {BIAS_LEVELS.map((v) => (
                   <option key={v} value={v}>
@@ -214,7 +214,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               value={draft.affects}
               onChange={(e) => setDraft((d) => ({ ...d, affects: e.target.value }))}
               placeholder="SPX, DXY, US10Y"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
 
@@ -223,7 +223,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               value={draft.tags}
               onChange={(e) => setDraft((d) => ({ ...d, tags: e.target.value }))}
               placeholder="risk-management, mean-reversion"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
             <div className="mt-1 flex flex-wrap gap-1 font-mono text-[8px] uppercase tracking-widest2 text-white/40">
               {HASHTAGS.map((h) => (
@@ -247,7 +247,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             <input
               value={draft.author}
               onChange={(e) => setDraft((d) => ({ ...d, author: e.target.value }))}
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white focus-visible:border-brand focus-visible:outline-none"
+              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
         </div>

@@ -69,7 +69,7 @@ export function StepMarketsGoal({ form, setForm, toggleMarket }: Props) {
           value={form.yearlyGoal}
           onChange={(e) => setForm({ ...form, yearlyGoal: e.target.value })}
           placeholder="e.g. 30% annual return, consistent 2R average, survive the year without blowing up"
-          className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus-visible:border-brand"
+          className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none transition-colors focus-visible:border-brand"
         />
       </div>
     </div>

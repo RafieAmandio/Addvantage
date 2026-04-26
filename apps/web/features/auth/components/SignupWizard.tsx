@@ -118,8 +118,9 @@ export function SignupWizard() {
                     onChange={(e) =>
                       setForm({ ...form, email: e.target.value })
                     }
+                    autoComplete="email"
                     placeholder="operator@domain.local"
-                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus-visible:border-brand"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none transition-colors focus-visible:border-brand"
                   />
                 </div>
                 <div>
@@ -132,8 +133,9 @@ export function SignupWizard() {
                     onChange={(e) =>
                       setForm({ ...form, handle: e.target.value })
                     }
+                    autoComplete="username"
                     placeholder="operator-00417"
-                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none focus-visible:border-brand"
+                    className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none transition-colors focus-visible:border-brand"
                   />
                 </div>
               </div>
