@@ -120,7 +120,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       {flash ? (
         <div
           role="status"
-          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-brand bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand shadow-[0_0_40px_rgba(163,230,53,0.25)]"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-brand bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand shadow-[0_0_40px_rgba(255,212,0,0.25)]"
         >
           {flash}
         </div>
@@ -138,7 +138,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
             className="absolute inset-0 bg-black/85 backdrop-blur-md"
             aria-hidden
           />
-          <div className="relative w-full max-w-lg border border-brand bg-gray-2 shadow-[0_0_60px_rgba(163,230,53,0.18)]">
+          <div className="relative w-full max-w-lg border border-brand bg-gray-2 shadow-[0_0_60px_rgba(255,212,0,0.18)]">
             <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
             <div className="border-b border-gray-3 p-5">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -250,5 +250,3 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
     </>
   );
 }
-
-export default AddPinButton;

@@ -197,5 +197,3 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
     </div>
   );
 }
-
-export default EventDrawer;

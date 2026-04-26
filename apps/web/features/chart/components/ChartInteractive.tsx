@@ -69,5 +69,3 @@ export function ChartInteractive({
     </>
   );
 }
-
-export default ChartInteractive;

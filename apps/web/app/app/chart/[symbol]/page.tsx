@@ -94,7 +94,7 @@ export default async function ChartPage({
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="stagger mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">

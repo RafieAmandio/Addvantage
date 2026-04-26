@@ -406,5 +406,3 @@ function formatClock(iso: string): string {
     minute: "2-digit",
   });
 }
-
-export default PriceChart;
