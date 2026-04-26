@@ -8,11 +8,6 @@ import { mockApprovedNews, mockApprovedNewsById } from "@/lib/mock/fixtures";
 const ImpactSchema = z.enum(IMPACT_LEVELS);
 const BiasSchema = z.enum(BIAS_LEVELS);
 
-/**
- * Narrow shape for the public news feed. Mirrors the SELECT column list in
- * `listApprovedNews` / `getApprovedNewsById`. Validated at the query boundary
- * — if the DB schema drifts, parse fails fast instead of corrupting the view.
- */
 export const NewsListRowSchema = z.object({
   id: z.string(),
   source_code: z.string(),
@@ -32,10 +27,6 @@ export const NewsListRowSchema = z.object({
 const NewsListItemSchema = NewsListRowSchema.omit({ status: true });
 export type NewsListItem = z.infer<typeof NewsListItemSchema>;
 
-/**
- * Narrow projection for the admin review/archive list pages. The detail page
- * (`/admin/review/[id]`) still loads the full row via `getNewsItemById`.
- */
 const NewsAdminListRowSchema = z.object({
   id: z.string(),
   source_code: z.string(),
@@ -55,11 +46,6 @@ const NEWS_ADMIN_LIST_COLUMNS =
 
 const DEFAULT_ADMIN_LIST_LIMIT = 100;
 
-/**
- * Full news_items row used by the admin review *detail* page. Keep in sync
- * with the DB columns; new columns must be added here too or `getNewsItemById`
- * will reject them.
- */
 const NewsRowSchema = z.object({
   id: z.string(),
   source_code: z.string(),
@@ -91,18 +77,14 @@ type NewsRow = z.infer<typeof NewsRowSchema>;
 export const NEWS_LIST_COLUMNS =
   "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
 
-// Full detail projection consumed by /admin/review/[id]. Explicit list (never
-// `select('*')`) shields the route from column drift on news_items.
 const NEWS_DETAIL_COLUMNS =
   "id,source_code,source_url,raw_text,content_hash,fetched_at,published_at,status,headline,rephrased,analysis,impact,bias,affects,tags,author,reviewed_at,reviewed_by,related_plan_ids,ai_system_prompt,ai_user_message,ai_raw_response,created_at,updated_at";
 
 export function toNewsListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
-  // Drop status from the public projection.
   const { status: _status, ...rest } = row;
   return rest;
 }
 
-/** Public-facing news feed: APPROVED items only, newest first. RLS enforces this. */
 export async function listApprovedNews(): Promise<NewsListItem[]> {
   if (isMockMode()) return mockApprovedNews();
   const supabase = supabaseServer();
@@ -155,7 +137,6 @@ interface AdminListPage {
   offset?: number;
 }
 
-/** Admin: pending review queue, oldest first. Paginated, narrow projection. */
 export async function listPendingNews(
   page: AdminListPage = {},
 ): Promise<NewsAdminListItem[]> {
@@ -172,7 +153,6 @@ export async function listPendingNews(
   return NewsAdminListRowSchema.array().parse(data ?? []);
 }
 
-/** Admin: rejected archive, newest first. Paginated, narrow projection. */
 export async function listRejectedNews(
   page: AdminListPage = {},
 ): Promise<NewsAdminListItem[]> {

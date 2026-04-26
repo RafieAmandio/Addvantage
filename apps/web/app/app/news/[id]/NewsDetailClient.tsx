@@ -41,26 +41,26 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const target = e.target as HTMLElement | null;
-      if (target) {
-        const tag = target.tagName;
+      const el = e.target as HTMLElement | null;
+      if (el) {
+        const tag = el.tagName;
         if (
           tag === "INPUT" ||
           tag === "TEXTAREA" ||
           tag === "SELECT" ||
-          target.isContentEditable
+          el.isContentEditable
         ) {
           return;
         }
       }
       if (e.key === "j") {
         e.preventDefault();
-        const target = next ?? relatedFeed[0];
-        if (target) router.push(`/app/news/${target.id}`);
+        const dest = next ?? relatedFeed[0];
+        if (dest) router.push(`/app/news/${dest.id}`);
       } else if (e.key === "k") {
         e.preventDefault();
-        const target = prev ?? relatedFeed[relatedFeed.length - 1];
-        if (target) router.push(`/app/news/${target.id}`);
+        const dest = prev ?? relatedFeed[relatedFeed.length - 1];
+        if (dest) router.push(`/app/news/${dest.id}`);
       }
     };
     window.addEventListener("keydown", onKey);
