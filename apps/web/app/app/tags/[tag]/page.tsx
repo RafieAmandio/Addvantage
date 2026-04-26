@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
-import { allHashtags, hashtagMeta } from "@/features/tags/constants";
+import { hashtagMeta } from "@/features/tags/constants";
 import { listNewsByTag, listPrimersByTag } from "@/features/tags/queries";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
@@ -36,7 +36,7 @@ export default async function TagPage({
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <Link
             href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← All hashtags
           </Link>
@@ -64,7 +64,7 @@ export default async function TagPage({
                 <Link
                   key={p.id}
                   href={`/app/education/${p.id}`}
-                  className="bg-black p-5 transition-colors hover:bg-gray-2"
+                  className="bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                     {p.id}
@@ -89,7 +89,7 @@ export default async function TagPage({
                 <Link
                   key={n.id}
                   href={`/app/news/${n.id}`}
-                  className="block bg-black p-4 transition-colors hover:bg-gray-2"
+                  className="block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   <div className="flex items-baseline justify-between">
                     <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -127,13 +127,13 @@ export default async function TagPage({
             <div className="mt-6 flex items-center justify-center gap-3">
               <Link
                 href="/app/tags"
-                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 ← All hashtags
               </Link>
               <Link
                 href="/app/news"
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Browse news →
               </Link>

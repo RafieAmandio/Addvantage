@@ -131,7 +131,7 @@ function TagsView() {
   }, [counts, query]);
 
   return (
-    <div className="stagger">
+    <div className="stagger bg-grid">
       <BackToTop />
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
@@ -186,7 +186,7 @@ function TagsView() {
                   key={opt.v}
                   onClick={() => setSortMode(opt.v)}
                   className={cn(
-                    "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+                    "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                     sortMode === opt.v
                       ? "bg-brand text-black"
                       : "bg-gray-2 text-white/60 hover:text-white",
@@ -209,7 +209,7 @@ function TagsView() {
             </div>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ✕ Clear search
             </button>
@@ -225,7 +225,7 @@ function TagsView() {
               <Link
                 key={tag}
                 href={`/app/tags/${tag}`}
-                className="group relative col-span-12 overflow-hidden bg-black p-6 transition-colors hover:bg-gray-2 sm:col-span-6 lg:col-span-4"
+                className="group relative col-span-12 overflow-hidden bg-black p-6 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:col-span-6 lg:col-span-4"
               >
                 <div
                   className="absolute bottom-0 left-0 h-0.5 bg-brand/70 transition-all group-hover:h-1"
