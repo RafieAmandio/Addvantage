@@ -3,9 +3,6 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isMockMode } from "@/lib/config/public";
-import { primers } from "@/features/education/mock";
-import { channelPosts } from "@/features/channel/mock";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
   DataLabel,
@@ -78,21 +75,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
     .slice(0, 4)
     .map((x) => x.n);
 
-  const mock = isMockMode();
-  const relatedPrimers = mock
-    ? primers
-        .filter((p) => p.tags.some((t) => item.tags.includes(t as (typeof p.tags)[number])))
-        .slice(0, 2)
-    : [];
-
-  const relatedChannel = mock
-    ? channelPosts
-        .filter((c) => c.tags.some((t) => item.tags.includes(t as (typeof c.tags)[number])))
-        .slice(0, 2)
-    : [];
-
-  const hasRelated =
-    relatedNews.length + relatedPrimers.length + relatedChannel.length > 0;
+  const hasRelated = relatedNews.length > 0;
 
   const ts = item.published_at ?? item.fetched_at;
 
@@ -237,55 +220,6 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
               </div>
             )}
 
-            {relatedPrimers.length > 0 && (
-              <div className="mt-6">
-                <DataLabel>Primers · {relatedPrimers.length}</DataLabel>
-                <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
-                  {relatedPrimers.map((p) => (
-                    <Link
-                      key={p.id}
-                      href={`/app/education/${p.id}`}
-                      className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
-                    >
-                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        {p.id} · {p.readingMin} min
-                      </div>
-                      <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
-                        {p.title}
-                      </div>
-                      <div className="mt-1 font-mono text-[9px] italic uppercase tracking-widest2 text-brand/60">
-                        {p.framework}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {relatedChannel.length > 0 && (
-              <div className="mt-6">
-                <DataLabel>Channel posts · {relatedChannel.length}</DataLabel>
-                <div className="mt-3 space-y-px bg-gray-3">
-                  {relatedChannel.map((c) => (
-                    <Link
-                      key={c.id}
-                      href="/app/channel"
-                      className="group block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2"
-                    >
-                      <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2">
-                        <span className="text-brand">{c.id}</span>
-                        <span className="text-white/40">
-                          · BY {c.author.toUpperCase()} · {formatDate(c.ts)}
-                        </span>
-                      </div>
-                      <p className="mt-2 line-clamp-2 text-sm text-white/80 group-hover:text-white">
-                        {c.body}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
 
