@@ -13,8 +13,16 @@ export default async function AdminReviewQueuePage() {
         <h1 className="font-display text-4xl text-white">
           Review <span className="italic text-brand">queue</span>
         </h1>
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          {items.length} pending
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            {items.length} pending
+          </span>
+          <Link
+            href="/admin/review/new"
+            className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+          >
+            + New item
+          </Link>
         </div>
       </div>
 

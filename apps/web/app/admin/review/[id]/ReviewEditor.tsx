@@ -115,7 +115,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
               href={item.source_url}
               target="_blank"
               rel="noreferrer"
-              className="block truncate border border-gray-3 text-black px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="block truncate border border-gray-3 bg-black px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
             >
               ↗ {item.source_url}
             </a>
@@ -126,7 +126,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         </div>
 
         {/* Right: editable rephrase */}
-        <div className="border border-brand/40 text-black p-6">
+        <div className="border border-brand/40 bg-black p-6">
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             REPHRASED · EDITABLE
           </div>

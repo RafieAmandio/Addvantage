@@ -55,7 +55,7 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 1.1 | Admin: insert news form — manual entry | [ ] | Admin can create a news item directly |
+| 1.1 | Admin: insert news form — manual entry | [x] | /admin/review/new — form with source, headline, analysis, impact, bias, affects, tags; creates pending item and redirects to review |
 | 1.2 | Admin: show raw text on review page | [ ] | Raw input visible alongside AI output |
 | 1.3 | Admin: show AI system prompt + user message | [ ] | What was sent to OpenAI |
 | 1.4 | Admin: show AI raw response (before schema parsing) | [ ] | Full JSON output from model |

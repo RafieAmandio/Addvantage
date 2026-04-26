@@ -52,3 +52,24 @@ export const NewsItemEditSchema = z.object({
 });
 
 export type NewsItemEdit = z.infer<typeof NewsItemEditSchema>;
+
+/**
+ * Shape for manually creating a news item from the admin panel.
+ * Covers all user-facing fields; server action fills id, content_hash,
+ * timestamps, and review metadata.
+ */
+export const NewsItemCreateSchema = z.object({
+  headline: z.string().min(1, "Headline is required").max(240),
+  rephrased: z.string().min(1, "Body is required"),
+  analysis: z.string().min(1, "Analysis is required"),
+  impact: z.enum(IMPACT_LEVELS),
+  bias: z.enum(BIAS_LEVELS),
+  affects: z.array(z.string()),
+  tags: z.array(z.enum(HASHTAGS)),
+  author: z.string().min(1, "Author is required"),
+  source_code: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
+  source_url: z.string().url().nullable(),
+  raw_text: z.string().nullable(),
+});
+
+export type NewsItemCreate = z.infer<typeof NewsItemCreateSchema>;
