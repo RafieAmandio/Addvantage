@@ -74,7 +74,7 @@ export default function SubscriptionPage() {
               <div
                 className={
                   "mt-2 font-mono text-sm uppercase tracking-widest2 " +
-                  (liabilitySigned ? "text-moss" : "text-red-500")
+                  (liabilitySigned ? "text-moss" : "text-blood-bright")
                 }
               >
                 {liabilitySigned ? "✓ SIGNED" : "● UNSIGNED"}

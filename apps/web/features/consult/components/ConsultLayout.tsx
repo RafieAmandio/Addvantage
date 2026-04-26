@@ -91,7 +91,7 @@ export function ConsultLayout({
         </button>
         {sessions.length === 0 && (
           <div className="mt-3 border border-gray-3 bg-black p-4 text-center">
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
+            <div className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
               ● NO MATCHES
             </div>
             <div className="mt-1 font-mono text-[10px] text-white/50">
@@ -190,7 +190,7 @@ export function ConsultLayout({
                         onDeleteSession(s.id, s.title);
                       }}
                       title="Delete session"
-                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-red-500"
+                      className="border border-gray-3 bg-gray-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright"
                     >
                       ✕
                     </button>

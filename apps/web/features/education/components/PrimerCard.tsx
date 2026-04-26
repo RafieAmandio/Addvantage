@@ -31,7 +31,7 @@ function PrimerCardImpl({ primer: p, query, locked, read, indexLabel }: PrimerCa
         <div
           className={
             "font-mono text-[9px] uppercase tracking-widest2 " +
-            (locked ? "text-red-500" : "text-moss")
+            (locked ? "text-blood-bright" : "text-moss")
           }
         >
           ● {locked ? "LOCKED" : "OPEN"}

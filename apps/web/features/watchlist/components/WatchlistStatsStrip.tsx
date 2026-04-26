@@ -46,7 +46,7 @@ export function WatchlistStatsStrip({
             (aggregateR > 0
               ? "text-moss"
               : aggregateR < 0
-              ? "text-red-500"
+              ? "text-blood-bright"
               : "text-white/70")
           }
         >

@@ -69,7 +69,7 @@ export function PlanDetailHeader({
           </div>
           <div className="flex flex-col items-end gap-2">
             <div className="font-mono text-[10px] uppercase tracking-widest2">
-              <div className={paid ? "text-moss" : "text-red-500"}>
+              <div className={paid ? "text-moss" : "text-blood-bright"}>
                 ● {paid ? "ACCESS GRANTED" : "ACCESS DENIED"}
               </div>
               <div className="text-white/40">Horizon · {plan.horizon}</div>

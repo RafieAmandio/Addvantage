@@ -86,7 +86,7 @@ export function PrimerDetailView({
                 className={
                   "border px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors " +
                   (isRead
-                    ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-red-500"
+                    ? "border-moss bg-moss/10 text-moss hover:border-blood hover:bg-blood/10 hover:text-blood-bright"
                     : "border-brand/60 text-brand hover:bg-brand hover:text-black")
                 }
               >

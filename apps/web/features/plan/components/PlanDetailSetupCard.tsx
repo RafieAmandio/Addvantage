@@ -145,7 +145,7 @@ export function PlanDetailSetupCard({
       </div>
 
       <div className="mt-4 border-t border-blood/40 pt-3">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
+        <div className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
           Invalidation
         </div>
         <p className="mt-1 text-sm text-white/80">{s.invalidation}</p>
@@ -173,7 +173,7 @@ export function PlanDetailSetupCard({
               (status === "win"
                 ? "text-moss"
                 : status === "loss" || status === "stopped"
-                ? "text-red-500"
+                ? "text-blood-bright"
                 : "text-white/60")
             }
           >

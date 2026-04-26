@@ -233,7 +233,7 @@ export function SignupWizard() {
               )}
             </div>
             {state.error ? (
-              <div className="mt-4 text-right font-mono text-xs text-red-400">
+              <div className="mt-4 text-right font-mono text-xs text-blood-bright">
                 {ERROR_MESSAGES[state.error] ?? "Something went wrong."}
               </div>
             ) : null}

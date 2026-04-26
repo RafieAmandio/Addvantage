@@ -26,7 +26,7 @@ export function ConsultHeroHeader({
             </p>
           </div>
           <div className="font-mono text-[10px] uppercase tracking-widest2">
-            <div className={paid ? "text-moss" : "text-red-500"}>
+            <div className={paid ? "text-moss" : "text-blood-bright"}>
               ● {paid ? "SESSION OPEN" : "ACCESS DENIED"}
             </div>
           </div>

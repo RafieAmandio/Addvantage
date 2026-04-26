@@ -46,7 +46,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
     ? {
         draft: "bg-gray-2 border-gray-3 text-white/60",
         published: "bg-brand/10 border-brand text-brand",
-        closed: "bg-blood/10 border-blood text-red-500",
+        closed: "bg-blood/10 border-blood text-blood-bright",
       }[plan.status]
     : "bg-gray-2 border-gray-3 text-white/60";
 
@@ -80,7 +80,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
       </div>
 
       {state.error && (
-        <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+        <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
           error: {state.error}
         </div>
       )}
@@ -248,7 +248,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                 />
                 <button
                   type="submit"
-                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-red-500 hover:bg-blood hover:text-black"
+                  className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black"
                 >
                   ✕ Close
                 </button>
@@ -257,7 +257,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             <form action={deletePlan.bind(null, plan.id)}>
               <button
                 type="submit"
-                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
+                className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
               >
                 Delete
               </button>

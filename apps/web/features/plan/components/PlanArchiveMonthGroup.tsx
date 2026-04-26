@@ -34,7 +34,7 @@ function PlanArchiveMonthGroupImpl({ group, latestId, query }: Props) {
                 (mR > 0
                   ? "text-moss"
                   : mR < 0
-                  ? "text-red-500"
+                  ? "text-blood-bright"
                   : "text-white/70")
               }
             >

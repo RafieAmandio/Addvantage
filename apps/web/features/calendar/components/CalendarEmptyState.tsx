@@ -37,7 +37,7 @@ export function CalendarEmptyState({
     <div className={cn(isMonth ? "max-w-md text-center" : "text-center", className)}>
       <div
         className={cn(
-          "font-mono uppercase tracking-widest2 text-red-500",
+          "font-mono uppercase tracking-widest2 text-blood-bright",
           isMonth ? "text-[10px]" : "text-[10px]"
         )}
       >

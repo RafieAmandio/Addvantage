@@ -20,7 +20,7 @@ function formatR(v: number | null): string {
 function rTone(v: number | null): string {
   if (v === null) return "text-white";
   if (v > 0) return "text-moss";
-  if (v < 0) return "text-red-500";
+  if (v < 0) return "text-blood-bright";
   return "text-white";
 }
 

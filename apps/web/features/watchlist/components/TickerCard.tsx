@@ -49,7 +49,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   (totalR > 0
                     ? "text-moss"
                     : totalR < 0
-                    ? "text-red-500"
+                    ? "text-blood-bright"
                     : "text-white/60")
                 }
               >
@@ -59,7 +59,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           )}
           <button
             onClick={() => onUnpin(ticker)}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
           >
             ✕ Unpin
           </button>
@@ -131,7 +131,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                       Entry {s.entry}
                     </div>
                     <div className="font-mono text-[10px] text-white/70">
-                      Stop <span className="text-red-500">{s.stop}</span>
+                      Stop <span className="text-blood-bright">{s.stop}</span>
                     </div>
                   </Link>
                 ))}
@@ -182,7 +182,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                               isWin
                                 ? "text-moss"
                                 : isLoss
-                                ? "text-red-500"
+                                ? "text-blood-bright"
                                 : "text-white/60"
                             )}
                           >
@@ -224,7 +224,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                         className={
                           "font-mono text-[9px] uppercase tracking-widest2 " +
                           (e.impact === "high"
-                            ? "text-red-500"
+                            ? "text-blood-bright"
                             : e.impact === "medium"
                             ? "text-brand"
                             : "text-moss")

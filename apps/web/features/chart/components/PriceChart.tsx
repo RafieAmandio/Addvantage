@@ -316,7 +316,7 @@ function MarkerHoverCard({
                   className={cn(
                     "border px-1.5 py-0.5",
                     marker.impact === "high"
-                      ? "border-blood/60 text-red-500"
+                      ? "border-blood/60 text-blood-bright"
                       : marker.impact === "medium"
                       ? "border-brand/60 text-brand"
                       : "border-gray-3 text-white/50"
@@ -332,7 +332,7 @@ function MarkerHoverCard({
                     marker.bias === "bullish"
                       ? "border-brand/60 text-brand"
                       : marker.bias === "bearish"
-                      ? "border-blood/60 text-red-500"
+                      ? "border-blood/60 text-blood-bright"
                       : "border-gray-3 text-white/50"
                   )}
                 >

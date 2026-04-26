@@ -68,7 +68,7 @@ export function ConfirmDialog({
           <div
             className={cn(
               "font-mono text-[10px] uppercase tracking-widest2",
-              destructive ? "text-red-500" : "text-brand"
+              destructive ? "text-blood-bright" : "text-brand"
             )}
           >
             ● {destructive ? "DESTRUCTIVE · CONFIRM REQUIRED" : "CONFIRM REQUIRED"}

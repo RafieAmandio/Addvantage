@@ -97,7 +97,7 @@ export function FeaturedRow({
                     ○ UNLOCKED
                   </span>
                 ) : (
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
+                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
                     ● LOCKED
                   </span>
                 )}

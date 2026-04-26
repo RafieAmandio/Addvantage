@@ -59,7 +59,7 @@ export function PlanArchiveHorizonPanel({
                 : aggregateR > 0
                 ? "text-moss"
                 : aggregateR < 0
-                ? "text-red-500"
+                ? "text-blood-bright"
                 : "text-white/70")
             }
           >
@@ -99,7 +99,7 @@ export function PlanArchiveHorizonPanel({
                     : data.r > 0
                     ? "text-moss"
                     : data.r < 0
-                    ? "text-red-500"
+                    ? "text-blood-bright"
                     : "text-white/70")
                 }
               >

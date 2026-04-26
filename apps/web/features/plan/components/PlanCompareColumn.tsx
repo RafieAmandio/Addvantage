@@ -58,7 +58,7 @@ function CompactSetup({
               isWin
                 ? "text-moss"
                 : isLoss
-                ? "text-red-500"
+                ? "text-blood-bright"
                 : "text-white/60"
             )}
           >
@@ -113,7 +113,7 @@ export function PlanCompareColumn({
                 outcome.totalR > 0
                   ? "text-moss"
                   : outcome.totalR < 0
-                  ? "text-red-500"
+                  ? "text-blood-bright"
                   : "text-white/60"
               )}
             >
@@ -161,7 +161,7 @@ export function PlanCompareColumn({
           <ul className="mt-2 space-y-1 text-sm text-white/70">
             {plan.risks.map((r, i) => (
               <li key={i} className="flex gap-2">
-                <span className="font-mono text-[10px] text-red-500">
+                <span className="font-mono text-[10px] text-blood-bright">
                   R0{i + 1}
                 </span>
                 <span>{r}</span>

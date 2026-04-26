@@ -67,7 +67,7 @@ export function LoginForm() {
             className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white outline-none transition-colors focus:border-brand"
           />
           {state.error ? (
-            <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-red-400">
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
               {ERROR_MESSAGES[state.error] ?? "Something went wrong."}
             </div>
           ) : null}

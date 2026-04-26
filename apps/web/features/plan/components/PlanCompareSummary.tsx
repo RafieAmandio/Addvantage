@@ -19,7 +19,7 @@ function SummaryCell({
     valueTone === "moss"
       ? "text-moss"
       : valueTone === "blood"
-      ? "text-red-500"
+      ? "text-blood-bright"
       : valueTone === "lime"
       ? "text-brand"
       : valueTone === "paper"

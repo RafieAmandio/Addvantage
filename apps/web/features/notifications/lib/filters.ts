@@ -27,7 +27,7 @@ export const KIND_LABEL: Record<NotificationKind, string> = {
 };
 
 export const KIND_COLOR: Record<NotificationKind, string> = {
-  alert: "text-red-500",
+  alert: "text-blood-bright",
   plan: "text-brand",
   consult: "text-moss",
   education: "text-brand",

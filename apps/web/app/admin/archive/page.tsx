@@ -48,7 +48,7 @@ export default async function AdminArchivePage() {
             className="group grid grid-cols-12 gap-6 bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+              <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
                 [{n.source_code}]
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">

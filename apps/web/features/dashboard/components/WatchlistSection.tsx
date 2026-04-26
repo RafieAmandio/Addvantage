@@ -126,7 +126,7 @@ export function WatchlistSection({
                     </div>
                     <div className="mt-1 font-mono text-[11px] text-white/70">
                       Entry <span className="text-white">{s.entry}</span> · Stop{" "}
-                      <span className="text-red-500">{s.stop}</span>
+                      <span className="text-blood-bright">{s.stop}</span>
                     </div>
                   </Link>
                 ))}
@@ -175,7 +175,7 @@ export function WatchlistSection({
                                 isWin
                                   ? "text-moss"
                                   : isLoss
-                                  ? "text-red-500"
+                                  ? "text-blood-bright"
                                   : "text-white/60"
                               )}
                             >

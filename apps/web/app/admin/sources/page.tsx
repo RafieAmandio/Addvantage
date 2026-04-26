@@ -73,7 +73,7 @@ export default async function AdminSourcesPage() {
                   <Stat label="Interval" value={`${s.poll_minutes}m`} />
                 </div>
                 {s.last_error && (
-                  <div className="mt-2 border border-red-400/30 bg-red-400/5 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-red-400">
+                  <div className="mt-2 border border-blood-bright/30 bg-blood-bright/5 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
                     ● {s.last_error}
                   </div>
                 )}

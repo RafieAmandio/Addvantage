@@ -94,7 +94,7 @@ export default function WatchlistPage() {
             {tickers.length > 0 && (
               <button
                 onClick={() => setConfirmingClear(true)}
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-red-500"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-blood hover:text-blood-bright"
               >
                 ✕ Clear all
               </button>

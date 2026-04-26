@@ -15,7 +15,7 @@ export function SearchPaletteNoResults({
 }: SearchPaletteNoResultsProps) {
   return (
     <div className="p-10 text-center">
-      <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
         ● NULL TRANSMISSION
       </div>
       <div className="mt-3 font-display text-2xl text-white">

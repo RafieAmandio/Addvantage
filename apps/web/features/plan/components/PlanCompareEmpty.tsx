@@ -31,7 +31,7 @@ export function PlanCompareInvalid({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
         ● INVALID PLAN ID
       </div>
       <div className="mt-3 font-display text-2xl text-white">

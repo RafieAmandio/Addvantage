@@ -238,7 +238,7 @@ function NavItem({
         </span>
       </span>
       {isLocked && (
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-red-500">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
           ●
         </span>
       )}

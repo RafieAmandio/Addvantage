@@ -4,7 +4,7 @@ import type { Plan, PlanStatus } from "@/features/plan/types";
 const STATUS_CHIP: Record<PlanStatus, string> = {
   draft: "bg-gray-2 border-gray-3 text-white/60",
   published: "bg-brand/10 border-brand text-brand",
-  closed: "bg-blood/10 border-blood text-red-500",
+  closed: "bg-blood/10 border-blood text-blood-bright",
 };
 
 function fmt(ts: string | null) {

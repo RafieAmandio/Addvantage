@@ -16,7 +16,7 @@ function kindBadge(kind: TimelineEvent["kind"]): string {
     case "tweet":
       return "bg-brand/10 text-brand/70";
     case "macro":
-      return "bg-blood/15 text-red-500";
+      return "bg-blood/15 text-blood-bright";
     case "earnings":
       return "bg-moss/15 text-moss";
     case "user_pin":
@@ -29,7 +29,7 @@ function biasColor(bias: TimelineEvent["bias"]): string {
     case "bullish":
       return "bg-brand/15 text-brand";
     case "bearish":
-      return "bg-blood/15 text-red-500";
+      return "bg-blood/15 text-blood-bright";
     case "neutral":
       return "bg-white/15 text-white/70";
     default:
@@ -40,7 +40,7 @@ function biasColor(bias: TimelineEvent["bias"]): string {
 function impactColor(impact: TimelineEvent["impact"]): string {
   switch (impact) {
     case "high":
-      return "bg-blood/15 text-red-500";
+      return "bg-blood/15 text-blood-bright";
     case "medium":
       return "bg-brand/15 text-brand";
     case "low":

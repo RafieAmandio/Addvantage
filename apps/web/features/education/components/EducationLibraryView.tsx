@@ -148,7 +148,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
               {readCount > 0 && (
                 <button
                   onClick={() => setConfirmingReset(true)}
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-red-500"
+                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 hover:border-blood hover:text-blood-bright"
                 >
                   Reset
                 </button>
@@ -173,7 +173,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
 
         {visiblePrimers.length === 0 && query && primers.length > 0 && (
           <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
               ● NULL TRANSMISSION
             </div>
             <div className="mt-3 font-display text-2xl text-white">

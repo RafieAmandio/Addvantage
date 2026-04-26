@@ -10,7 +10,7 @@ function kindBadge(kind: TimelineEvent["kind"]): string {
     case "tweet":
       return "bg-brand/10 text-brand/70";
     case "macro":
-      return "bg-blood/15 text-red-500";
+      return "bg-blood/15 text-blood-bright";
     case "earnings":
       return "bg-moss/15 text-moss";
     case "user_pin":

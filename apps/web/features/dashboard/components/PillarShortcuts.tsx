@@ -88,7 +88,7 @@ function PillarTile({
           {hint}
         </kbd>
         {locked && (
-          <span className="font-mono text-[8px] uppercase tracking-widest2 text-red-500">
+          <span className="font-mono text-[8px] uppercase tracking-widest2 text-blood-bright">
             LOCKED
           </span>
         )}

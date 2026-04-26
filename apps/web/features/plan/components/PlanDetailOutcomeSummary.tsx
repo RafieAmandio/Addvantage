@@ -25,7 +25,7 @@ export function PlanDetailOutcomeSummary({
               (outcome.totalR > 0
                 ? "text-moss"
                 : outcome.totalR < 0
-                ? "text-red-500"
+                ? "text-blood-bright"
                 : "text-white/70")
             }
           >
@@ -61,7 +61,7 @@ function OutcomeStat({
     tone === "moss"
       ? "text-moss"
       : tone === "blood"
-      ? "text-red-500"
+      ? "text-blood-bright"
       : "text-white/60";
   return (
     <div>

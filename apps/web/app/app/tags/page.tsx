@@ -202,7 +202,7 @@ function TagsView() {
 
         {visibleCounts.length === 0 && query && (
           <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
               ● NULL TRANSMISSION
             </div>
             <div className="mt-3 font-display text-2xl text-white">

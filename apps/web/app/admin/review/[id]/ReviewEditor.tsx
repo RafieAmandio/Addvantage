@@ -46,7 +46,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
   const statusChip = {
     pending: "bg-brand/10 border-brand text-brand",
     approved: "bg-moss/10 border-moss text-moss",
-    rejected: "bg-blood/10 border-blood text-red-500",
+    rejected: "bg-blood/10 border-blood text-blood-bright",
   }[item.status] ?? "bg-gray-2 border-gray-3 text-white/60";
 
   async function onSave() {
@@ -96,7 +96,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             type="button"
             onClick={onReject}
             disabled={pending || item.status !== "pending"}
-            className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-red-500 hover:bg-blood hover:text-black disabled:opacity-40"
+            className="border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright hover:bg-blood hover:text-black disabled:opacity-40"
           >
             ✕ Reject
           </button>

@@ -51,7 +51,7 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
                 (outcome.totalR > 0
                   ? "text-moss"
                   : outcome.totalR < 0
-                  ? "text-red-500"
+                  ? "text-blood-bright"
                   : "text-white/70")
               }
             >

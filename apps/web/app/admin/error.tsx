@@ -21,7 +21,7 @@ export default function AdminError({
       data-testid="error-boundary"
     >
       <div className="w-full max-w-md text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-400">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
           ● ADMIN FAULT
         </div>
         <h1 className="mt-4 font-display text-4xl text-white">
