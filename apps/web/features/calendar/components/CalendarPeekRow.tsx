@@ -14,7 +14,7 @@ export function CalendarPeekRow({ event }: { event: CalendarEvent }) {
   return (
     <Link
       href="/app/calendar"
-      className="group flex items-start gap-3 bg-black p-3 transition-colors hover:bg-gray-2"
+      className="group flex items-start gap-3 bg-black p-3 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
       <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
         {formatTime(event.ts)}Z

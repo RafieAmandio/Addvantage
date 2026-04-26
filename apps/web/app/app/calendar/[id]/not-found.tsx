@@ -17,7 +17,7 @@ export default function CalendarEventNotFound() {
         <div className="mt-8">
           <Link
             href="/app/calendar"
-            className="border border-brand/60 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black"
+            className="border border-brand/60 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ← Back to calendar
           </Link>

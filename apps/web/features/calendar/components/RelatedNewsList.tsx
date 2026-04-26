@@ -25,7 +25,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
           <Link
             key={n.id}
             href={`/app/news/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             <div className="col-span-12 lg:col-span-3">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">

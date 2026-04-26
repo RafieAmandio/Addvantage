@@ -18,7 +18,7 @@ export function FilterChips({
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
-            "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+            "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
             value === opt.value
               ? "bg-brand text-black"
               : "bg-gray-2 text-white/60 hover:text-white"

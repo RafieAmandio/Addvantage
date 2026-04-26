@@ -54,7 +54,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(-1)}
             className={cn(
-              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black",
+              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               btnPad,
               size
             )}
@@ -66,7 +66,7 @@ export function CalendarEmptyState({
           onClick={onToday}
           disabled={anchor === TODAY_YMD}
           className={cn(
-            "border font-mono uppercase tracking-widest2",
+            "border font-mono uppercase tracking-widest2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
             btnPad,
             size,
             anchor === TODAY_YMD
@@ -80,7 +80,7 @@ export function CalendarEmptyState({
           <button
             onClick={() => onJumpToNearest(1)}
             className={cn(
-              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black",
+              "border border-brand/60 font-mono uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               btnPad,
               size
             )}
@@ -94,7 +94,7 @@ export function CalendarEmptyState({
           <button
             onClick={onResetFilters}
             className={cn(
-              "border border-gray-3 font-mono uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand",
+              "border border-gray-3 font-mono uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               btnPad,
               size
             )}

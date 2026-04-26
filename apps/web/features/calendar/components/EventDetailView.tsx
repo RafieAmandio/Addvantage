@@ -19,7 +19,7 @@ export function EventDetailView({
           <div className="flex items-center gap-3">
             <Link
               href="/app/calendar"
-              className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ← Calendar
             </Link>

@@ -19,14 +19,14 @@ export function EventRow({
         <div className="flex flex-wrap items-baseline gap-2">
           <Link
             href={`/app/calendar/${event.id}`}
-            className="font-display text-base leading-tight text-white group-hover:text-brand hover:text-brand hover:underline"
+            className="font-display text-base leading-tight text-white group-hover:text-brand hover:text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             {event.title}
           </Link>
           {event.relatedNewsId && (
             <Link
               href={`/app/news/${event.relatedNewsId}`}
-              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               ↗ NEWS
             </Link>

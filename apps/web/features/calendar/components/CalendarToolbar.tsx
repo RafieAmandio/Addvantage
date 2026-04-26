@@ -38,7 +38,7 @@ export function CalendarToolbar({
             role="tab"
             aria-selected={view === v}
             className={cn(
-              "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
+              "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               view === v
                 ? "bg-brand text-black"
                 : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white"
@@ -53,7 +53,7 @@ export function CalendarToolbar({
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))}
           aria-label={`Previous ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           ←
         </button>
@@ -68,7 +68,7 @@ export function CalendarToolbar({
         <button
           onClick={() => onAnchorChange(stepAnchor(view, anchor, 1))}
           aria-label={`Next ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand"
+          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         >
           →
         </button>
@@ -76,7 +76,7 @@ export function CalendarToolbar({
           onClick={() => onAnchorChange(TODAY_YMD)}
           disabled={anchor === TODAY_YMD}
           className={cn(
-            "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
+            "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
             anchor === TODAY_YMD
               ? "cursor-default border-gray-3 text-white/30"
               : "border-brand/60 text-brand hover:bg-brand hover:text-black"

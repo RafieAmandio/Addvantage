@@ -74,7 +74,8 @@ export function MonthGrid({
                 !isAnchor && !isToday && "hover:ring-1 hover:ring-inset hover:ring-brand/30",
                 isAnchor && !isToday && "bg-brand/5 ring-2 ring-inset ring-brand/60",
                 isToday && "ring-1 ring-inset ring-brand",
-                isAnchor && isToday && "ring-2 ring-brand bg-brand/10"
+                isAnchor && isToday && "ring-2 ring-brand bg-brand/10",
+                "focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
               )}
             >
               <div className="flex items-baseline justify-between">
