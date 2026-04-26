@@ -8,56 +8,80 @@ export default async function AdminSourcesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
-      <h1 className="mb-6 font-display text-4xl text-white">
-        Source <span className="italic text-brand">registry</span>
-      </h1>
-
-      <div className="space-y-px bg-gray-3">
-        {rows.map((s) => (
-          <div key={s.code} className="grid grid-cols-12 gap-6 text-black p-5">
-            <div className="col-span-12 md:col-span-2">
-              <div className="font-mono text-[11px] uppercase tracking-widest2 text-brand">
-                [{s.code}]
-              </div>
-              <div
-                className={
-                  "mt-1 font-mono text-[9px] uppercase tracking-widest2 " +
-                  (s.enabled ? "text-emerald-400" : "text-white/40")
-                }
-              >
-                {s.enabled ? "● ENABLED" : "○ DISABLED"}
-              </div>
-            </div>
-            <div className="col-span-12 md:col-span-10">
-              <div className="font-display text-xl text-white">{s.name}</div>
-              <a
-                href={s.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:text-brand"
-              >
-                {s.url}
-              </a>
-              <div className="mt-3 grid grid-cols-3 gap-4 font-mono text-[9px] uppercase tracking-widest2">
-                <Stat
-                  label="Last poll"
-                  value={s.last_polled_at?.slice(0, 16).replace("T", " ") ?? "—"}
-                />
-                <Stat
-                  label="Last success"
-                  value={s.last_success_at?.slice(0, 16).replace("T", " ") ?? "—"}
-                />
-                <Stat label="Interval" value={`${s.poll_minutes}m`} />
-              </div>
-              {s.last_error && (
-                <div className="mt-2 border border-blood bg-blood/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-red-500">
-                  ● {s.last_error}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="mb-6">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+          OPERATOR // ADMIN
+        </div>
+        <h1 className="mt-1 font-display text-4xl text-white">
+          Source <span className="italic text-brand">registry</span>
+        </h1>
+        <p className="mt-2 font-display text-lg text-white/60">
+          Ingestion adapters wired to the pipeline. Enable or disable via the
+          database — changes take effect at the next scheduler tick.
+        </p>
       </div>
+
+      {rows.length === 0 ? (
+        <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            ● NO SOURCES REGISTERED
+          </div>
+          <div className="mt-3 font-display text-2xl text-white">
+            Source registry is empty.
+          </div>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            Run the DB migration to seed the sources table, then restart the
+            worker.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-px bg-gray-3">
+          {rows.map((s) => (
+            <div key={s.code} className="grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2">
+              <div className="col-span-12 md:col-span-2">
+                <div className="font-mono text-[11px] uppercase tracking-widest2 text-brand">
+                  [{s.code}]
+                </div>
+                <div
+                  className={
+                    "mt-1 font-mono text-[9px] uppercase tracking-widest2 " +
+                    (s.enabled ? "text-emerald-400" : "text-white/40")
+                  }
+                >
+                  {s.enabled ? "● ENABLED" : "○ DISABLED"}
+                </div>
+              </div>
+              <div className="col-span-12 md:col-span-10">
+                <div className="font-display text-xl text-white">{s.name}</div>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-white/40 hover:text-brand"
+                >
+                  {s.url}
+                </a>
+                <div className="mt-3 grid grid-cols-3 gap-4 font-mono text-[9px] uppercase tracking-widest2">
+                  <Stat
+                    label="Last poll"
+                    value={s.last_polled_at?.slice(0, 16).replace("T", " ") ?? "—"}
+                  />
+                  <Stat
+                    label="Last success"
+                    value={s.last_success_at?.slice(0, 16).replace("T", " ") ?? "—"}
+                  />
+                  <Stat label="Interval" value={`${s.poll_minutes}m`} />
+                </div>
+                {s.last_error && (
+                  <div className="mt-2 border border-red-400/30 bg-red-400/5 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-red-400">
+                    ● {s.last_error}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

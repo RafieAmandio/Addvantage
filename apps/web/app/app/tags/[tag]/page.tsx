@@ -145,9 +145,31 @@ export default function TagPage({
         )}
 
         {total === 0 && (
-          <div className="border border-gray-3 bg-gray-2 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            No items tagged #{tag} yet. Tag will populate as content is
-            published.
+          <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
+            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+              ● EMPTY CROSS-CUT
+            </div>
+            <div className="mt-3 font-display text-2xl text-white">
+              Nothing tagged #{tag} yet.
+            </div>
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+              This tag will populate as news, primers, and channel posts are
+              published.
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Link
+                href="/app/tags"
+                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              >
+                ← All hashtags
+              </Link>
+              <Link
+                href="/app/news"
+                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white"
+              >
+                Browse news →
+              </Link>
+            </div>
           </div>
         )}
       </div>

@@ -19,8 +19,31 @@ export default async function AdminReviewQueuePage() {
       </div>
 
       {items.length === 0 && (
-        <div className="border border-gray-3 bg-gray-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-          ● INBOX CLEAR · no pending items
+        <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-emerald-400">
+            ● INBOX CLEAR
+          </div>
+          <div className="mt-3 font-display text-2xl text-white">
+            No items pending review.
+          </div>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            New items appear here after the worker ingests and rephrases a
+            source. Check the logs for recent pipeline runs.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link
+              href="/admin/logs"
+              className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+            >
+              View pipeline logs →
+            </Link>
+            <Link
+              href="/admin/sources"
+              className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 hover:border-white/40 hover:text-white"
+            >
+              Check sources
+            </Link>
+          </div>
         </div>
       )}
 
@@ -29,7 +52,7 @@ export default async function AdminReviewQueuePage() {
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 text-black p-5 transition-colors hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">

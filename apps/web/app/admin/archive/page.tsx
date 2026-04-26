@@ -18,8 +18,25 @@ export default async function AdminArchivePage() {
       </div>
 
       {items.length === 0 && (
-        <div className="border border-gray-3 bg-gray-2/40 p-12 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-          ● EMPTY · no rejected items
+        <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
+          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            ● ARCHIVE EMPTY
+          </div>
+          <div className="mt-3 font-display text-2xl text-white">
+            No rejected items yet.
+          </div>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+            Items rejected during review appear here. Rejected items are
+            hidden from the public feed but preserved for audit.
+          </p>
+          <div className="mt-6">
+            <Link
+              href="/admin/review"
+              className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+            >
+              ← Back to review queue
+            </Link>
+          </div>
         </div>
       )}
 
@@ -28,7 +45,7 @@ export default async function AdminArchivePage() {
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-6 text-black p-5 transition-colors hover:bg-gray-2"
+            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-red-500">
