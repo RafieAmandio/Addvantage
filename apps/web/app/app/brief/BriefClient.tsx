@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { tradingPlans } from "@/features/plan/mock";
 import { useAppState, isPaid } from "@/lib/state";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import {
@@ -13,17 +12,18 @@ import {
 } from "@/components/ui/Marker";
 import { formatTime, formatDate } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
+import type { TradingPlan } from "@/features/plan/types";
 
 interface Props {
   news: NewsListItem[];
+  plan: TradingPlan | null;
 }
 
-export function BriefClient({ news }: Props) {
+export function BriefClient({ news, plan }: Props) {
   const { tier } = useAppState();
   const paid = isPaid(tier);
   const { ids: seenIds, hydrated: seenHydrated } = useSeenNews();
   const [hideSeen, setHideSeen] = useState(false);
-  const plan = tradingPlans[0];
   const topNewsFull = news.slice(0, 4);
   const topNews =
     hideSeen && seenHydrated
@@ -52,7 +52,7 @@ export function BriefClient({ news }: Props) {
             </div>
             <div className="hidden text-right font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:block">
               <div>News · {news.length}</div>
-              <div>Open setups · {plan.setups.length}</div>
+              {plan && <div>Open setups · {plan.setups.length}</div>}
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@ export function BriefClient({ news }: Props) {
               <button
                 onClick={() => setHideSeen((v) => !v)}
                 className={
-                  "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors " +
+                  "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none " +
                   (hideSeen
                     ? "border-brand bg-brand/10 text-brand"
                     : "border-gray-3 text-white/60 hover:border-brand hover:text-brand")
@@ -142,7 +142,7 @@ export function BriefClient({ news }: Props) {
           )}
           <Link
             href="/app/news"
-            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline"
+            className="mt-4 inline-flex font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             FULL FEED →
           </Link>
@@ -150,46 +150,60 @@ export function BriefClient({ news }: Props) {
 
         <aside className="col-span-12 space-y-8 lg:col-span-4">
           <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
-            <div className="flex items-center justify-between">
-              <DataLabel>Trading Plan · TX-03</DataLabel>
-              {paid ? (
-                <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
-                  ○ UNLOCKED
-                </span>
-              ) : (
-                <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-                  ● LOCKED
-                </span>
-              )}
-            </div>
-            <h3 className="mt-3 font-display text-2xl text-white">
-              {paid
-                ? plan.thesis.slice(0, 100) + "…"
-                : "Bias is repricing the cut path. Three setups live."}
-            </h3>
-            <div className="mt-4 grid grid-cols-2 gap-2 text-center">
-              {plan.setups.map((s) => (
-                <div
-                  key={s.id}
-                  className="border border-gray-3 bg-black p-2"
-                >
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                    {s.instrument}
-                  </div>
-                  <div
-                    className={
-                      "font-display text-sm " +
-                      (s.direction === "long" ? "text-moss" : "text-brand")
-                    }
-                  >
-                    {s.direction === "long" ? "LONG" : "SHORT"}
-                  </div>
+            {plan ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <DataLabel>Trading Plan · {plan.id}</DataLabel>
+                  {paid ? (
+                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
+                      ○ UNLOCKED
+                    </span>
+                  ) : (
+                    <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
+                      ● LOCKED
+                    </span>
+                  )}
                 </div>
-              ))}
-            </div>
+                <h3 className="mt-3 font-display text-2xl text-white">
+                  {paid
+                    ? plan.thesis.slice(0, 100) + "…"
+                    : "Latest plan published. Upgrade to view."}
+                </h3>
+                <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+                  {plan.setups.map((s) => (
+                    <div
+                      key={s.id}
+                      className="border border-gray-3 bg-black p-2"
+                    >
+                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                        {s.instrument}
+                      </div>
+                      <div
+                        className={
+                          "font-display text-sm " +
+                          (s.direction === "long" ? "text-moss" : "text-brand")
+                        }
+                      >
+                        {s.direction === "long" ? "LONG" : "SHORT"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <DataLabel>Trading Plan</DataLabel>
+                <div className="mt-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                  No published plans yet
+                </div>
+                <p className="mt-2 text-sm text-white/30">
+                  Plans will appear here once published by the desk.
+                </p>
+              </>
+            )}
             <Link
               href="/app/plan"
-              className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black"
+              className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               {paid ? "Open plan →" : "Unlock plan →"}
             </Link>
