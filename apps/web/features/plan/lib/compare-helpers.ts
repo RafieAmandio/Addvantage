@@ -6,9 +6,8 @@ export function commonInstruments(
   planB: TradingPlan
 ): string[] {
   const aInstr = new Set(planA.setups.map((s) => s.instrument));
-  return planB.setups
-    .map((s) => s.instrument)
-    .filter((i) => aInstr.has(i));
+  const bInstr = new Set(planB.setups.map((s) => s.instrument));
+  return [...bInstr].filter((i) => aInstr.has(i));
 }
 
 export type CompareSummary = {

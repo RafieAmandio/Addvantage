@@ -28,8 +28,6 @@ export function PlanDetail({
   const outcome = computePlanOutcome(plan);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const scrollToHash = () => {
       const hash = window.location.hash.replace("#", "");
       if (!hash) return;
