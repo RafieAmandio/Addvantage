@@ -27,7 +27,7 @@ async function realGetUser() {
   return data.user;
 }
 
-export interface ProfileSummary {
+interface ProfileSummary {
   id: string;
   email: string | null;
   handle: string | null;

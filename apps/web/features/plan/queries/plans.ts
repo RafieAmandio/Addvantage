@@ -10,7 +10,7 @@ const PLAN_COLUMNS =
 
 const DEFAULT_LIST_LIMIT = 50;
 
-export interface ListPublishedPlansInput {
+interface ListPublishedPlansInput {
   limit?: number;
   symbol?: string;
 }
@@ -109,7 +109,7 @@ export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
   return parsed.data;
 }
 
-export interface ListMyDraftPlansInput {
+interface ListMyDraftPlansInput {
   limit?: number;
 }
 

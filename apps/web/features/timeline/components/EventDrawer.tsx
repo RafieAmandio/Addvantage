@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { cn } from "@/lib/cn";
 import type { TimelineEvent } from "@/features/timeline/types";
 
-export interface EventDrawerProps {
+interface EventDrawerProps {
   event: TimelineEvent | null;
   onClose: () => void;
 }

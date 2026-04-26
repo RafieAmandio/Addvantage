@@ -86,7 +86,7 @@ const NewsRowSchema = z.object({
   created_at: z.string(),
   updated_at: z.string(),
 });
-export type NewsRow = z.infer<typeof NewsRowSchema>;
+type NewsRow = z.infer<typeof NewsRowSchema>;
 
 export const NEWS_LIST_COLUMNS =
   "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
@@ -150,7 +150,7 @@ export async function getApprovedNewsById(id: string): Promise<NewsListItem | nu
   return toNewsListItem(parsed.data);
 }
 
-export interface AdminListPage {
+interface AdminListPage {
   limit?: number;
   offset?: number;
 }

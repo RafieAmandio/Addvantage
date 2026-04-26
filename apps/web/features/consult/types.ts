@@ -31,7 +31,7 @@ export const CONSULT_STORAGE_KEY = "ants-domain-consult-v1";
 // ---------------------------------------------------------------------------
 
 export const CONSULT_MESSAGE_ROLES = ["user", "assistant"] as const;
-export type ConsultMessageRole = (typeof CONSULT_MESSAGE_ROLES)[number];
+type ConsultMessageRole = (typeof CONSULT_MESSAGE_ROLES)[number];
 
 export const ConsultSessionRowSchema = z.object({
   id: z.string().uuid(),

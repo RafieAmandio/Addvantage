@@ -80,7 +80,7 @@ const TraderProfileSchema = z.object({
   faultAttribution: z.enum(["vantage", "me", "market"]).optional(),
 });
 
-export interface TraderProfileActionState {
+interface TraderProfileActionState {
   ok: boolean;
   error?: string;
 }

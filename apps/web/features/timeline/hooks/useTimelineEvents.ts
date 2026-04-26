@@ -17,7 +17,7 @@ import {
  */
 const MAX_EVENTS = 500;
 
-export interface UseTimelineEventsParams {
+interface UseTimelineEventsParams {
   initialEvents: TimelineEvent[];
   symbols: string[];
   /** ISO timestamp lower bound (inclusive). */

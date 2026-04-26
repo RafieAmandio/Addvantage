@@ -22,20 +22,20 @@ if (typeof window !== "undefined") {
   );
 }
 
-export type PaymentStatus =
+type PaymentStatus =
   | "pending"
   | "paid"
   | "failed"
   | "refunded"
   | "cancelled";
 
-export type PaymentEventKind =
+type PaymentEventKind =
   | "checkout_completed"
   | "subscription_renewed"
   | "subscription_cancelled"
   | "payment_failed";
 
-export interface PaymentEvent {
+interface PaymentEvent {
   kind: PaymentEventKind;
   externalRef: string;
   profileId?: string;
@@ -44,12 +44,12 @@ export interface PaymentEvent {
   raw: unknown;
 }
 
-export interface VerifyWebhookInput {
+interface VerifyWebhookInput {
   rawBody: string;
   headers: Record<string, string>;
 }
 
-export type VerifyWebhookResult =
+type VerifyWebhookResult =
   | { valid: true; event: PaymentEvent }
   | {
       valid: false;

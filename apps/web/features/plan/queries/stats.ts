@@ -31,7 +31,7 @@ const EMPTY_STATS: ClosedPlanStats = {
 
 const DEFAULT_LIMIT = 500;
 
-export interface GetClosedPlanStatsInput {
+interface GetClosedPlanStatsInput {
   limit?: number;
 }
 

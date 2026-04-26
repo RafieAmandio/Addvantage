@@ -45,7 +45,7 @@ function SubmitButton() {
   );
 }
 
-export interface AddPinButtonProps {
+interface AddPinButtonProps {
   symbol: string;
 }
 

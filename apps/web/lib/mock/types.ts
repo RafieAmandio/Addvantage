@@ -132,7 +132,7 @@ export interface ChannelPost {
   tags: Hashtag[];
 }
 
-export interface User {
+interface User {
   id: string;
   handle: string;
   email: string;

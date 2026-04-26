@@ -23,7 +23,7 @@ import {
   PlanCompareInvalid,
 } from "@/features/plan/components/PlanCompareEmpty";
 
-export interface PlanCompareViewProps {
+interface PlanCompareViewProps {
   allPlans: TradingPlan[];
   latest: TradingPlan | null;
   planA: TradingPlan | null;

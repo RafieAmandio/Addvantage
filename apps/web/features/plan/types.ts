@@ -28,13 +28,13 @@ export type PlanMonthGroup = {
 // ---------------------------------------------------------------------------
 
 export const PlanDirectionSchema = z.enum(["long", "short"]);
-export type PlanDirection = z.infer<typeof PlanDirectionSchema>;
+type PlanDirection = z.infer<typeof PlanDirectionSchema>;
 
 export const PlanStatusSchema = z.enum(["draft", "published", "closed"]);
 export type PlanStatus = z.infer<typeof PlanStatusSchema>;
 
 export const PlanTierSchema = z.enum(["free", "vip"]);
-export type PlanTier = z.infer<typeof PlanTierSchema>;
+type PlanTier = z.infer<typeof PlanTierSchema>;
 
 export const PlanOutcomeSchema = z.enum([
   "win",
@@ -42,7 +42,7 @@ export const PlanOutcomeSchema = z.enum([
   "breakeven",
   "stopped",
 ]);
-export type PlanOutcome = z.infer<typeof PlanOutcomeSchema>;
+type PlanOutcome = z.infer<typeof PlanOutcomeSchema>;
 
 /**
  * Single entry in the JSONB `setups` array. Kept intentionally loose — the
@@ -60,7 +60,7 @@ export const PlanSetupSchema = z
     note: z.string().optional(),
   })
   .passthrough();
-export type PlanSetup = z.infer<typeof PlanSetupSchema>;
+type PlanSetup = z.infer<typeof PlanSetupSchema>;
 
 /**
  * Canonical Zod row schema for `public.trading_plans`. All nullable DB columns

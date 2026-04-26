@@ -20,7 +20,7 @@ const BASE_HEADERS: Record<string, string> = {
   "upgrade-insecure-requests": "1",
 };
 
-export interface FetchOptions {
+interface FetchOptions {
   headers?: Record<string, string>;
   timeoutMs?: number;
   retries?: number;

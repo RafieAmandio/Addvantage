@@ -28,14 +28,14 @@ const SendEmailResponseSchema = z.object({
   messageId: z.string().min(1),
 });
 
-export interface SendBrevoTemplateInput {
+interface SendBrevoTemplateInput {
   to: { email: string; name?: string };
   templateId: number;
   params?: Record<string, unknown>;
   subject?: string;
 }
 
-export interface SendBrevoTemplateResult {
+interface SendBrevoTemplateResult {
   provider: "brevo";
   messageId: string;
 }

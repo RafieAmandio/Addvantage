@@ -14,7 +14,7 @@ const NewsForPlanRowSchema = z.object({
   fetched_at: z.string(),
   published_at: z.string().nullable(),
 });
-export type NewsForPlanRow = z.infer<typeof NewsForPlanRowSchema>;
+type NewsForPlanRow = z.infer<typeof NewsForPlanRowSchema>;
 
 const NEWS_FOR_PLAN_COLUMNS =
   "id,source_code,headline,fetched_at,published_at";

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { Tier } from "./mock/types";
 
-export interface TraderProfile {
+interface TraderProfile {
   tradingLength: string;
   longestProfitable: string;
   markets: string[];

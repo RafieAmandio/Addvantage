@@ -44,7 +44,7 @@ const RESPONSE_SCHEMA = {
   },
 } as const;
 
-export interface RephraseResult {
+interface RephraseResult {
   output: RephraseOutput;
   systemPrompt: string;
   userMessage: string;

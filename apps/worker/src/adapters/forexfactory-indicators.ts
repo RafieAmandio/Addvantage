@@ -15,9 +15,9 @@
  */
 import type { Impact } from "@tradevantage/shared";
 
-export type CanonicalImpact = Impact;
+type CanonicalImpact = Impact;
 
-export interface IndicatorRule {
+interface IndicatorRule {
   match: RegExp;
   affects: string[];
   impact: CanonicalImpact;

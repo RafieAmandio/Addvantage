@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 
-export interface RetryOptions {
+interface RetryOptions {
   /** Total attempts including the first try. Default 3. */
   attempts?: number;
   /** Initial delay before the first retry, in ms. Default 500. */

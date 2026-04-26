@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export interface UseUrlSyncedStateOptions {
+interface UseUrlSyncedStateOptions {
   /** Scroll to top on replace. Defaults to `false` (desired for filter UIs). */
   scroll?: boolean;
   /**

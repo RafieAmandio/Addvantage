@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Highlight } from "@/components/ui/Highlight";
 import type { Primer } from "@/features/education/types";
 
-export interface PrimerCardProps {
+interface PrimerCardProps {
   primer: Primer;
   query: string;
   locked: boolean;

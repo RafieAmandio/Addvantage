@@ -96,4 +96,4 @@ export class FredAdapter implements SourceAdapter {
 }
 
 // Silence unused-import in strict mode if future consumer imports are removed.
-export type _FredSeriesResponse = FredSeriesResponse;
+type _FredSeriesResponse = FredSeriesResponse;

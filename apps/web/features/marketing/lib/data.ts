@@ -9,7 +9,7 @@ export const heroTicker = [
   { sym: "DGWA", val: "806", chg: "-0.1%", dir: "down" as const },
 ];
 
-export type HeroTickerItem = (typeof heroTicker)[number];
+type HeroTickerItem = (typeof heroTicker)[number];
 
 export const pillars = [
   {

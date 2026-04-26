@@ -1,7 +1,7 @@
 import type { CalendarEvent, CalendarDayMeta } from "@/lib/mock/types";
 
 export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;
-export type CurrencyCode = (typeof CURRENCIES)[number];
+type CurrencyCode = (typeof CURRENCIES)[number];
 
 export const calendarDayMeta: CalendarDayMeta[] = [
   { date: "2026-04-03", summary: "NFP + Unemployment" },

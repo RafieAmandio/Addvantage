@@ -11,7 +11,7 @@ import { Highlight } from "@/components/ui/Highlight";
 import { formatTime } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
-export interface NewsListRowProps {
+interface NewsListRowProps {
   item: NewsListItem;
   query: string;
   isSeen: boolean;

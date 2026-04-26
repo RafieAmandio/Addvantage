@@ -12,7 +12,7 @@ const SourceRowSchema = z.object({
   last_error: z.string().nullable(),
 });
 
-export type SourceRow = z.infer<typeof SourceRowSchema>;
+type SourceRow = z.infer<typeof SourceRowSchema>;
 
 const SOURCE_LIST_COLUMNS =
   "code,name,url,enabled,poll_minutes,last_polled_at,last_success_at,last_error";

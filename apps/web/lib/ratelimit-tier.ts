@@ -17,7 +17,7 @@ if (typeof window !== "undefined") {
 
 export type Tier = "free" | "vip";
 
-export type TierAction = "consult:send" | "api:bars" | "api:events";
+type TierAction = "consult:send" | "api:bars" | "api:events";
 
 interface Bucket {
   limit: number;
@@ -45,7 +45,7 @@ const TIER_BUCKETS: Record<TierAction, Record<Tier, Bucket>> = {
   },
 };
 
-export type EnforceTierRateLimitInput =
+type EnforceTierRateLimitInput =
   | { userId: string; tier: Tier; action: TierAction }
   | { ip: string; action: TierAction };
 

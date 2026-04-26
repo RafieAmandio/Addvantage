@@ -5,7 +5,7 @@ if (typeof window !== "undefined") {
   throw new Error("lib/ratelimit.ts is server-only");
 }
 
-export type RateLimitArgs = {
+type RateLimitArgs = {
   key: string;
   limit: number;
   windowSec: number;

@@ -65,7 +65,7 @@ export function saveFilter(f: NotifFilter): void {
 
 export type BucketId = 0 | 1 | 2;
 
-export interface NotificationWithBucket {
+interface NotificationWithBucket {
   n: MockNotification;
   idx: number;
   bucket: BucketId;

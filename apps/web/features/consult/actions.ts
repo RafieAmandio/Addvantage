@@ -11,7 +11,6 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { CONSULT_MESSAGE_ROLES } from "@/features/consult/types";
 import {
   sendConsultMessageImpl,
-  type SendConsultReason,
   type SendConsultResult,
 } from "@/features/consult/lib/send-message";
 import {
@@ -20,7 +19,6 @@ import {
 } from "@/features/consult/queries/usage";
 import type { Json } from "@tradevantage/db";
 
-export type { SendConsultReason, SendConsultResult };
 
 /**
  * Consult session / message server actions. Auth-gated — middleware already
@@ -29,7 +27,7 @@ export type { SendConsultReason, SendConsultResult };
  * at the DB layer.
  */
 
-export interface ActionState {
+interface ActionState {
   ok: boolean;
   error?: string;
   sessionId?: string;

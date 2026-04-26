@@ -5,7 +5,7 @@ import { retry } from "../lib/retry";
 import { rephrase } from "./rephrase";
 import type { Candidate } from "../adapters/base";
 
-export interface PersistResult {
+interface PersistResult {
   inserted: number;
   skipped: number;
   rephrased: number;

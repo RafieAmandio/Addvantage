@@ -36,7 +36,7 @@ export interface ChartMarker {
   impact?: "high" | "medium" | "low" | null;
 }
 
-export interface PriceChartProps {
+interface PriceChartProps {
   bars: Bar[];
   seriesType?: "candlestick" | "area";
   height?: number;

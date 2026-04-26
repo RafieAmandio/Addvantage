@@ -85,7 +85,7 @@ export const publicConfig = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY:
     parsed.data.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? MOCK_PLACEHOLDER_ANON_KEY,
 };
-export type PublicConfig = typeof publicConfig;
+type PublicConfig = typeof publicConfig;
 
 /** True when the app should serve static fixtures instead of hitting Supabase. */
 export const isMockMode = (): boolean => MOCK_MODE;

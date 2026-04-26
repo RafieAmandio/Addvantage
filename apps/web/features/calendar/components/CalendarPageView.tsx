@@ -29,7 +29,7 @@ import { CalendarDayWeekTable } from "@/features/calendar/components/CalendarDay
 import { CalendarLegend } from "@/features/calendar/components/CalendarLegend";
 import { useCalendarKeyboard } from "@/features/calendar/hooks/useCalendarKeyboard";
 
-export interface CalendarPageViewProps {
+interface CalendarPageViewProps {
   events?: CalendarEvent[];
 }
 

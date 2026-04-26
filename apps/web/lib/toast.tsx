@@ -9,14 +9,14 @@ import {
   useState,
 } from "react";
 
-export type ToastTone = "info" | "success" | "warn" | "error";
+type ToastTone = "info" | "success" | "warn" | "error";
 
-export interface ToastAction {
+interface ToastAction {
   label: string;
   onClick: () => void;
 }
 
-export interface Toast {
+interface Toast {
   id: number;
   tone: ToastTone;
   title: string;

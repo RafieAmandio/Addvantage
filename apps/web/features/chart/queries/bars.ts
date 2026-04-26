@@ -30,7 +30,7 @@ export type Bar = z.infer<typeof BarSchema>;
 const BAR_COLUMNS = "ts,open,high,low,close,volume";
 const DEFAULT_LIMIT = 5000;
 
-export interface ListBarsInput {
+interface ListBarsInput {
   symbol: string;
   interval: "1m" | "5m" | "1h" | "1d";
   from: Date;

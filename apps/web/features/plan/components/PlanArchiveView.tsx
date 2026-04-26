@@ -27,7 +27,7 @@ import { PlanArchiveHorizonPanel } from "@/features/plan/components/PlanArchiveH
 import { PlanArchiveEmpty } from "@/features/plan/components/PlanArchiveEmpty";
 import { PlanArchiveMonthGroup } from "@/features/plan/components/PlanArchiveMonthGroup";
 
-export interface PlanArchiveViewProps {
+interface PlanArchiveViewProps {
   allPlans: TradingPlan[];
   latest: TradingPlan | null;
 }

@@ -10,7 +10,7 @@ import { AddPinButton } from "@/features/timeline/components/AddPinButton";
 import { EventDrawer } from "@/features/timeline/components/EventDrawer";
 import type { TimelineEvent } from "@/features/timeline/types";
 
-export interface ChartInteractiveProps {
+interface ChartInteractiveProps {
   bars: ChartBar[];
   events: TimelineEvent[];
   markers: ChartMarker[];

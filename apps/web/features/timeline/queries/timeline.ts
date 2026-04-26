@@ -14,7 +14,7 @@ export type { TimelineEvent };
 const TIMELINE_EVENT_COLUMNS =
   "id,kind,source_code,occurred_at,symbols,title,body,url,bias,impact,news_item_id";
 
-export interface ListTimelineParams {
+interface ListTimelineParams {
   /**
    * Symbols to filter by. If provided, must be non-empty — matches
    * `symbols && {…}` (array overlap) semantics. Omit to read across all

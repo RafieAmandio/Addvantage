@@ -81,7 +81,7 @@ export function planToMarkdown(plan: TradingPlan): string {
   return lines.join("\n");
 }
 
-export type OutcomeMeta = {
+type OutcomeMeta = {
   label: string;
   style: string;
   dot: string;
