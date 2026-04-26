@@ -9,10 +9,6 @@ export function parseQuery(v: string | null): string {
   return v ? v.trim() : "";
 }
 
-/**
- * Case-insensitive match across plan id, thesis, risks, setup rationales,
- * instruments, entry/stop levels, and tags. Empty query matches everything.
- */
 export function matchesQuery(p: TradingPlan, q: string): boolean {
   if (!q) return true;
   const haystack = [
@@ -32,10 +28,6 @@ export function matchesQuery(p: TradingPlan, q: string): boolean {
   return haystack.includes(q.toLowerCase());
 }
 
-/**
- * Group plans by YYYY-MM and sort keys newest-first (plans within a group
- * are also sorted newest-first by date).
- */
 export function groupByMonth(plans: TradingPlan[]): PlanMonthGroup[] {
   const map = new Map<string, TradingPlan[]>();
   for (const p of plans) {

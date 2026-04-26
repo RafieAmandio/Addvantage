@@ -46,9 +46,6 @@ export function PlanDetailSetupCard({
     const url = `${window.location.origin}/app/plan/${planId}#${s.id}`;
     try {
       await navigator.clipboard.writeText(url);
-      // Push the hash into browser history so back/forward navigates
-      // between anchored setups. Use pushState (not replaceState) so each
-      // copied anchor becomes a real history entry.
       if (window.location.hash !== `#${s.id}`) {
         window.history.pushState(null, "", `#${s.id}`);
       }

@@ -247,7 +247,6 @@ export function computePlanOutcome(plan: TradingPlan) {
   ).length;
   const skipped = closed.filter((s) => s.outcome === "skipped").length;
 
-  // Sum R by parsing outcomeR strings like "+1.8R", "-1R", "0R"
   const totalR = closed.reduce((acc, s) => {
     if (!s.outcomeR) return acc;
     const n = parseFloat(s.outcomeR.replace(/R/i, ""));

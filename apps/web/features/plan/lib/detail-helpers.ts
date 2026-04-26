@@ -1,11 +1,6 @@
 import type { SetupOutcome, TradingPlan, TradingSetup } from "@/lib/mock/types";
 import { formatDate } from "@/lib/cn";
 
-/**
- * Serialise a single setup as a plain-text block suitable for pasting into
- * chat, Telegram, or a post-trade journal. Used by the "copy setup as text"
- * action on `PlanDetailSetupCard`.
- */
 export function setupToText(s: TradingSetup, planId: string): string {
   const lines = [
     `${planId} · ${s.id} · ${s.instrument} · ${s.direction.toUpperCase()}`,
@@ -21,10 +16,6 @@ export function setupToText(s: TradingSetup, planId: string): string {
   return lines.join("\n");
 }
 
-/**
- * Serialise an entire plan as markdown. Used by the "export plan" action in
- * `PlanDetailHeader`.
- */
 export function planToMarkdown(plan: TradingPlan): string {
   const lines: string[] = [
     `# Trading Plan · ${plan.id}`,
@@ -87,10 +78,6 @@ type OutcomeMeta = {
   dot: string;
 };
 
-/**
- * Presentation metadata for each setup outcome state. Drives the pill, dot
- * colour, and short label on `PlanDetailSetupCard`. Keyed by `SetupOutcome`.
- */
 export const OUTCOME_META: Record<SetupOutcome, OutcomeMeta> = {
   live: {
     label: "LIVE",

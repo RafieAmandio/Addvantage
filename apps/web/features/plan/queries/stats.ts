@@ -10,11 +10,6 @@ import {
 import { isMockMode } from "@/lib/config/public";
 import { mockClosedPlanStats } from "@/lib/mock/fixtures";
 
-/**
- * Narrow row shape for the aggregate — intentionally smaller than
- * `PlanRowSchema` to avoid pulling unrelated columns through the wire. Keep
- * the column list in sync with the explicit `.select()` below.
- */
 const ClosedPlanStatsRowSchema = z.object({
   direction: PlanDirectionSchema,
   outcome: PlanOutcomeSchema.nullable(),
@@ -35,13 +30,6 @@ interface GetClosedPlanStatsInput {
   limit?: number;
 }
 
-/**
- * Aggregate win-rate + avg-R across closed plans with a non-null
- * `realized_r`. Runs a single explicit-column SELECT and folds in-process —
- * Postgres aggregates would need RPC scaffolding for so small a payload.
- * Never throws: errors are logged to Sentry and an empty-shape is returned
- * so the page render never 500s (mirrors `listPublishedPlans`).
- */
 export async function getClosedPlanStats(
   input: GetClosedPlanStatsInput = {},
 ): Promise<ClosedPlanStats> {

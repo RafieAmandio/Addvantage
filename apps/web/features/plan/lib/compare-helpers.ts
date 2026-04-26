@@ -1,10 +1,6 @@
 import type { TradingPlan } from "@/lib/mock/types";
 import { computePlanOutcome } from "@/features/plan/mock";
 
-/**
- * Instruments that appear in both plans. Preserves the order they appear
- * in `planB` — matches the visual order of Plan B's setup list.
- */
 export function commonInstruments(
   planA: TradingPlan,
   planB: TradingPlan

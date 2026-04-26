@@ -2,7 +2,6 @@ import type { TradingPlan } from "@/lib/mock/types";
 import { computePlanOutcome } from "@/features/plan/mock";
 import type { HorizonRBreakdown } from "@/features/plan/types";
 
-/** Sum totalR across a set of closed plans. */
 export function aggregateR(plans: TradingPlan[]): number {
   return plans.reduce((acc, p) => {
     const o = computePlanOutcome(p);
@@ -10,7 +9,6 @@ export function aggregateR(plans: TradingPlan[]): number {
   }, 0);
 }
 
-/** Totalled R for the plans in a single month, excluding the live plan. */
 export function monthTotalR(
   plans: TradingPlan[],
   latestId: string
@@ -18,7 +16,6 @@ export function monthTotalR(
   return aggregateR(plans.filter((p) => p.id !== latestId));
 }
 
-/** Per-horizon R breakdown across the provided closed plans. */
 export function horizonBreakdown(closed: TradingPlan[]): HorizonRBreakdown {
   const acc: HorizonRBreakdown = {
     intraday: { r: 0, n: 0 },

@@ -3,16 +3,6 @@ import type { Plan } from "@/features/plan/types";
 import { logger } from "@/lib/logger";
 import type { TradingPlan, TradingSetup, Bias } from "@/lib/mock/types";
 
-/**
- * Adapt a DB `trading_plans` row (validated via `PlanRowSchema`) into the
- * legacy `TradingPlan` shape consumed by the existing plan UI components
- * (`PlanDetail`, `PlanArchive*`, `PlanCompare*`).
- *
- * v1 is a lossy adapter on purpose — P4's charter is to wire the DB behind
- * the current UI, not redesign the plan surfaces. Fields the DB doesn't
- * have yet (horizon, risks list, per-setup outcome) fall back to sensible
- * defaults; richer payloads can ride on the JSONB `setups` passthrough.
- */
 const KNOWN_HASHTAGS = new Set<string>(HASHTAGS);
 
 function narrowHashtags(tags: readonly unknown[]): Hashtag[] {
@@ -145,8 +135,6 @@ function extractRisks(setups: Plan["setups"]): string[] {
 export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
   const horizon = parseHorizon(plan.tags);
 
-  // Pick setups: first try rich shape (matches the mock TradingSetup), then
-  // fall back to a single synthesized setup from the scalar fields.
   const rawSetups = plan.setups.filter(
     (s) => (s as Partial<RisksMeta>).label !== "__risks__",
   );
@@ -159,8 +147,6 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
       );
       if (s) richAttempts.push(s);
     } catch (error) {
-      // Malformed JSONB entry — skip rather than nuke the whole plan render.
-      // Log so writer-side drift doesn't silently degrade plan rendering.
       logger.warn("plan.adapt: malformed setup JSONB", {
         planId: plan.id,
         setupIndex: i,
@@ -176,7 +162,6 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
   const risks = extractRisks(plan.setups);
 
   const date = plan.published_at ?? plan.created_at;
-  // Normalize to YYYY-MM-DD for the legacy `date` field (components format it).
   const isoDate = date.length >= 10 ? date.slice(0, 10) : date;
 
   return {
@@ -186,8 +171,6 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
     thesis: plan.thesis,
     setups,
     risks,
-    // Don't leak UUIDs to the UI; byline is always "Desk" until a profile
-    // join surfaces handles (out of scope for P4).
     authoredBy: "Desk",
   };
 }

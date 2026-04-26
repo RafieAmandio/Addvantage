@@ -27,14 +27,12 @@ export function PlanDetail({
   const paid = isPaid(tier);
   const outcome = computePlanOutcome(plan);
 
-  // Scroll to hash on mount and on popstate
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const scrollToHash = () => {
       const hash = window.location.hash.replace("#", "");
       if (!hash) return;
-      // Defer until after paint so the element is mounted and positioned
       setTimeout(() => {
         const el = document.getElementById(hash);
         if (el) {

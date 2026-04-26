@@ -1,12 +1,6 @@
 import { z } from "zod";
 import type { TradingPlan } from "@/lib/mock/types";
 
-// ---------------------------------------------------------------------------
-// Legacy mock-era UI types. Retained so the existing archive/filter code
-// (`features/plan/lib/*`, `features/plan/components/PlanArchive*`) keeps
-// compiling until P3/P4 flip those consumers to the DB-backed `Plan` shape.
-// ---------------------------------------------------------------------------
-
 export type HorizonFilter = "all" | TradingPlan["horizon"];
 
 export type HorizonRBreakdown = Record<
@@ -19,13 +13,6 @@ export type PlanMonthGroup = {
   label: string;
   plans: TradingPlan[];
 };
-
-// ---------------------------------------------------------------------------
-// Canonical DB row schemas for the `trading_plans` table (migration 0021).
-// Pure — no Supabase/server imports — so client components may safely import
-// the type aliases here without pulling the server graph into their bundle.
-// Mirrors the closed taxonomy on the DB side (`check (direction in …)` etc.).
-// ---------------------------------------------------------------------------
 
 export const PlanDirectionSchema = z.enum(["long", "short"]);
 type PlanDirection = z.infer<typeof PlanDirectionSchema>;
@@ -44,14 +31,6 @@ export const PlanOutcomeSchema = z.enum([
 ]);
 type PlanOutcome = z.infer<typeof PlanOutcomeSchema>;
 
-/**
- * Single entry in the JSONB `setups` array. Kept intentionally loose — the
- * mock UI (`features/plan/mock.ts`) uses richer fields (`instrument`, `bias`,
- * `targets[]`, `confidence`, etc.) but v1 admin authoring only mandates a
- * label + free-text trigger/invalidation/note. Extra keys pass through via
- * `.passthrough()` so the schema won't reject richer payloads the UI chooses
- * to save — we trade strictness here for iteration speed on P3.
- */
 export const PlanSetupSchema = z
   .object({
     label: z.string(),
@@ -62,13 +41,6 @@ export const PlanSetupSchema = z
   .passthrough();
 type PlanSetup = z.infer<typeof PlanSetupSchema>;
 
-/**
- * Canonical Zod row schema for `public.trading_plans`. All nullable DB columns
- * are `.nullable()`; `setups` defaults to `[]` so legacy rows without the
- * column don't fail parse. Keep this in sync with the SELECT column list in
- * `features/plan/queries/plans.ts` (`PLAN_COLUMNS`) and the row shape in
- * `packages/db/src/types.ts`.
- */
 export const PlanRowSchema = z.object({
   id: z.string(),
   symbol: z.string(),
@@ -93,11 +65,6 @@ export const PlanRowSchema = z.object({
 });
 
 export type Plan = z.infer<typeof PlanRowSchema>;
-
-// ---------------------------------------------------------------------------
-// Aggregated closed-plan stats surface (O3). Safe for client import — pure
-// Zod, no server graph. Consumed by `PlanStatsBadges` + `getClosedPlanStats`.
-// ---------------------------------------------------------------------------
 
 const PlanStatsBucketSchema = z.object({
   n: z.number(),
