@@ -26,7 +26,7 @@ export function PlanDetailOutcomeSummary({
           </div>
           <div
             className={
-              "font-display text-4xl " +
+              "font-display text-2xl sm:text-4xl " +
               (outcome.totalR > 0
                 ? "text-moss"
                 : outcome.totalR < 0

@@ -47,7 +47,7 @@
 | 0.17 | All pages — loading states | [x] | 21 loading.tsx skeleton screens added across all app + admin routes |
 | 0.18 | All pages — empty states | [x] | Education zero-primers state, admin sources empty state added, tags/[tag] improved with CTAs, admin review/archive improved with context + links, bg-black bug fixed on grid rows |
 | 0.19 | All pages — error states | [x] | Segment error.tsx for /app/* and /admin/*; contextual not-found.tsx for all 6 dynamic segments; unit tests for all 10 modules |
-| 0.20 | All pages — mobile responsive | [~] | Dashboard + News done: px-4 mobile padding, scaled headings, hidden kbd hints, fixed text-black→bg-black bug on news detail |
+| 0.20 | All pages — mobile responsive | [x] | All pages done: px-4 sm:px-6 padding, scaled headings, hidden kbd hints, fixed text-black→bg-black bugs, fixed stale ink-3/ring-offset-ink tokens |
 
 ---
 

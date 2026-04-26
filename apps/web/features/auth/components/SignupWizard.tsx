@@ -37,7 +37,7 @@ export function SignupWizard() {
   };
 
   return (
-    <main className="relative mx-auto grid max-w-7xl grid-cols-12 gap-6 px-6 py-20">
+    <main className="relative mx-auto grid max-w-7xl grid-cols-12 gap-4 px-4 py-12 sm:gap-6 sm:px-6 sm:py-20">
       <div className="col-span-12 lg:col-span-5">
         <SectionNumber n="00 /" label="ENROLLMENT" />
         <h1 className="mt-8 font-display text-6xl leading-[0.9] text-white">

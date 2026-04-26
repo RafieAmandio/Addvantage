@@ -27,7 +27,7 @@ export function EventFeed({
           {emptyMessage}
         </div>
       ) : (
-        <ul className={cn("divide-y divide-ink-3 overflow-y-auto", maxHeightClass)}>
+        <ul className={cn("divide-y divide-gray-3 overflow-y-auto", maxHeightClass)}>
           {events.map((e) => (
             <li key={e.id}>
               <EventCard event={e} />

@@ -34,7 +34,7 @@ export default function SubscriptionPage() {
   return (
     <div className="bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <DataLabel>Operator account · Tier control</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-white">
             Subscription <span className="italic text-brand">& Access</span>
@@ -42,7 +42,7 @@ export default function SubscriptionPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {/* Status panel */}
         <section className="border border-brand/40 bg-gray-2/30 p-8">
           <div className="grid grid-cols-12 gap-6">

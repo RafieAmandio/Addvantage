@@ -92,9 +92,9 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
         onCancel={() => setConfirmingReset(false)}
       />
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <DataLabel>Transmission TX-05</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-white">
+          <h1 className="mt-2 font-display text-3xl sm:text-4xl md:text-5xl text-white">
             Education <span className="italic text-brand">Library</span>
           </h1>
           <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
@@ -105,7 +105,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {/* Search input */}
         <div className="mb-6">
           <PageSearchInput

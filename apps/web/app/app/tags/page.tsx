@@ -135,7 +135,7 @@ function TagsView() {
     <div>
       <BackToTop />
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <DataLabel>Index · Cross-cut</DataLabel>
           <h1 className="mt-2 font-display text-5xl text-white">
             Hashtag <span className="italic text-brand">Explorer</span>
@@ -147,7 +147,7 @@ function TagsView() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {/* Search */}
         <div className="mb-6">
           <PageSearchInput

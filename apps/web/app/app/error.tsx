@@ -17,7 +17,7 @@ export default function AppError({
 
   return (
     <div
-      className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-20"
+      className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-12 sm:px-6 sm:py-20"
       data-testid="error-boundary"
     >
       <div className="w-full max-w-md text-center">

@@ -36,7 +36,7 @@ export default function TagPage({
   return (
     <div className="bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <Link
             href="/app/tags"
             className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 hover:text-brand"
@@ -60,7 +60,7 @@ export default function TagPage({
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {matchedPrimers.length > 0 && (
           <Group n="01 /" label="PRIMERS">
             <div className="grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-2 lg:grid-cols-3">

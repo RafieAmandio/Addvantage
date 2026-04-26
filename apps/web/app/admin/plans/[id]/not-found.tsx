@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function AdminPlanNotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 py-20">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-12 sm:px-6 sm:py-20">
       <div className="w-full max-w-md text-center">
         <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
           ● PLAN NOT FOUND

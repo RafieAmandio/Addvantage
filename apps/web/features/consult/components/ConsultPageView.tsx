@@ -137,7 +137,7 @@ export function ConsultPageView({
       />
       <ConsultHeroHeader paid={paid} />
 
-      <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
         {!paid && (
           <div className="relative h-[60vh]">
             <PaywallOverlay

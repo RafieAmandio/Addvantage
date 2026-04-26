@@ -17,14 +17,14 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
   if (rows.length === 0) return null;
 
   return (
-    <section className={cn("mx-auto max-w-7xl px-6 pb-12", className)}>
+    <section className={cn("mx-auto max-w-7xl px-4 pb-8 sm:px-6 sm:pb-12", className)}>
       <div className="border border-gray-3 bg-gray-2/30">
         <header className="border-b border-gray-3 px-4 py-3">
           <h2 className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
             News mentioning this plan · {rows.length}
           </h2>
         </header>
-        <ul className="divide-y divide-ink-3">
+        <ul className="divide-y divide-gray-3">
           {rows.map((n) => {
             const ts = n.published_at ?? n.fetched_at;
             return (

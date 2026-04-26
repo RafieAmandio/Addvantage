@@ -45,7 +45,7 @@ export function PlanDetailHeader({
 
   return (
     <div className="border-b border-gray-3 bg-gray-2/30">
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {breadcrumbs && <div className="mb-4">{breadcrumbs}</div>}
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>
@@ -62,7 +62,7 @@ export function PlanDetailHeader({
                 </span>
               )}
             </div>
-            <h1 className="mt-2 font-display text-5xl text-white">
+            <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
               Trading <span className="italic text-brand">Plan</span>
             </h1>
             <p className="mt-2 font-mono text-[11px] uppercase tracking-widest2 text-white/40">

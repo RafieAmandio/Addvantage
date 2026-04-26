@@ -58,14 +58,14 @@ export function PlanDetail({
             "ring-2",
             "ring-brand",
             "ring-offset-2",
-            "ring-offset-ink"
+            "ring-offset-black"
           );
           setTimeout(() => {
             el.classList.remove(
               "ring-2",
               "ring-brand",
               "ring-offset-2",
-              "ring-offset-ink"
+              "ring-offset-black"
             );
           }, 2400);
         }
@@ -90,7 +90,7 @@ export function PlanDetail({
         breadcrumbs={breadcrumbs}
       />
 
-      <div className="relative mx-auto max-w-7xl px-6 py-10">
+      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {!paid && (
           <PaywallOverlay
             surface="Trading Plan"

@@ -23,7 +23,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-black">
       <div className="border-b border-gray-3 bg-gray-2/40">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-6">
             <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
               DESK · ADMIN

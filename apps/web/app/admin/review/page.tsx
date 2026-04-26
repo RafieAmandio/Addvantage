@@ -8,7 +8,7 @@ export default async function AdminReviewQueuePage() {
   const items = await listPendingNews();
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-baseline justify-between">
         <h1 className="font-display text-4xl text-white">
           Review <span className="italic text-brand">queue</span>

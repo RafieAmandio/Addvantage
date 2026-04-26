@@ -15,10 +15,10 @@ export default async function PlanPage() {
   if (!latest) {
     return (
       <div className="bg-grid-fine">
-        <div className="mx-auto max-w-7xl px-6 pt-6">
+        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
           <PlanStatsBadges stats={stats} />
         </div>
-        <div className="mx-auto max-w-7xl px-6 pb-24 pt-4">
+        <div className="mx-auto max-w-7xl px-4 pb-24 pt-4 sm:px-6">
           <div className="border border-gray-3 bg-gray-2/30 p-8 text-center">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
               TRADING PLAN
@@ -46,7 +46,7 @@ export default async function PlanPage() {
 
   return (
     <div className="bg-grid-fine">
-      <div className="mx-auto max-w-7xl px-6 pt-6">
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
         <PlanStatsBadges stats={stats} />
       </div>
       <PlanDetail

@@ -77,7 +77,7 @@ export default async function PlanDetailPage({
 
       <NewsMentioningPlan planId={plan.id} />
 
-      <div className="mx-auto max-w-7xl px-6 pb-12">
+      <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 sm:pb-12">
         <nav className="grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
             href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}

@@ -22,7 +22,7 @@ export function EventDetailView({
   return (
     <div className="bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-center gap-3">
             <Link
               href="/app/calendar"
@@ -65,7 +65,7 @@ export function EventDetailView({
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6">
           <SectionNumber
             n="01 /"

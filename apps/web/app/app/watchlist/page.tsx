@@ -82,7 +82,7 @@ export default function WatchlistPage() {
 
       {/* Hero */}
       <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <div>
               <DataLabel>Operator · Watchlist</DataLabel>
@@ -107,7 +107,7 @@ export default function WatchlistPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         {hydrated && tickers.length === 0 && <WatchlistEmpty />}
 
         {tickers.length > 0 && (

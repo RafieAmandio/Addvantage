@@ -96,7 +96,7 @@ function PlanCompareViewInner({
     <div className="bg-grid-fine">
       <PlanCompareHero />
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <div className="mb-6 grid grid-cols-1 items-end gap-4 sm:grid-cols-[1fr_auto_1fr]">
           <PlanComparePicker
             label="Plan A"
