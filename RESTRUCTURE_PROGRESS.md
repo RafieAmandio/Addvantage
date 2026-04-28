@@ -9,7 +9,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 2** — Features: health, source, tag, search
 - [x] **Phase 3** — Feature: news (full CRUD + admin review)
 - [x] **Phase 4** — Feature: plan (full CRUD + stats)
-- [ ] **Phase 5** — Feature: consult (CRUD + SSE stream)
+- [x] **Phase 5** — Feature: consult (CRUD + SSE stream)
 - [ ] **Phase 6** — Features: chart, calendar, timeline
 - [ ] **Phase 7** — Features: user, auth
 - [ ] **Phase 8** — Feature: education
@@ -180,6 +180,41 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/features/plans/queries/plans.ts` → plan repository
 - `apps/web/app/admin/plans/[id]/actions.ts` → plan service create/update/publish/close/delete
 - `apps/web/app/api/plans/stats/route.ts` → plan controller getStats
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 5 — 2026-04-28
+
+**Created:**
+- `src/config/openai.ts` — OpenAI client singleton (lazy init, null if OPENAI_API_KEY unset)
+- `src/features/consult/consult.lib.ts` — System prompt, 8 canned replies with keyword matching, FREE_DAILY_TOKEN_CAP
+- `src/features/consult/consult.repository.ts` — Prisma queries: sessions CRUD, messages CRUD, daily token usage (raw SQL), profile tier lookup
+- `src/features/consult/consult.service.ts` — Session ownership checks, tier resolution, daily token cap enforcement, SSE streaming with OpenAI + canned reply fallback
+- `src/features/consult/consult.validation.ts` — Zod schemas: createSession, renameSession, appendMessage, streamBody
+- `src/features/consult/consult.controller.ts` — 7 endpoints including SSE stream handler
+- `src/features/consult/consult.routes.ts` — All routes with auth + rate limiting (user-based for CRUD, tier-based for stream)
+
+**Endpoints:**
+- `GET /consult/sessions` — list user's sessions
+- `POST /consult/sessions` — create session
+- `PUT /consult/sessions/:id` — rename session
+- `DELETE /consult/sessions/:id` — delete session
+- `GET /consult/sessions/:id/messages` — list messages (chronological)
+- `POST /consult/sessions/:id/messages` — append message
+- `POST /consult/stream` — SSE streaming (OpenAI gpt-4o-mini, canned reply fallback, daily token cap for free tier)
+
+**Modified:**
+- `src/routes.ts` — Mounted consult routes
+
+**Migrates from:**
+- `apps/web/features/consult/queries/messages.ts` → consult repository (listSessions, listMessages)
+- `apps/web/features/consult/queries/usage.ts` → consult repository (getDailyTokensUsed)
+- `apps/web/features/consult/actions.ts` → consult service (create/rename/delete/append)
+- `apps/web/features/consult/lib/send-message.ts` → consult service (streamResponse)
+- `apps/web/app/api/consult/stream/route.ts` → consult controller (stream)
+- `apps/web/features/consult/lib/replies.ts` → consult.lib (pickReply)
+- `apps/web/features/consult/lib/prompt.ts` → consult.lib (DESK_SYSTEM_PROMPT)
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
