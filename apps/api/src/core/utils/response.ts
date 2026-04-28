@@ -1,12 +1,12 @@
 import type { Response } from "express";
 
-export function sendSuccess<T>(res: Response, content: T, message = "Success", status = 200) {
-  res.status(status).json({ message, content });
+export function sendSuccess<T>(res: Response, data: T, message = "Success", status = 200) {
+  res.status(status).json({ success: true, data, message });
 }
 
 export function sendPaginatedSuccess<T>(
   res: Response,
-  data: {
+  result: {
     content: T[];
     page: number;
     limit: number;
@@ -15,13 +15,11 @@ export function sendPaginatedSuccess<T>(
   message = "Success",
 ) {
   res.status(200).json({
+    success: true,
+    data: result.content,
+    total: result.total,
+    page: result.page,
+    limit: result.limit,
     message,
-    content: data.content,
-    meta: {
-      page: data.page,
-      limit: data.limit,
-      total: data.total,
-      totalPages: Math.ceil(data.total / data.limit),
-    },
   });
 }

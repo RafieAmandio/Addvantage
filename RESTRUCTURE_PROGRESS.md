@@ -16,7 +16,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 9** — Integrations: payment (provider-agnostic) + email
 - [x] **Phase 10** — Frontend: wire all pages to Express API
 - [x] **Phase 11** — Cleanup: delete old code, archive
-- [ ] **Phase 12** — Backend tests
+- [x] **Phase 12** — Backend tests
 - [ ] **Phase 13** — E2E tests
 - [ ] **Phase 14** — (Optional) Worker → Prisma
 
@@ -455,3 +455,30 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `pnpm typecheck` passes (5/5 packages)
 - No stale imports to deleted files
 - `pnpm install` succeeds with updated lockfile
+
+### Phase 12 — 2026-04-28
+
+**Infrastructure:**
+- `apps/api/vitest.config.ts` — Added `setupFiles: ["src/test/setup.ts"]`
+- `apps/api/src/test/setup.ts` — Global mocks: env vars (DATABASE_URL, JWT_SECRET, etc.), logger (silent noop)
+- `apps/api/src/test/helpers.ts` — Test utilities: TEST_USER, TEST_ADMIN, mockAuthMiddleware, mockAdminMiddleware
+
+**Test files created (7 files, 56 tests):**
+
+*Core:*
+- `src/core/utils/response.test.ts` — 3 tests: sendSuccess format, custom status/message, sendPaginatedSuccess flat paginated shape
+- `src/core/middleware/error.middleware.test.ts` — 4 tests (Supertest): NotFoundError→404, ForbiddenError→403, ValidationError→400 with errors array, unknown→500
+
+*Features:*
+- `src/features/health/health.test.ts` — 2 tests (Supertest): 200 with ok/app fields, includes uptime_s and ts
+- `src/features/news/news.service.test.ts` — 10 tests: getApproved (found/not found), approve (pending/non-pending/missing), reject (pending/already-approved), create (content hash generation/determinism), listApproved (paginated)
+- `src/features/plan/plan.service.test.ts` — 15 tests: publish (draft/non-draft/missing), close (long R, negative R, short R, null R entry=stop, null R close=null, non-published rejection), getPublished (published/non-published), getStats (empty/computed with byDirection), remove (exists/missing)
+- `src/features/consult/consult.service.test.ts` — 17 tests: listMessages ownership (owner/non-owner/missing), appendMessage ownership (owner/non-owner), renameSession (success/0 rows), deleteSession (success/0 rows), getUserTier (vip/unknown/null), checkDailyTokenCap (under/at/over), streamResponse fallback (canned reply/non-owner)
+- `src/features/consult/consult.lib.test.ts` — 5 tests: pickReply (non-empty, keyword matching, fallback round-robin, all indices), FREE_DAILY_TOKEN_CAP value
+
+**Bug fix:**
+- `src/core/utils/response.ts` — Fixed response format from `{ message, content }` to `{ success: true, data, message }` matching frontend ApiResponse expectations. Also fixed sendPaginatedSuccess to output flat `{ success, data, total, page, limit, message }`.
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+- `pnpm --filter @tradevantage/api test` — 56 tests pass across 7 files (280ms)
