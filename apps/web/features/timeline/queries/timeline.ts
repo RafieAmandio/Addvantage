@@ -1,18 +1,13 @@
 import { cache } from "react";
-import { supabaseServer } from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
 import {
-  TimelineEventSchema,
   type TimelineEvent,
   type TimelineKind,
 } from "@/features/timeline/types";
 import { isMockMode } from "@/lib/config/public";
 import { mockTimelineEvents } from "@/lib/mock/fixtures";
+import { apiGet } from "@/lib/api/client-server";
 
 export type { TimelineEvent };
-
-const TIMELINE_EVENT_COLUMNS =
-  "id,kind,source_code,occurred_at,symbols,title,body,url,bias,impact,news_item_id";
 
 interface ListTimelineParams {
   symbols?: string[];
@@ -39,68 +34,26 @@ export async function listTimelineEvents(
     return all.slice(0, limit);
   }
 
-  const supabase = supabaseServer();
-
-  let teQ = supabase
-    .from("timeline_events")
-    .select(TIMELINE_EVENT_COLUMNS)
-    .order("occurred_at", { ascending: false })
-    .limit(limit);
-  if (symbols) teQ = teQ.overlaps("symbols", symbols);
-  if (kinds) teQ = teQ.in("kind", kinds);
-  if (from) teQ = teQ.gte("occurred_at", from);
-  if (to) teQ = teQ.lte("occurred_at", to);
-
-  const teRes = await teQ;
-
-  if (teRes.error) {
-    logger.error("listTimelineEvents: timeline_events read failed", {
-      error: teRes.error,
-      scope: "timeline.listTimelineEvents",
-    });
+  try {
+    const qs = new URLSearchParams();
+    if (symbols) qs.set("symbols", symbols.join(","));
+    if (kinds) qs.set("kinds", kinds.join(","));
+    if (from) qs.set("from", from);
+    if (to) qs.set("to", to);
+    qs.set("limit", String(limit));
+    const data = await apiGet<TimelineEvent[]>(`/timeline?${qs.toString()}`);
+    return data ?? [];
+  } catch {
     return [];
   }
-
-  const parsed = TimelineEventSchema.array().safeParse(teRes.data ?? []);
-  if (!parsed.success) {
-    logger.error("listTimelineEvents: timeline_events shape mismatch", {
-      issues: parsed.error.issues,
-      scope: "timeline.listTimelineEvents",
-    });
-    return [];
-  }
-
-  return parsed.data;
 }
 
 export const getTimelineEventById = cache(async function getTimelineEventById(
   id: string
 ): Promise<TimelineEvent | null> {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("timeline_events")
-    .select(TIMELINE_EVENT_COLUMNS)
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    logger.error("getTimelineEventById: timeline_events read failed", {
-      id,
-      error,
-      scope: "timeline.getTimelineEventById",
-    });
+  try {
+    return await apiGet<TimelineEvent>(`/timeline/${id}`);
+  } catch {
     return null;
   }
-  if (!data) return null;
-
-  const parsed = TimelineEventSchema.safeParse(data);
-  if (!parsed.success) {
-    logger.error("getTimelineEventById: timeline_events shape mismatch", {
-      id,
-      issues: parsed.error.issues,
-      scope: "timeline.getTimelineEventById",
-    });
-    return null;
-  }
-  return parsed.data;
 });

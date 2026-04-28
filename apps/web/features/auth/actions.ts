@@ -1,7 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import type { TablesUpdate } from "@tradevantage/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -10,7 +9,7 @@ import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
 import { supabaseServer } from "@/lib/supabase/server";
-import { enforceUserRateLimit } from "@/lib/user-ratelimit";
+import { apiPut, apiPost } from "@/lib/api/client-server";
 
 const EmailSchema = z.object({ email: z.string().email() });
 
@@ -105,15 +104,6 @@ export async function saveTraderProfile(
     return { ok: false, error: "unauthorized" };
   }
 
-  try {
-    await enforceUserRateLimit(user.id, "profile:save", {
-      limit: 5,
-      scope: "auth.saveTraderProfile",
-    });
-  } catch {
-    return { ok: false, error: "rate_limited" };
-  }
-
   const rawMarkets = formData
     .getAll("markets")
     .filter((v): v is string => typeof v === "string")
@@ -134,53 +124,31 @@ export async function saveTraderProfile(
     return { ok: false, error: "invalid_input" };
   }
 
-  const data = parsed.data;
-  const update: TablesUpdate<"profiles"> = {};
-  if (data.handle !== undefined) update.handle = data.handle;
-  if (data.tradingLength !== undefined) update.trading_length = data.tradingLength;
-  if (data.longestProfitable !== undefined)
-    update.longest_profitable = data.longestProfitable;
-  if (data.markets !== undefined) update.markets = [...data.markets];
-  if (data.yearlyGoal !== undefined) update.yearly_goal = data.yearlyGoal;
-  if (data.faultAttribution !== undefined)
-    update.fault_attribution = data.faultAttribution;
-
-  if (Object.keys(update).length === 0) {
+  try {
+    await apiPut("/users/profile", parsed.data);
     return { ok: true };
-  }
-
-  const supabase = supabaseServer();
-  const { error } = await supabase
-    .from("profiles")
-    .update(update)
-    .eq("id", user.id);
-
-  if (error) {
-    Sentry.captureException(error, {
+  } catch (err) {
+    Sentry.captureException(err, {
       tags: { scope: "auth.saveTraderProfile" },
       extra: { userId: user.id },
     });
     logger.error("saveTraderProfile failed", {
-      error,
+      error: err,
       userId: user.id,
       scope: "auth.saveTraderProfile",
     });
     return { ok: false, error: "save_failed" };
   }
-
-  return { ok: true };
 }
 
 export async function logoutAction(): Promise<void> {
-  const supabase = supabaseServer();
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    Sentry.captureException(error, { tags: { scope: "auth.logout" } });
-    logger.error("logout failed", { error, scope: "auth.logout" });
-    // Fall through — we still redirect so the session cookie at minimum
-    // clears on the client side. If signOut fails server-side, the user
-    // gets a stale client-side state but can retry from /login.
+  try {
+    await apiPost("/auth/logout");
+  } catch {
+    // Best-effort — still redirect
   }
+  const supabase = supabaseServer();
+  await supabase.auth.signOut().catch(() => {});
   redirect("/");
 }
 

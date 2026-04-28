@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { supabaseServer } from "@/lib/supabase/server";
 import { isMockMode } from "@/lib/config/public";
+import { apiGet } from "@/lib/api/client-server";
 
 const MOCK_USER = {
   id: "demo-operator",
@@ -41,13 +42,11 @@ export const getProfile = cache(async function getProfile(): Promise<ProfileSumm
   if (isMockMode()) return MOCK_PROFILE;
   const user = await getSession();
   if (!user) return null;
-  const supabase = supabaseServer();
-  const { data } = await supabase
-    .from("profiles")
-    .select("id,email,handle,is_admin,tier,signed_liability")
-    .eq("id", user.id)
-    .maybeSingle();
-  return (data as ProfileSummary | null) ?? null;
+  try {
+    return await apiGet<ProfileSummary>("/users/me");
+  } catch {
+    return null;
+  }
 });
 
 export async function requireAdmin(): Promise<ProfileSummary> {

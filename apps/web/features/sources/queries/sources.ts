@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { supabaseServer } from "@/lib/supabase/server";
+import { apiGet } from "@/lib/api/client-server";
 
 const SourceRowSchema = z.object({
   code: z.string(),
@@ -14,15 +14,7 @@ const SourceRowSchema = z.object({
 
 type SourceRow = z.infer<typeof SourceRowSchema>;
 
-const SOURCE_LIST_COLUMNS =
-  "code,name,url,enabled,poll_minutes,last_polled_at,last_success_at,last_error";
-
 export async function listSources(): Promise<SourceRow[]> {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("sources")
-    .select(SOURCE_LIST_COLUMNS)
-    .order("code");
-  if (error) throw error;
+  const data = await apiGet<SourceRow[]>("/sources");
   return SourceRowSchema.array().parse(data ?? []);
 }

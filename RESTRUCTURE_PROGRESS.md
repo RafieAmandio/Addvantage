@@ -14,7 +14,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 7** — Features: user, auth
 - [x] **Phase 8** — Feature: education
 - [x] **Phase 9** — Integrations: payment (provider-agnostic) + email
-- [ ] **Phase 10** — Frontend: wire all pages to Express API
+- [x] **Phase 10** — Frontend: wire all pages to Express API
 - [ ] **Phase 11** — Cleanup: delete old code, archive
 - [ ] **Phase 12** — Backend tests
 - [ ] **Phase 13** — E2E tests
@@ -353,6 +353,51 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/app/api/webhooks/xendit/route.ts` → subscription controller + service
 - `apps/web/lib/payment/verify-xendit.ts` → integrations/payment/providers/xendit/provider.ts
 - `apps/web/lib/email/brevo.ts` → integrations/email/providers/brevo/provider.ts
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 10 — 2026-04-28
+
+**Created:**
+- `apps/web/lib/api/client-server.ts` — Server-side API client (reads Supabase token from cookies, apiGet/apiPost/apiPut/apiDelete/apiStream)
+- `apps/web/lib/api/client.ts` — Browser-side API client (reads token from supabaseBrowser session, apiGet/apiPost/apiPut/apiDelete/apiStreamFetch)
+
+**Modified (query files → Express API):**
+- `features/news/queries/news.ts` — 5 functions → /news, /news/:id, /news/admin/pending, /news/admin/rejected, /news/admin/:id
+- `features/plan/queries/plans.ts` — 4 functions → /plans, /plans/:id, /plans/admin/all, /plans/admin/drafts
+- `features/plan/queries/stats.ts` — getClosedPlanStats → /plans/stats
+- `features/plan/queries/news.ts` — getNewsForPlan → /plans/:id/news
+- `features/education/queries/primers.ts` — listPublishedPrimers → /education
+- `features/timeline/queries/timeline.ts` — 2 functions → /timeline, /timeline/:id
+- `features/chart/queries/bars.ts` — listBars → /bars
+- `features/calendar/queries/correlation.ts` — listNewsForEvent → /events/:id/correlation
+- `features/consult/queries/messages.ts` — 2 functions → /consult/sessions, /consult/sessions/:id/messages
+- `features/consult/queries/usage.ts` — Simplified to stub (enforcement moved server-side)
+- `features/tags/queries.ts` — listNewsByTag → /tags/:tag/news, getTagCounts → /tags/counts
+- `features/sources/queries/sources.ts` — listSources → /sources
+
+**Modified (action files → Express API):**
+- `features/consult/actions.ts` — 5 actions → /consult/sessions CRUD + /consult/stream
+- `features/plan/actions.ts` — 5 actions → /plans CRUD + publish/close
+- `features/timeline/actions.ts` — createUserPin → /timeline/pin
+- `features/auth/actions.ts` — saveTraderProfile → /users/profile, logoutAction → /auth/logout (OTP stays on Supabase)
+- `app/admin/review/[id]/actions.ts` — saveDraft/approve/reject → /news/:id/draft, approve, reject
+- `app/admin/review/new/actions.ts` — createNewsItem → POST /news
+
+**Modified (auth/session):**
+- `lib/auth/session.ts` — getProfile() → GET /users/me (getSession stays Supabase for cookie-based auth)
+
+**Modified (client-side wiring):**
+- `features/consult/hooks/useConsultActions.ts` — Stream → apiStreamFetch (Express /consult/stream)
+- `lib/api/client.ts` — apiStreamFetch returns raw Response (caller handles errors)
+
+**Not migrated (by design):**
+- `app/admin/logs/page.tsx` — reads ingestion_runs directly from Supabase (no Express endpoint)
+- `app/auth/callback/route.ts` — Supabase auth cookie exchange
+- `features/timeline/hooks/useTimelineEvents.ts` — Supabase Realtime subscription
+- `features/auth/actions.ts` — OTP login/signup stays Supabase Auth
+- `app/api/consult/stream/route.ts` — Legacy Next.js SSE route (remove in Phase 11)
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)

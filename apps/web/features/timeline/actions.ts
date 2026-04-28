@@ -1,12 +1,9 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { z } from "zod";
-import { logger } from "@/lib/logger";
-import { supabaseServer } from "@/lib/supabase/server";
-import { enforceUserRateLimit } from "@/lib/user-ratelimit";
+import { getSession } from "@/lib/auth/session";
+import { apiPost } from "@/lib/api/client-server";
 
 const UserPinSchema = z.object({
   title: z.string().trim().min(1, "title required").max(200),
@@ -24,27 +21,8 @@ export async function createUserPin(
   _prev: PinActionState,
   formData: FormData,
 ): Promise<PinActionState> {
-  const supabase = supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSession();
   if (!user) return { ok: false, error: "unauthorized" };
-
-  const ip =
-    headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  try {
-    await enforceUserRateLimit(user.id, "timeline:pin", {
-      limit: 10,
-      windowSec: 60,
-      scope: "timeline.createUserPin",
-      keySuffix: ip,
-    });
-  } catch (err) {
-    if (err instanceof Error && err.message === "rate_limited") {
-      return { ok: false, error: "rate_limited" };
-    }
-    throw err;
-  }
 
   const bodyRaw = formData.get("body");
   const parsed = UserPinSchema.safeParse({
@@ -63,30 +41,16 @@ export async function createUserPin(
   const { title, body, symbol, occurredAt } = parsed.data;
   const upperSymbol = symbol.toUpperCase();
 
-  const { error } = await supabase.from("timeline_events").insert({
-    kind: "user_pin",
-    source_code: "USER",
-    occurred_at: occurredAt,
-    symbols: [upperSymbol],
-    title,
-    body: body ?? null,
-    created_by: user.id,
-  });
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "timeline.createUserPin" },
-      extra: { userId: user.id, symbol: upperSymbol },
-    });
-    logger.error("createUserPin failed", {
-      error,
-      userId: user.id,
+  try {
+    await apiPost("/timeline/pin", {
+      title,
+      body: body ?? null,
       symbol: upperSymbol,
-      scope: "timeline.createUserPin",
+      occurredAt,
     });
+    revalidatePath(`/app/chart/${upperSymbol}`);
+    return { ok: true };
+  } catch {
     return { ok: false, error: "insert_failed" };
   }
-
-  revalidatePath(`/app/chart/${upperSymbol}`);
-  return { ok: true };
 }

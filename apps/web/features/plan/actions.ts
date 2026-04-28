@@ -1,14 +1,10 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { supabaseServer } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/session";
-import { enforceAdminRateLimit } from "@/lib/admin-ratelimit";
-import { logger } from "@/lib/logger";
-import type { Json, TablesInsert, TablesUpdate } from "@tradevantage/db";
+import { apiPost, apiPut, apiDelete } from "@/lib/api/client-server";
 import {
   PlanDirectionSchema,
   PlanOutcomeSchema,
@@ -91,23 +87,6 @@ export const PlanCloseInputSchema = z.object({
   close_price: nullableNumber,
 });
 
-function computeRealizedR(input: {
-  direction: "long" | "short";
-  entry: number | null;
-  stop: number | null;
-  close_price: number | null;
-}): number | null {
-  const { direction, entry, stop, close_price } = input;
-  if (entry === null || stop === null || close_price === null) return null;
-  if (entry === stop) return null;
-  const raw =
-    direction === "long"
-      ? (close_price - entry) / (entry - stop)
-      : (entry - close_price) / (stop - entry);
-  if (!Number.isFinite(raw)) return null;
-  return Math.round(raw * 100) / 100;
-}
-
 function readPlanForm(fd: FormData) {
   return {
     symbol: fd.get("symbol"),
@@ -127,12 +106,7 @@ export async function createPlan(
   _prev: PlanActionState,
   formData: FormData,
 ): Promise<PlanActionState> {
-  const admin = await requireAdmin();
-  try {
-    await enforceAdminRateLimit(admin.id, "createPlan", ADMIN_SCOPE);
-  } catch {
-    return { ok: false, error: "rate_limited" };
-  }
+  await requireAdmin();
 
   const parse = PlanCreateInputSchema.safeParse(readPlanForm(formData));
   if (!parse.success) {
@@ -142,41 +116,14 @@ export async function createPlan(
     };
   }
 
-  const now = new Date().toISOString();
-  const insert: TablesInsert<"trading_plans"> = {
-    symbol: parse.data.symbol,
-    thesis: parse.data.thesis,
-    direction: parse.data.direction,
-    entry: parse.data.entry,
-    stop: parse.data.stop,
-    target: parse.data.target,
-    r_multiple: parse.data.r_multiple,
-    setups: JSON.parse(JSON.stringify(parse.data.setups)) as Json,
-    tags: parse.data.tags,
-    tier: parse.data.tier,
-    status: "draft",
-    author_id: admin.id,
-    created_at: now,
-    updated_at: now,
-  };
-
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("trading_plans")
-    .insert(insert)
-    .select("id")
-    .single();
-
-  if (error || !data) {
-    Sentry.captureException(error ?? new Error("createPlan: no row returned"), {
-      tags: { scope: "admin.plan.create" },
-    });
-    logger.error("createPlan failed", { error, scope: "admin.plan.create" });
-    return { ok: false, error: error?.message ?? "insert failed" };
+  try {
+    const data = await apiPost<{ id: string }>("/plans", parse.data);
+    revalidatePath("/admin/plans");
+    redirect(`/admin/plans/${data.id}`);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
+    return { ok: false, error: "insert failed" };
   }
-
-  revalidatePath("/admin/plans");
-  redirect(`/admin/plans/${data.id}`);
 }
 
 export async function updatePlan(
@@ -184,12 +131,7 @@ export async function updatePlan(
   _prev: PlanActionState,
   formData: FormData,
 ): Promise<PlanActionState> {
-  const admin = await requireAdmin();
-  try {
-    await enforceAdminRateLimit(admin.id, "updatePlan", ADMIN_SCOPE);
-  } catch {
-    return { ok: false, error: "rate_limited" };
-  }
+  await requireAdmin();
 
   const parse = PlanUpdateInputSchema.safeParse(readPlanForm(formData));
   if (!parse.success) {
@@ -199,77 +141,26 @@ export async function updatePlan(
     };
   }
 
-  const { setups, ...rest } = parse.data;
-  const update: TablesUpdate<"trading_plans"> = {
-    ...rest,
-    updated_at: new Date().toISOString(),
-  };
-  if (setups !== undefined) {
-    update.setups = JSON.parse(JSON.stringify(setups)) as Json;
+  try {
+    await apiPut(`/plans/${id}`, parse.data);
+    revalidatePath("/admin/plans");
+    revalidatePath(`/admin/plans/${id}`);
+    return { ok: true, id };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "update failed" };
   }
-
-  const supabase = supabaseServer();
-  const { error } = await supabase
-    .from("trading_plans")
-    .update(update)
-    .eq("id", id);
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "admin.plan.update" },
-      extra: { id },
-    });
-    logger.error("updatePlan failed", {
-      id,
-      error,
-      scope: "admin.plan.update",
-    });
-    return { ok: false, error: error.message };
-  }
-
-  revalidatePath("/admin/plans");
-  revalidatePath(`/admin/plans/${id}`);
-  return { ok: true, id };
 }
 
 export async function publishPlan(id: string): Promise<void> {
-  const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "publishPlan", ADMIN_SCOPE);
-
-  const now = new Date().toISOString();
-  const update: TablesUpdate<"trading_plans"> = {
-    status: "published",
-    published_at: now,
-    updated_at: now,
-  };
-
-  const supabase = supabaseServer();
-  const { error } = await supabase
-    .from("trading_plans")
-    .update(update)
-    .eq("id", id);
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "admin.plan.publish" },
-      extra: { id },
-    });
-    logger.error("publishPlan failed", {
-      id,
-      error,
-      scope: "admin.plan.publish",
-    });
-    throw new Error(error.message);
-  }
-
+  await requireAdmin();
+  await apiPut(`/plans/${id}/publish`);
   revalidatePath("/admin/plans");
   revalidatePath(`/admin/plans/${id}`);
   revalidatePath("/app/plan");
 }
 
 export async function closePlan(id: string, formData: FormData): Promise<void> {
-  const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "closePlan", ADMIN_SCOPE);
+  await requireAdmin();
 
   const parse = PlanCloseInputSchema.safeParse({
     outcome: formData.get("outcome"),
@@ -279,65 +170,7 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
     throw new Error(parse.error.issues[0]?.message ?? "validation failed");
   }
 
-  const supabase = supabaseServer();
-
-  // Load entry/stop/direction so we can derive realized_r server-side. We
-  // never trust the client to send these — the row is the source of truth.
-  const { data: row, error: fetchError } = await supabase
-    .from("trading_plans")
-    .select("direction, entry, stop")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (fetchError || !row) {
-    const err = fetchError ?? new Error("closePlan: plan not found");
-    Sentry.captureException(err, {
-      tags: { scope: "admin.plan.close" },
-      extra: { id },
-    });
-    logger.error("closePlan fetch failed", {
-      id,
-      error: err,
-      scope: "admin.plan.close",
-    });
-    throw new Error(fetchError?.message ?? "plan not found");
-  }
-
-  const realized_r = computeRealizedR({
-    direction: row.direction as "long" | "short",
-    entry: row.entry,
-    stop: row.stop,
-    close_price: parse.data.close_price,
-  });
-
-  const now = new Date().toISOString();
-  const update: TablesUpdate<"trading_plans"> = {
-    status: "closed",
-    outcome: parse.data.outcome,
-    close_price: parse.data.close_price,
-    realized_r,
-    closed_at: now,
-    updated_at: now,
-  };
-
-  const { error } = await supabase
-    .from("trading_plans")
-    .update(update)
-    .eq("id", id);
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "admin.plan.close" },
-      extra: { id },
-    });
-    logger.error("closePlan failed", {
-      id,
-      error,
-      scope: "admin.plan.close",
-    });
-    throw new Error(error.message);
-  }
-
+  await apiPut(`/plans/${id}/close`, parse.data);
   revalidatePath("/admin/plans");
   revalidatePath(`/admin/plans/${id}`);
   revalidatePath("/app/plan");
@@ -345,25 +178,8 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
 }
 
 export async function deletePlan(id: string): Promise<void> {
-  const admin = await requireAdmin();
-  await enforceAdminRateLimit(admin.id, "deletePlan", ADMIN_SCOPE);
-
-  const supabase = supabaseServer();
-  const { error } = await supabase.from("trading_plans").delete().eq("id", id);
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "admin.plan.delete" },
-      extra: { id },
-    });
-    logger.error("deletePlan failed", {
-      id,
-      error,
-      scope: "admin.plan.delete",
-    });
-    throw new Error(error.message);
-  }
-
+  await requireAdmin();
+  await apiDelete(`/plans/${id}`);
   revalidatePath("/admin/plans");
   revalidatePath("/app/plan");
   redirect("/admin/plans");

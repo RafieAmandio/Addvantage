@@ -9,6 +9,7 @@ import {
 } from "@/features/consult/actions";
 import type { ConsultMessage, ConsultSession, LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
+import { apiStreamFetch } from "@/lib/api/client";
 
 export function useConsultActions({
   active,
@@ -99,10 +100,9 @@ export function useConsultActions({
 
     const bubbleId = `M-x${Date.now() + 1}`;
     const streamMessage = async () => {
-      const res = await fetch("/api/consult/stream", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ sessionId, body: userBody }),
+      const res = await apiStreamFetch("/consult/stream", {
+        sessionId,
+        body: userBody,
       });
       if (!res.ok || !res.body) {
         let errCode: string | undefined;

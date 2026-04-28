@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { supabaseServer } from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
+import { apiGet } from "@/lib/api/client-server";
 
 const NewsForPlanRowSchema = z.object({
   id: z.string(),
@@ -11,37 +10,13 @@ const NewsForPlanRowSchema = z.object({
 });
 type NewsForPlanRow = z.infer<typeof NewsForPlanRowSchema>;
 
-const NEWS_FOR_PLAN_COLUMNS =
-  "id,source_code,headline,fetched_at,published_at";
-
 export async function getNewsForPlan(
   planId: string,
 ): Promise<NewsForPlanRow[]> {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase
-    .from("news_items")
-    .select(NEWS_FOR_PLAN_COLUMNS)
-    .eq("status", "approved")
-    .contains("related_plan_ids", [planId])
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .order("fetched_at", { ascending: false })
-    .limit(20);
-  if (error) {
-    logger.error("getNewsForPlan failed", {
-      planId,
-      error,
-      scope: "plan.getNewsForPlan",
-    });
+  try {
+    const data = await apiGet<NewsForPlanRow[]>(`/plans/${planId}/news`);
+    return NewsForPlanRowSchema.array().parse(data ?? []);
+  } catch {
     return [];
   }
-  const parsed = NewsForPlanRowSchema.array().safeParse(data ?? []);
-  if (!parsed.success) {
-    logger.error("getNewsForPlan shape mismatch", {
-      planId,
-      issues: parsed.error.issues,
-      scope: "plan.getNewsForPlan",
-    });
-    return [];
-  }
-  return parsed.data;
 }

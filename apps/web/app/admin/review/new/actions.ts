@@ -1,17 +1,10 @@
 "use server";
 
-import { createHash } from "crypto";
-import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { supabaseServer } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth/session";
-import { enforceAdminRateLimit } from "@/lib/admin-ratelimit";
-import { logger } from "@/lib/logger";
+import { apiPost } from "@/lib/api/client-server";
 import { NewsItemCreateSchema } from "@tradevantage/shared";
-import type { TablesInsert } from "@tradevantage/db";
-
-const ADMIN_SCOPE = "admin.review";
 
 export interface CreateFormState {
   ok: boolean;
@@ -26,24 +19,11 @@ function parseArrayField(v: FormDataEntryValue | null): string[] {
     .filter(Boolean);
 }
 
-function contentHash(parts: (string | null | undefined)[]): string {
-  const joined = parts
-    .filter(Boolean)
-    .map((s) => String(s).replace(/\s+/g, " ").trim())
-    .join("␞");
-  return createHash("sha256").update(joined).digest("hex");
-}
-
 export async function createNewsItem(
   _prev: CreateFormState,
   formData: FormData,
 ): Promise<CreateFormState> {
-  const admin = await requireAdmin();
-  try {
-    await enforceAdminRateLimit(admin.id, "createNews", ADMIN_SCOPE);
-  } catch {
-    return { ok: false, error: "rate_limited" };
-  }
+  await requireAdmin();
 
   const sourceUrl = formData.get("source_url");
   const rawText = formData.get("raw_text");
@@ -69,44 +49,12 @@ export async function createNewsItem(
     };
   }
 
-  const data = parse.data;
-  const now = new Date().toISOString();
-  const hash = contentHash([data.source_code, "manual", data.headline]);
-
-  const insert: TablesInsert<"news_items"> = {
-    source_code: data.source_code,
-    source_url: data.source_url,
-    raw_text: data.raw_text,
-    content_hash: hash,
-    headline: data.headline,
-    rephrased: data.rephrased,
-    analysis: data.analysis,
-    impact: data.impact,
-    bias: data.bias,
-    affects: data.affects,
-    tags: data.tags,
-    author: data.author,
-    status: "pending",
-    fetched_at: now,
-    created_at: now,
-    updated_at: now,
-  };
-
-  const supabase = supabaseServer();
-  const { data: row, error } = await supabase
-    .from("news_items")
-    .insert(insert)
-    .select("id")
-    .single();
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "admin.createNews" },
-    });
-    logger.error("createNewsItem failed", { error, scope: "admin.createNews" });
-    return { ok: false, error: error.message };
+  try {
+    const data = await apiPost<{ id: string }>("/news", parse.data);
+    revalidatePath("/admin/review");
+    redirect(`/admin/review/${data.id}`);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
+    return { ok: false, error: err instanceof Error ? err.message : "create failed" };
   }
-
-  revalidatePath("/admin/review");
-  redirect(`/admin/review/${row.id}`);
 }
