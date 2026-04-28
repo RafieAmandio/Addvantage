@@ -7,7 +7,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 0** — Express boilerplate + core infrastructure
 - [x] **Phase 1** — Prisma schema + client from db pull
 - [x] **Phase 2** — Features: health, source, tag, search
-- [ ] **Phase 3** — Feature: news (full CRUD + admin review)
+- [x] **Phase 3** — Feature: news (full CRUD + admin review)
 - [ ] **Phase 4** — Feature: plan (full CRUD + stats)
 - [ ] **Phase 5** — Feature: consult (CRUD + SSE stream)
 - [ ] **Phase 6** — Features: chart, calendar, timeline
@@ -113,6 +113,37 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/features/tags/queries.ts` → tag repository + service
 - `apps/web/app/api/tags/counts/route.ts` → tag controller (counts)
 - `apps/web/app/api/search/route.ts` → search controller + repository
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 3 — 2026-04-28
+
+**Created:**
+- `src/features/news/news.repository.ts` — findApproved, findApprovedById, findPending, findRejected, findById, create, updateDraft, approve, reject + count queries
+- `src/features/news/news.service.ts` — business logic: content hash, status lifecycle (pending → approved/rejected), NotFoundError/ForbiddenError guards
+- `src/features/news/news.controller.ts` — 8 endpoints: list/get public + admin pending/rejected/detail + create/draft/approve/reject
+- `src/features/news/news.validation.ts` — Zod schemas for create + edit (reuses IMPACT_LEVELS, BIAS_LEVELS, HASHTAGS, SOURCE_CODES from shared)
+- `src/features/news/news.routes.ts` — all routes with auth/admin/rate-limit middleware
+
+**Endpoints:**
+- `GET /news` — public approved list, paginated
+- `GET /news/:id` — public approved detail
+- `GET /news/admin/pending` — admin queue (oldest first)
+- `GET /news/admin/rejected` — admin rejected (newest first)
+- `GET /news/admin/:id` — admin detail with AI audit trail
+- `POST /news` — admin create (content hash computed from sourceCode + "manual" + headline)
+- `PUT /news/:id/draft` — admin save draft edits
+- `PUT /news/:id/approve` — sets status=approved, reviewed_by, reviewed_at, published_at
+- `PUT /news/:id/reject` — sets status=rejected, reviewed_by, reviewed_at, published_at=null
+
+**Modified:**
+- `src/routes.ts` — Mounted news routes
+
+**Migrates from:**
+- `apps/web/features/news/queries/news.ts` → news repository (all 5 query functions)
+- `apps/web/app/admin/review/new/actions.ts` → news service create
+- `apps/web/app/admin/review/[id]/actions.ts` → news service draft/approve/reject
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)

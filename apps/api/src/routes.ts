@@ -3,15 +3,16 @@ import { healthRoutes } from "./features/health/health.routes.js";
 import { sourceRoutes } from "./features/source/source.routes.js";
 import { tagRoutes } from "./features/tag/tag.routes.js";
 import { searchRoutes } from "./features/search/search.routes.js";
+import { newsRoutes } from "./features/news/news.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
   app.use("/sources", sourceRoutes);
   app.use("/tags", tagRoutes);
   app.use("/search", searchRoutes);
+  app.use("/news", newsRoutes);
 
-  // Phase 3+: feature routes will be mounted here
-  // app.use("/news", newsRoutes);
+  // Phase 4+: feature routes will be mounted here
   // app.use("/plans", planRoutes);
   // app.use("/consult", consultRoutes);
   // app.use("/bars", chartRoutes);
