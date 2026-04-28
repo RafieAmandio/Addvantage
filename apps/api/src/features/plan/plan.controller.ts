@@ -1,0 +1,129 @@
+import type { Response } from "express";
+import type { Prisma } from "@tradevantage/db";
+import { asyncHandler } from "@/core/utils/async-handler.js";
+import { sendSuccess, sendPaginatedSuccess } from "@/core/utils/response.js";
+import { parsePagination } from "@/core/utils/pagination.js";
+import { ValidationError } from "@/core/errors/index.js";
+import type { AdminRequest } from "@/core/types/request.js";
+import { planService } from "./plan.service.js";
+import { planCreateSchema, planUpdateSchema, planCloseSchema } from "./plan.validation.js";
+
+export const planController = {
+  listPublished: asyncHandler(async (req, res: Response) => {
+    const opts = parsePagination(req.query);
+    const symbol = req.query.symbol ? String(req.query.symbol) : undefined;
+    const result = await planService.listPublished({ ...opts, symbol });
+    sendPaginatedSuccess(res, result);
+  }),
+
+  getPublished: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const plan = await planService.getPublished(id);
+    sendSuccess(res, plan);
+  }),
+
+  getNewsForPlan: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const news = await planService.getNewsForPlan(id);
+    sendSuccess(res, news);
+  }),
+
+  getStats: asyncHandler(async (_req, res: Response) => {
+    const stats = await planService.getStats();
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+    sendSuccess(res, stats);
+  }),
+
+  listAllForAdmin: asyncHandler(async (req, res: Response) => {
+    const opts = parsePagination(req.query);
+    const result = await planService.listAllForAdmin(opts);
+    sendPaginatedSuccess(res, result);
+  }),
+
+  listMyDrafts: asyncHandler(async (req, res: Response) => {
+    const adminReq = req as AdminRequest;
+    const opts = parsePagination(req.query);
+    const result = await planService.listMyDrafts(adminReq.user.id, opts);
+    sendPaginatedSuccess(res, result);
+  }),
+
+  getForAdmin: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const plan = await planService.getForAdmin(id);
+    sendSuccess(res, plan);
+  }),
+
+  create: asyncHandler(async (req, res: Response) => {
+    const parsed = planCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
+      throw new ValidationError(messages);
+    }
+    const adminReq = req as AdminRequest;
+    const data = parsed.data;
+    const result = await planService.create({
+      symbol: data.symbol,
+      thesis: data.thesis,
+      direction: data.direction,
+      entry: data.entry,
+      stop: data.stop,
+      target: data.target,
+      rMultiple: data.r_multiple,
+      setups: data.setups as Prisma.InputJsonValue,
+      tags: data.tags,
+      tier: data.tier,
+      authorId: adminReq.user.id,
+    });
+    sendSuccess(res, result, "Plan created", 201);
+  }),
+
+  update: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const parsed = planUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
+      throw new ValidationError(messages);
+    }
+    const data = parsed.data;
+    const updateData: Record<string, unknown> = {};
+    if (data.symbol !== undefined) updateData.symbol = data.symbol;
+    if (data.thesis !== undefined) updateData.thesis = data.thesis;
+    if (data.direction !== undefined) updateData.direction = data.direction;
+    if (data.entry !== undefined) updateData.entry = data.entry;
+    if (data.stop !== undefined) updateData.stop = data.stop;
+    if (data.target !== undefined) updateData.target = data.target;
+    if (data.r_multiple !== undefined) updateData.rMultiple = data.r_multiple;
+    if (data.setups !== undefined) updateData.setups = data.setups;
+    if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.tier !== undefined) updateData.tier = data.tier;
+
+    await planService.update(id, updateData);
+    sendSuccess(res, null, "Plan updated");
+  }),
+
+  publish: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    await planService.publish(id);
+    sendSuccess(res, null, "Plan published");
+  }),
+
+  close: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const parsed = planCloseSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
+      throw new ValidationError(messages);
+    }
+    await planService.close(id, {
+      outcome: parsed.data.outcome,
+      closePrice: parsed.data.close_price,
+    });
+    sendSuccess(res, null, "Plan closed");
+  }),
+
+  remove: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    await planService.remove(id);
+    sendSuccess(res, null, "Plan deleted");
+  }),
+};

@@ -8,7 +8,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 1** — Prisma schema + client from db pull
 - [x] **Phase 2** — Features: health, source, tag, search
 - [x] **Phase 3** — Feature: news (full CRUD + admin review)
-- [ ] **Phase 4** — Feature: plan (full CRUD + stats)
+- [x] **Phase 4** — Feature: plan (full CRUD + stats)
 - [ ] **Phase 5** — Feature: consult (CRUD + SSE stream)
 - [ ] **Phase 6** — Features: chart, calendar, timeline
 - [ ] **Phase 7** — Features: user, auth
@@ -144,6 +144,42 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/features/news/queries/news.ts` → news repository (all 5 query functions)
 - `apps/web/app/admin/review/new/actions.ts` → news service create
 - `apps/web/app/admin/review/[id]/actions.ts` → news service draft/approve/reject
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 4 — 2026-04-28
+
+**Created:**
+- `src/features/plan/plan.repository.ts` — findPublished (symbol filter), countPublished, findById, findAllForAdmin, countAll, findMyDrafts, countMyDrafts, findClosedWithR, getNewsForPlan (cross-table on relatedPlanIds), create, update, remove
+- `src/features/plan/plan.service.ts` — computeRealizedR (long/short), stats aggregation (win rate, avg R by direction), status lifecycle (draft→published→closed)
+- `src/features/plan/plan.validation.ts` — planCreateSchema, planUpdateSchema (partial), planCloseSchema with nullableNumber transform
+- `src/features/plan/plan.controller.ts` — 11 endpoints: list/get public + stats + news-for-plan + admin CRUD + publish/close/remove
+- `src/features/plan/plan.routes.ts` — public + admin routes with auth/admin/rate-limit middleware
+
+**Endpoints:**
+- `GET /plans` — public published list (paginated, optional symbol filter)
+- `GET /plans/stats` — win rate, avg R, breakdown by direction (5min cache)
+- `GET /plans/:id` — public published detail
+- `GET /plans/:id/news` — approved news linked to plan
+- `GET /plans/admin/all` — admin list all plans
+- `GET /plans/admin/drafts` — admin's own drafts + closed
+- `GET /plans/admin/:id` — admin detail
+- `POST /plans` — admin create (draft status)
+- `PUT /plans/:id` — admin update
+- `PUT /plans/:id/publish` — draft → published
+- `PUT /plans/:id/close` — published → closed (computes realizedR)
+- `DELETE /plans/:id` — admin remove
+
+**Modified:**
+- `src/routes.ts` — Mounted plan routes
+- `packages/db/src/prisma.ts` — Re-exports `Prisma` namespace from @prisma/client
+- `packages/db/src/index.ts` — Re-exports `Prisma` for downstream use
+
+**Migrates from:**
+- `apps/web/features/plans/queries/plans.ts` → plan repository
+- `apps/web/app/admin/plans/[id]/actions.ts` → plan service create/update/publish/close/delete
+- `apps/web/app/api/plans/stats/route.ts` → plan controller getStats
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
