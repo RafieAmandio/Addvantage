@@ -1,29 +1,36 @@
 import type { Metadata } from "next";
-import { supabaseServer } from "@/lib/supabase/server";
+import { apiGet } from "@/lib/api/client-server";
 
 export const metadata: Metadata = { title: "Ingestion Logs" };
 import { cn, formatDateTime } from "@/lib/cn";
-import type { Database } from "@tradevantage/db";
 
-type IngestionRun = Database["public"]["Tables"]["ingestion_runs"]["Row"];
+interface IngestionRun {
+  id: string;
+  sourceCode: string;
+  startedAt: string;
+  finishedAt: string | null;
+  status: string;
+  itemsFetched: number;
+  itemsNew: number;
+  itemsRephrased: number;
+  error: string | null;
+}
+
+interface Source {
+  code: string;
+  name: string;
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-async function getRuns(): Promise<IngestionRun[]> {
-  const { data, error } = await supabaseServer()
-    .from("ingestion_runs")
-    .select("*")
-    .order("started_at", { ascending: false })
-    .limit(100);
-
-  if (error) throw error;
-  return data ?? [];
-}
-
-async function getSources() {
-  const { data } = await supabaseServer().from("sources").select("code, name");
-  return data ?? [];
+async function getData(): Promise<{ runs: IngestionRun[]; sources: Source[] }> {
+  try {
+    const result = await apiGet<{ runs: IngestionRun[]; sources: Source[] }>("/ingestion/runs?limit=100");
+    return result;
+  } catch {
+    return { runs: [], sources: [] };
+  }
 }
 
 function statusBadge(status: string) {
@@ -60,19 +67,19 @@ function countCell(n: number) {
 }
 
 function duration(run: IngestionRun) {
-  if (!run.finished_at) return "—";
+  if (!run.finishedAt) return "—";
   const ms =
-    new Date(run.finished_at).getTime() - new Date(run.started_at).getTime();
+    new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime();
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
 }
 
 export default async function IngestionLogsPage() {
-  const [runs, sources] = await Promise.all([getRuns(), getSources()]);
+  const { runs, sources } = await getData();
   const sourceNames = Object.fromEntries(sources.map((s) => [s.code, s.name]));
 
-  const totalFetched = runs.reduce((a, r) => a + r.items_fetched, 0);
-  const totalNew = runs.reduce((a, r) => a + r.items_new, 0);
-  const totalRephrased = runs.reduce((a, r) => a + r.items_rephrased, 0);
+  const totalFetched = runs.reduce((a, r) => a + r.itemsFetched, 0);
+  const totalNew = runs.reduce((a, r) => a + r.itemsNew, 0);
+  const totalRephrased = runs.reduce((a, r) => a + r.itemsRephrased, 0);
   const errors = runs.filter((r) => r.status === "error").length;
 
   return (
@@ -144,26 +151,26 @@ export default async function IngestionLogsPage() {
                   className="grid grid-cols-12 gap-4 bg-black px-4 py-3 transition-colors hover:bg-gray-2"
                 >
                   <div className="col-span-2 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    [{run.source_code}]
+                    [{run.sourceCode}]
                     <span className="ml-1 text-white/40">
-                      {sourceNames[run.source_code] ?? ""}
+                      {sourceNames[run.sourceCode] ?? ""}
                     </span>
                   </div>
                   <div className="col-span-1">{statusBadge(run.status)}</div>
                   <div className="col-span-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-                    {formatDateTime(run.started_at)}
+                    {formatDateTime(run.startedAt)}
                   </div>
                   <div className="col-span-1 font-mono text-[10px] tabular-nums text-white/50">
                     {duration(run)}
                   </div>
                   <div className="col-span-1 text-center">
-                    {countCell(run.items_fetched)}
+                    {countCell(run.itemsFetched)}
                   </div>
                   <div className="col-span-1 text-center">
-                    {countCell(run.items_new)}
+                    {countCell(run.itemsNew)}
                   </div>
                   <div className="col-span-1 text-center">
-                    {countCell(run.items_rephrased)}
+                    {countCell(run.itemsRephrased)}
                   </div>
                   <div className="col-span-3 truncate font-mono text-[10px] text-blood-bright">
                     {run.error ?? (
@@ -180,25 +187,25 @@ export default async function IngestionLogsPage() {
               <div key={run.id} className="bg-black px-4 py-3">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    [{run.source_code}]
+                    [{run.sourceCode}]
                   </span>
                   {statusBadge(run.status)}
                 </div>
                 <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                  {formatDateTime(run.started_at)} · {duration(run)}
+                  {formatDateTime(run.startedAt)} · {duration(run)}
                 </div>
                 <div className="mt-2 flex gap-4">
                   <div className="flex flex-col items-center">
                     <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">F</span>
-                    {countCell(run.items_fetched)}
+                    {countCell(run.itemsFetched)}
                   </div>
                   <div className="flex flex-col items-center">
                     <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">N</span>
-                    {countCell(run.items_new)}
+                    {countCell(run.itemsNew)}
                   </div>
                   <div className="flex flex-col items-center">
                     <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">R</span>
-                    {countCell(run.items_rephrased)}
+                    {countCell(run.itemsRephrased)}
                   </div>
                 </div>
                 {run.error && (

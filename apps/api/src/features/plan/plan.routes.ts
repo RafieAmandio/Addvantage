@@ -7,7 +7,7 @@ import { planController } from "./plan.controller.js";
 const router = Router();
 
 router.get("/stats", planController.getStats);
-router.get("/admin", requireAuth, requireAdmin, planController.listAllForAdmin);
+router.get("/admin/all", requireAuth, requireAdmin, planController.listAllForAdmin);
 router.get("/admin/drafts", requireAuth, requireAdmin, planController.listMyDrafts);
 router.get("/admin/:id", requireAuth, requireAdmin, planController.getForAdmin);
 router.get("/:id/news", planController.getNewsForPlan);

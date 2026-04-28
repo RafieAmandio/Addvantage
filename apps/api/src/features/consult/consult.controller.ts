@@ -3,6 +3,7 @@ import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
 import { ValidationError, AppError } from "@/core/errors/index.js";
 import type { AuthRequest } from "@/core/types/request.js";
+import { uploadFile, isS3Configured } from "@/config/s3.js";
 import { consultService } from "./consult.service.js";
 import {
   createSessionSchema,
@@ -67,6 +68,40 @@ export const consultController = {
     }
     const result = await consultService.appendMessage(authReq.user.id, sessionId, parsed.data);
     sendSuccess(res, result, "Message appended", 201);
+  }),
+
+  uploadImage: asyncHandler(async (req, res: Response) => {
+    const authReq = req as AuthRequest;
+    const sessionId = String(req.params.id);
+
+    if (!isS3Configured()) {
+      throw new AppError("File uploads not configured", 503);
+    }
+
+    const file = (req as unknown as { file?: Express.Multer.File }).file;
+    if (!file) {
+      throw new ValidationError(["No file provided"]);
+    }
+
+    const session = await consultService.verifySessionOwnership(authReq.user.id, sessionId);
+    if (!session) throw new AppError("Session not found", 404);
+
+    const result = await uploadFile(file.buffer, file.originalname, file.mimetype, "consult");
+
+    const message = await consultService.appendMessage(authReq.user.id, sessionId, {
+      role: "user",
+      content: `[image: ${file.originalname}]`,
+      metadata: {
+        type: "image",
+        imageUrl: result.url,
+        imageKey: result.key,
+        contentType: result.contentType,
+        size: result.size,
+        originalName: file.originalname,
+      },
+    });
+
+    sendSuccess(res, { ...message, imageUrl: result.url }, "Image uploaded", 201);
   }),
 
   stream: asyncHandler(async (req, res: Response) => {

@@ -13,6 +13,7 @@ const MESSAGE_SELECT = {
   sessionId: true,
   role: true,
   content: true,
+  metadata: true,
   createdAt: true,
 } as const;
 

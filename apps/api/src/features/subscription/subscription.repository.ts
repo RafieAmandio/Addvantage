@@ -14,6 +14,31 @@ export const subscriptionRepository = {
       select: { email: true, handle: true, tier: true },
     }),
 
+  getSubscriptionStatus: (profileId: string) =>
+    prisma.profile.findUnique({
+      where: { id: profileId },
+      select: {
+        tier: true,
+        renewsAt: true,
+        signedLiability: true,
+        joinedAt: true,
+      },
+    }),
+
+  getPaymentHistory: (profileId: string, limit: number) =>
+    prisma.emailLog.findMany({
+      where: { profileId, kind: { in: ["dunning", "renewal_reminder", "checkout"] } },
+      select: {
+        id: true,
+        kind: true,
+        provider: true,
+        sentAt: true,
+        templateId: true,
+      },
+      orderBy: { sentAt: "desc" },
+      take: limit,
+    }),
+
   insertEmailLog: (data: {
     profileId: string;
     kind: string;

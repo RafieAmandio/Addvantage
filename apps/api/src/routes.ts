@@ -13,6 +13,7 @@ import { userRoutes } from "./features/user/user.routes.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { educationRoutes } from "./features/education/education.routes.js";
 import { subscriptionRoutes } from "./features/subscription/subscription.routes.js";
+import { ingestionRoutes } from "./features/ingestion/ingestion.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -28,11 +29,6 @@ export function mountRoutes(app: Express) {
   app.use("/users", userRoutes);
   app.use("/auth", authRoutes);
   app.use("/education", educationRoutes);
-  app.use("/webhooks", subscriptionRoutes);
-  // app.use("/bars", chartRoutes);
-  // app.use("/events", calendarRoutes);
-  // app.use("/timeline", timelineRoutes);
-  // app.use("/education", educationRoutes);
-  // app.use("/users", userRoutes);
-  // app.use("/webhooks/payment", subscriptionRoutes);
+  app.use("/subscription", subscriptionRoutes);
+  app.use("/ingestion", ingestionRoutes);
 }

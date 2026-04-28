@@ -35,6 +35,12 @@ const EnvSchema = z.object({
   DUNNING_TEMPLATE_ID: z.preprocess(emptyToUndef, z.coerce.number().int().positive().optional()),
 
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
+
+  AWS_S3_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  AWS_S3_REGION: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  AWS_ACCESS_KEY_ID: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  AWS_SECRET_ACCESS_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  AWS_S3_ENDPOINT: z.preprocess(emptyToUndef, z.string().url().optional()),
 });
 
 const parsed = EnvSchema.safeParse(process.env);

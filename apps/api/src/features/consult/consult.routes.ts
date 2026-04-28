@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth } from "@/core/middleware/auth.middleware.js";
 import { tierRateLimit, userRateLimit } from "@/core/middleware/rate-limit.middleware.js";
+import { upload } from "@/core/middleware/upload.middleware.js";
 import type { Request } from "express";
 import type { AuthUser } from "@/core/types/request.js";
 import { consultController } from "./consult.controller.js";
@@ -21,6 +22,7 @@ router.delete("/sessions/:id", ...auth, userRateLimit({ limit: 30, action: "cons
 
 router.get("/sessions/:id/messages", ...auth, userRateLimit({ limit: 30, action: "consult:messages" }), consultController.listMessages);
 router.post("/sessions/:id/messages", ...auth, userRateLimit({ limit: 30, action: "consult:append" }), consultController.appendMessage);
+router.post("/sessions/:id/upload", ...auth, userRateLimit({ limit: 10, action: "consult:upload" }), upload.single("image"), consultController.uploadImage);
 
 router.post("/stream", ...auth, tierRateLimit("consult:send", getTier), consultController.stream);
 

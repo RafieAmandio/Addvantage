@@ -6,6 +6,13 @@ import { consultRepository } from "./consult.repository.js";
 import { DESK_SYSTEM_PROMPT, pickReply, FREE_DAILY_TOKEN_CAP } from "./consult.lib.js";
 
 export const consultService = {
+  async verifySessionOwnership(userId: string, sessionId: string) {
+    const session = await consultRepository.findSessionById(sessionId);
+    if (!session) return null;
+    if (session.userId !== userId) throw new ForbiddenError("Not your session");
+    return session;
+  },
+
   async listSessions(userId: string, limit = 50) {
     return consultRepository.listSessions(userId, limit);
   },
