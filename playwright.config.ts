@@ -1,11 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./.screenshots",
+  testDir: "./e2e",
   timeout: 30_000,
+  expect: { timeout: 5_000 },
+  retries: process.env.CI ? 2 : 0,
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
   projects: [
     {

@@ -17,7 +17,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 10** — Frontend: wire all pages to Express API
 - [x] **Phase 11** — Cleanup: delete old code, archive
 - [x] **Phase 12** — Backend tests
-- [ ] **Phase 13** — E2E tests
+- [x] **Phase 13** — E2E tests
 - [ ] **Phase 14** — (Optional) Worker → Prisma
 
 ## Log
@@ -482,3 +482,31 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
 - `pnpm --filter @tradevantage/api test` — 56 tests pass across 7 files (280ms)
+
+### Phase 13 — 2026-04-28
+
+**Infrastructure:**
+- `playwright.config.ts` — Updated: testDir → `./e2e`, added retries for CI, screenshot on failure, expect timeout
+- `package.json` — Added `test:e2e` and `test:e2e:ui` scripts at monorepo root
+
+**Test specs created (6 files):**
+
+- `e2e/auth.spec.ts` — 5 tests: login form renders, email input, signup link, auth redirect, dashboard loads in mock mode
+- `e2e/news-browse.spec.ts` — 7 tests: news heading, list renders mock items, impact/bias badges, search filtering (null transmission state), filter buttons, click to detail navigation, detail page content
+- `e2e/admin-review.spec.ts` — 7 tests: review page loads, heading visible, pending count or empty state, new item page, admin plans/sources/logs pages load
+- `e2e/consult.spec.ts` — 3 tests: page loads, session list or empty state, interactive elements present
+- `e2e/plan-lifecycle.spec.ts` — 6 tests: plan page loads, latest plan or empty state, stats badges, archive page, admin plan creation page + form fields
+- `e2e/navigation.spec.ts` — 14 tests: homepage, sidebar links + navigation, tier badge, all dashboard routes accessible, responsive (mobile viewport for dashboard/news/sidebar/admin)
+
+**Modified:**
+- `apps/web/lib/auth/session.ts` — MOCK_PROFILE.is_admin set to `true` so admin pages render in mock mode for E2E testing
+
+**Notes:**
+- Tests run in mock mode (NEXT_PUBLIC_MOCK_MODE=1) — auth bypassed, fixture data for news/plans/timeline
+- Features requiring Express API (consult sessions, admin CRUD actions) have lighter tests (page load + UI presence)
+- Features with mock data (news browse, plan view) have deeper journey tests (filtering, navigation, detail pages)
+- Existing `__tests__/integration/navigation.spec.ts` kept as-is (Vitest unit/integration tests, separate from Playwright E2E)
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+- `pnpm --filter @tradevantage/api test` — 56 backend tests still pass

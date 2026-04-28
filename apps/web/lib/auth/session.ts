@@ -12,7 +12,7 @@ const MOCK_PROFILE: ProfileSummary = {
   id: MOCK_USER.id,
   email: MOCK_USER.email,
   handle: "demo-operator",
-  is_admin: false,
+  is_admin: true,
   tier: "vip",
   signed_liability: true,
 };
