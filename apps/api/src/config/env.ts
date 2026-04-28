@@ -8,6 +8,8 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]).default("info"),
   API_PORT: z.coerce.number().default(3100),
 
+  DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   SUPABASE_URL: z.preprocess(emptyToUndef, z.string().url()),
   SUPABASE_SERVICE_ROLE_KEY: z.preprocess(emptyToUndef, z.string().min(1)),
 
