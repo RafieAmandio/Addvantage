@@ -6,7 +6,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 
 - [x] **Phase 0** — Express boilerplate + core infrastructure
 - [x] **Phase 1** — Prisma schema + client from db pull
-- [ ] **Phase 2** — Features: health, source, tag, search
+- [x] **Phase 2** — Features: health, source, tag, search
 - [ ] **Phase 3** — Feature: news (full CRUD + admin review)
 - [ ] **Phase 4** — Feature: plan (full CRUD + stats)
 - [ ] **Phase 5** — Feature: consult (CRUD + SSE stream)
@@ -87,3 +87,32 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `pnpm typecheck` passes (5/5 packages)
 - Prisma client instantiates with all 12 models confirmed via tsx script
 - Old Supabase type exports preserved for worker compatibility
+
+### Phase 2 — 2026-04-28
+
+**Created:**
+- `src/features/source/source.repository.ts` — `findAll()` via Prisma
+- `src/features/source/source.controller.ts` — GET / list all sources
+- `src/features/source/source.routes.ts` — `GET /sources`
+- `src/features/tag/tag.repository.ts` — approved news tags, published primer tags, news by tag
+- `src/features/tag/tag.service.ts` — tag count aggregation (news + primers against HASHTAGS constant)
+- `src/features/tag/tag.controller.ts` — GET /counts, GET /:tag/news
+- `src/features/tag/tag.routes.ts` — `GET /tags/counts`, `GET /tags/:tag/news`
+- `src/features/search/search.repository.ts` — full-text search on headline/analysis/author
+- `src/features/search/search.controller.ts` — validate query, return results
+- `src/features/search/search.validation.ts` — Zod schema for q + limit params
+- `src/features/search/search.routes.ts` — `GET /search` with IP rate limit (30/60s)
+
+**Modified:**
+- `src/features/health/health.controller.ts` — Switched from Supabase to Prisma `$queryRaw`
+- `src/routes.ts` — Mounted source, tag, search routes
+
+**Migrates from:**
+- `apps/web/app/api/health/route.ts` → health controller (Prisma check)
+- `apps/web/features/sources/queries/sources.ts` → source repository
+- `apps/web/features/tags/queries.ts` → tag repository + service
+- `apps/web/app/api/tags/counts/route.ts` → tag controller (counts)
+- `apps/web/app/api/search/route.ts` → search controller + repository
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
