@@ -9,6 +9,8 @@ import { consultRoutes } from "./features/consult/consult.routes.js";
 import { chartRoutes } from "./features/chart/chart.routes.js";
 import { calendarRoutes } from "./features/calendar/calendar.routes.js";
 import { timelineRoutes } from "./features/timeline/timeline.routes.js";
+import { userRoutes } from "./features/user/user.routes.js";
+import { authRoutes } from "./features/auth/auth.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -21,8 +23,10 @@ export function mountRoutes(app: Express) {
   app.use("/bars", chartRoutes);
   app.use("/events", calendarRoutes);
   app.use("/timeline", timelineRoutes);
+  app.use("/users", userRoutes);
+  app.use("/auth", authRoutes);
 
-  // Phase 7+: feature routes will be mounted here
+  // Phase 8+: feature routes will be mounted here
   // app.use("/bars", chartRoutes);
   // app.use("/events", calendarRoutes);
   // app.use("/timeline", timelineRoutes);

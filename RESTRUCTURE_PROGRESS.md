@@ -11,7 +11,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 4** — Feature: plan (full CRUD + stats)
 - [x] **Phase 5** — Feature: consult (CRUD + SSE stream)
 - [x] **Phase 6** — Features: chart, calendar, timeline
-- [ ] **Phase 7** — Features: user, auth
+- [x] **Phase 7** — Features: user, auth
 - [ ] **Phase 8** — Feature: education
 - [ ] **Phase 9** — Integrations: payment (provider-agnostic) + email
 - [ ] **Phase 10** — Frontend: wire all pages to Express API
@@ -261,6 +261,41 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/features/calendar/queries/correlation.ts` → calendar service + repository
 - `apps/web/features/timeline/queries/timeline.ts` → timeline repository + service
 - `apps/web/features/timeline/actions.ts` → timeline service (createPin)
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 7 — 2026-04-28
+
+**Created:**
+
+*User feature:*
+- `src/features/user/user.repository.ts` — findById (full profile), findMe (summary), updateProfile
+- `src/features/user/user.service.ts` — getMe, updateProfile with existence check
+- `src/features/user/user.validation.ts` — updateProfileSchema (handle, tradingLength, longestProfitable, markets, yearlyGoal, faultAttribution)
+- `src/features/user/user.controller.ts` — GET /me, PUT /profile
+- `src/features/user/user.routes.ts` — auth required, rate limit on profile save (5/60s)
+
+*Auth feature:*
+- `src/features/auth/auth.controller.ts` — logout via Supabase admin.signOut(userId)
+- `src/features/auth/auth.routes.ts` — POST /logout (auth required)
+
+**Endpoints:**
+- `GET /users/me` — authenticated user's profile summary
+- `PUT /users/profile` — update trader profile fields (rate limited)
+- `POST /auth/logout` — server-side Supabase sign out
+
+**Modified:**
+- `src/routes.ts` — Mounted user and auth routes
+
+**Migrates from:**
+- `apps/web/lib/auth/session.ts:getProfile()` → user repository + service (getMe)
+- `apps/web/features/auth/actions.ts:saveTraderProfile()` → user service (updateProfile)
+- `apps/web/features/auth/actions.ts:logoutAction()` → auth controller (logout)
+
+**Notes:**
+- Login/signup OTP stays client-side (supabase.auth.signInWithOtp from browser)
+- /auth/callback route stays in Next.js (cookie exchange)
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
