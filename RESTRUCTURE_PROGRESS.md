@@ -15,7 +15,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 8** — Feature: education
 - [x] **Phase 9** — Integrations: payment (provider-agnostic) + email
 - [x] **Phase 10** — Frontend: wire all pages to Express API
-- [ ] **Phase 11** — Cleanup: delete old code, archive
+- [x] **Phase 11** — Cleanup: delete old code, archive
 - [ ] **Phase 12** — Backend tests
 - [ ] **Phase 13** — E2E tests
 - [ ] **Phase 14** — (Optional) Worker → Prisma
@@ -397,7 +397,61 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `app/auth/callback/route.ts` — Supabase auth cookie exchange
 - `features/timeline/hooks/useTimelineEvents.ts` — Supabase Realtime subscription
 - `features/auth/actions.ts` — OTP login/signup stays Supabase Auth
-- `app/api/consult/stream/route.ts` — Legacy Next.js SSE route (remove in Phase 11)
+- `app/api/consult/stream/route.ts` — Legacy Next.js SSE route (removed in Phase 11)
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
+
+### Phase 11 — 2026-04-28
+
+**Deleted from `apps/web/`:**
+
+*API routes (7 directories):*
+- `app/api/bars/` — superseded by Express GET /bars
+- `app/api/consult/` — superseded by Express POST /consult/stream
+- `app/api/events/` — superseded by Express GET /events
+- `app/api/health/` — superseded by Express GET /health
+- `app/api/search/` — superseded by Express GET /search
+- `app/api/tags/` — superseded by Express GET /tags/counts
+- `app/api/webhooks/` — superseded by Express POST /webhooks/payment
+
+*Lib files (cascade-orphaned after API route deletion):*
+- `lib/openai.ts` — OpenAI client (now in Express config/openai.ts)
+- `lib/redis.ts` — Redis client (inlined into ratelimit.ts for OTP)
+- `lib/cache.ts` — Cache wrapper (unused)
+- `lib/ratelimit-tier.ts` — Tier rate limiting (now in Express middleware)
+- `lib/ip-ratelimit.ts` — IP rate limiting (now in Express middleware)
+- `lib/user-ratelimit.ts` — User rate limiting (now in Express middleware)
+- `lib/admin-ratelimit.ts` — Admin rate limiting (now in Express middleware)
+- `lib/config/server.ts` — Server env config (now in Express config/env.ts)
+- `lib/supabase/admin.ts` — Service-role Supabase client (now in Express)
+- `lib/payment/` — Xendit verification (now in Express integrations/payment/)
+- `lib/email/` — Brevo integration (now in Express integrations/email/)
+
+*Feature internals:*
+- `features/consult/lib/send-message.ts` — Replaced by Express consult.service
+- `features/consult/lib/prompt.ts` — Moved to Express consult.lib
+- `features/consult/lib/replies.ts` — Moved to Express consult.lib
+- `features/consult/queries/usage.ts` — Token cap enforced server-side
+
+**Modified:**
+- `lib/ratelimit.ts` — Inlined Redis client (was importing deleted redis.ts)
+- `app/app/tags/page.tsx` — Client-side fetch redirected from /api/tags/counts to Express /tags/counts
+- `package.json` — Removed `openai` dependency
+
+**Archived to `archive/web-legacy/`:**
+- `api/` — All 7 old API route handlers
+- `lib-server/` — openai, redis, cache, ratelimit-tier, ip-ratelimit, user-ratelimit, admin-ratelimit, config-server, supabase-admin, payment/, email/
+- `consult-lib/` — send-message, prompt, replies, usage
+
+**Retained (by design):**
+- `lib/supabase/server.ts` — Auth session cookies, middleware, admin logs, auth callback
+- `lib/supabase/client.ts` — Browser Supabase for realtime + API client token
+- `lib/ratelimit.ts` — Still needed for OTP rate limiting in auth/actions.ts
+- `app/admin/logs/page.tsx` — Reads ingestion_runs from Supabase (no Express endpoint)
+- `app/auth/callback/route.ts` — Supabase auth cookie exchange
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+- No stale imports to deleted files
+- `pnpm install` succeeds with updated lockfile

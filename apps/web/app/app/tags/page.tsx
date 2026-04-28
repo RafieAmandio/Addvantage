@@ -71,14 +71,16 @@ function TagsView() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/tags/counts")
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
+    fetch(`${apiBase}/tags/counts`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!cancelled && data?.counts) {
+      .then((json) => {
+        if (!cancelled && json?.data) {
+          const counts = json.data as Record<string, number>;
           setTagCounts(
-            data.counts.map((c: { tag: string; total: number }) => ({
-              tag: c.tag as Hashtag,
-              c: c.total,
+            Object.entries(counts).map(([tag, total]) => ({
+              tag: tag as Hashtag,
+              c: total,
             })),
           );
         }

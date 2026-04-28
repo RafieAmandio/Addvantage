@@ -1,5 +1,5 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { getRedis } from "@/lib/redis";
+import { Redis } from "@upstash/redis";
 
 if (typeof window !== "undefined") {
   throw new Error("lib/ratelimit.ts is server-only");
@@ -17,6 +17,20 @@ export type RateLimitResult = {
   remaining?: number;
   reset?: number;
 };
+
+let redisClient: Redis | null | undefined;
+
+function getRedis(): Redis | null {
+  if (redisClient !== undefined) return redisClient;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) {
+    redisClient = null;
+    return null;
+  }
+  redisClient = new Redis({ url, token });
+  return redisClient;
+}
 
 const limiters = new Map<string, Ratelimit>();
 
