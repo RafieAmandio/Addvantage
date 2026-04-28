@@ -5,6 +5,7 @@ import type { TablesUpdate } from "@tradevantage/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { isMockMode } from "@/lib/config/public";
 import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/ratelimit";
@@ -29,6 +30,10 @@ export async function requestLoginOtp(
     return { ok: false, error: "invalid_email" };
   }
   const email = parsed.data.email.toLowerCase();
+
+  if (isMockMode()) {
+    return { ok: true, sent: true, email };
+  }
 
   const ip =
     headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
@@ -195,6 +200,10 @@ export async function requestSignupOtp(
     return { ok: false, error: "invalid_email" };
   }
   const email = parsed.data.email.toLowerCase();
+
+  if (isMockMode()) {
+    return { ok: true, sent: true, email };
+  }
 
   const ip =
     headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";

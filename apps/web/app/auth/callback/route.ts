@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { isMockMode } from "@/lib/config/public";
 import { logger } from "@/lib/logger";
 import { supabaseServer } from "@/lib/supabase/server";
 
@@ -11,6 +12,10 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const rawNext = url.searchParams.get("next") ?? "/app";
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/app";
+
+  if (isMockMode()) {
+    return NextResponse.redirect(new URL(next, url));
+  }
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=missing_code", url));

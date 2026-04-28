@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=@tradevantage/web",
+    "dev:api": "turbo run dev --filter=@tradevantage/api",
     "dev:worker": "turbo run dev --filter=@tradevantage/worker",
     "build": "turbo run build",
     "lint": "turbo run lint",

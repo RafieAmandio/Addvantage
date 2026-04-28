@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/Button";
 import { DataLabel } from "@/components/ui/Marker";
@@ -10,6 +12,7 @@ import {
 } from "@/features/auth/actions";
 
 const INITIAL_STATE: LoginActionState = { ok: false };
+const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_MODE === "1";
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_email: "That email doesn't look right.",
@@ -19,8 +22,15 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export function LoginForm() {
   const [state, formAction] = useFormState(requestLoginOtp, INITIAL_STATE);
+  const router = useRouter();
 
-  if (state.sent) {
+  useEffect(() => {
+    if (state.sent && IS_MOCK) {
+      router.push("/app");
+    }
+  }, [state.sent, router]);
+
+  if (state.sent && !IS_MOCK) {
     return (
       <div className="col-span-12 border border-gray-3 bg-black-2/40 p-10 lg:col-span-7">
         <DataLabel>Transmission dispatched</DataLabel>
