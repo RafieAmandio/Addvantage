@@ -23,6 +23,8 @@ const EnvSchema = z.object({
     z.string().min(1).optional()
   ),
 
+  DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   OPENAI_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   OPENAI_MODEL: z.string().default("gpt-4o-mini"),
 

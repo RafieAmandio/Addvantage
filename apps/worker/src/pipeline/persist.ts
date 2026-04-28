@@ -1,7 +1,6 @@
-import { supabase } from "../lib/supabase";
+import { prisma } from "@tradevantage/db";
 import { contentHash } from "../lib/hash";
 import { logger } from "../lib/logger";
-import { retry } from "../lib/retry";
 import { rephrase } from "./rephrase";
 import type { Candidate } from "../adapters/base";
 
@@ -54,47 +53,38 @@ export async function persistCandidates(
 
     const { output: rephrased } = rephraseResult;
 
-    // Prefer adapter-level canonical hints (e.g. FF indicator map) over
-    // LLM-derived affects/impact when present — deterministic taxonomy beats
-    // model drift for closed, well-known macro events.
     const affects = c.canonicalAffects ?? rephrased.affects;
     const impact = c.canonicalImpact ?? rephrased.impact;
 
-    const { data, error } = await retry(
-      async () =>
-        supabase()
-          .from("news_items")
-          .insert({
-            source_code: sourceCode,
-            source_url: c.sourceUrl,
-            content_hash: hash,
-            fetched_at: new Date().toISOString(),
-            raw_text: c.rawText,
-            headline: rephrased.headline,
-            rephrased: rephrased.rephrased,
-            analysis: rephrased.analysis,
-            impact,
-            bias: rephrased.bias,
-            affects,
-            tags: rephrased.tags,
-            author: `[${sourceCode}]`,
-            status: "pending",
-            ai_system_prompt: rephraseResult.systemPrompt,
-            ai_user_message: rephraseResult.userMessage,
-            ai_raw_response: rephraseResult.rawResponse,
-          })
-          .select("id")
-          .single(),
-      { label: "supabase.news_items.insert", attempts: 3 }
-    );
-
-    if (error || !data) {
-      logger.error({ err: error?.message, externalId: c.externalId }, "insert failed");
+    try {
+      const row = await prisma.newsItem.create({
+        data: {
+          sourceCode,
+          sourceUrl: c.sourceUrl,
+          contentHash: hash,
+          fetchedAt: new Date(),
+          rawText: c.rawText,
+          headline: rephrased.headline,
+          rephrased: rephrased.rephrased,
+          analysis: rephrased.analysis,
+          impact,
+          bias: rephrased.bias,
+          affects,
+          tags: rephrased.tags,
+          author: `[${sourceCode}]`,
+          status: "pending",
+          aiSystemPrompt: rephraseResult.systemPrompt,
+          aiUserMessage: rephraseResult.userMessage,
+          aiRawResponse: rephraseResult.rawResponse,
+        },
+        select: { id: true },
+      });
+      result.inserted++;
+      result.insertedIds.push(row.id);
+    } catch (err) {
+      logger.error({ err: String(err), externalId: c.externalId }, "insert failed");
       result.errors++;
-      continue;
     }
-    result.inserted++;
-    result.insertedIds.push(data.id);
   }
 
   return result;
@@ -105,17 +95,14 @@ export async function persistCandidates(
  * dedupe without one round-trip per candidate.
  */
 export async function loadExistingHashes(sourceCode: string): Promise<Set<string>> {
-  const { data, error } = await retry(
-    async () =>
-      supabase()
-        .from("news_items")
-        .select("content_hash")
-        .eq("source_code", sourceCode),
-    { label: "supabase.news_items.loadHashes", attempts: 3 }
-  );
-  if (error) {
-    logger.error({ err: error.message, sourceCode }, "loadExistingHashes failed");
+  try {
+    const rows = await prisma.newsItem.findMany({
+      where: { sourceCode },
+      select: { contentHash: true },
+    });
+    return new Set(rows.map((r) => r.contentHash));
+  } catch (err) {
+    logger.error({ err: String(err), sourceCode }, "loadExistingHashes failed");
     return new Set();
   }
-  return new Set((data ?? []).map((r) => r.content_hash as string));
 }

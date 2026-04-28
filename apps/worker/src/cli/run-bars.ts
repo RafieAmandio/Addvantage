@@ -2,9 +2,6 @@
  * One-shot CLI: fetch OHLCV bars for a single symbol via the configured
  * market-data provider and upsert them into `public.instrument_bars`.
  *
- * Mirrors `run-once.ts` for news adapters. Useful for manual backfills and
- * smoke-testing the bars pipeline without running the scheduler.
- *
  * Usage:
  *   pnpm --filter @tradevantage/worker run:bars SPX
  *   pnpm --filter @tradevantage/worker run:bars EUR/USD 1h
@@ -16,11 +13,10 @@
  *
  * Window: last 30 days up to now().
  */
+import { prisma, Prisma } from "@tradevantage/db";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
-import { retry } from "../lib/retry";
 import { singleflight } from "../lib/singleflight";
-import { supabase } from "../lib/supabase";
 import { getBarsAdapter, type Bar, type Interval } from "../adapters/bars";
 
 const VALID_INTERVALS: readonly Interval[] = ["1m", "5m", "1h", "1d"];
@@ -76,9 +72,6 @@ async function main() {
     "run:bars: fetching"
   );
 
-  // Coalesce concurrent invocations with the same (provider, symbol,
-  // interval, window) onto a single Twelve Data call. Ten-second request
-  // bursts from parallel CLI runs or retries thus share one upstream hit.
   const sfKey = `bars:${adapter.code}:${symbol}:${interval}:${from.toISOString()}:${to.toISOString()}`;
   const bars = await singleflight<Bar[]>(sfKey, 30, () =>
     adapter.fetchBars({ symbol, interval, from, to }),
@@ -94,45 +87,33 @@ async function main() {
       { symbol, interval },
       "run:bars: provider returned 0 bars; nothing to upsert"
     );
-    // eslint-disable-next-line no-console
     console.log(`[bars] ${symbol} ${interval}: 0 bars fetched, 0 upserted`);
     process.exit(0);
   }
 
-  const rows = bars.map((b) => ({
-    symbol,
-    interval,
-    ts: b.ts,
-    open: b.open,
-    high: b.high,
-    low: b.low,
-    close: b.close,
-    volume: b.volume,
-  }));
-
-  const { error } = await retry(
-    async () =>
-      supabase()
-        .from("instrument_bars")
-        .upsert(rows, { onConflict: "symbol,interval,ts" }),
-    { label: "supabase.instrument_bars.upsert", attempts: 3 }
+  const values = bars.map(
+    (b) =>
+      Prisma.sql`(${symbol}, ${interval}, ${new Date(b.ts)}::timestamptz, ${b.open}::numeric, ${b.high}::numeric, ${b.low}::numeric, ${b.close}::numeric, ${b.volume !== null ? b.volume : null}::numeric)`
   );
 
-  if (error) {
-    logger.error(
-      { err: error.message, symbol, interval },
-      "run:bars: upsert failed"
-    );
-    process.exit(1);
-  }
+  await prisma.$executeRaw`
+    INSERT INTO instrument_bars (symbol, interval, ts, open, high, low, close, volume)
+    VALUES ${Prisma.join(values)}
+    ON CONFLICT (symbol, interval, ts)
+    DO UPDATE SET
+      open    = EXCLUDED.open,
+      high    = EXCLUDED.high,
+      low     = EXCLUDED.low,
+      close   = EXCLUDED.close,
+      volume  = EXCLUDED.volume
+  `;
 
   logger.info(
-    { symbol, interval, upserted: rows.length },
+    { symbol, interval, upserted: bars.length },
     "run:bars: done"
   );
-  // eslint-disable-next-line no-console
   console.log(
-    `[bars] ${symbol} ${interval}: ${bars.length} bars fetched, ${rows.length} upserted`
+    `[bars] ${symbol} ${interval}: ${bars.length} bars fetched, ${bars.length} upserted`
   );
   process.exit(0);
 }

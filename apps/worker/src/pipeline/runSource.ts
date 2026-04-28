@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { supabase } from "../lib/supabase";
+import { prisma } from "@tradevantage/db";
 import { logger } from "../lib/logger";
 import { getAdapter } from "../adapters";
 import { loadExistingHashes, persistCandidates } from "./persist";
@@ -16,11 +16,10 @@ export async function runSource(sourceCode: string): Promise<void> {
     return;
   }
 
-  const { data: runRow } = await supabase()
-    .from("ingestion_runs")
-    .insert({ source_code: sourceCode, status: "running" })
-    .select("id")
-    .single();
+  const runRow = await prisma.ingestionRun.create({
+    data: { sourceCode, status: "running" },
+    select: { id: true },
+  });
 
   const started = Date.now();
   try {
@@ -35,42 +34,42 @@ export async function runSource(sourceCode: string): Promise<void> {
       await notifyPending(sourceCode, result.insertedIds);
     }
 
-    await supabase()
-      .from("ingestion_runs")
-      .update({
+    await prisma.ingestionRun.update({
+      where: { id: runRow.id },
+      data: {
         status: "ok",
-        finished_at: new Date().toISOString(),
-        items_fetched: candidates.length,
-        items_new: result.inserted,
-        items_rephrased: result.rephrased,
-      })
-      .eq("id", runRow?.id);
+        finishedAt: new Date(),
+        itemsFetched: candidates.length,
+        itemsNew: result.inserted,
+        itemsRephrased: result.rephrased,
+      },
+    });
 
-    await supabase()
-      .from("sources")
-      .update({
-        last_polled_at: new Date().toISOString(),
-        last_success_at: new Date().toISOString(),
-        last_error: null,
-      })
-      .eq("code", sourceCode);
+    await prisma.source.update({
+      where: { code: sourceCode },
+      data: {
+        lastPolledAt: new Date(),
+        lastSuccessAt: new Date(),
+        lastError: null,
+      },
+    });
   } catch (err) {
     Sentry.captureException(err, {
       tags: { scope: "runSource", sourceCode },
     });
     logger.error({ err: String(err), sourceCode }, "runSource failed");
-    await supabase()
-      .from("ingestion_runs")
-      .update({
+    await prisma.ingestionRun.update({
+      where: { id: runRow.id },
+      data: {
         status: "error",
-        finished_at: new Date().toISOString(),
+        finishedAt: new Date(),
         error: String(err),
-      })
-      .eq("id", runRow?.id);
-    await supabase()
-      .from("sources")
-      .update({ last_polled_at: new Date().toISOString(), last_error: String(err) })
-      .eq("code", sourceCode);
+      },
+    });
+    await prisma.source.update({
+      where: { code: sourceCode },
+      data: { lastPolledAt: new Date(), lastError: String(err) },
+    });
   } finally {
     logger.info({ sourceCode, ms: Date.now() - started }, "runSource done");
   }

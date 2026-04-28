@@ -1,8 +1,8 @@
 import cron, { type ScheduledTask } from "node-cron";
 import * as Sentry from "@sentry/node";
+import { prisma } from "@tradevantage/db";
 import { logger } from "../lib/logger";
 import { config } from "../lib/config";
-import { supabase } from "../lib/supabase";
 import { runSource } from "../pipeline/runSource";
 import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
@@ -19,16 +19,12 @@ let inFlightTick: Promise<void> | null = null;
  * (E3). Unconfigured envs are a quiet no-op so dev boots cleanly.
  */
 export function startScheduler(): void {
-  // Run every hour at minute 3 to spread load.
   scheduledTask = cron.schedule("3 * * * *", async () => {
     await tick();
   });
 
-  // Kick once at boot so the worker is productive immediately.
   void tick();
 
-  // Daily renewal-reminder cron (09:00 server time) — only when email is
-  // configured. We also kick once at boot to mirror the source-poller pattern.
   if (config.EMAIL_PROVIDER) {
     renewalTask = cron.schedule("0 9 * * *", () => {
       runRenewalReminders().catch((err) => {
@@ -80,12 +76,12 @@ async function tick(): Promise<void> {
   const run = (async () => {
     logger.info("scheduler tick");
 
-    const { data: sources } = await supabase()
-      .from("sources")
-      .select("code,enabled");
+    const sources = await prisma.source.findMany({
+      select: { code: true, enabled: true },
+    });
 
     const enabledFromDb = new Set(
-      (sources ?? []).filter((s) => s.enabled).map((s) => s.code as string)
+      sources.filter((s) => s.enabled).map((s) => s.code)
     );
     const override = config.ENABLED_SOURCES;
     const codesToRun = override.length > 0 ? override : [...enabledFromDb];

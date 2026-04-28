@@ -18,7 +18,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 11** — Cleanup: delete old code, archive
 - [x] **Phase 12** — Backend tests
 - [x] **Phase 13** — E2E tests
-- [ ] **Phase 14** — (Optional) Worker → Prisma
+- [x] **Phase 14** — Worker → Prisma
 
 ## Log
 
@@ -510,3 +510,44 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
 - `pnpm --filter @tradevantage/api test` — 56 backend tests still pass
+
+### Phase 14 — 2026-04-28
+
+**Modified (Supabase → Prisma):**
+- `apps/worker/src/pipeline/persist.ts` — `supabase().from("news_items").insert()` → `prisma.newsItem.create()`, `supabase().from("news_items").select("content_hash")` → `prisma.newsItem.findMany()`. Removed retry wrapper (Prisma handles connection retries internally).
+- `apps/worker/src/pipeline/runSource.ts` — ingestion_runs create/update and sources update via Prisma. Removed `supabase` import.
+- `apps/worker/src/scheduler/index.ts` — `supabase().from("sources").select("code,enabled")` → `prisma.source.findMany()`. Removed `supabase` import.
+- `apps/worker/src/telegram/notify.ts` — `supabase().from("telegram_admins").select()` → `prisma.telegramAdmin.findMany()`. BigInt → Number conversion for tgUserId.
+- `apps/worker/src/telegram/bot.ts` — `supabase().from("news_items").select("*", { count: "exact", head: true })` → `prisma.newsItem.count()`. `isAdminChat()` → `prisma.telegramAdmin.findFirst()` with BigInt comparison.
+- `apps/worker/src/cli/run-bars.ts` — bulk upsert via `prisma.$executeRaw` with `INSERT ... ON CONFLICT DO UPDATE` (Prisma has no native bulk upsert). Removed `supabase` and `retry` imports.
+- `apps/worker/src/scheduler/renewal-reminder.ts` — profiles query → `prisma.profile.findMany()`, email_log query → `prisma.emailLog.findMany()`, email_log insert → `prisma.emailLog.create()`. Kept retry wrapper for external email API calls only.
+- `apps/worker/src/lib/config.ts` — Added `DATABASE_URL` (optional) to Zod env schema.
+
+**Not modified (no Supabase usage):**
+- `apps/worker/src/adapters/payment/xendit.ts` — HTTP calls to external Xendit API, no DB queries
+- `apps/worker/src/adapters/email/brevo.ts` — HTTP calls to external Brevo API, no DB queries
+
+**Orphaned (no remaining importers):**
+- `apps/worker/src/lib/supabase.ts` — Service-role Supabase client. No longer imported by any file. Retained for reference but all DB access now goes through Prisma.
+
+**Benefits achieved:**
+- No more RLS bypass via service-role key for DB operations
+- Consistent typed queries across all 3 apps (API, web mock-mode, worker)
+- Prisma's type-safe query builder catches schema mismatches at compile time
+- Connection pooling managed by Prisma instead of Supabase HTTP client
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+- `pnpm --filter @tradevantage/api test` — 56 backend tests pass
+
+---
+
+## Restructure Complete 🏁
+
+All 15 phases (0–14) are done. The monorepo now has:
+- **Express API** (`apps/api/`) — Feature-based backend with Prisma ORM, 14 feature modules
+- **Next.js frontend** (`apps/web/`) — UI unchanged, data-fetching wired to Express API
+- **Worker** (`apps/worker/`) — Migrated from Supabase to Prisma for DB operations
+- **56 backend unit tests** (Vitest + Supertest)
+- **42 E2E tests** (Playwright)
+- **Old code archived** in `archive/web-legacy/`

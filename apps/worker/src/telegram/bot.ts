@@ -1,7 +1,7 @@
 import { Bot } from "grammy";
+import { prisma } from "@tradevantage/db";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
-import { supabase } from "../lib/supabase";
 
 let _bot: Bot | null = null;
 
@@ -39,11 +39,10 @@ export function bot(): Bot {
 
   b.command("status", async (ctx) => {
     if (!ctx.chat?.id || !(await isAdminChat(ctx.chat.id))) return;
-    const { count: pending } = await supabase()
-      .from("news_items")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "pending");
-    await ctx.reply(`pending review queue: ${pending ?? 0}`);
+    const pending = await prisma.newsItem.count({
+      where: { status: "pending" },
+    });
+    await ctx.reply(`pending review queue: ${pending}`);
   });
 
   b.catch((err) => {
@@ -56,13 +55,11 @@ export function bot(): Bot {
 
 async function isAdminChat(chatId: number): Promise<boolean> {
   if (config.TELEGRAM_ADMIN_CHAT_IDS.includes(String(chatId))) return true;
-  const { data } = await supabase()
-    .from("telegram_admins")
-    .select("tg_user_id")
-    .eq("tg_user_id", chatId)
-    .eq("active", true)
-    .maybeSingle();
-  return Boolean(data);
+  const admin = await prisma.telegramAdmin.findFirst({
+    where: { tgUserId: BigInt(chatId), active: true },
+    select: { tgUserId: true },
+  });
+  return Boolean(admin);
 }
 
 export async function startBot(): Promise<void> {

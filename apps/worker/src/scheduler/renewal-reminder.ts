@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/node";
+import { prisma } from "@tradevantage/db";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
-import { supabase } from "../lib/supabase";
 import { getEmailAdapter, EMAIL_ADAPTERS } from "../adapters/email";
 
 /**
@@ -12,13 +12,6 @@ import { getEmailAdapter, EMAIL_ADAPTERS } from "../adapters/email";
  * (6 to 7 days out) and sends a Brevo transactional template. Every successful
  * send is recorded in `email_log` with kind='renewal_reminder' so re-runs
  * within a 7-day window don't double-send.
- *
- * `profiles.email` is a denormalised mirror of `auth.users.email` maintained
- * elsewhere, so this job reads `profiles.email` directly (no auth.users JOIN).
- * Rows with NULL email are silently skipped.
- *
- * Unset EMAIL_PROVIDER → caller should not register the cron at all, but this
- * function is also defensive: if the registry is empty it warns and returns.
  */
 export async function runRenewalReminders(): Promise<void> {
   const providerCode = config.EMAIL_PROVIDER ?? "brevo";
@@ -43,60 +36,33 @@ export async function runRenewalReminders(): Promise<void> {
   const now = new Date();
   const windowStart = new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000);
   const windowEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const sevenDaysAgo = new Date(
-    now.getTime() - 7 * 24 * 60 * 60 * 1000
-  ).toISOString();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  // Fetch candidate profiles in the renewal window. Bound to renews_at
-  // partial index, so this stays cheap even as profiles grows.
-  const { data: profiles, error: profilesErr } = await retry(
-    async () =>
-      supabase()
-        .from("profiles")
-        .select("id,email,handle,tier,renews_at")
-        .gte("renews_at", windowStart.toISOString())
-        .lt("renews_at", windowEnd.toISOString()),
-    { label: "supabase.profiles.renewalWindow", attempts: 3 }
-  );
+  const candidates = await prisma.profile.findMany({
+    where: {
+      renewsAt: { gte: windowStart, lt: windowEnd },
+    },
+    select: { id: true, email: true, handle: true, tier: true, renewsAt: true },
+  });
 
-  if (profilesErr) {
-    logger.error(
-      { err: profilesErr.message },
-      "renewal-reminder: failed to load profiles"
-    );
-    return;
-  }
-
-  const candidates = profiles ?? [];
   if (candidates.length === 0) {
     logger.info("renewal-reminder: no profiles in window");
     return;
   }
 
-  // Pre-load recent renewal sends to dedupe without per-row round-trips.
   const profileIds = candidates.map((p) => p.id);
-  const { data: recentSends, error: sendsErr } = await retry(
-    async () =>
-      supabase()
-        .from("email_log")
-        .select("profile_id")
-        .eq("kind", "renewal_reminder")
-        .gte("sent_at", sevenDaysAgo)
-        .in("profile_id", profileIds),
-    { label: "supabase.email_log.recentRenewals", attempts: 3 }
-  );
-
-  if (sendsErr) {
-    logger.error(
-      { err: sendsErr.message },
-      "renewal-reminder: failed to load recent sends"
-    );
-    return;
-  }
+  const recentSends = await prisma.emailLog.findMany({
+    where: {
+      kind: "renewal_reminder",
+      sentAt: { gte: sevenDaysAgo },
+      profileId: { in: profileIds },
+    },
+    select: { profileId: true },
+  });
 
   const alreadySent = new Set(
-    (recentSends ?? [])
-      .map((r) => r.profile_id as string | null)
+    recentSends
+      .map((r) => r.profileId)
       .filter((v): v is string => typeof v === "string")
   );
 
@@ -125,27 +91,26 @@ export async function runRenewalReminders(): Promise<void> {
             },
             templateId: config.RENEWAL_TEMPLATE_ID as number,
             params: {
-              renews_at: p.renews_at,
+              renews_at: p.renewsAt?.toISOString() ?? null,
               tier: p.tier,
             },
           }),
         { label: "email.renewal_reminder.send", attempts: 2 }
       );
 
-      const { error: insertErr } = await supabase()
-        .from("email_log")
-        .insert({
-          profile_id: p.id,
-          kind: "renewal_reminder",
-          provider: result.provider,
-          external_message_id: result.messageId,
-          template_id: String(config.RENEWAL_TEMPLATE_ID),
+      try {
+        await prisma.emailLog.create({
+          data: {
+            profileId: p.id,
+            kind: "renewal_reminder",
+            provider: result.provider,
+            externalMessageId: result.messageId,
+            templateId: String(config.RENEWAL_TEMPLATE_ID),
+          },
         });
-
-      if (insertErr) {
-        // Don't fail the run — the send already happened. Log loudly.
+      } catch (insertErr) {
         logger.error(
-          { err: insertErr.message, profileId: p.id },
+          { err: String(insertErr), profileId: p.id },
           "renewal-reminder: email sent but email_log insert failed"
         );
       }

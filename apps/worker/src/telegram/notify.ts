@@ -1,7 +1,7 @@
+import { prisma } from "@tradevantage/db";
 import { bot } from "./bot";
 import { config } from "../lib/config";
 import { logger } from "../lib/logger";
-import { supabase } from "../lib/supabase";
 
 /**
  * Broadcast a "new pending item" message to every whitelisted admin chat.
@@ -42,10 +42,10 @@ async function resolveRecipients(): Promise<number[]> {
   const envIds = config.TELEGRAM_ADMIN_CHAT_IDS.map((s) => Number(s)).filter(
     (n) => Number.isFinite(n) && n !== 0
   );
-  const { data } = await supabase()
-    .from("telegram_admins")
-    .select("tg_user_id")
-    .eq("active", true);
-  const dbIds = (data ?? []).map((r) => Number(r.tg_user_id));
+  const dbAdmins = await prisma.telegramAdmin.findMany({
+    where: { active: true },
+    select: { tgUserId: true },
+  });
+  const dbIds = dbAdmins.map((r) => Number(r.tgUserId));
   return Array.from(new Set([...envIds, ...dbIds]));
 }
