@@ -10,7 +10,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 3** — Feature: news (full CRUD + admin review)
 - [x] **Phase 4** — Feature: plan (full CRUD + stats)
 - [x] **Phase 5** — Feature: consult (CRUD + SSE stream)
-- [ ] **Phase 6** — Features: chart, calendar, timeline
+- [x] **Phase 6** — Features: chart, calendar, timeline
 - [ ] **Phase 7** — Features: user, auth
 - [ ] **Phase 8** — Feature: education
 - [ ] **Phase 9** — Integrations: payment (provider-agnostic) + email
@@ -215,6 +215,52 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 - `apps/web/app/api/consult/stream/route.ts` → consult controller (stream)
 - `apps/web/features/consult/lib/replies.ts` → consult.lib (pickReply)
 - `apps/web/features/consult/lib/prompt.ts` → consult.lib (DESK_SYSTEM_PROMPT)
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 6 — 2026-04-28
+
+**Created:**
+
+*Chart feature:*
+- `src/features/chart/chart.repository.ts` — listBars (Prisma, Decimal→number conversion in service)
+- `src/features/chart/chart.service.ts` — default 30-day window, Decimal-to-number mapping, 5000 bar limit
+- `src/features/chart/chart.validation.ts` — symbol, interval (1m/5m/1h/1d), from/to dates, limit
+- `src/features/chart/chart.controller.ts` — GET with 60s cache header
+- `src/features/chart/chart.routes.ts` — optionalAuth + tier rate limit (api:bars)
+
+*Calendar feature:*
+- `src/features/calendar/calendar.repository.ts` — listEvents (hasSome for symbols), findEventById, listCorrelatedNews (±2h window)
+- `src/features/calendar/calendar.service.ts` — events listing + news correlation logic
+- `src/features/calendar/calendar.validation.ts` — comma-separated symbols parsing, from/to/limit
+- `src/features/calendar/calendar.controller.ts` — listEvents (private cache) + getCorrelation
+- `src/features/calendar/calendar.routes.ts` — optionalAuth + tier rate limit (api:events), auth for correlation
+
+*Timeline feature:*
+- `src/features/timeline/timeline.repository.ts` — list (hasSome, kind in, date range), findById, createPin (user_pin + USER source)
+- `src/features/timeline/timeline.service.ts` — list, getById, createPin with symbol uppercasing
+- `src/features/timeline/timeline.validation.ts` — timelineQuery (symbols, kinds, from/to, limit), createPin (title, body, symbol, occurredAt)
+- `src/features/timeline/timeline.controller.ts` — list, getById, createPin
+- `src/features/timeline/timeline.routes.ts` — public GET + auth+rate-limit for pin creation
+
+**Endpoints:**
+- `GET /bars` — OHLCV bars (tier-gated, 60s cache)
+- `GET /events` — timeline events by symbols (tier-gated, private cache)
+- `GET /events/:id/correlation` — news correlated with event (±2h window)
+- `GET /timeline` — public timeline events (filterable by symbols, kinds, dates)
+- `GET /timeline/:id` — single timeline event
+- `POST /timeline/pin` — create user pin (auth + rate limit 10/60s)
+
+**Modified:**
+- `src/routes.ts` — Mounted chart, calendar, timeline routes
+
+**Migrates from:**
+- `apps/web/app/api/bars/route.ts` + `features/chart/queries/bars.ts` → chart feature
+- `apps/web/app/api/events/route.ts` → calendar controller
+- `apps/web/features/calendar/queries/correlation.ts` → calendar service + repository
+- `apps/web/features/timeline/queries/timeline.ts` → timeline repository + service
+- `apps/web/features/timeline/actions.ts` → timeline service (createPin)
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)

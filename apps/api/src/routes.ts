@@ -6,6 +6,9 @@ import { searchRoutes } from "./features/search/search.routes.js";
 import { newsRoutes } from "./features/news/news.routes.js";
 import { planRoutes } from "./features/plan/plan.routes.js";
 import { consultRoutes } from "./features/consult/consult.routes.js";
+import { chartRoutes } from "./features/chart/chart.routes.js";
+import { calendarRoutes } from "./features/calendar/calendar.routes.js";
+import { timelineRoutes } from "./features/timeline/timeline.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -15,8 +18,11 @@ export function mountRoutes(app: Express) {
   app.use("/news", newsRoutes);
   app.use("/plans", planRoutes);
   app.use("/consult", consultRoutes);
+  app.use("/bars", chartRoutes);
+  app.use("/events", calendarRoutes);
+  app.use("/timeline", timelineRoutes);
 
-  // Phase 6+: feature routes will be mounted here
+  // Phase 7+: feature routes will be mounted here
   // app.use("/bars", chartRoutes);
   // app.use("/events", calendarRoutes);
   // app.use("/timeline", timelineRoutes);
