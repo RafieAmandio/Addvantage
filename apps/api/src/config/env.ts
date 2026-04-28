@@ -32,6 +32,8 @@ const EnvSchema = z.object({
   EMAIL_SENDER_EMAIL: z.preprocess(emptyToUndef, z.string().email().optional()),
   EMAIL_SENDER_NAME: z.preprocess(emptyToUndef, z.string().optional()),
 
+  DUNNING_TEMPLATE_ID: z.preprocess(emptyToUndef, z.coerce.number().int().positive().optional()),
+
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 });
 

@@ -13,7 +13,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 6** — Features: chart, calendar, timeline
 - [x] **Phase 7** — Features: user, auth
 - [x] **Phase 8** — Feature: education
-- [ ] **Phase 9** — Integrations: payment (provider-agnostic) + email
+- [x] **Phase 9** — Integrations: payment (provider-agnostic) + email
 - [ ] **Phase 10** — Frontend: wire all pages to Express API
 - [ ] **Phase 11** — Cleanup: delete old code, archive
 - [ ] **Phase 12** — Backend tests
@@ -317,6 +317,42 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 
 **Migrates from:**
 - `apps/web/features/education/queries/primers.ts:listPublishedPrimers()` → education repository + service
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 9 — 2026-04-28
+
+**Created:**
+
+*Payment integration (provider-agnostic):*
+- `src/integrations/payment/types.ts` — PaymentEvent, PaymentProvider interface, VerifyResult
+- `src/integrations/payment/index.ts` — getPaymentProvider() factory (reads PAYMENT_PROVIDER env)
+- `src/integrations/payment/providers/xendit/types.ts` — InvoiceCallbackSchema (Zod)
+- `src/integrations/payment/providers/xendit/provider.ts` — XenditProvider: x-callback-token verification, status mapping
+
+*Email integration (provider-agnostic):*
+- `src/integrations/email/types.ts` — EmailProvider interface, SendTemplateOpts, SendResult
+- `src/integrations/email/index.ts` — getEmailProvider() factory (reads EMAIL_PROVIDER env)
+- `src/integrations/email/providers/brevo/provider.ts` — BrevoProvider: Brevo v3 SMTP API
+
+*Subscription feature:*
+- `src/features/subscription/subscription.repository.ts` — updateTier, findProfile, insertEmailLog
+- `src/features/subscription/subscription.service.ts` — handleWebhook: verify → tier update or dunning email
+- `src/features/subscription/subscription.controller.ts` — POST handler
+- `src/features/subscription/subscription.routes.ts` — POST /webhooks/payment with IP rate limit
+
+**Endpoints:**
+- `POST /webhooks/payment` — provider-agnostic webhook (currently Xendit, extensible to Stripe)
+
+**Modified:**
+- `src/config/env.ts` — Added DUNNING_TEMPLATE_ID
+- `src/routes.ts` — Mounted subscription webhook routes
+
+**Migrates from:**
+- `apps/web/app/api/webhooks/xendit/route.ts` → subscription controller + service
+- `apps/web/lib/payment/verify-xendit.ts` → integrations/payment/providers/xendit/provider.ts
+- `apps/web/lib/email/brevo.ts` → integrations/email/providers/brevo/provider.ts
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)

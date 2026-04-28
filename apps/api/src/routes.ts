@@ -12,6 +12,7 @@ import { timelineRoutes } from "./features/timeline/timeline.routes.js";
 import { userRoutes } from "./features/user/user.routes.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { educationRoutes } from "./features/education/education.routes.js";
+import { subscriptionRoutes } from "./features/subscription/subscription.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -27,8 +28,7 @@ export function mountRoutes(app: Express) {
   app.use("/users", userRoutes);
   app.use("/auth", authRoutes);
   app.use("/education", educationRoutes);
-
-  // Phase 9+: integration routes will be mounted here
+  app.use("/webhooks", subscriptionRoutes);
   // app.use("/bars", chartRoutes);
   // app.use("/events", calendarRoutes);
   // app.use("/timeline", timelineRoutes);
