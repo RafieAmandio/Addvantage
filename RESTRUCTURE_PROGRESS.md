@@ -12,7 +12,7 @@ Tracking execution of `RESTRUCTURE_PLAN.md`. One phase per tick.
 - [x] **Phase 5** — Feature: consult (CRUD + SSE stream)
 - [x] **Phase 6** — Features: chart, calendar, timeline
 - [x] **Phase 7** — Features: user, auth
-- [ ] **Phase 8** — Feature: education
+- [x] **Phase 8** — Feature: education
 - [ ] **Phase 9** — Integrations: payment (provider-agnostic) + email
 - [ ] **Phase 10** — Frontend: wire all pages to Express API
 - [ ] **Phase 11** — Cleanup: delete old code, archive
@@ -296,6 +296,27 @@ Profile, Source, NewsItem, TelegramAdmin, IngestionRun, InstrumentBar, TimelineE
 **Notes:**
 - Login/signup OTP stays client-side (supabase.auth.signInWithOtp from browser)
 - /auth/callback route stays in Next.js (cookie exchange)
+
+**Verified:**
+- `pnpm typecheck` passes (5/5 packages)
+
+### Phase 8 — 2026-04-28
+
+**Created:**
+- `src/features/education/education.repository.ts` — listPublished (sorted by sortOrder, createdAt), findBySlug, findById
+- `src/features/education/education.service.ts` — listPublished (default 100), getByIdOrSlug (UUID detection, published guard)
+- `src/features/education/education.controller.ts` — list + getByIdOrSlug
+- `src/features/education/education.routes.ts` — public GET / and GET /:id
+
+**Endpoints:**
+- `GET /education` — list published primers (sorted, body excluded for list)
+- `GET /education/:id` — primer detail by UUID or slug (includes body)
+
+**Modified:**
+- `src/routes.ts` — Mounted education routes
+
+**Migrates from:**
+- `apps/web/features/education/queries/primers.ts:listPublishedPrimers()` → education repository + service
 
 **Verified:**
 - `pnpm typecheck` passes (5/5 packages)
