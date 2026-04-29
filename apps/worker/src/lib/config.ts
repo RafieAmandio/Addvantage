@@ -121,11 +121,6 @@ const EnvSchema = z.object({
     z.string().min(1).optional()
   ).transform((v) => v ?? "TradeVantage"),
 
-  /** Brevo numeric templateId used by the E3 renewal-reminder scheduler task.
-   *  Optional — when unset, the daily renewal cron is not registered and the
-   *  worker boots with no email traffic. */
-  RENEWAL_TEMPLATE_ID: z.coerce.number().int().positive().optional(),
-
   /** Better Stack (Logtail) log ingestion. When LOGTAIL_SOURCE_TOKEN is set,
    *  the worker's pino logger dual-writes to stdout + Better Stack via the
    *  `@logtail/pino` transport. When unset, the logger is untouched (stdout

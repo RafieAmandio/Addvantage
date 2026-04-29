@@ -5,13 +5,44 @@ import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
 import { getEmailAdapter, EMAIL_ADAPTERS } from "../adapters/email";
 
+function buildRenewalEmail(tier: string, renewsAt: string): { subject: string; html: string } {
+  const renewDate = new Date(renewsAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<style>
+body{margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+.c{max-width:560px;margin:0 auto;padding:40px 20px}
+.card{background:#fff;border-radius:8px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.h{text-align:center;margin-bottom:24px}.h h1{margin:0;font-size:20px;color:#6366f1;font-weight:700}
+.b{color:#27272a;font-size:15px;line-height:1.6}.b p{margin:0 0 16px}
+.f{text-align:center;margin-top:24px;color:#a1a1aa;font-size:12px}
+</style></head><body><div class="c"><div class="card">
+<div class="h"><h1>TradeVantage</h1></div>
+<div class="b">
+<p>Your <strong>${tier}</strong> subscription is renewing on <strong>${renewDate}</strong>.</p>
+<p>No action is needed if you'd like to continue. If you want to change or cancel your plan, please do so before the renewal date.</p>
+</div></div>
+<div class="f">&copy; ${new Date().getFullYear()} TradeVantage</div>
+</div></body></html>`;
+
+  return {
+    subject: `Your ${tier} plan renews on ${renewDate}`,
+    html,
+  };
+}
+
 /**
  * E3: Renewal reminder job.
  *
  * Runs daily. Finds profiles whose `renews_at` falls in a one-day window
- * (6 to 7 days out) and sends a Brevo transactional template. Every successful
- * send is recorded in `email_log` with kind='renewal_reminder' so re-runs
- * within a 7-day window don't double-send.
+ * (6 to 7 days out) and sends an HTML email. Every successful send is
+ * recorded in `email_log` with kind='renewal_reminder' so re-runs within
+ * a 7-day window don't double-send.
  */
 export async function runRenewalReminders(): Promise<void> {
   const providerCode = config.EMAIL_PROVIDER ?? "brevo";
@@ -20,13 +51,6 @@ export async function runRenewalReminders(): Promise<void> {
     logger.warn(
       { providerCode },
       "renewal-reminder: no email adapter registered; skipping run"
-    );
-    return;
-  }
-
-  if (!config.RENEWAL_TEMPLATE_ID) {
-    logger.warn(
-      "renewal-reminder: RENEWAL_TEMPLATE_ID unset; skipping run"
     );
     return;
   }
@@ -82,18 +106,20 @@ export async function runRenewalReminders(): Promise<void> {
     }
 
     try {
+      const { subject, html } = buildRenewalEmail(
+        p.tier,
+        p.renewsAt?.toISOString() ?? new Date().toISOString(),
+      );
+
       const result = await retry(
         async () =>
-          adapter.sendTemplate({
+          adapter.sendRaw({
             to: {
               email: p.email as string,
               name: p.handle ?? undefined,
             },
-            templateId: config.RENEWAL_TEMPLATE_ID as number,
-            params: {
-              renews_at: p.renewsAt?.toISOString() ?? null,
-              tier: p.tier,
-            },
+            subject,
+            html,
           }),
         { label: "email.renewal_reminder.send", attempts: 2 }
       );
@@ -105,7 +131,6 @@ export async function runRenewalReminders(): Promise<void> {
             kind: "renewal_reminder",
             provider: result.provider,
             externalMessageId: result.messageId,
-            templateId: String(config.RENEWAL_TEMPLATE_ID),
           },
         });
       } catch (insertErr) {
