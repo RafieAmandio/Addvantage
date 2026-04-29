@@ -10,9 +10,13 @@
     "./types": "./src/types.ts",
     "./prisma": "./src/prisma.ts"
   },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
   "scripts": {
     "generate": "npx prisma generate",
     "postinstall": "npx prisma generate",
+    "seed": "npx prisma db seed",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo"
   },
