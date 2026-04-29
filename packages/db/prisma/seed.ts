@@ -224,6 +224,28 @@ async function main() {
   }
   console.log(`✓ Timeline events: ${feedItems.length} created from approved news`);
 
+  // ─── Sample payment ─────────────────────────────────────────────────
+  const paymentRef = "tv-seed-demo-001";
+  const existingPayment = await prisma.payment.findUnique({ where: { externalRef: paymentRef } });
+  if (!existingPayment) {
+    await prisma.payment.create({
+      data: {
+        profileId: USER_ID,
+        externalId: "seed-inv-001",
+        externalRef: paymentRef,
+        provider: "xendit",
+        amount: 150000,
+        currency: "IDR",
+        status: "paid",
+        tier: "pro",
+        invoiceUrl: "https://checkout.xendit.co/seed-demo",
+        description: "TradeVantage pro subscription",
+        paidAt: now,
+      },
+    });
+  }
+  console.log("✓ Sample payment created (demo user, paid)");
+
   console.log("\n✅ Seed complete!");
 }
 
