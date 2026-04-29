@@ -56,9 +56,6 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.1038.0
         version: 3.1038.0
-      '@supabase/supabase-js':
-        specifier: ^2.45.4
-        version: 2.103.0
       '@tradevantage/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -83,6 +80,9 @@ importers:
       helmet:
         specifier: ^8.0.0
         version: 8.1.0
+      jose:
+        specifier: ^6.2.3
+        version: 6.2.3
       multer:
         specifier: ^2.1.1
         version: 2.1.1
@@ -3646,6 +3646,9 @@ packages:
   jiti@2.6.1:
     resolution: {integrity: sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==}
     hasBin: true
+
+  jose@6.2.3:
+    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -9223,6 +9226,8 @@ snapshots:
   jiti@1.21.7: {}
 
   jiti@2.6.1: {}
+
+  jose@6.2.3: {}
 
   joycon@3.1.1: {}
 

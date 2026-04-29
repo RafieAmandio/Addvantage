@@ -10,8 +10,10 @@ const EnvSchema = z.object({
 
   DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
-  SUPABASE_URL: z.preprocess(emptyToUndef, z.string().url()),
-  SUPABASE_SERVICE_ROLE_KEY: z.preprocess(emptyToUndef, z.string().min(1)),
+  JWT_SECRET: z.preprocess(emptyToUndef, z.string().min(1)),
+
+  SUPABASE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  SUPABASE_SERVICE_ROLE_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   CORS_ORIGIN: z
     .string()

@@ -1,10 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+import { jwtVerify } from "jose";
 import type { Request, Response, NextFunction } from "express";
 import { env } from "../../config/env.js";
 import { UnauthorizedError } from "../errors/index.js";
 import type { AuthUser } from "../types/request.js";
 
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+const secret = new TextEncoder().encode(env.JWT_SECRET);
 
 function extractToken(req: Request): string | null {
   const header = req.headers.authorization;
@@ -16,13 +16,18 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
   const token = extractToken(req);
   if (!token) throw new UnauthorizedError("Missing authorization token");
 
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data.user) throw new UnauthorizedError("Invalid or expired token");
+  try {
+    const { payload } = await jwtVerify(token, secret);
 
-  (req as Request & { user: AuthUser }).user = {
-    id: data.user.id,
-    email: data.user.email ?? "",
-  };
+    const sub = payload.sub;
+    const email = (payload.email as string) ?? "";
+    if (!sub) throw new UnauthorizedError("Invalid token: missing sub");
+
+    (req as Request & { user: AuthUser }).user = { id: sub, email };
+  } catch (err) {
+    if (err instanceof UnauthorizedError) throw err;
+    throw new UnauthorizedError("Invalid or expired token");
+  }
 
   next();
 }
@@ -34,16 +39,20 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
     return next();
   }
 
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data.user) {
-    (req as Request & { user?: AuthUser | null }).user = null;
-    return next();
-  }
+  try {
+    const { payload } = await jwtVerify(token, secret);
 
-  (req as Request & { user: AuthUser }).user = {
-    id: data.user.id,
-    email: data.user.email ?? "",
-  };
+    const sub = payload.sub;
+    const email = (payload.email as string) ?? "";
+    if (!sub) {
+      (req as Request & { user?: AuthUser | null }).user = null;
+      return next();
+    }
+
+    (req as Request & { user: AuthUser }).user = { id: sub, email };
+  } catch {
+    (req as Request & { user?: AuthUser | null }).user = null;
+  }
 
   next();
 }
