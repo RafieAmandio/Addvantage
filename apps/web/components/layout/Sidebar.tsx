@@ -8,18 +8,36 @@ import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
 const nav = [
-  { code: "TX-00", label: "Home", href: "/app", group: "live" },
-  { code: "TX-00b", label: "Today's Brief", href: "/app/brief", group: "live" },
-  { code: "TX-01", label: "News", href: "/app/news", group: "live" },
-  { code: "TX-02", label: "Calendar", href: "/app/calendar", group: "live" },
-  { code: "TX-06", label: "My Channel", href: "/app/channel", group: "live" },
-  { code: "TX-03", label: "Trading Plan", href: "/app/plan", group: "ops", locked: true },
-  { code: "TX-04", label: "Consultation", href: "/app/consult", group: "ops", locked: true },
-  { code: "TX-05", label: "Education", href: "/app/education", group: "ops" },
-  { code: "—", label: "Hashtags", href: "/app/tags", group: "ops" },
-  { code: "—", label: "Watchlist", href: "/app/watchlist", group: "ops" },
-  { code: "—", label: "Subscription", href: "/app/subscription", group: "self" },
+  { label: "Home", href: "/app", group: "main", icon: "home" },
+  { label: "Today's Brief", href: "/app/brief", group: "main", icon: "brief" },
+  { label: "News", href: "/app/news", group: "main", icon: "news" },
+  { label: "Calendar", href: "/app/calendar", group: "main", icon: "calendar" },
+  { label: "Channel", href: "/app/channel", group: "main", icon: "channel" },
+  { label: "Trading Plan", href: "/app/plan", group: "tools", locked: true, icon: "plan" },
+  { label: "Consultation", href: "/app/consult", group: "tools", locked: true, icon: "consult" },
+  { label: "Education", href: "/app/education", group: "tools", icon: "education" },
+  { label: "Hashtags", href: "/app/tags", group: "tools", icon: "tags" },
+  { label: "Watchlist", href: "/app/watchlist", group: "tools", icon: "watchlist" },
+  { label: "Subscription", href: "/app/subscription", group: "account", icon: "subscription" },
 ];
+
+function NavIcon({ name, className }: { name: string; className?: string }) {
+  const props = { width: 16, height: 16, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "round" as const, strokeLinejoin: "round" as const, className };
+  switch (name) {
+    case "home": return <svg {...props}><path d="M2 6.5L8 2l6 4.5V13a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" /><path d="M6 14V9h4v5" /></svg>;
+    case "brief": return <svg {...props}><rect x="3" y="2" width="10" height="12" rx="1" /><path d="M6 5h4M6 8h4M6 11h2" /></svg>;
+    case "news": return <svg {...props}><path d="M2 3h8v10H3a1 1 0 01-1-1V3z" /><path d="M10 6h4v6a1 1 0 01-1 1h-3V6z" /><path d="M4 6h4M4 8.5h4" /></svg>;
+    case "calendar": return <svg {...props}><rect x="2" y="3" width="12" height="11" rx="1" /><path d="M2 7h12M5 1v3M11 1v3" /></svg>;
+    case "channel": return <svg {...props}><path d="M3 3h10a1 1 0 011 1v6a1 1 0 01-1 1H9l-3 3v-3H3a1 1 0 01-1-1V4a1 1 0 011-1z" /></svg>;
+    case "plan": return <svg {...props}><path d="M2 2l4 12L9 7l5 7" /><circle cx="13" cy="3" r="1.5" /></svg>;
+    case "consult": return <svg {...props}><circle cx="8" cy="5" r="3" /><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" /></svg>;
+    case "education": return <svg {...props}><path d="M8 2L1 6l7 4 7-4-7-4z" /><path d="M3 8v4c0 1 2.2 2 5 2s5-1 5-2V8" /></svg>;
+    case "tags": return <svg {...props}><path d="M2 8V3a1 1 0 011-1h5l6 6-5 5-6-6z" /><circle cx="5.5" cy="5.5" r="1" /></svg>;
+    case "watchlist": return <svg {...props}><path d="M8 2l1.8 3.6L14 6.2l-3 2.9.7 4.1L8 11.4l-3.7 1.8.7-4.1-3-2.9 4.2-.6L8 2z" /></svg>;
+    case "subscription": return <svg {...props}><rect x="2" y="4" width="12" height="8" rx="1" /><path d="M2 7h12" /></svg>;
+    default: return null;
+  }
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -77,85 +95,82 @@ export function Sidebar() {
 
   const inner = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-gray-3 px-6 py-6">
-        <div>
-          <Link
-            href="/"
-            className="group font-display text-3xl text-white transition-transform hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ANTS<span className="text-brand">.</span>
-          </Link>
-          <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            DOMAIN // OPERATOR
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-5">
+        <Link
+          href="/"
+          className="font-mono text-base font-bold text-white transition-opacity hover:opacity-80 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+        >
+          +vantage
+        </Link>
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setSidebarCollapsed(true)}
             aria-label="Collapse sidebar"
             title="Collapse sidebar · \"
-            className="hidden items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="hidden items-center justify-center rounded-lg p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-              <path d="M9 2L4 7l5 5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             onClick={() => setNavOpen(false)}
             aria-label="Close navigation"
-            className="flex items-center justify-center border border-gray-3 p-2 text-white/60 transition-colors hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="flex items-center justify-center rounded-lg p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-              <path d="M2 2l10 10M12 2L2 12" />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+              <path d="M3 3l10 10M13 3L3 13" strokeLinecap="round" />
             </svg>
           </button>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-4">
-        <NavGroup label="Live transmissions">
-          {nav.filter((n) => n.group === "live").map((n) => (
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto px-3 pb-4">
+        <NavGroup label="Main">
+          {nav.filter((n) => n.group === "main").map((n) => (
             <NavItem key={n.href} {...n} active={pathname === n.href} paid={paid} />
           ))}
         </NavGroup>
-        <NavGroup label="Operator surfaces">
-          {nav.filter((n) => n.group === "ops").map((n) => (
+        <NavGroup label="Tools">
+          {nav.filter((n) => n.group === "tools").map((n) => (
             <NavItem key={n.href} {...n} active={pathname.startsWith(n.href)} paid={paid} />
           ))}
         </NavGroup>
         <NavGroup label="Account">
-          {nav.filter((n) => n.group === "self").map((n) => (
+          {nav.filter((n) => n.group === "self" || n.group === "account").map((n) => (
             <NavItem key={n.href} {...n} active={pathname === n.href} paid={paid} />
           ))}
         </NavGroup>
       </nav>
 
-      <div className="border-t border-gray-3 p-4">
-        <div className="border border-brand/30 bg-brand/5 p-3">
-          <div className="flex items-baseline justify-between">
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-              ● TIER {paid ? "01" : "00"}
+      {/* User card */}
+      <div className="border-t border-white/[0.06] px-3 py-4">
+        <div className="rounded-xl bg-white/[0.04] p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand/15 font-mono text-xs font-bold text-brand">
+              {operatorName.charAt(0).toUpperCase()}
             </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-              U-00417
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-medium text-white">
+                {operatorName}
+              </div>
+              <div className="text-xs text-white/40">
+                {paid ? "VIP+ Trader" : "Free"}
+              </div>
             </div>
-          </div>
-          <div className="mt-2 font-display text-lg leading-tight text-white">
-            {operatorName}
-          </div>
-          <div className="mt-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            {paid ? "VIP+ Trader" : "Free access"}
           </div>
           {!paid && (
             <Link
               href="/app/subscription"
-              className="mt-3 block font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand hover:decoration-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="mt-3 block rounded-lg bg-brand px-3 py-2 text-center text-xs font-bold text-black transition-colors hover:bg-brand-dim focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
-              Upgrade access →
+              Upgrade
             </Link>
           )}
-          <div className="mt-2">
-            <LogoutButton />
+          <div className="mt-3 flex items-center justify-between">
+            <LogoutButton className="text-xs text-white/40 transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none" />
           </div>
         </div>
       </div>
@@ -165,7 +180,7 @@ export function Sidebar() {
   return (
     <>
       {!sidebarCollapsed && (
-        <aside className="hidden w-64 shrink-0 border-r border-gray-3 bg-gray-2/40 lg:block">
+        <aside className="hidden w-[260px] shrink-0 border-r border-white/[0.06] bg-black-2 lg:block">
           <div className="sticky top-0 h-screen">{inner}</div>
         </aside>
       )}
@@ -189,10 +204,9 @@ export function Sidebar() {
           aria-modal="true"
           aria-label="Navigation"
           className={cn(
-            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-brand/40 bg-gray-2 transition-transform duration-300",
+            "absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-white/[0.06] bg-black-2 transition-transform duration-300",
             navOpen ? "translate-x-0" : "-translate-x-full"
           )}
-          style={{ boxShadow: navOpen ? "0 0 60px rgba(255,212,0,0.1)" : undefined }}
         >
           {inner}
         </aside>
@@ -203,19 +217,19 @@ export function Sidebar() {
 
 function NavGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mb-6">
-      <div className="mb-2 px-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+    <div className="mb-5">
+      <div className="mb-1.5 px-3 text-[11px] font-medium uppercase tracking-wider text-white/25">
         {label}
       </div>
-      <div className="space-y-px">{children}</div>
+      <div className="space-y-0.5">{children}</div>
     </div>
   );
 }
 
 function NavItem({
-  code, label, href, active, locked, paid,
+  label, href, icon, active, locked, paid,
 }: {
-  code: string; label: string; href: string;
+  label: string; href: string; icon: string;
   active?: boolean; locked?: boolean; paid: boolean;
 }) {
   const isLocked = locked && !paid;
@@ -223,23 +237,17 @@ function NavItem({
     <Link
       href={href}
       className={cn(
-        "group flex items-center justify-between px-3 py-2 transition-all duration-150 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
         active
-          ? "border-l-2 border-brand bg-brand/10 text-brand"
-          : "border-l-2 border-transparent text-white/60 hover:border-brand/40 hover:bg-gray-2 hover:text-white"
+          ? "bg-brand/10 font-medium text-brand"
+          : "text-white/50 hover:bg-white/[0.04] hover:text-white"
       )}
     >
-      <span className="flex items-center gap-3">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 opacity-60">
-          {code}
-        </span>
-        <span className="font-mono text-[11px] uppercase tracking-widest2">
-          {label}
-        </span>
-      </span>
+      <NavIcon name={icon} className={cn("shrink-0", active ? "text-brand" : "text-white/30 group-hover:text-white/50")} />
+      <span className="flex-1">{label}</span>
       {isLocked && (
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-          ●
+        <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-medium text-white/30">
+          PRO
         </span>
       )}
     </Link>

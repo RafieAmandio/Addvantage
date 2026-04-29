@@ -15,14 +15,12 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div
-      className={cn("flex items-baseline justify-between gap-3", className)}
-    >
-      <div className="flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-        <span>{n}</span>
-        <span className="h-px w-6 bg-brand/30" />
-        <span className="text-white/60">{label}</span>
-        {right && <span className="text-white/30">· {right}</span>}
+    <div className={cn("flex items-baseline justify-between gap-3", className)}>
+      <div className="flex items-baseline gap-2 text-sm">
+        <span className="font-bold text-brand">{n}</span>
+        <span className="text-white/20">/</span>
+        <span className="text-white/50">{label}</span>
+        {right && <span className="text-white/30">{right}</span>}
       </div>
       {children}
     </div>

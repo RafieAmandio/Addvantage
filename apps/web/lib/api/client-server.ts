@@ -1,30 +1,10 @@
 import { cookies } from "next/headers";
-import { createClient } from "@supabase/supabase-js";
-import { publicConfig } from "@/lib/config/public";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
-async function getAccessToken(): Promise<string | null> {
+function getAccessToken(): string | null {
   const cookieStore = cookies();
-  const allCookies = cookieStore.getAll();
-  const tokenCookie = allCookies.find(
-    (c) => c.name.endsWith("-auth-token") || c.name.includes("sb-") && c.name.includes("auth-token"),
-  );
-
-  if (!tokenCookie) {
-    const supabase = createClient(
-      publicConfig.NEXT_PUBLIC_SUPABASE_URL,
-      publicConfig.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        global: { headers: { cookie: cookieStore.toString() } },
-        auth: { flowType: "pkce" },
-      },
-    );
-    const { data } = await supabase.auth.getSession();
-    return data.session?.access_token ?? null;
-  }
-
-  return null;
+  return cookieStore.get("access_token")?.value ?? null;
 }
 
 interface ApiResponse<T> {
@@ -33,16 +13,8 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-interface PaginatedApiResponse<T> {
-  success: boolean;
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
 export async function apiGet<T>(path: string, opts?: { token?: string }): Promise<T> {
-  const token = opts?.token ?? (await getAccessToken());
+  const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -61,7 +33,7 @@ export async function apiGet<T>(path: string, opts?: { token?: string }): Promis
 }
 
 export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
-  const token = opts?.token ?? (await getAccessToken());
+  const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -81,7 +53,7 @@ export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: 
 }
 
 export async function apiPut<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
-  const token = opts?.token ?? (await getAccessToken());
+  const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -101,7 +73,7 @@ export async function apiPut<T>(path: string, body?: unknown, opts?: { token?: s
 }
 
 export async function apiDelete(path: string, opts?: { token?: string }): Promise<void> {
-  const token = opts?.token ?? (await getAccessToken());
+  const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -122,7 +94,7 @@ export async function apiStream(
   onChunk: (text: string) => void,
   opts?: { token?: string },
 ): Promise<void> {
-  const token = opts?.token ?? (await getAccessToken());
+  const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 

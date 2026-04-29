@@ -10,7 +10,7 @@ export function PlanCompareHero({ className }: { className?: string }) {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>
-            <DataLabel>Transmission TX-03 · Compare</DataLabel>
+            <DataLabel>Plan Compare</DataLabel>
             <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
               Plan <span className="italic text-brand">comparison</span>
             </h1>

@@ -42,7 +42,9 @@
     "DATABASE_URL",
     "CORS_ORIGIN",
     "PAYMENT_PROVIDER",
-    "NEXT_PUBLIC_API_URL"
+    "NEXT_PUBLIC_API_URL",
+    "STORAGE_PROVIDER",
+    "STORAGE_BUCKET"
   ],
   "tasks": {
     "build": {

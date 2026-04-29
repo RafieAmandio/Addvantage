@@ -19,7 +19,6 @@ export function TopBar() {
   } = useAppState();
   const toast = useToast();
   const paid = isPaid(tier);
-  const [stamp, setStamp] = useState("");
   const [isMac, setIsMac] = useState(false);
 
   const flipTier = (next: Tier) => {
@@ -27,12 +26,12 @@ export function TopBar() {
     setTier(next);
     toast.push({
       tone: next === "vip" ? "success" : "info",
-      title: next === "vip" ? "Tier · VIP+ Trader" : "Tier · Free",
+      title: next === "vip" ? "VIP+ Trader" : "Free Tier",
       description:
         next === "vip"
-          ? "All locked surfaces unlocked. Trading Plan, 1v1 Consultation, full Education library."
-          : "Returning to free tier. Locked surfaces will require upgrade.",
-      duration: 2500,
+          ? "All features unlocked."
+          : "Returning to free tier.",
+      duration: 2000,
     });
   };
 
@@ -40,34 +39,18 @@ export function TopBar() {
     setIsMac(/Mac|iPhone|iPad/.test(navigator.platform));
   }, []);
 
-  useEffect(() => {
-    const tick = () =>
-      setStamp(new Date().toUTCString().slice(5, 16).toUpperCase());
-    tick();
-    const id = setInterval(tick, 30_000);
-    return () => clearInterval(id);
-  }, []);
-
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-3 bg-black/95 backdrop-blur">
-      <div className="classification-stripe h-1" />
-
-      <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-3 sm:gap-6">
+    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-black/90 backdrop-blur-lg">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        {/* Left */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
-            className="border border-gray-3 p-2 text-white/70 transition-colors hover:border-brand hover:text-brand lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/[0.04] hover:text-white lg:hidden focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M1 3h12M1 7h12M1 11h12" />
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M2 4.5h14M2 9h14M2 13.5h14" strokeLinecap="round" />
             </svg>
           </button>
 
@@ -75,46 +58,31 @@ export function TopBar() {
             <button
               onClick={() => setSidebarCollapsed(false)}
               aria-label="Expand sidebar"
-              title="Expand sidebar · \\"
-              className="hidden items-center gap-1 border border-gray-3 p-2 text-white/70 transition-colors hover:border-brand hover:text-brand lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              title="Expand sidebar · \"
+              className="hidden rounded-lg p-2 text-white/50 transition-colors hover:bg-white/[0.04] hover:text-white lg:flex focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                aria-hidden
-              >
-                <path
-                  d="M5 2l5 5-5 5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path d="M2 3v8" strokeLinecap="round" />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+                <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 4v8" strokeLinecap="round" />
               </svg>
             </button>
           )}
 
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            ● <span className="hidden sm:inline">TRANSMISSION </span>LIVE
-          </div>
-          <div className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:flex">
-            <span>NODE 04</span>
-            <span className="text-brand/40">/</span>
-            <span>BRIEF 088</span>
-            <span className="text-brand/40">/</span>
-            <span suppressHydrationWarning>{stamp || "—"}</span>
-          </div>
+          {sidebarCollapsed && (
+            <Link href="/" className="hidden font-mono text-sm font-bold text-white lg:block">
+              +vantage
+            </Link>
+          )}
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 border border-gray-3 bg-black-2 p-1">
+        {/* Right */}
+        <div className="flex items-center gap-2">
+          {/* Tier toggle */}
+          <div className="flex items-center gap-0.5 rounded-lg bg-white/[0.04] p-1">
             <button
               onClick={() => flipTier("free")}
               className={cn(
-                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                "rounded-md px-3 py-1.5 text-xs font-medium transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 !paid
                   ? "bg-brand text-black"
                   : "text-white/40 hover:text-white"
@@ -125,7 +93,7 @@ export function TopBar() {
             <button
               onClick={() => flipTier("vip")}
               className={cn(
-                "px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                "rounded-md px-3 py-1.5 text-xs font-medium transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 paid
                   ? "bg-brand text-black"
                   : "text-white/40 hover:text-white"
@@ -135,31 +103,22 @@ export function TopBar() {
             </button>
           </div>
 
+          {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}
-            aria-label="Search the DOMAIN"
-            className="group flex items-center gap-2 border border-gray-3 bg-black-2 px-3 py-1.5 text-white/50 transition-colors hover:border-brand hover:text-brand sm:gap-3 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            aria-label="Search"
+            className="group flex items-center gap-2 rounded-lg bg-white/[0.04] px-3 py-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white/60 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden
-            >
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
               <circle cx="9" cy="9" r="6" />
               <path d="M14 14l4 4" strokeLinecap="round" />
             </svg>
-            <span className="hidden font-mono text-[10px] uppercase tracking-widest2 sm:inline">
-              Search
-            </span>
-            <span className="hidden items-center gap-1 lg:flex">
-              <kbd className="border border-gray-3 bg-black px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+            <span className="hidden text-xs sm:inline">Search</span>
+            <span className="hidden items-center gap-0.5 lg:flex">
+              <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-white/30">
                 {isMac ? "⌘" : "Ctrl"}
               </kbd>
-              <kbd className="border border-gray-3 bg-black px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+              <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-white/30">
                 K
               </kbd>
             </span>
@@ -167,29 +126,32 @@ export function TopBar() {
 
           <NotificationBell />
 
+          {/* Help */}
           <button
-            onClick={() =>
-              window.dispatchEvent(new CustomEvent("ants:help-toggle"))
-            }
-            aria-label="Show keyboard shortcuts and help"
-            title="Press ? for keyboard shortcuts"
-            className="border border-gray-3 bg-black-2 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            onClick={() => window.dispatchEvent(new CustomEvent("ants:help-toggle"))}
+            aria-label="Keyboard shortcuts"
+            title="Press ? for shortcuts"
+            className="rounded-lg p-2 text-xs text-white/40 transition-colors hover:bg-white/[0.04] hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ?
           </button>
 
-          <Link
-            href="/app/subscription"
-            className="hidden border border-brand/40 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:bg-brand hover:text-black sm:block focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            {paid ? "Manage tier" : "Upgrade →"}
-          </Link>
+          {/* Upgrade CTA */}
+          {!paid && (
+            <Link
+              href="/app/subscription"
+              className="hidden rounded-lg bg-brand px-3 py-2 text-xs font-bold text-black transition-colors hover:bg-brand-dim sm:block focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              Upgrade
+            </Link>
+          )}
 
-          <div className="flex items-center gap-2 border-l border-gray-3 pl-4 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-            <span className="led" aria-hidden />
-            <span className="hidden sm:inline">{operatorName.toUpperCase()}</span>
-            <span className="text-white/30 hidden lg:inline">·</span>
-            <span className="text-white/40 hidden lg:inline">U-00417</span>
+          {/* User */}
+          <div className="flex items-center gap-2 border-l border-white/[0.06] pl-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">
+              {operatorName.charAt(0).toUpperCase()}
+            </div>
+            <span className="hidden text-sm text-white/60 sm:inline">{operatorName}</span>
           </div>
         </div>
       </div>

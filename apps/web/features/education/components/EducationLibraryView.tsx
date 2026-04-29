@@ -92,7 +92,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
       />
       <div className="border-b border-gray-3 bg-gray-2/30">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <DataLabel>Transmission TX-05</DataLabel>
+          <DataLabel>Education</DataLabel>
           <h1 className="mt-2 font-display text-3xl sm:text-4xl md:text-5xl text-white">
             Education <span className="italic text-brand">Library</span>
           </h1>

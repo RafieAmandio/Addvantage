@@ -14,6 +14,8 @@ vi.mock("@/config/env.js", () => ({
     EMAIL_PROVIDER: undefined,
     XENDIT_SECRET_KEY: undefined,
     XENDIT_WEBHOOK_TOKEN: undefined,
+    STORAGE_PROVIDER: undefined,
+    STORAGE_BUCKET: undefined,
   },
 }));
 

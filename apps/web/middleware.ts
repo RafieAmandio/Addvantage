@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { updateSession } from "@/lib/auth/middleware";
 
 export async function middleware(request: NextRequest) {
   return updateSession(request);
@@ -7,10 +7,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Run on all routes except:
-     *   _next/static, _next/image, favicon, fonts, images, icons.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

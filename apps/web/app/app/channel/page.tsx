@@ -15,7 +15,7 @@ export default function ChannelPage() {
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
           <div className="flex items-baseline justify-between">
             <div>
-              <DataLabel>Transmission TX-06 · Free pillar</DataLabel>
+              <DataLabel>Channel</DataLabel>
               <h1 className="mt-2 font-display text-5xl text-white">
                 My <span className="italic text-brand">Channel</span>
               </h1>

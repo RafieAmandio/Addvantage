@@ -37,6 +37,9 @@ const EnvSchema = z.object({
 
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 
+  STORAGE_PROVIDER: z.preprocess(emptyToUndef, z.enum(["supabase", "s3"]).optional()),
+  STORAGE_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   AWS_S3_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   AWS_S3_REGION: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   AWS_ACCESS_KEY_ID: z.preprocess(emptyToUndef, z.string().min(1).optional()),

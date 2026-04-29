@@ -3,7 +3,7 @@ import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
 import { ValidationError, AppError } from "@/core/errors/index.js";
 import type { AuthRequest } from "@/core/types/request.js";
-import { uploadFile, isS3Configured } from "@/config/s3.js";
+import { getStorageProvider } from "@/integrations/storage/index.js";
 import { consultService } from "./consult.service.js";
 
 export const consultController = {
@@ -53,7 +53,8 @@ export const consultController = {
     const authReq = req as AuthRequest;
     const sessionId = String(req.params.id);
 
-    if (!isS3Configured()) {
+    const storage = getStorageProvider();
+    if (!storage) {
       throw new AppError("File uploads not configured", 503);
     }
 
@@ -65,7 +66,12 @@ export const consultController = {
     const session = await consultService.verifySessionOwnership(authReq.user.id, sessionId);
     if (!session) throw new AppError("Session not found", 404);
 
-    const result = await uploadFile(file.buffer, file.originalname, file.mimetype, "consult");
+    const result = await storage.upload({
+      buffer: file.buffer,
+      originalName: file.originalname,
+      contentType: file.mimetype,
+      folder: "consult",
+    });
 
     const message = await consultService.appendMessage(authReq.user.id, sessionId, {
       role: "user",

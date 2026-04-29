@@ -36,9 +36,9 @@ export function NewsListClient({ items }: { items: NewsListItem[] }) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
+          <div className="flex items-center gap-3 text-sm text-brand">
             <span className="led" aria-hidden />
-            DECODING NEWS FEED
+            Loading news...
           </div>
         </div>
       }
@@ -91,7 +91,7 @@ function View({ items }: { items: NewsListItem[] }) {
   );
 
   return (
-    <div className="bg-grid-fine stagger">
+    <div className="stagger">
       <BackToTop />
       <ConfirmDialog
         open={confirmingResetSeen}
@@ -111,15 +111,15 @@ function View({ items }: { items: NewsListItem[] }) {
         }}
         onCancel={() => setConfirmingResetSeen(false)}
       />
-      <div className="border-b border-gray-3 bg-gray-2/30">
+      <div className="border-b border-white/[0.06]">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <DataLabel>Transmission TX-01 · Free pillar</DataLabel>
-          <h1 className="mt-2 font-display text-4xl text-white sm:text-5xl">
-            Live <span className="italic text-brand">News</span>
+          <DataLabel>News</DataLabel>
+          <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">
+            Live <span className="text-brand">News</span>
           </h1>
-          <p className="mt-2 max-w-2xl font-display text-base text-white/60 sm:text-lg">
+          <p className="mt-2 max-w-2xl text-base leading-relaxed text-white/50">
             Raw market-moving news, annotated with what it actually means for
-            price. No "analysts say". No "experts believe".
+            price. No &quot;analysts say&quot;. No &quot;experts believe&quot;.
           </p>
         </div>
       </div>
@@ -129,11 +129,11 @@ function View({ items }: { items: NewsListItem[] }) {
           <PageSearchInput
             value={query}
             onChange={setQuery}
-            placeholder="Search headlines, analysis, tickers, tags…   (press s to focus, esc to blur)"
+            placeholder="Search headlines, analysis, tickers, tags...   (press s to focus, esc to blur)"
             ariaLabel="Search news"
             matchLabel={
               query
-                ? `${filtered.length} ${filtered.length === 1 ? "MATCH" : "MATCHES"} for "${query}"`
+                ? `${filtered.length} ${filtered.length === 1 ? "match" : "matches"} for "${query}"`
                 : null
             }
           />
@@ -141,32 +141,32 @@ function View({ items }: { items: NewsListItem[] }) {
 
         {seenHydrated && seenCount > 0 && (
           <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+            <span className="text-xs text-white/40">
               {seenCount} seen
             </span>
             <button
               onClick={() => setHideSeen((v) => !v)}
               className={cn(
-                "border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                "rounded-lg border px-3 py-1.5 text-xs transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                 hideSeen
                   ? "border-brand bg-brand/10 text-brand"
-                  : "border-gray-3 text-white/60 hover:border-brand hover:text-brand"
+                  : "border-white/[0.1] text-white/50 hover:border-brand hover:text-brand"
               )}
             >
-              {hideSeen ? "✓ HIDING SEEN" : "HIDE SEEN"}
+              {hideSeen ? "Showing unread" : "Hide seen"}
             </button>
             <button
               onClick={() => setConfirmingResetSeen(true)}
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="rounded-lg border border-white/[0.1] px-3 py-1.5 text-xs text-white/50 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
-              ↶ Reset seen
+              Reset seen
             </button>
           </div>
         )}
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <SectionNumber n="01 /" label={`${filtered.length} ITEMS`} />
-          <div className="flex flex-wrap gap-px bg-gray-3">
+          <SectionNumber n="01" label={`${filtered.length} items`} />
+          <div className="flex flex-wrap gap-1 rounded-lg bg-white/[0.03] p-1">
             {(
               [
                 "all",
@@ -181,10 +181,10 @@ function View({ items }: { items: NewsListItem[] }) {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  "px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:px-4 sm:py-2",
+                  "rounded-md px-3 py-1.5 text-xs font-medium capitalize transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                   filter === f
                     ? "bg-brand text-black"
-                    : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white"
+                    : "text-white/50 hover:text-white"
                 )}
               >
                 {f}
@@ -194,21 +194,18 @@ function View({ items }: { items: NewsListItem[] }) {
         </div>
 
         {filtered.length === 0 && (
-          <div className="border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              ● NULL TRANSMISSION
-            </div>
-            <div className="mt-3 font-display text-2xl text-white">
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-12 text-center">
+            <p className="text-lg font-medium text-white">
               No items match{query ? ` "${query}"` : " this filter"}
-              {filter !== "all" && query ? ` in the ${filter} cut` : ""}.
-            </div>
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              Try a different cut. The desk doesn't fabricate items to fill a screen.
+              {filter !== "all" && query ? ` in ${filter}` : ""}.
+            </p>
+            <p className="mt-2 text-sm text-white/40">
+              Try a different filter or search term.
             </p>
           </div>
         )}
 
-        <div className="space-y-px bg-gray-3">
+        <div className="space-y-2">
           {filtered.map((n) => (
             <NewsListRow
               key={n.id}

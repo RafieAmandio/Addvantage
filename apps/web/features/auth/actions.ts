@@ -1,72 +1,183 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { isMockMode } from "@/lib/config/public";
 import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
-import { rateLimit } from "@/lib/ratelimit";
-import { supabaseServer } from "@/lib/supabase/server";
 import { apiPut, apiPost } from "@/lib/api/client-server";
 
-const EmailSchema = z.object({ email: z.string().email() });
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
+
+// ─── Token helpers ──────────────────────────────────────────────────
+
+function setAuthCookies(accessToken: string, refreshToken: string) {
+  const cookieStore = cookies();
+  cookieStore.set("access_token", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 15 * 60, // 15 min
+  });
+  cookieStore.set("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
+  });
+}
+
+function clearAuthCookies() {
+  const cookieStore = cookies();
+  cookieStore.delete("access_token");
+  cookieStore.delete("refresh_token");
+}
+
+// ─── Login ──────────────────────────────────────────────────────────
+
+const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
 
 export interface LoginActionState {
   ok: boolean;
-  sent?: boolean;
+  error?: string;
+}
+
+export async function loginAction(
+  _prev: LoginActionState,
+  formData: FormData,
+): Promise<LoginActionState> {
+  const parsed = LoginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
+  if (!parsed.success) {
+    return { ok: false, error: "invalid_input" };
+  }
+
+  if (isMockMode()) {
+    redirect("/app");
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      if (res.status === 401) return { ok: false, error: "invalid_credentials" };
+      if (res.status === 403) return { ok: false, error: "email_not_verified" };
+      return { ok: false, error: "login_failed" };
+    }
+
+    setAuthCookies(json.data.accessToken, json.data.refreshToken);
+  } catch (err) {
+    Sentry.captureException(err, { tags: { scope: "auth.login" } });
+    logger.error("login failed", { error: err, scope: "auth.login" });
+    return { ok: false, error: "login_failed" };
+  }
+
+  redirect("/app");
+}
+
+// ─── Signup ─────────────────────────────────────────────────────────
+
+const SignupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  handle: z.string().min(2).max(30).optional(),
+});
+
+export interface SignupActionState {
+  ok: boolean;
+  done?: boolean;
   email?: string;
   error?: string;
 }
 
-export async function requestLoginOtp(
-  _prev: LoginActionState,
-  formData: FormData
-): Promise<LoginActionState> {
-  const parsed = EmailSchema.safeParse({ email: formData.get("email") });
+export async function signupAction(
+  _prev: SignupActionState,
+  formData: FormData,
+): Promise<SignupActionState> {
+  const raw = {
+    email: formData.get("email"),
+    password: formData.get("password"),
+    handle: formData.get("handle") || undefined,
+  };
+  const parsed = SignupSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false, error: "invalid_email" };
+    const issues = parsed.error.issues;
+    const pwIssue = issues.find((i) => i.path[0] === "password");
+    if (pwIssue) return { ok: false, error: "password_too_short" };
+    return { ok: false, error: "invalid_input" };
   }
-  const email = parsed.data.email.toLowerCase();
 
   if (isMockMode()) {
-    return { ok: true, sent: true, email };
+    return { ok: true, done: true, email: parsed.data.email };
   }
 
-  const ip =
-    headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rl = await rateLimit({
-    key: `auth:otp:${ip}`,
-    limit: 5,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    return { ok: false, error: "rate_limited" };
-  }
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const supabase = supabaseServer();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: `${siteUrl}/auth/callback` },
-  });
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "auth.requestLoginOtp" },
-      extra: { email },
+  try {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
     });
-    logger.error("requestLoginOtp failed", {
-      error,
-      email,
-      scope: "auth.requestLoginOtp",
-    });
-    return { ok: false, error: "send_failed" };
-  }
 
-  return { ok: true, sent: true, email };
+    const json = await res.json();
+
+    if (!res.ok) {
+      if (res.status === 409) return { ok: false, error: "email_taken" };
+      return { ok: false, error: "signup_failed" };
+    }
+
+    setAuthCookies(json.data.accessToken, json.data.refreshToken);
+    return { ok: true, done: true, email: parsed.data.email };
+  } catch (err) {
+    Sentry.captureException(err, { tags: { scope: "auth.signup" } });
+    logger.error("signup failed", { error: err, scope: "auth.signup" });
+    return { ok: false, error: "signup_failed" };
+  }
 }
+
+// ─── Verify email ───────────────────────────────────────────────────
+
+export interface VerifyEmailState {
+  ok: boolean;
+  error?: string;
+}
+
+export async function verifyEmailAction(token: string): Promise<VerifyEmailState> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/verify-email?token=${token}`);
+    if (!res.ok) {
+      return { ok: false, error: "invalid_or_expired" };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "verify_failed" };
+  }
+}
+
+export async function resendVerificationAction(): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await apiPost("/auth/resend-verification");
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "resend_failed" };
+  }
+}
+
+// ─── Trader profile ─────────────────────────────────────────────────
 
 const MARKET_VALUES = ["indo", "crypto", "forex", "us"] as const;
 const TraderProfileSchema = z.object({
@@ -97,7 +208,7 @@ function emptyToUndef(v: FormDataEntryValue | null): string | undefined {
 
 export async function saveTraderProfile(
   _prev: TraderProfileActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<TraderProfileActionState> {
   const user = await getSession();
   if (!user) {
@@ -108,7 +219,7 @@ export async function saveTraderProfile(
     .getAll("markets")
     .filter((v): v is string => typeof v === "string")
     .filter((v): v is (typeof MARKET_VALUES)[number] =>
-      (MARKET_VALUES as readonly string[]).includes(v)
+      (MARKET_VALUES as readonly string[]).includes(v),
     );
 
   const parsed = TraderProfileSchema.safeParse({
@@ -141,70 +252,14 @@ export async function saveTraderProfile(
   }
 }
 
+// ─── Logout ─────────────────────────────────────────────────────────
+
 export async function logoutAction(): Promise<void> {
   try {
     await apiPost("/auth/logout");
   } catch {
-    // Best-effort — still redirect
+    // Best-effort
   }
-  const supabase = supabaseServer();
-  await supabase.auth.signOut().catch(() => {});
+  clearAuthCookies();
   redirect("/");
-}
-
-export interface SignupActionState {
-  ok: boolean;
-  sent?: boolean;
-  email?: string;
-  error?: string;
-}
-
-export async function requestSignupOtp(
-  _prev: SignupActionState,
-  formData: FormData
-): Promise<SignupActionState> {
-  const parsed = EmailSchema.safeParse({ email: formData.get("email") });
-  if (!parsed.success) {
-    return { ok: false, error: "invalid_email" };
-  }
-  const email = parsed.data.email.toLowerCase();
-
-  if (isMockMode()) {
-    return { ok: true, sent: true, email };
-  }
-
-  const ip =
-    headers().get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rl = await rateLimit({
-    key: `auth:otp:${ip}`,
-    limit: 5,
-    windowSec: 60,
-  });
-  if (!rl.success) {
-    return { ok: false, error: "rate_limited" };
-  }
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const supabase = supabaseServer();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${siteUrl}/auth/callback?next=/signup/liability`,
-    },
-  });
-
-  if (error) {
-    Sentry.captureException(error, {
-      tags: { scope: "auth.requestSignupOtp" },
-      extra: { email },
-    });
-    logger.error("requestSignupOtp failed", {
-      error,
-      email,
-      scope: "auth.requestSignupOtp",
-    });
-    return { ok: false, error: "send_failed" };
-  }
-
-  return { ok: true, sent: true, email };
 }

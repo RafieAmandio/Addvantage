@@ -21,33 +21,31 @@ export function FeaturedRow({
   className?: string;
 }) {
   return (
-    <section className={cn("border-b border-gray-3", className)}>
+    <section className={cn("border-b border-white/[0.06]", className)}>
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="grid grid-cols-12 gap-4 sm:gap-6">
           <div className="col-span-12 lg:col-span-8">
             <SectionHeader
-              n="01 /"
-              label="Top of the wire"
-              right={`${topNews.length} most-impact items`}
+              n="01"
+              label="Latest news"
+              right={`${topNews.length} items`}
             >
               <Link
                 href="/app/news"
-                className="font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="text-xs font-medium text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
-                Full feed →
+                View all
               </Link>
             </SectionHeader>
             {topNews.length === 0 ? (
-              <div className="mt-4 border border-gray-3 bg-black p-8 text-center">
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                  No approved news items yet
-                </div>
-                <div className="mt-2 font-display text-sm text-white/30">
-                  Items will appear here once approved by the desk.
-                </div>
+              <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-8 text-center">
+                <p className="text-sm text-white/40">No approved news items yet.</p>
+                <p className="mt-1 text-xs text-white/25">
+                  Items will appear here once approved.
+                </p>
               </div>
             ) : (
-              <div className="mt-4 space-y-px bg-gray-3">
+              <div className="mt-4 space-y-2">
                 {topNews.map((n) => {
                   const seen = seenHydrated && seenNewsIds.includes(n.id);
                   const ts = n.published_at ?? n.fetched_at;
@@ -56,34 +54,34 @@ export function FeaturedRow({
                       key={n.id}
                       href={`/app/news/${n.id}`}
                       className={cn(
-                        "group block bg-black p-5 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                        "group block rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 transition-all hover:border-white/[0.1] hover:bg-white/[0.04] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
                         seen && "opacity-60 hover:opacity-100"
                       )}
                     >
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                          [{n.source_code}]
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-medium text-brand">
+                          {n.source_code}
                         </span>
                         <ImpactPill level={n.impact} />
                         <BiasBadge bias={n.bias} />
                         {seen && (
-                          <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/40">
-                            ✓ SEEN
+                          <span className="text-[10px] text-white/30">
+                            read
                           </span>
                         )}
-                        <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
-                          {formatTime(ts)}Z · BY {n.author.toUpperCase()}
+                        <span className="ml-auto hidden text-xs text-white/30 sm:inline">
+                          {formatTime(ts)}
                         </span>
                       </div>
                       <h3
                         className={cn(
-                          "mt-3 font-display text-xl leading-snug transition-colors group-hover:text-brand sm:text-2xl",
+                          "mt-2 text-lg font-medium leading-snug transition-colors group-hover:text-brand",
                           seen ? "text-white/70" : "text-white"
                         )}
                       >
                         {n.headline}
                       </h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-white/60">
+                      <p className="mt-1.5 line-clamp-2 text-sm text-white/45">
                         {n.analysis}
                       </p>
                     </Link>
@@ -94,41 +92,37 @@ export function FeaturedRow({
           </div>
 
           <aside className="col-span-12 lg:col-span-4">
-            <div className="border border-brand/40 bg-gray-2/30 p-5 scanline">
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-5">
               <div className="flex items-center justify-between">
-                <DataLabel>Trading Plan · TX-03</DataLabel>
+                <DataLabel>Trading Plan</DataLabel>
                 {paid ? (
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
-                    ○ UNLOCKED
-                  </span>
+                  <span className="text-[11px] text-moss">Unlocked</span>
                 ) : (
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-                    ● LOCKED
-                  </span>
+                  <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-white/30">PRO</span>
                 )}
               </div>
               {plan ? (
                 <>
-                  <h3 className="mt-3 font-display text-2xl text-white">
+                  <h3 className="mt-3 text-lg font-medium text-white">
                     {paid
                       ? plan.thesis.length > 100
-                        ? plan.thesis.slice(0, 100) + "…"
+                        ? plan.thesis.slice(0, 100) + "..."
                         : plan.thesis
                       : "Macro is repricing the cut path. Four setups live."}
                   </h3>
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+                  <div className="mt-4 grid grid-cols-2 gap-2">
                     {plan.setups.map((s) => (
-                      <div key={s.id} className="border border-gray-3 bg-black p-2">
-                        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+                      <div key={s.id} className="rounded-lg bg-white/[0.04] p-2.5 text-center">
+                        <div className="text-xs text-white/40">
                           {s.instrument}
                         </div>
                         <div
                           className={cn(
-                            "font-display text-sm",
+                            "mt-0.5 text-sm font-bold",
                             s.direction === "long" ? "text-moss" : "text-brand"
                           )}
                         >
-                          {s.direction === "long" ? "LONG" : "SHORT"}
+                          {s.direction === "long" ? "Long" : "Short"}
                         </div>
                       </div>
                     ))}
@@ -136,19 +130,17 @@ export function FeaturedRow({
                 </>
               ) : (
                 <div className="mt-3 py-6 text-center">
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                    ● No active plan
-                  </div>
-                  <div className="mt-2 font-display text-sm text-white/30">
+                  <p className="text-sm text-white/40">No active plan</p>
+                  <p className="mt-1 text-xs text-white/25">
                     The desk hasn&apos;t published a trading plan yet.
-                  </div>
+                  </p>
                 </div>
               )}
               <Link
                 href="/app/plan"
-                className="mt-4 block border border-brand/60 py-2 text-center font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="mt-4 block rounded-lg bg-brand py-2.5 text-center text-sm font-bold text-black transition-colors hover:bg-brand-dim focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
-                {paid ? "Open plan →" : "Unlock plan →"}
+                {paid ? "Open plan" : "Unlock plan"}
               </Link>
             </div>
           </aside>

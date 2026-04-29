@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { supabaseServer } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 import { isMockMode } from "@/lib/config/public";
 import { apiGet } from "@/lib/api/client-server";
 
@@ -17,17 +18,34 @@ const MOCK_PROFILE: ProfileSummary = {
   signed_liability: true,
 };
 
-export const getSession = cache(async function getSession() {
-  if (isMockMode()) return MOCK_USER as unknown as Awaited<ReturnType<typeof realGetUser>>;
-  return realGetUser();
-});
-
-async function realGetUser() {
-  const supabase = supabaseServer();
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-  return data.user;
+interface SessionUser {
+  id: string;
+  email: string;
 }
+
+export const getSession = cache(async function getSession(): Promise<SessionUser | null> {
+  if (isMockMode()) return MOCK_USER;
+
+  const cookieStore = cookies();
+  const token = cookieStore.get("access_token")?.value;
+  if (!token) return null;
+
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return null;
+
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(secret),
+    );
+    const id = payload.sub;
+    const email = (payload.email as string) ?? "";
+    if (!id) return null;
+    return { id, email };
+  } catch {
+    return null;
+  }
+});
 
 interface ProfileSummary {
   id: string;

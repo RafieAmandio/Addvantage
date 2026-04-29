@@ -46,7 +46,7 @@ export function PlanDetailHeader({
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <DataLabel>Transmission TX-03 · Restricted</DataLabel>
+              <DataLabel>Trading Plan</DataLabel>
               {isLatest && (
                 <span className="border border-brand bg-brand/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
                   ● LATEST

@@ -9,9 +9,11 @@ datasource db {
 
 // ─── profiles ────────────────────────────────────────────────────────
 model Profile {
-  id               String    @id @db.Uuid
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   handle           String?   @unique
-  email            String?
+  email            String    @unique
+  passwordHash     String?   @map("password_hash")
+  emailVerified    Boolean   @default(false) @map("email_verified")
   tier             String    @default("free")
   isAdmin          Boolean   @default(false) @map("is_admin")
   signedLiability  Boolean   @default(false) @map("signed_liability")

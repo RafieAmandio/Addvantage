@@ -12,13 +12,13 @@ export function SectionNumber({
   return (
     <div
       className={cn(
-        "flex items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand",
+        "flex items-baseline gap-2 text-sm",
         className
       )}
     >
-      <span className="text-brand">{n}</span>
-      <span className="h-px flex-1 bg-brand/30" />
-      <span className="text-white/60">{label}</span>
+      <span className="font-bold text-brand">{n}</span>
+      <span className="text-white/20">/</span>
+      <span className="text-white/50">{label}</span>
     </div>
   );
 }
@@ -33,7 +33,7 @@ export function DataLabel({
   return (
     <span
       className={cn(
-        "font-mono text-[10px] uppercase tracking-widest2 text-white/50",
+        "text-xs text-white/40",
         className
       )}
     >
@@ -48,19 +48,19 @@ export function ImpactPill({
   level: "high" | "medium" | "low";
 }) {
   const styles = {
-    high: "border-brand/60 text-brand bg-brand/5",
-    medium: "border-white/30 text-white/70 bg-white/5",
-    low: "border-steel/40 text-steel bg-transparent",
+    high: "border-brand/40 text-brand bg-brand/[0.08]",
+    medium: "border-white/20 text-white/60 bg-white/[0.04]",
+    low: "border-white/10 text-white/40 bg-transparent",
   } as const;
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium",
         styles[level]
       )}
     >
       {level === "high" && <span className="led" aria-hidden />}
-      {level} impact
+      {level}
     </span>
   );
 }
@@ -71,15 +71,15 @@ export function BiasBadge({
   bias: "bullish" | "bearish" | "neutral";
 }) {
   const styles = {
-    bullish: "text-moss border-moss/40",
-    bearish: "text-brand border-brand/60",
-    neutral: "text-white/50 border-white/20",
+    bullish: "text-moss border-moss/30 bg-moss/[0.06]",
+    bearish: "text-brand border-brand/30 bg-brand/[0.06]",
+    neutral: "text-white/50 border-white/10 bg-white/[0.03]",
   } as const;
   const arrow = { bullish: "▲", bearish: "▼", neutral: "•" } as const;
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
+        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11px] font-medium",
         styles[bias]
       )}
     >

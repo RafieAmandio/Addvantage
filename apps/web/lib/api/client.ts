@@ -1,10 +1,11 @@
-import { supabaseBrowser } from "@/lib/supabase/client";
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
-async function getAccessToken(): Promise<string | null> {
-  const { data } = await supabaseBrowser().auth.getSession();
-  return data.session?.access_token ?? null;
+function getAccessToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie
+    .split("; ")
+    .find((c) => c.startsWith("access_token="));
+  return match ? match.split("=")[1] : null;
 }
 
 interface ApiResponse<T> {
@@ -14,7 +15,7 @@ interface ApiResponse<T> {
 }
 
 export async function apiGet<T>(path: string): Promise<T> {
-  const token = await getAccessToken();
+  const token = getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -29,7 +30,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 }
 
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
-  const token = await getAccessToken();
+  const token = getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -48,7 +49,7 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export async function apiPut<T>(path: string, body?: unknown): Promise<T> {
-  const token = await getAccessToken();
+  const token = getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -67,7 +68,7 @@ export async function apiPut<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export async function apiDelete(path: string): Promise<void> {
-  const token = await getAccessToken();
+  const token = getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -82,7 +83,7 @@ export async function apiStreamFetch(
   path: string,
   body: unknown,
 ): Promise<Response> {
-  const token = await getAccessToken();
+  const token = getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 

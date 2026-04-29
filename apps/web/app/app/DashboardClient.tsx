@@ -79,7 +79,7 @@ export function DashboardClient({ news, primers, plans }: Props) {
   const openSetups = plan?.setups.length ?? 0;
 
   return (
-    <div className="bg-grid">
+    <div>
       <div className="stagger">
         <DashboardHero
           stamp={stamp}
@@ -119,8 +119,8 @@ export function DashboardClient({ news, primers, plans }: Props) {
         )}
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 text-center font-mono text-[9px] uppercase tracking-widest2 text-white/30 animate-[revealUp_0.6s_ease-out_both] sm:px-6 sm:py-8">
-        ANTS // DOMAIN // OPERATOR HOME<span className="hidden sm:inline"> · Press {isMac ? "⌘" : "Ctrl+"}K or / to search · Press ? for shortcuts</span>
+      <div className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-white/20 animate-[revealUp_0.6s_ease-out_both] sm:px-6 sm:py-8">
+        <span className="hidden sm:inline">Press {isMac ? "⌘" : "Ctrl+"}K to search · ? for shortcuts</span>
       </div>
     </div>
   );
