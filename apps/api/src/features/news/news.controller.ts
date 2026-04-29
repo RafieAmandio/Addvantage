@@ -2,10 +2,8 @@ import type { Response } from "express";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess, sendPaginatedSuccess } from "@/core/utils/response.js";
 import { parsePagination } from "@/core/utils/pagination.js";
-import { ValidationError } from "@/core/errors/index.js";
 import type { AdminRequest } from "@/core/types/request.js";
 import { newsService } from "./news.service.js";
-import { newsCreateSchema, newsEditSchema } from "./news.validation.js";
 
 export const newsController = {
   listApproved: asyncHandler(async (req, res: Response) => {
@@ -39,12 +37,7 @@ export const newsController = {
   }),
 
   create: asyncHandler(async (req, res: Response) => {
-    const parsed = newsCreateSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    const data = parsed.data;
+    const data = req.body;
     const result = await newsService.create({
       headline: data.headline,
       rephrased: data.rephrased,
@@ -63,12 +56,7 @@ export const newsController = {
 
   saveDraft: asyncHandler(async (req, res: Response) => {
     const id = String(req.params.id);
-    const parsed = newsEditSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    await newsService.updateDraft(id, parsed.data);
+    await newsService.updateDraft(id, req.body);
     sendSuccess(res, null, "Draft saved");
   }),
 

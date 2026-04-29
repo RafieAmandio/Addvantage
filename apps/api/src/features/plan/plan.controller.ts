@@ -3,10 +3,8 @@ import type { Prisma } from "@tradevantage/db";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess, sendPaginatedSuccess } from "@/core/utils/response.js";
 import { parsePagination } from "@/core/utils/pagination.js";
-import { ValidationError } from "@/core/errors/index.js";
 import type { AdminRequest } from "@/core/types/request.js";
 import { planService } from "./plan.service.js";
-import { planCreateSchema, planUpdateSchema, planCloseSchema } from "./plan.validation.js";
 
 export const planController = {
   listPublished: asyncHandler(async (req, res: Response) => {
@@ -54,13 +52,8 @@ export const planController = {
   }),
 
   create: asyncHandler(async (req, res: Response) => {
-    const parsed = planCreateSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
     const adminReq = req as AdminRequest;
-    const data = parsed.data;
+    const data = req.body;
     const result = await planService.create({
       symbol: data.symbol,
       thesis: data.thesis,
@@ -79,12 +72,7 @@ export const planController = {
 
   update: asyncHandler(async (req, res: Response) => {
     const id = String(req.params.id);
-    const parsed = planUpdateSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    const data = parsed.data;
+    const data = req.body;
     const updateData: Record<string, unknown> = {};
     if (data.symbol !== undefined) updateData.symbol = data.symbol;
     if (data.thesis !== undefined) updateData.thesis = data.thesis;
@@ -109,14 +97,9 @@ export const planController = {
 
   close: asyncHandler(async (req, res: Response) => {
     const id = String(req.params.id);
-    const parsed = planCloseSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
     await planService.close(id, {
-      outcome: parsed.data.outcome,
-      closePrice: parsed.data.close_price,
+      outcome: req.body.outcome,
+      closePrice: req.body.close_price,
     });
     sendSuccess(res, null, "Plan closed");
   }),

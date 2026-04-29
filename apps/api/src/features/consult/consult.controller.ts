@@ -5,12 +5,6 @@ import { ValidationError, AppError } from "@/core/errors/index.js";
 import type { AuthRequest } from "@/core/types/request.js";
 import { uploadFile, isS3Configured } from "@/config/s3.js";
 import { consultService } from "./consult.service.js";
-import {
-  createSessionSchema,
-  renameSessionSchema,
-  appendMessageSchema,
-  streamBodySchema,
-} from "./consult.validation.js";
 
 export const consultController = {
   listSessions: asyncHandler(async (req, res: Response) => {
@@ -22,24 +16,14 @@ export const consultController = {
 
   createSession: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
-    const parsed = createSessionSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    const result = await consultService.createSession(authReq.user.id, parsed.data.title);
+    const result = await consultService.createSession(authReq.user.id, req.body.title);
     sendSuccess(res, result, "Session created", 201);
   }),
 
   renameSession: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
     const sessionId = String(req.params.id);
-    const parsed = renameSessionSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    await consultService.renameSession(authReq.user.id, sessionId, parsed.data.title);
+    await consultService.renameSession(authReq.user.id, sessionId, req.body.title);
     sendSuccess(res, null, "Session renamed");
   }),
 
@@ -61,12 +45,7 @@ export const consultController = {
   appendMessage: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
     const sessionId = String(req.params.id);
-    const parsed = appendMessageSchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-    const result = await consultService.appendMessage(authReq.user.id, sessionId, parsed.data);
+    const result = await consultService.appendMessage(authReq.user.id, sessionId, req.body);
     sendSuccess(res, result, "Message appended", 201);
   }),
 
@@ -106,13 +85,7 @@ export const consultController = {
 
   stream: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
-    const parsed = streamBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      const messages = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`);
-      throw new ValidationError(messages);
-    }
-
-    const { sessionId, body } = parsed.data;
+    const { sessionId, body } = req.body;
     const userId = authReq.user.id;
 
     const tier = await consultService.getUserTier(userId);

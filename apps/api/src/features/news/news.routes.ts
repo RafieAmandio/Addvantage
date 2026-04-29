@@ -2,7 +2,9 @@ import { Router } from "express";
 import { requireAuth } from "@/core/middleware/auth.middleware.js";
 import { requireAdmin } from "@/core/middleware/admin.middleware.js";
 import { adminRateLimit } from "@/core/middleware/rate-limit.middleware.js";
+import { validate } from "@/core/middleware/validate.middleware.js";
 import { newsController } from "./news.controller.js";
+import { newsCreateSchema, newsEditSchema } from "./news.validation.js";
 
 const router = Router();
 
@@ -17,6 +19,7 @@ router.post(
   requireAuth,
   requireAdmin,
   adminRateLimit({ action: "news:create" }),
+  validate({ body: newsCreateSchema }),
   newsController.create,
 );
 
@@ -25,6 +28,7 @@ router.put(
   requireAuth,
   requireAdmin,
   adminRateLimit({ action: "news:draft" }),
+  validate({ body: newsEditSchema }),
   newsController.saveDraft,
 );
 
