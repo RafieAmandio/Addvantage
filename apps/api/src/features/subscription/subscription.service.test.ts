@@ -21,6 +21,8 @@ vi.mock("./subscription.repository.js", () => ({
     updateTier: vi.fn(),
     findProfile: vi.fn(),
     insertEmailLog: vi.fn(),
+    getSubscriptionStatus: vi.fn(),
+    getPaymentHistory: vi.fn(),
   },
 }));
 
@@ -72,6 +74,50 @@ function makeFakeRequest(): Request {
 /* ------------------------------------------------------------------ */
 /*  Tests                                                              */
 /* ------------------------------------------------------------------ */
+
+describe("subscriptionService.getStatus", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns subscription status for a profile", async () => {
+    repo.getSubscriptionStatus.mockResolvedValue({
+      tier: "vip",
+      renewsAt: new Date("2025-09-01"),
+      signedLiability: true,
+      joinedAt: new Date("2025-01-01"),
+    } as never);
+
+    const result = await subscriptionService.getStatus("p-1");
+
+    expect(result.tier).toBe("vip");
+    expect(repo.getSubscriptionStatus).toHaveBeenCalledWith("p-1");
+  });
+
+  it("throws 404 when profile not found", async () => {
+    repo.getSubscriptionStatus.mockResolvedValue(null as never);
+
+    await expect(subscriptionService.getStatus("missing"))
+      .rejects.toThrow(AppError);
+  });
+});
+
+describe("subscriptionService.getHistory", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns payment history", async () => {
+    repo.getPaymentHistory.mockResolvedValue([
+      { id: "log-1", kind: "dunning" },
+    ] as never);
+
+    const result = await subscriptionService.getHistory("p-1", 50);
+
+    expect(result).toHaveLength(1);
+    expect(repo.getPaymentHistory).toHaveBeenCalledWith("p-1", 50);
+  });
+});
 
 describe("subscriptionService.handleWebhook", () => {
   beforeEach(() => {

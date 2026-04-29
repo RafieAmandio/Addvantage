@@ -2,28 +2,21 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import express from "express";
 import request from "supertest";
 import { errorHandler } from "@/core/middleware/error.middleware.js";
+import { AppError } from "@/core/errors/index.js";
 import { TEST_USER, mockAuthMiddleware } from "@/test/helpers.js";
 import type { AuthUser } from "@/core/types/request.js";
 
-const { mockGetSubscriptionStatus, mockGetPaymentHistory } = vi.hoisted(() => ({
-  mockGetSubscriptionStatus: vi.fn(),
-  mockGetPaymentHistory: vi.fn(),
-}));
-
-vi.mock("@/config/database.js", () => ({
-  prisma: {
-    profile: {
-      findUnique: mockGetSubscriptionStatus,
-    },
-    emailLog: {
-      findMany: mockGetPaymentHistory,
-    },
-  },
+const { mockGetStatus, mockGetHistory, mockHandleWebhook } = vi.hoisted(() => ({
+  mockGetStatus: vi.fn(),
+  mockGetHistory: vi.fn(),
+  mockHandleWebhook: vi.fn(),
 }));
 
 vi.mock("./subscription.service.js", () => ({
   subscriptionService: {
-    handleWebhook: vi.fn(),
+    getStatus: mockGetStatus,
+    getHistory: mockGetHistory,
+    handleWebhook: mockHandleWebhook,
   },
 }));
 
@@ -35,6 +28,7 @@ function createApp(user: AuthUser = TEST_USER) {
   app.use(mockAuthMiddleware(user));
   app.get("/status", subscriptionController.getStatus);
   app.get("/history", subscriptionController.getHistory);
+  app.post("/payment", subscriptionController.handleWebhook);
   app.use(errorHandler);
   return app;
 }
@@ -46,7 +40,7 @@ describe("subscriptionController", () => {
 
   describe("GET /status", () => {
     it("returns subscription status", async () => {
-      mockGetSubscriptionStatus.mockResolvedValue({
+      mockGetStatus.mockResolvedValue({
         tier: "vip",
         renewsAt: new Date("2025-09-01"),
         signedLiability: true,
@@ -58,10 +52,11 @@ describe("subscriptionController", () => {
       expect(res.status).toBe(200);
       expect(res.body.data.tier).toBe("vip");
       expect(res.body.data.signedLiability).toBe(true);
+      expect(mockGetStatus).toHaveBeenCalledWith(TEST_USER.id);
     });
 
     it("returns 404 when profile not found", async () => {
-      mockGetSubscriptionStatus.mockResolvedValue(null);
+      mockGetStatus.mockRejectedValue(new AppError("Profile not found", 404));
 
       const res = await request(createApp()).get("/status");
 
@@ -71,7 +66,7 @@ describe("subscriptionController", () => {
 
   describe("GET /history", () => {
     it("returns payment history", async () => {
-      mockGetPaymentHistory.mockResolvedValue([
+      mockGetHistory.mockResolvedValue([
         {
           id: "log-1",
           kind: "dunning",
@@ -89,7 +84,7 @@ describe("subscriptionController", () => {
     });
 
     it("returns empty array when no history", async () => {
-      mockGetPaymentHistory.mockResolvedValue([]);
+      mockGetHistory.mockResolvedValue([]);
 
       const res = await request(createApp()).get("/history");
 
@@ -98,18 +93,32 @@ describe("subscriptionController", () => {
     });
 
     it("respects limit query param", async () => {
-      mockGetPaymentHistory.mockResolvedValue([]);
+      mockGetHistory.mockResolvedValue([]);
 
       await request(createApp()).get("/history?limit=10");
 
-      expect(mockGetPaymentHistory).toHaveBeenCalledWith(
-        expect.objectContaining({
-          take: 10,
-          where: expect.objectContaining({
-            profileId: TEST_USER.id,
-          }),
-        }),
-      );
+      expect(mockGetHistory).toHaveBeenCalledWith(TEST_USER.id, 10);
+    });
+
+    it("caps limit at 200", async () => {
+      mockGetHistory.mockResolvedValue([]);
+
+      await request(createApp()).get("/history?limit=9999");
+
+      expect(mockGetHistory).toHaveBeenCalledWith(TEST_USER.id, 200);
+    });
+  });
+
+  describe("POST /payment", () => {
+    it("handles webhook and returns result", async () => {
+      mockHandleWebhook.mockResolvedValue({ received: true });
+
+      const res = await request(createApp())
+        .post("/payment")
+        .send({ event: "checkout_completed" });
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.received).toBe(true);
     });
   });
 });

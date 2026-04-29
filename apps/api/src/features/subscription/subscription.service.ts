@@ -8,6 +8,16 @@ import { getEmailProvider } from "@/integrations/email/index.js";
 import { subscriptionRepository } from "./subscription.repository.js";
 
 export const subscriptionService = {
+  async getStatus(profileId: string) {
+    const status = await subscriptionRepository.getSubscriptionStatus(profileId);
+    if (!status) throw new AppError("Profile not found", 404);
+    return status;
+  },
+
+  async getHistory(profileId: string, limit: number) {
+    return subscriptionRepository.getPaymentHistory(profileId, limit);
+  },
+
   async handleWebhook(req: Request) {
     const provider = getPaymentProvider();
     if (!provider) {

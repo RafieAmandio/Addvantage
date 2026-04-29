@@ -42,4 +42,8 @@ export const tagService = {
       };
     });
   },
+
+  async listNewsByTag(tag: string, limit: number) {
+    return tagRepository.listNewsByTag(tag, limit);
+  },
 };

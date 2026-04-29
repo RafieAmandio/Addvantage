@@ -11,11 +11,6 @@ const { mockGetCounts, mockListNewsByTag } = vi.hoisted(() => ({
 vi.mock("./tag.service.js", () => ({
   tagService: {
     getCounts: mockGetCounts,
-  },
-}));
-
-vi.mock("./tag.repository.js", () => ({
-  tagRepository: {
     listNewsByTag: mockListNewsByTag,
   },
 }));

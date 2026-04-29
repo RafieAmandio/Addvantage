@@ -127,4 +127,16 @@ describe("tagService", () => {
       expect(repo.listPublishedPrimerTags).toHaveBeenCalledOnce();
     });
   });
+
+  describe("listNewsByTag", () => {
+    it("delegates to repository", async () => {
+      const items = [{ id: "n1", headline: "Test", tags: ["macro"] }];
+      repo.listNewsByTag.mockResolvedValue(items as never);
+
+      const result = await tagService.listNewsByTag("macro", 50);
+
+      expect(result).toEqual(items);
+      expect(repo.listNewsByTag).toHaveBeenCalledWith("macro", 50);
+    });
+  });
 });
