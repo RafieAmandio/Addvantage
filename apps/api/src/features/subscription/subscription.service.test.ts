@@ -356,3 +356,125 @@ describe("subscriptionService.handleWebhook", () => {
     expect(result).toEqual({ received: true, sent: true });
   });
 });
+
+describe("subscriptionService.createInvoice", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("throws 503 when no payment provider configured", async () => {
+    mockGetPaymentProvider.mockReturnValue(null);
+
+    await expect(subscriptionService.createInvoice("p-1", {
+      tier: "pro", amount: 150000, currency: "IDR",
+    })).rejects.toThrow(AppError);
+  });
+
+  it("throws 404 when profile not found", async () => {
+    const provider = makeProvider({ valid: true, event: makeEvent() });
+    provider.createInvoice = vi.fn();
+    mockGetPaymentProvider.mockReturnValue(provider);
+    repo.findProfile.mockResolvedValue(null as never);
+
+    await expect(subscriptionService.createInvoice("p-missing", {
+      tier: "pro", amount: 150000, currency: "IDR",
+    })).rejects.toThrow(AppError);
+  });
+
+  it("throws 400 when profile has no email", async () => {
+    const provider = makeProvider({ valid: true, event: makeEvent() });
+    provider.createInvoice = vi.fn();
+    mockGetPaymentProvider.mockReturnValue(provider);
+    repo.findProfile.mockResolvedValue({ email: null, handle: "x", tier: "free" } as never);
+
+    await expect(subscriptionService.createInvoice("p-1", {
+      tier: "pro", amount: 150000, currency: "IDR",
+    })).rejects.toThrow(AppError);
+  });
+
+  it("creates invoice, stores payment record, and sends email", async () => {
+    const provider = makeProvider({ valid: true, event: makeEvent() });
+    provider.createInvoice = vi.fn().mockResolvedValue({
+      externalId: "inv-001",
+      invoiceUrl: "https://checkout.xendit.co/inv-001",
+      status: "PENDING",
+      expiresAt: new Date("2025-02-01"),
+    });
+    mockGetPaymentProvider.mockReturnValue(provider);
+
+    repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: "trader1", tier: "free" } as never);
+    repo.createPayment.mockResolvedValue({ id: "pay-uuid" } as never);
+
+    const emailProvider = makeEmailProvider();
+    mockGetEmailProvider.mockReturnValue(emailProvider);
+
+    const result = await subscriptionService.createInvoice("p-1", {
+      tier: "pro", amount: 150000, currency: "IDR",
+    });
+
+    expect(result.invoiceUrl).toBe("https://checkout.xendit.co/inv-001");
+    expect(result.tier).toBe("pro");
+    expect(result.status).toBe("pending");
+    expect(provider.createInvoice).toHaveBeenCalledWith(expect.objectContaining({
+      amount: 150000,
+      currency: "IDR",
+      payerEmail: "user@test.com",
+      metadata: { profile_id: "p-1", tier: "pro" },
+    }));
+    expect(repo.createPayment).toHaveBeenCalledWith(expect.objectContaining({
+      profileId: "p-1",
+      externalId: "inv-001",
+      provider: "mock-payment",
+      amount: 150000,
+      tier: "pro",
+    }));
+    expect(emailProvider.sendHtml).toHaveBeenCalledWith(expect.objectContaining({
+      to: { email: "user@test.com", name: "trader1" },
+      subject: expect.stringContaining("pro"),
+    }));
+  });
+
+  it("still creates invoice even when email fails", async () => {
+    const provider = makeProvider({ valid: true, event: makeEvent() });
+    provider.createInvoice = vi.fn().mockResolvedValue({
+      externalId: "inv-002",
+      invoiceUrl: "https://checkout.xendit.co/inv-002",
+      status: "PENDING",
+    });
+    mockGetPaymentProvider.mockReturnValue(provider);
+
+    repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: null, tier: "free" } as never);
+    repo.createPayment.mockResolvedValue({ id: "pay-uuid" } as never);
+
+    const emailProvider = makeEmailProvider();
+    (emailProvider.sendHtml as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("SMTP down"));
+    mockGetEmailProvider.mockReturnValue(emailProvider);
+
+    const result = await subscriptionService.createInvoice("p-1", {
+      tier: "vip", amount: 300000, currency: "IDR",
+    });
+
+    expect(result.invoiceUrl).toBe("https://checkout.xendit.co/inv-002");
+    expect(repo.createPayment).toHaveBeenCalled();
+  });
+
+  it("works without email provider configured", async () => {
+    const provider = makeProvider({ valid: true, event: makeEvent() });
+    provider.createInvoice = vi.fn().mockResolvedValue({
+      externalId: "inv-003",
+      invoiceUrl: "https://checkout.xendit.co/inv-003",
+      status: "PENDING",
+    });
+    mockGetPaymentProvider.mockReturnValue(provider);
+
+    repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: null, tier: "free" } as never);
+    repo.createPayment.mockResolvedValue({ id: "pay-uuid" } as never);
+    mockGetEmailProvider.mockReturnValue(null);
+
+    const result = await subscriptionService.createInvoice("p-1", {
+      tier: "pro", amount: 150000, currency: "IDR",
+    });
+
+    expect(result.invoiceUrl).toBe("https://checkout.xendit.co/inv-003");
+  });
+});

@@ -1,5 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { env } from "./env.js";
@@ -83,33 +82,6 @@ export async function uploadFile(
   logger.info({ key, contentType, size: buffer.length }, "s3: uploaded");
 
   return { key, url, contentType, size: buffer.length };
-}
-
-export async function deleteFile(key: string): Promise<void> {
-  const client = getClient();
-  if (!client || !env.AWS_S3_BUCKET) return;
-
-  await client.send(
-    new DeleteObjectCommand({
-      Bucket: env.AWS_S3_BUCKET,
-      Key: key,
-    }),
-  );
-
-  logger.info({ key }, "s3: deleted");
-}
-
-export async function getPresignedUrl(key: string, expiresIn = 3600): Promise<string> {
-  const client = getClient();
-  if (!client || !env.AWS_S3_BUCKET) {
-    throw new Error("S3 not configured");
-  }
-
-  return getSignedUrl(
-    client,
-    new GetObjectCommand({ Bucket: env.AWS_S3_BUCKET, Key: key }),
-    { expiresIn },
-  );
 }
 
 function mimeToExt(mime: string): string {
