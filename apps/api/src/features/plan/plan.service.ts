@@ -1,12 +1,7 @@
 import type { Prisma } from "@tradevantage/db";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
+import type { PaginationOpts } from "@/core/utils/pagination.js";
 import { planRepository } from "./plan.repository.js";
-
-interface PaginationOpts {
-  page: number;
-  limit: number;
-  skip: number;
-}
 
 function computeRealizedR(input: {
   direction: string;

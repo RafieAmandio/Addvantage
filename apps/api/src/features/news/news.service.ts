@@ -1,5 +1,6 @@
 import { createHash } from "crypto";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
+import type { PaginationOpts } from "@/core/utils/pagination.js";
 import { newsRepository } from "./news.repository.js";
 
 function contentHash(parts: (string | null | undefined)[]): string {
@@ -8,12 +9,6 @@ function contentHash(parts: (string | null | undefined)[]): string {
     .map((s) => String(s).replace(/\s+/g, " ").trim())
     .join("␞");
   return createHash("sha256").update(joined).digest("hex");
-}
-
-interface PaginationOpts {
-  page: number;
-  limit: number;
-  skip: number;
 }
 
 export const newsService = {

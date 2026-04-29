@@ -1,4 +1,5 @@
 import { prisma } from "@/config/database.js";
+import type { PaginationOpts } from "@/core/utils/pagination.js";
 
 const LIST_SELECT = {
   id: true,
@@ -54,11 +55,6 @@ const DETAIL_SELECT = {
   createdAt: true,
   updatedAt: true,
 } as const;
-
-interface PaginationOpts {
-  skip: number;
-  limit: number;
-}
 
 export const newsRepository = {
   findApproved: (opts: PaginationOpts) =>

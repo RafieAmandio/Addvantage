@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database.js";
 import { Prisma } from "@tradevantage/db";
+import type { PaginationOpts } from "@/core/utils/pagination.js";
 
 const PLAN_SELECT = {
   id: true,
@@ -23,11 +24,6 @@ const PLAN_SELECT = {
   publishedAt: true,
   closedAt: true,
 } as const;
-
-interface PaginationOpts {
-  skip: number;
-  limit: number;
-}
 
 export const planRepository = {
   findPublished: (opts: PaginationOpts & { symbol?: string }) => {
