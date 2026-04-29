@@ -9,11 +9,13 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <HeroSection />
-      <PositioningSection />
-      <TransmissionsSection />
-      <FaqSection />
-      <AccessSection />
-      <MarketingFooter />
+      <div className="relative z-10 bg-black">
+        <PositioningSection />
+        <TransmissionsSection />
+        <FaqSection />
+        <AccessSection />
+        <MarketingFooter />
+      </div>
     </main>
   );
 }
