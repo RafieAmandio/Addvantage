@@ -13,4 +13,11 @@ export function getPaymentProvider(): PaymentProvider | null {
   }
 }
 
-export type { PaymentProvider, PaymentEvent, PaymentEventKind, VerifyResult } from "./types.js";
+export type {
+  PaymentProvider,
+  PaymentEvent,
+  PaymentEventKind,
+  VerifyResult,
+  CreateInvoiceOpts,
+  InvoiceResult,
+} from "./types.js";

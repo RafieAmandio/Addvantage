@@ -13,4 +13,6 @@ export function getEmailProvider(): EmailProvider | null {
   }
 }
 
-export type { EmailProvider, SendTemplateOpts, SendResult } from "./types.js";
+export type { EmailProvider, SendTemplateOpts, SendHtmlOpts, SendResult } from "./types.js";
+export { dunningEmail, renewalReminderEmail, invoiceCreatedEmail } from "./templates/index.js";
+export type { DunningParams, RenewalReminderParams, InvoiceCreatedParams } from "./templates/index.js";

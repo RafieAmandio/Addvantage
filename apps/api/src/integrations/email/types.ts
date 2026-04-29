@@ -5,6 +5,13 @@ export interface SendTemplateOpts {
   subject?: string;
 }
 
+export interface SendHtmlOpts {
+  to: { email: string; name?: string };
+  subject: string;
+  html: string;
+  replyTo?: string;
+}
+
 export interface SendResult {
   provider: string;
   messageId: string;
@@ -13,4 +20,5 @@ export interface SendResult {
 export interface EmailProvider {
   name: string;
   sendTemplate(opts: SendTemplateOpts): Promise<SendResult | null>;
+  sendHtml(opts: SendHtmlOpts): Promise<SendResult | null>;
 }

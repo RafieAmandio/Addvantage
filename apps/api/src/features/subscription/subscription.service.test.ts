@@ -12,9 +12,13 @@ vi.mock("@/integrations/payment/index.js", () => ({
   getPaymentProvider: vi.fn(),
 }));
 
-vi.mock("@/integrations/email/index.js", () => ({
-  getEmailProvider: vi.fn(),
-}));
+vi.mock("@/integrations/email/index.js", async () => {
+  const actual = await vi.importActual("@/integrations/email/index.js");
+  return {
+    ...actual,
+    getEmailProvider: vi.fn(),
+  };
+});
 
 vi.mock("./subscription.repository.js", () => ({
   subscriptionRepository: {
@@ -23,6 +27,9 @@ vi.mock("./subscription.repository.js", () => ({
     insertEmailLog: vi.fn(),
     getSubscriptionStatus: vi.fn(),
     getPaymentHistory: vi.fn(),
+    createPayment: vi.fn(),
+    findPaymentByExternalRef: vi.fn(),
+    updatePaymentStatus: vi.fn(),
   },
 }));
 
@@ -31,7 +38,6 @@ import { subscriptionService } from "./subscription.service.js";
 import { getPaymentProvider } from "@/integrations/payment/index.js";
 import { getEmailProvider } from "@/integrations/email/index.js";
 import { subscriptionRepository } from "./subscription.repository.js";
-import { env } from "@/config/env.js";
 
 const mockGetPaymentProvider = vi.mocked(getPaymentProvider);
 const mockGetEmailProvider = vi.mocked(getEmailProvider);
@@ -57,6 +63,7 @@ function makeProvider(verifyReturn: VerifyResult): PaymentProvider {
   return {
     name: "mock-payment",
     verifyWebhook: vi.fn().mockReturnValue(verifyReturn),
+    createInvoice: vi.fn(),
   };
 }
 
@@ -64,6 +71,7 @@ function makeEmailProvider(sendResult: SendResult | null = { provider: "brevo", 
   return {
     name: "mock-email",
     sendTemplate: vi.fn().mockResolvedValue(sendResult),
+    sendHtml: vi.fn().mockResolvedValue(sendResult),
   };
 }
 
@@ -237,9 +245,6 @@ describe("subscriptionService.handleWebhook", () => {
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
 
-    // Set DUNNING_TEMPLATE_ID
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     const profile = { email: "user@example.com", handle: "trader1", tier: "pro" };
     repo.findProfile.mockResolvedValue(profile as never);
     repo.insertEmailLog.mockResolvedValue(undefined as never);
@@ -250,22 +255,20 @@ describe("subscriptionService.handleWebhook", () => {
     const result = await subscriptionService.handleWebhook(makeFakeRequest());
 
     expect(result).toEqual({ received: true, sent: true });
-    expect(emailProvider.sendTemplate).toHaveBeenCalledWith({
-      to: { email: "user@example.com", name: "trader1" },
-      templateId: 42,
-      params: {
-        tier: "pro",
-        externalRef: event.externalRef,
-        occurredAt: event.occurredAt.toISOString(),
-      },
-    });
+    expect(emailProvider.sendHtml).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: { email: "user@example.com", name: "trader1" },
+        subject: expect.stringContaining("payment failed"),
+        html: expect.stringContaining("pro"),
+      }),
+    );
     expect(repo.insertEmailLog).toHaveBeenCalledWith(
       expect.objectContaining({
         profileId: "p-1",
         kind: "dunning",
         provider: "brevo",
         externalMessageId: "msg-123",
-        templateId: "42",
+        templateId: null,
       }),
     );
   });
@@ -276,8 +279,6 @@ describe("subscriptionService.handleWebhook", () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue({ email: null, handle: "nomail", tier: "free" } as never);
 
     const result = await subscriptionService.handleWebhook(makeFakeRequest());
@@ -285,23 +286,10 @@ describe("subscriptionService.handleWebhook", () => {
     expect(result).toEqual({ received: true, sent: false, reason: "email_missing" });
   });
 
-  it("returns template_unset when DUNNING_TEMPLATE_ID is not set", async () => {
-    const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
-    const provider = makeProvider({ valid: true, event });
-    mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = undefined;
-
-    const result = await subscriptionService.handleWebhook(makeFakeRequest());
-
-    expect(result).toEqual({ received: true, sent: false, reason: "template_unset" });
-  });
-
   it("returns profile_not_found when profile does not exist", async () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-missing" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue(null as never);
 
     const result = await subscriptionService.handleWebhook(makeFakeRequest());
@@ -313,8 +301,6 @@ describe("subscriptionService.handleWebhook", () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: null, tier: "pro" } as never);
     mockGetEmailProvider.mockReturnValue(null);
 
@@ -329,12 +315,10 @@ describe("subscriptionService.handleWebhook", () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: "x", tier: "pro" } as never);
 
     const emailProvider = makeEmailProvider();
-    (emailProvider.sendTemplate as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("SMTP down"));
+    (emailProvider.sendHtml as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("SMTP down"));
     mockGetEmailProvider.mockReturnValue(emailProvider);
 
     const result = await subscriptionService.handleWebhook(makeFakeRequest());
@@ -342,12 +326,10 @@ describe("subscriptionService.handleWebhook", () => {
     expect(result).toEqual({ received: true, sent: false, reason: "send_error" });
   });
 
-  it("returns email_provider_unset when sendTemplate returns null", async () => {
+  it("returns email_provider_unset when sendHtml returns null", async () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: "x", tier: "pro" } as never);
 
     const emailProvider = makeEmailProvider(null);
@@ -362,8 +344,6 @@ describe("subscriptionService.handleWebhook", () => {
     const event = makeEvent({ kind: "payment_failed", profileId: "p-1" });
     const provider = makeProvider({ valid: true, event });
     mockGetPaymentProvider.mockReturnValue(provider);
-    (env as Record<string, unknown>).DUNNING_TEMPLATE_ID = 42;
-
     repo.findProfile.mockResolvedValue({ email: "user@test.com", handle: "x", tier: "pro" } as never);
     repo.insertEmailLog.mockRejectedValue(new Error("DB write failed"));
 

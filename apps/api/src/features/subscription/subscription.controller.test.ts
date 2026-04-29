@@ -6,10 +6,11 @@ import { AppError } from "@/core/errors/index.js";
 import { TEST_USER, mockAuthMiddleware } from "@/test/helpers.js";
 import type { AuthUser } from "@/core/types/request.js";
 
-const { mockGetStatus, mockGetHistory, mockHandleWebhook } = vi.hoisted(() => ({
+const { mockGetStatus, mockGetHistory, mockHandleWebhook, mockCreateInvoice } = vi.hoisted(() => ({
   mockGetStatus: vi.fn(),
   mockGetHistory: vi.fn(),
   mockHandleWebhook: vi.fn(),
+  mockCreateInvoice: vi.fn(),
 }));
 
 vi.mock("./subscription.service.js", () => ({
@@ -17,6 +18,7 @@ vi.mock("./subscription.service.js", () => ({
     getStatus: mockGetStatus,
     getHistory: mockGetHistory,
     handleWebhook: mockHandleWebhook,
+    createInvoice: mockCreateInvoice,
   },
 }));
 
@@ -29,6 +31,7 @@ function createApp(user: AuthUser = TEST_USER) {
   app.get("/status", subscriptionController.getStatus);
   app.get("/history", subscriptionController.getHistory);
   app.post("/payment", subscriptionController.handleWebhook);
+  app.post("/invoice", subscriptionController.createInvoice);
   app.use(errorHandler);
   return app;
 }
@@ -68,11 +71,15 @@ describe("subscriptionController", () => {
     it("returns payment history", async () => {
       mockGetHistory.mockResolvedValue([
         {
-          id: "log-1",
-          kind: "dunning",
-          provider: "brevo",
-          sentAt: new Date("2025-06-10"),
-          templateId: "42",
+          id: "pay-1",
+          externalRef: "tv-abc-123",
+          provider: "xendit",
+          amount: 150000,
+          currency: "IDR",
+          status: "paid",
+          tier: "pro",
+          paidAt: new Date("2025-06-10"),
+          createdAt: new Date("2025-06-10"),
         },
       ]);
 
@@ -80,7 +87,7 @@ describe("subscriptionController", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data).toHaveLength(1);
-      expect(res.body.data[0].kind).toBe("dunning");
+      expect(res.body.data[0].status).toBe("paid");
     });
 
     it("returns empty array when no history", async () => {
@@ -119,6 +126,43 @@ describe("subscriptionController", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data.received).toBe(true);
+    });
+  });
+
+  describe("POST /invoice", () => {
+    it("creates an invoice and returns 201", async () => {
+      mockCreateInvoice.mockResolvedValue({
+        id: "pay-uuid",
+        externalRef: "tv-abc-123-hex",
+        invoiceUrl: "https://checkout.xendit.co/inv-123",
+        amount: 150000,
+        currency: "IDR",
+        tier: "pro",
+        status: "pending",
+      });
+
+      const res = await request(createApp())
+        .post("/invoice")
+        .send({ tier: "pro", amount: 150000, currency: "IDR" });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.invoiceUrl).toContain("xendit");
+      expect(res.body.data.tier).toBe("pro");
+      expect(mockCreateInvoice).toHaveBeenCalledWith(TEST_USER.id, {
+        tier: "pro",
+        amount: 150000,
+        currency: "IDR",
+      });
+    });
+
+    it("returns 503 when payment provider not configured", async () => {
+      mockCreateInvoice.mockRejectedValue(new AppError("Payment provider not configured", 503));
+
+      const res = await request(createApp())
+        .post("/invoice")
+        .send({ tier: "pro", amount: 150000 });
+
+      expect(res.status).toBe(503);
     });
   });
 });

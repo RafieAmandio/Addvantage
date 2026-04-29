@@ -3,6 +3,7 @@ import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
 import type { AuthRequest } from "@/core/types/request.js";
 import { subscriptionService } from "./subscription.service.js";
+import type { CreateInvoiceInput } from "./subscription.validation.js";
 
 export const subscriptionController = {
   handleWebhook: asyncHandler(async (req, res: Response) => {
@@ -21,5 +22,12 @@ export const subscriptionController = {
     const limit = Math.min(Number(req.query.limit) || 50, 200);
     const history = await subscriptionService.getHistory(authReq.user.id, limit);
     sendSuccess(res, history);
+  }),
+
+  createInvoice: asyncHandler(async (req, res: Response) => {
+    const authReq = req as AuthRequest;
+    const input = req.body as CreateInvoiceInput;
+    const result = await subscriptionService.createInvoice(authReq.user.id, input);
+    sendSuccess(res, result, "Invoice created", 201);
   }),
 };

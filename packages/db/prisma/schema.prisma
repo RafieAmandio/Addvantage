@@ -33,6 +33,7 @@ model Profile {
   telegramAdmins   TelegramAdmin[]
   timelineEvents   TimelineEvent[]  @relation("TimelineCreator")
   emailLogs        EmailLog[]
+  payments         Payment[]
 
   @@map("profiles")
 }
@@ -255,6 +256,33 @@ model EducationPrimer {
   @@index([published, sortOrder])
   @@index([tags], type: Gin)
   @@map("education_primers")
+}
+
+// ─── payments ────────────────────────────────────────────────────────
+model Payment {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profileId    String    @map("profile_id") @db.Uuid
+  externalId   String?   @map("external_id")
+  externalRef  String    @unique @map("external_ref")
+  provider     String
+  amount       Decimal   @db.Decimal
+  currency     String    @default("IDR")
+  status       String    @default("pending")
+  tier         String
+  invoiceUrl   String?   @map("invoice_url")
+  description  String?
+  paidAt       DateTime? @map("paid_at") @db.Timestamptz(6)
+  expiredAt    DateTime? @map("expired_at") @db.Timestamptz(6)
+  metadata     Json?
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  profile      Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, createdAt(sort: Desc)])
+  @@index([status])
+  @@index([externalId])
+  @@map("payments")
 }
 
 // ─── email_log ───────────────────────────────────────────────────────

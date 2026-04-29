@@ -27,14 +27,13 @@ const EnvSchema = z.object({
   OPENAI_MODEL: z.string().default("gpt-4o-mini"),
 
   PAYMENT_PROVIDER: z.preprocess(emptyToUndef, z.enum(["xendit", "stripe"]).optional()),
+  XENDIT_SECRET_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   XENDIT_WEBHOOK_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   EMAIL_PROVIDER: z.preprocess(emptyToUndef, z.enum(["brevo", "resend"]).optional()),
   BREVO_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   EMAIL_SENDER_EMAIL: z.preprocess(emptyToUndef, z.string().email().optional()),
   EMAIL_SENDER_NAME: z.preprocess(emptyToUndef, z.string().optional()),
-
-  DUNNING_TEMPLATE_ID: z.preprocess(emptyToUndef, z.coerce.number().int().positive().optional()),
 
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 

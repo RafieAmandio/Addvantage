@@ -26,17 +26,46 @@ export const subscriptionRepository = {
     }),
 
   getPaymentHistory: (profileId: string, limit: number) =>
-    prisma.emailLog.findMany({
-      where: { profileId, kind: { in: ["dunning", "renewal_reminder", "checkout"] } },
+    prisma.payment.findMany({
+      where: { profileId },
       select: {
         id: true,
-        kind: true,
+        externalRef: true,
         provider: true,
-        sentAt: true,
-        templateId: true,
+        amount: true,
+        currency: true,
+        status: true,
+        tier: true,
+        invoiceUrl: true,
+        paidAt: true,
+        createdAt: true,
       },
-      orderBy: { sentAt: "desc" },
+      orderBy: { createdAt: "desc" },
       take: limit,
+    }),
+
+  createPayment: (data: {
+    profileId: string;
+    externalId: string;
+    externalRef: string;
+    provider: string;
+    amount: number;
+    currency: string;
+    tier: string;
+    invoiceUrl: string;
+    description: string;
+    expiredAt?: Date;
+    metadata?: Prisma.InputJsonValue;
+  }) =>
+    prisma.payment.create({ data }),
+
+  findPaymentByExternalRef: (externalRef: string) =>
+    prisma.payment.findUnique({ where: { externalRef } }),
+
+  updatePaymentStatus: (externalRef: string, status: string, paidAt?: Date) =>
+    prisma.payment.update({
+      where: { externalRef },
+      data: { status, ...(paidAt ? { paidAt } : {}) },
     }),
 
   insertEmailLog: (data: {
@@ -44,7 +73,7 @@ export const subscriptionRepository = {
     kind: string;
     provider: string;
     externalMessageId: string;
-    templateId: string;
+    templateId: string | null;
     payload: Prisma.InputJsonValue;
   }) =>
     prisma.emailLog.create({
