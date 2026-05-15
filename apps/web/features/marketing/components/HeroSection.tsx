@@ -74,7 +74,8 @@ export function HeroSection() {
       requestAnimationFrame(() => {
         const scrolled = window.scrollY;
         if (earthRef.current) {
-          earthRef.current.style.transform = `translate(-50%, ${scrolled * 0.08}px)`;
+          const zoom = 1 + Math.min(1, scrolled / window.innerHeight) * 0.4;
+          earthRef.current.style.transform = `translate(-50%, ${scrolled * 0.08}px) scale(${zoom})`;
         }
         ticking = false;
       });

@@ -70,30 +70,35 @@ RAW CONTENT:
 ${rawText}
 """${metaBlock}
 
-Return the rewritten item as structured JSON matching the schema.`;
+Return the rewritten item as a single raw JSON object (no markdown, no code fences). Schema: { headline: string, rephrased: string, analysis: string, impact: one of [${IMPACTS_LIST}], bias: one of [${BIAS_LIST}], affects: string[], tags: string[] }`;
+
+  const isOpenAI = config.LLM_PROVIDER === "openai";
 
   const res = await retry(
     () =>
       getOpenai().chat.completions.create({
-        model: config.OPENAI_MODEL,
+        model: config.LLM_MODEL,
         temperature: 0.4,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: user },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "news_item",
-            strict: true,
-            schema: RESPONSE_SCHEMA,
-          },
-        },
+        ...(isOpenAI
+          ? {
+              response_format: {
+                type: "json_schema",
+                json_schema: {
+                  name: "news_item",
+                  strict: true,
+                  schema: RESPONSE_SCHEMA,
+                },
+              },
+            }
+          : {}),
       }),
     {
-      label: "openai.rephrase",
+      label: "llm.rephrase",
       attempts: 3,
-      // Don't retry user-error responses (4xx); only transient infra issues.
       shouldRetry: (err) => {
         const status = (err as { status?: number } | null)?.status;
         if (typeof status === "number") return status >= 500 || status === 429;
@@ -102,8 +107,11 @@ Return the rewritten item as structured JSON matching the schema.`;
     }
   );
 
-  const text = res.choices[0]?.message?.content;
-  if (!text) throw new Error("openai: empty response");
+  let text = res.choices[0]?.message?.content;
+  if (!text) throw new Error("llm: empty response");
+
+  // Strip markdown code fences that non-OpenAI providers may wrap around JSON
+  text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
   const parsed = RephraseOutputSchema.safeParse(JSON.parse(text));
   if (!parsed.success) {

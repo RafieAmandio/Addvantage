@@ -1,5 +1,6 @@
 import { config } from "../lib/config";
 import { fetchText } from "../lib/http";
+import { openai } from "../lib/openai";
 import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
@@ -30,7 +31,7 @@ export class TruthSocialAdapter implements SourceAdapter {
       return [];
     }
 
-    const items = extractItems(xml);
+    const items = extractItems(xml).slice(0, 5);
     const out: Candidate[] = [];
     for (const item of items) {
       const link = item.link ?? item.guid;
@@ -38,8 +39,30 @@ export class TruthSocialAdapter implements SourceAdapter {
       const externalId = item.guid ?? link;
       const title = cleanText(item.title ?? "");
       const body = cleanText(stripHtml(item.description ?? ""));
-      const rawText = [title, body].filter(Boolean).join("\n\n").trim();
-      if (!rawText) continue;
+      const imageUrls = extractImageUrls(item.description ?? "");
+      let rawText = [title, body].filter(Boolean).join("\n\n").trim();
+
+      // If the post has little/no text, fetch the post page to find images
+      const textOnly = body.trim();
+      if (textOnly.length === 0) {
+        const pageImages = imageUrls.length > 0
+          ? imageUrls
+          : await scrapePostImages(link, ctx);
+
+        if (pageImages.length > 0) {
+          try {
+            const described = await describeImage(pageImages[0], ctx);
+            rawText = [title, `[Image content]: ${described}`]
+              .filter(Boolean)
+              .join("\n\n")
+              .trim();
+          } catch (err) {
+            ctx.logger.warn({ err: String(err), url: pageImages[0] }, "vision describe failed");
+          }
+        }
+      }
+
+      if (!rawText || rawText.length < 10) continue;
 
       const occurredAt = item.pubDate
         ? parseRssDate(item.pubDate)
@@ -53,11 +76,12 @@ export class TruthSocialAdapter implements SourceAdapter {
           title,
           link,
           pubDate: item.pubDate ?? "",
+          hasImage: imageUrls.length > 0 ? "true" : "false",
         },
         occurredAt,
       });
     }
-    return dedupeByExternalId(out).slice(0, 20);
+    return dedupeByExternalId(out);
   }
 }
 
@@ -128,5 +152,124 @@ function cleanText(s: string): string {
 function parseRssDate(s: string): string | undefined {
   const d = new Date(s);
   return Number.isFinite(d.getTime()) ? d.toISOString() : undefined;
+}
+
+async function scrapePostImages(
+  postUrl: string,
+  ctx: AdapterContext,
+): Promise<string[]> {
+  try {
+    const html = await fetchText(postUrl);
+    return extractImageUrls(html);
+  } catch (err) {
+    ctx.logger.warn({ err: String(err), url: postUrl }, "truth-social: failed to scrape post page");
+    return [];
+  }
+}
+
+function extractImageUrls(html: string): string[] {
+  const urls: string[] = [];
+  const re = /<img[^>]+src=["']([^"']+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    const src = m[1];
+    if (!src) continue;
+    if (src.includes("emoji") || src.includes("avatar") || src.includes("favicon") || src.includes("logo") || src.endsWith(".svg")) continue;
+    urls.push(src);
+  }
+  // Prefer full-size images (archive URLs or "original" in path) over thumbnails
+  urls.sort((a, b) => {
+    const aFull = a.includes("archive") || a.includes("original") ? 0 : 1;
+    const bFull = b.includes("archive") || b.includes("original") ? 0 : 1;
+    return aFull - bFull;
+  });
+  return urls;
+}
+
+async function downloadImageAsBase64(url: string): Promise<{ base64: string; mediaType: string }> {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    },
+  });
+  if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  const contentType = res.headers.get("content-type") ?? "image/jpeg";
+  const mediaType = contentType.split(";")[0].trim();
+  return { base64: buf.toString("base64"), mediaType };
+}
+
+async function describeImage(
+  imageUrl: string,
+  ctx: AdapterContext,
+): Promise<string> {
+  ctx.logger.info({ url: imageUrl }, "vision: describing image");
+  const { base64, mediaType } = await downloadImageAsBase64(imageUrl);
+
+  const baseURL = config.LLM_BASE_URL ?? (config.LLM_PROVIDER === "openlimits" ? "https://openlimits.app" : "https://api.anthropic.com");
+
+  const res = await fetch(`${baseURL}/v1/messages`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": config.LLM_API_KEY!,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      stream: false,
+      thinking: { type: "disabled" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: mediaType,
+                data: base64,
+              },
+            },
+            {
+              type: "text",
+              text: "Read and transcribe ALL text in this image. If it's a screenshot of a statement, article, or social media post, extract the full text verbatim. If it's a chart or graph, describe what it shows including any numbers, labels, and trends. Be thorough — every word matters for market analysis.",
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`vision API ${res.status}: ${err.slice(0, 200)}`);
+  }
+
+  // OpenLimits may return SSE even with stream:false — parse both formats
+  const raw = await res.text();
+  let text: string | undefined;
+
+  if (raw.startsWith("{")) {
+    const json = JSON.parse(raw) as { content?: Array<{ type: string; text?: string }> };
+    text = json.content?.find((c) => c.type === "text")?.text?.trim();
+  } else {
+    // Parse SSE: collect text deltas from content_block_delta events
+    const textChunks: string[] = [];
+    for (const line of raw.split("\n")) {
+      if (!line.startsWith("data: ")) continue;
+      try {
+        const evt = JSON.parse(line.slice(6));
+        if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+          textChunks.push(evt.delta.text);
+        }
+      } catch {}
+    }
+    text = textChunks.join("").trim();
+  }
+
+  if (!text) throw new Error("vision: empty response");
+  return text;
 }
 

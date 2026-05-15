@@ -23,8 +23,10 @@ const EnvSchema = z.object({
   UPSTASH_REDIS_REST_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
   UPSTASH_REDIS_REST_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
-  OPENAI_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  LLM_PROVIDER: z.enum(["openai", "openlimits"]).default("openai"),
+  LLM_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  LLM_MODEL: z.string().default("gpt-4o-mini"),
+  LLM_BASE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
 
   PAYMENT_PROVIDER: z.preprocess(emptyToUndef, z.enum(["xendit", "stripe"]).optional()),
   XENDIT_SECRET_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),

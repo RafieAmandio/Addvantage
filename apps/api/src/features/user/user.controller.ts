@@ -11,6 +11,11 @@ export const userController = {
     sendSuccess(res, profile);
   }),
 
+  listAll: asyncHandler(async (_req, res: Response) => {
+    const users = await userService.listAll();
+    sendSuccess(res, users);
+  }),
+
   updateProfile: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
     await userService.updateProfile(authReq.user.id, req.body);

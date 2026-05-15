@@ -18,7 +18,7 @@ vi.mock("../consult.repository.js", () => ({
 
 vi.mock("@/config/openai.js", () => ({
   getOpenAI: vi.fn(() => null),
-  OPENAI_MODEL: "gpt-4o-mini",
+  LLM_MODEL: "gpt-4o-mini",
 }));
 
 import { consultService } from "../consult.service.js";

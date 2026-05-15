@@ -18,3 +18,5 @@ coverage/
 .claude/scheduled_tasks.lock
 .screenshots/
 test-results/
+.vercel/
+apps/worker/.kobeissi-profile/

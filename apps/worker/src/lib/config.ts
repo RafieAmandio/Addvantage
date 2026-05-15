@@ -25,8 +25,10 @@ const EnvSchema = z.object({
 
   DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
-  OPENAI_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  LLM_PROVIDER: z.enum(["openai", "openlimits"]).default("openai"),
+  LLM_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  LLM_MODEL: z.string().default("gpt-4o-mini"),
+  LLM_BASE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
 
   TELEGRAM_BOT_TOKEN: z.preprocess(
     emptyToUndef,
@@ -45,6 +47,8 @@ const EnvSchema = z.object({
   SITE_URL: z.string().url().default("http://localhost:3000"),
 
   FRED_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
+  KOBEISSI_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   /** Override for the Truth Social RSS mirror URL. Unset = use the adapter's
    *  hardcoded default (`https://trumpstruth.org/feed`). Useful if the mirror

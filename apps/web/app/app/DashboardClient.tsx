@@ -3,7 +3,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { useAppState, isPaid } from "@/lib/state";
-import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import { greeting } from "@/features/dashboard/lib/greeting";
@@ -12,31 +11,27 @@ import {
   filterNewsByWatch,
   filterSetupsByWatch,
 } from "@/features/dashboard/lib/watchlist-mentions";
-import { pickFeaturedPrimer } from "@/features/dashboard/lib/featured";
 import { DashboardHero } from "@/features/dashboard/components/DashboardHero";
-import { PillarShortcuts } from "@/features/dashboard/components/PillarShortcuts";
+import { DashboardEventChart } from "@/features/dashboard/components/DashboardEventChart";
+import { CalendarStrip } from "@/features/dashboard/components/CalendarStrip";
+import { ActivePlanSection } from "@/features/dashboard/components/ActivePlanSection";
 import { WatchlistSection } from "@/features/dashboard/components/WatchlistSection";
-import { FeaturedRow } from "@/features/dashboard/components/FeaturedRow";
-import { DiscoveryRow } from "@/features/dashboard/components/DiscoveryRow";
+import { NewsRows } from "@/features/dashboard/components/NewsRows";
 import type { NewsListItem } from "@/features/news/queries/news";
-import type { Primer } from "@/features/education/types";
 import type { Plan } from "@/features/plan/types";
 
 interface Props {
   news: NewsListItem[];
-  primers: Primer[];
   plans: Plan[];
 }
 
-export function DashboardClient({ news, primers, plans }: Props) {
+export function DashboardClient({ news, plans }: Props) {
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
-  const { ids: readIds } = useReadPrimers();
   const { ids: seenNewsIds, hydrated: seenHydrated } = useSeenNews();
   const { tickers, hydrated: watchHydrated } = useWatchlist();
   const [hour, setHour] = useState<number | null>(null);
   const [stamp, setStamp] = useState("");
-  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
     const d = new Date();
@@ -47,9 +42,8 @@ export function DashboardClient({ news, primers, plans }: Props) {
         day: "2-digit",
         month: "long",
         year: "numeric",
-      })
+      }),
     );
-    setIsMac(/Mac|iPhone|iPad/.test(navigator.userAgent));
   }, []);
 
   const greet = hour === null ? "Welcome" : greeting(hour);
@@ -59,69 +53,61 @@ export function DashboardClient({ news, primers, plans }: Props) {
     [plans],
   );
 
-  const topNews = news.slice(0, 3);
   const plan = allTradingPlans[0] ?? null;
-  const featuredPrimer = pickFeaturedPrimer(primers, readIds, paid);
 
-  const watchNewsMentions = watchHydrated
-    ? filterNewsByWatch(news, tickers)
-    : [];
-  const watchSetupMentions =
-    watchHydrated && plan
-      ? filterSetupsByWatch(plan.setups, tickers)
-      : [];
+  const watchNewsMentions = useMemo(
+    () => (watchHydrated ? filterNewsByWatch(news, tickers) : []),
+    [watchHydrated, news, tickers],
+  );
+  const watchSetupMentions = useMemo(
+    () => (watchHydrated && plan ? filterSetupsByWatch(plan.setups, tickers) : []),
+    [watchHydrated, plan, tickers],
+  );
+  const watchArchiveSetups = useMemo(
+    () => (watchHydrated ? collectWatchArchiveSetups(allTradingPlans, tickers, plan?.id ?? "") : []),
+    [watchHydrated, allTradingPlans, tickers, plan?.id],
+  );
 
-  const watchArchiveSetups = watchHydrated
-    ? collectWatchArchiveSetups(allTradingPlans, tickers, plan?.id ?? "")
-    : [];
-
-  const highImpactToday = news.filter((n) => n.impact === "high").length;
+  const highImpactToday = useMemo(
+    () => news.filter((n) => n.impact === "high").length,
+    [news],
+  );
   const openSetups = plan?.setups.length ?? 0;
 
   return (
-    <div>
-      <div className="stagger">
-        <DashboardHero
-          stamp={stamp}
-          greet={greet}
-          operatorName={operatorName}
-          paid={paid}
-          isMac={isMac}
-          highImpactToday={highImpactToday}
-          openSetups={openSetups}
-        />
+    <div className="stagger">
+      {/* Hero: tight top, greeting bar */}
+      <DashboardHero
+        stamp={stamp}
+        greet={greet}
+        operatorName={operatorName}
+        highImpactToday={highImpactToday}
+        openSetups={openSetups}
+      />
 
-        <PillarShortcuts paid={paid} />
+      {/* Chart + Calendar: grouped visually (chart has own padding) */}
+      <DashboardEventChart />
+      <CalendarStrip />
 
-        {watchHydrated && tickers.length > 0 && plan && (
-          <WatchlistSection
-            tickers={tickers}
-            watchNewsMentions={watchNewsMentions}
-            watchSetupMentions={watchSetupMentions}
-            watchArchiveSetups={watchArchiveSetups}
-            planId={plan.id}
-          />
-        )}
+      {/* Plan: primary content, most generous spacing */}
+      <ActivePlanSection plan={plan} paid={paid} />
 
-        <FeaturedRow
-          topNews={topNews}
-          seenNewsIds={seenNewsIds}
-          seenHydrated={seenHydrated}
-          plan={plan}
-          paid={paid}
-        />
+      {/* Watchlist: secondary, tighter */}
+      <WatchlistSection
+        tickers={tickers}
+        watchHydrated={watchHydrated}
+        watchNewsMentions={watchNewsMentions}
+        watchSetupMentions={watchSetupMentions}
+        watchArchiveSetups={watchArchiveSetups}
+        planId={plan?.id ?? null}
+      />
 
-        {featuredPrimer && (
-          <DiscoveryRow
-            featuredPrimer={featuredPrimer}
-            paid={paid}
-          />
-        )}
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-white/20 animate-[revealUp_0.6s_ease-out_both] sm:px-6 sm:py-8">
-        <span className="hidden sm:inline">Press {isMac ? "⌘" : "Ctrl+"}K to search · ? for shortcuts</span>
-      </div>
+      {/* News: dense rows, tightest data section */}
+      <NewsRows
+        news={news}
+        seenNewsIds={seenNewsIds}
+        seenHydrated={seenHydrated}
+      />
     </div>
   );
 }

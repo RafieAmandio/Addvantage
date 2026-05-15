@@ -22,7 +22,8 @@ async function main(): Promise<void> {
   logger.info(
     {
       env: config.NODE_ENV,
-      model: config.OPENAI_MODEL,
+      llmProvider: config.LLM_PROVIDER,
+      llmModel: config.LLM_MODEL,
       siteUrl: config.SITE_URL,
     },
     "worker boot"

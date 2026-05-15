@@ -1,7 +1,7 @@
 import type { Prisma } from "@tradevantage/db";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
 import { logger } from "@/config/logger.js";
-import { getOpenAI, OPENAI_MODEL } from "@/config/openai.js";
+import { getOpenAI, LLM_MODEL } from "@/config/openai.js";
 import { consultRepository } from "./consult.repository.js";
 import { DESK_SYSTEM_PROMPT, pickReply, FREE_DAILY_TOKEN_CAP } from "./consult.lib.js";
 
@@ -113,7 +113,7 @@ export const consultService = {
 
     try {
       const completion = await client.chat.completions.create({
-        model: OPENAI_MODEL,
+        model: LLM_MODEL,
         temperature: 0.4,
         stream: true,
         stream_options: { include_usage: true },
@@ -157,7 +157,7 @@ export const consultService = {
     const metadata: Record<string, unknown> = fellBack
       ? { model: "fallback.pickReply", streamed: true }
       : {
-          model: OPENAI_MODEL,
+          model: LLM_MODEL,
           prompt_tokens: usage?.prompt_tokens,
           completion_tokens: usage?.completion_tokens,
           total_tokens: usage?.total_tokens,
@@ -172,7 +172,7 @@ export const consultService = {
         promptTokens: usage?.prompt_tokens,
         completionTokens: usage?.completion_tokens,
         totalTokens: usage?.total_tokens,
-        model: OPENAI_MODEL,
+        model: LLM_MODEL,
       }, "consult.llm");
     }
 

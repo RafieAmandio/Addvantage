@@ -1,14 +1,31 @@
 import type { Metadata } from "next";
-import type { ChannelPost } from "@/features/channel/types";
-
-export const metadata: Metadata = { title: "Channel" };
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate, formatTime } from "@/lib/cn";
+import { apiGet } from "@/lib/api/client-server";
 import Link from "next/link";
 
-const posts: ChannelPost[] = [];
+export const metadata: Metadata = { title: "Channel" };
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default function ChannelPage() {
+interface ChannelPost {
+  id: string;
+  author: string;
+  body: string;
+  image_url: string | null;
+  tags: string[];
+  pinned: boolean;
+  created_at: string;
+}
+
+export default async function ChannelPage() {
+  let posts: ChannelPost[] = [];
+  try {
+    posts = (await apiGet<ChannelPost[]>("/channel")) ?? [];
+  } catch {
+    posts = [];
+  }
+
   return (
     <div className="stagger bg-grid">
       <div className="border-b border-gray-3 bg-gray-2/30">
@@ -55,17 +72,31 @@ export default function ChannelPage() {
             >
               <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-brand" />
               <div className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2">
-                <span className="text-brand">{p.id}</span>
-                <span className="text-white/40">·</span>
                 <span className="text-white/60">
-                  {formatDate(p.ts)} · {formatTime(p.ts)}Z
+                  {formatDate(p.created_at)} · {formatTime(p.created_at)}Z
                 </span>
                 <span className="text-white/40">·</span>
                 <span className="text-brand">BY {p.author.toUpperCase()}</span>
+                {p.pinned && (
+                  <>
+                    <span className="text-white/40">·</span>
+                    <span className="text-brand/60">PINNED</span>
+                  </>
+                )}
               </div>
-              <p className="mt-3 font-display text-xl leading-snug text-white">
+              <p className="mt-3 font-display text-xl leading-snug text-white whitespace-pre-wrap">
                 {p.body}
               </p>
+              {p.image_url && (
+                <div className="mt-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.image_url}
+                    alt=""
+                    className="max-w-full rounded border border-gray-3"
+                  />
+                </div>
+              )}
               {p.tags.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {p.tags.map((t) => (

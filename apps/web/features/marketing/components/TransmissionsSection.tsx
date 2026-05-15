@@ -217,10 +217,10 @@ export function TransmissionsSection() {
             transform: inView ? "translateY(0)" : "translateY(20px)",
           }}
         >
-          <span className="font-mono text-base font-bold text-brand">
+          <span className="text-base font-bold text-brand">
             <AnimatedCounter value="02" trigger={inView} />
           </span>
-          <span className="font-mono text-base font-bold text-white">
+          <span className="text-base font-bold text-white">
             <TypewriterLabel text="Transmissions" trigger={inView} delay={200} />
           </span>
         </div>
@@ -241,7 +241,7 @@ export function TransmissionsSection() {
       </div>
 
       {/* Grid */}
-      <div className="mx-6 border-x border-white/20 bg-gray-2 md:mx-[100px]">
+      <div className="mx-6 border-x border-white/20 bg-white/[0.03] md:mx-[100px]">
         <div className="grid grid-cols-1 md:grid-cols-3">
           {pillars.map((p, i) => {
             const row = Math.floor(i / 3);
@@ -261,7 +261,7 @@ export function TransmissionsSection() {
                   transitionDelay: `${300 + i * 100}ms`,
                 }}
               >
-                <div className="flex items-center justify-between font-mono text-base">
+                <div className="flex items-center justify-between text-base">
                   <ScrambleSpan
                     text={p.code}
                     className="font-light text-white"
@@ -281,10 +281,10 @@ export function TransmissionsSection() {
                     {p.locked ? "Locked" : "Free"}
                   </span>
                 </div>
-                <h3 className="font-mono text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-white">
                   {p.title}
                 </h3>
-                <p className="font-mono text-base font-light leading-[1.4] text-white">
+                <p className="text-base font-light leading-[1.4] text-white">
                   {p.desc}
                 </p>
               </div>

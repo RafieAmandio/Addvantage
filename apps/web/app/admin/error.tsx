@@ -24,10 +24,10 @@ export default function AdminError({
         <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
           ● ADMIN FAULT
         </div>
-        <h1 className="mt-4 font-display text-4xl text-white">
-          Panel <span className="italic text-brand">error</span>
+        <h1 className="mt-4 font-mono text-2xl font-bold text-white">
+          Transmission Fault
         </h1>
-        <p className="mt-4 font-display text-lg text-white/60">
+        <p className="mt-4 font-mono text-sm font-light text-white/50">
           An error interrupted this admin page. It has been logged
           automatically.
         </p>

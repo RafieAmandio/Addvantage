@@ -77,32 +77,6 @@ export function TopBar() {
 
         {/* Right */}
         <div className="flex items-center gap-2">
-          {/* Tier toggle */}
-          <div className="flex items-center gap-0.5 rounded-lg bg-white/[0.04] p-1">
-            <button
-              onClick={() => flipTier("free")}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-medium transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                !paid
-                  ? "bg-brand text-black"
-                  : "text-white/40 hover:text-white"
-              )}
-            >
-              Free
-            </button>
-            <button
-              onClick={() => flipTier("vip")}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-medium transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                paid
-                  ? "bg-brand text-black"
-                  : "text-white/40 hover:text-white"
-              )}
-            >
-              VIP+
-            </button>
-          </div>
-
           {/* Search */}
           <button
             onClick={() => setSearchOpen(true)}

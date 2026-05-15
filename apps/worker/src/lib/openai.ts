@@ -1,19 +1,21 @@
 import OpenAI from "openai";
 import { config } from "./config";
 
+const BASE_URLS: Record<string, string> = {
+  openai: "https://api.openai.com/v1",
+  openlimits: "https://openlimits.app/v1",
+};
+
 let client: OpenAI | null = null;
 
-/**
- * Lazy OpenAI client. Throws with a clear message if the API key isn't set —
- * lets the worker boot without a key for adapter-only smoke tests.
- */
 export function openai(): OpenAI {
   if (client) return client;
-  if (!config.OPENAI_API_KEY) {
+  if (!config.LLM_API_KEY) {
     throw new Error(
-      "OPENAI_API_KEY is not set — required for the rephrase pipeline"
+      "LLM_API_KEY is not set — required for the rephrase pipeline"
     );
   }
-  client = new OpenAI({ apiKey: config.OPENAI_API_KEY });
+  const baseURL = config.LLM_BASE_URL ?? BASE_URLS[config.LLM_PROVIDER];
+  client = new OpenAI({ apiKey: config.LLM_API_KEY, baseURL });
   return client;
 }

@@ -80,7 +80,7 @@ export async function loginAction(
       return { ok: false, error: "login_failed" };
     }
 
-    setAuthCookies(json.data.accessToken, json.data.refreshToken);
+    setAuthCookies(json.data.access_token ?? json.data.accessToken, json.data.refresh_token ?? json.data.refreshToken);
   } catch (err) {
     Sentry.captureException(err, { tags: { scope: "auth.login" } });
     logger.error("login failed", { error: err, scope: "auth.login" });
@@ -140,7 +140,7 @@ export async function signupAction(
       return { ok: false, error: "signup_failed" };
     }
 
-    setAuthCookies(json.data.accessToken, json.data.refreshToken);
+    setAuthCookies(json.data.access_token ?? json.data.accessToken, json.data.refresh_token ?? json.data.refreshToken);
     return { ok: true, done: true, email: parsed.data.email };
   } catch (err) {
     Sentry.captureException(err, { tags: { scope: "auth.signup" } });

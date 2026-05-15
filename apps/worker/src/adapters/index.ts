@@ -6,6 +6,8 @@ import { YardeniAdapter } from "./yardeni";
 import { RbcAdapter } from "./rbc";
 import { TruthSocialAdapter } from "./truth-social";
 import { ForexFactoryAdapter } from "./forexfactory";
+import { KobeissiAdapter } from "./kobeissi/adapter";
+// TradingEconomics is a calendar adapter, not a news adapter — see calendar/tradingeconomics.ts
 
 /** Ordered registry. The scheduler iterates this list on each tick. */
 export const ADAPTERS: SourceAdapter[] = [
@@ -16,6 +18,7 @@ export const ADAPTERS: SourceAdapter[] = [
   new RbcAdapter(),
   new TruthSocialAdapter(),
   new ForexFactoryAdapter(),
+  new KobeissiAdapter(),
 ];
 
 export function getAdapter(code: string): SourceAdapter | undefined {

@@ -8,6 +8,10 @@ export const userService = {
     return profile;
   },
 
+  async listAll() {
+    return userRepository.findAll();
+  },
+
   async updateProfile(
     userId: string,
     data: {

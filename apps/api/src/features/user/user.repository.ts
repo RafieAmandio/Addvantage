@@ -39,6 +39,23 @@ export const userRepository = {
       select: ME_SELECT,
     }),
 
+  findAll: () =>
+    prisma.profile.findMany({
+      select: {
+        id: true,
+        email: true,
+        handle: true,
+        tier: true,
+        isAdmin: true,
+        signedLiability: true,
+        joinedAt: true,
+        tradingLength: true,
+        longestProfitable: true,
+        markets: true,
+      },
+      orderBy: { joinedAt: "desc" },
+    }),
+
   updateProfile: (
     id: string,
     data: {

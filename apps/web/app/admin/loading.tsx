@@ -1,21 +1,24 @@
 export default function AdminLoading() {
   return (
-    <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-7xl animate-pulse">
-        <div className="mb-6 space-y-2">
-          <div className="h-3 w-24 rounded bg-gray-2" />
-          <div className="h-10 w-40 rounded bg-gray-2" />
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="flex flex-col items-center gap-6">
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+          ● Establishing Transmission
         </div>
-        <div className="space-y-px bg-gray-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="bg-black px-4 py-3 grid grid-cols-12 gap-4">
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-              <div className="col-span-4 h-4 rounded bg-gray-2" />
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-            </div>
+        <div className="flex items-end gap-1.5">
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <span
+              key={i}
+              className="block w-1 bg-brand"
+              style={{
+                height: "24px",
+                animation: `loadbar 1s ease-in-out ${i * 100}ms infinite`,
+              }}
+            />
           ))}
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
+          Decoding Packets · Please Stand By
         </div>
       </div>
     </div>

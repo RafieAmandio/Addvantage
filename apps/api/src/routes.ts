@@ -14,6 +14,7 @@ import { authRoutes } from "./features/auth/auth.routes.js";
 import { educationRoutes } from "./features/education/education.routes.js";
 import { subscriptionRoutes } from "./features/subscription/subscription.routes.js";
 import { ingestionRoutes } from "./features/ingestion/ingestion.routes.js";
+import { channelRoutes } from "./features/channel/channel.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -31,4 +32,5 @@ export function mountRoutes(app: Express) {
   app.use("/education", educationRoutes);
   app.use("/subscription", subscriptionRoutes);
   app.use("/ingestion", ingestionRoutes);
+  app.use("/channel", channelRoutes);
 }

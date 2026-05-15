@@ -11,17 +11,17 @@ export default async function AdminSourcesPage() {
   const rows = await listSources();
 
   return (
-    <div className="stagger mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-6">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          OPERATOR // ADMIN
-        </div>
-        <h1 className="mt-1 font-display text-4xl text-white">
-          Source <span className="italic text-brand">registry</span>
+    <div>
+      <div className="mb-8">
+        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+          Registry · Adapters
+        </span>
+        <h1 className="mt-2 font-mono text-2xl font-bold text-white">
+          Source Registry
         </h1>
-        <p className="mt-2 font-display text-lg text-white/60">
+        <p className="mt-2 max-w-2xl font-mono text-sm font-light text-white/50">
           Ingestion adapters wired to the pipeline. Enable or disable via the
-          database — changes take effect at the next scheduler tick.
+          database; changes take effect at the next scheduler tick.
         </p>
       </div>
 
