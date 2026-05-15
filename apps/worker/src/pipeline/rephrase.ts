@@ -1,5 +1,4 @@
-import { openai as getOpenai } from "../lib/openai";
-import { config } from "../lib/config";
+import { ai } from "../lib/ai";
 import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
 import {
@@ -77,29 +76,12 @@ ${rawText}
 
 Return the rewritten item as a single raw JSON object (no markdown, no code fences). Schema: { headline: string, rephrased: string, analysis: string, impact: one of [${IMPACTS_LIST}], bias: one of [${BIAS_LIST}], affects: string[], tags: string[] }`;
 
-  const supportsJsonSchema = config.LLM_PROVIDER === "openai" || config.LLM_PROVIDER === "moonshot";
-
-  const res = await retry(
+  const text = await retry(
     () =>
-      getOpenai().chat.completions.create({
-        model: config.LLM_MODEL,
-        ...(config.LLM_PROVIDER === "moonshot" ? {} : { temperature: 0.4 }),
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: user },
-        ],
-        ...(supportsJsonSchema
-          ? {
-              response_format: {
-                type: "json_schema",
-                json_schema: {
-                  name: "news_item",
-                  strict: true,
-                  schema: RESPONSE_SCHEMA,
-                },
-              },
-            }
-          : {}),
+      ai().chat({
+        system: SYSTEM_PROMPT,
+        user,
+        jsonSchema: { name: "news_item", strict: true, schema: RESPONSE_SCHEMA },
       }),
     {
       label: "llm.rephrase",
@@ -112,21 +94,17 @@ Return the rewritten item as a single raw JSON object (no markdown, no code fenc
     }
   );
 
-  let text = res.choices[0]?.message?.content;
-  if (!text) throw new Error("llm: empty response");
+  const cleaned = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
-  // Strip markdown code fences that non-OpenAI providers may wrap around JSON
-  text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
-
-  const parsed = RephraseOutputSchema.safeParse(JSON.parse(text));
+  const parsed = RephraseOutputSchema.safeParse(JSON.parse(cleaned));
   if (!parsed.success) {
-    logger.error({ errors: parsed.error.format(), raw: text }, "rephrase: invalid output");
+    logger.error({ errors: parsed.error.format(), raw: cleaned }, "rephrase: invalid output");
     throw new Error("rephrase output failed schema validation");
   }
   return {
     output: parsed.data,
     systemPrompt: SYSTEM_PROMPT,
     userMessage: user,
-    rawResponse: text,
+    rawResponse: cleaned,
   };
 }

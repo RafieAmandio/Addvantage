@@ -1,6 +1,6 @@
+import { ai } from "../lib/ai";
 import { config } from "../lib/config";
 import { fetchText } from "../lib/http";
-import { openai } from "../lib/openai";
 import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
@@ -206,70 +206,10 @@ async function describeImage(
   ctx.logger.info({ url: imageUrl }, "vision: describing image");
   const { base64, mediaType } = await downloadImageAsBase64(imageUrl);
 
-  const baseURL = config.LLM_BASE_URL ?? (config.LLM_PROVIDER === "openlimits" ? "https://openlimits.app" : "https://api.anthropic.com");
-
-  const res = await fetch(`${baseURL}/v1/messages`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": config.LLM_API_KEY!,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1024,
-      stream: false,
-      thinking: { type: "disabled" },
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: mediaType,
-                data: base64,
-              },
-            },
-            {
-              type: "text",
-              text: "Read and transcribe ALL text in this image. If it's a screenshot of a statement, article, or social media post, extract the full text verbatim. If it's a chart or graph, describe what it shows including any numbers, labels, and trends. Be thorough — every word matters for market analysis.",
-            },
-          ],
-        },
-      ],
-    }),
+  return ai().vision({
+    imageBase64: base64,
+    mediaType,
+    prompt: "Read and transcribe ALL text in this image. If it's a screenshot of a statement, article, or social media post, extract the full text verbatim. If it's a chart or graph, describe what it shows including any numbers, labels, and trends. Be thorough — every word matters for market analysis.",
   });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`vision API ${res.status}: ${err.slice(0, 200)}`);
-  }
-
-  // OpenLimits may return SSE even with stream:false — parse both formats
-  const raw = await res.text();
-  let text: string | undefined;
-
-  if (raw.startsWith("{")) {
-    const json = JSON.parse(raw) as { content?: Array<{ type: string; text?: string }> };
-    text = json.content?.find((c) => c.type === "text")?.text?.trim();
-  } else {
-    // Parse SSE: collect text deltas from content_block_delta events
-    const textChunks: string[] = [];
-    for (const line of raw.split("\n")) {
-      if (!line.startsWith("data: ")) continue;
-      try {
-        const evt = JSON.parse(line.slice(6));
-        if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
-          textChunks.push(evt.delta.text);
-        }
-      } catch {}
-    }
-    text = textChunks.join("").trim();
-  }
-
-  if (!text) throw new Error("vision: empty response");
-  return text;
 }
 
