@@ -25,7 +25,7 @@ const EnvSchema = z.object({
 
   DATABASE_URL: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
-  LLM_PROVIDER: z.enum(["openai", "openlimits"]).default("openai"),
+  LLM_PROVIDER: z.enum(["openai", "openlimits", "moonshot"]).default("openai"),
   LLM_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   LLM_MODEL: z.string().default("gpt-4o-mini"),
   LLM_BASE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),

@@ -77,18 +77,18 @@ ${rawText}
 
 Return the rewritten item as a single raw JSON object (no markdown, no code fences). Schema: { headline: string, rephrased: string, analysis: string, impact: one of [${IMPACTS_LIST}], bias: one of [${BIAS_LIST}], affects: string[], tags: string[] }`;
 
-  const isOpenAI = config.LLM_PROVIDER === "openai";
+  const supportsJsonSchema = config.LLM_PROVIDER === "openai" || config.LLM_PROVIDER === "moonshot";
 
   const res = await retry(
     () =>
       getOpenai().chat.completions.create({
         model: config.LLM_MODEL,
-        temperature: 0.4,
+        ...(config.LLM_PROVIDER === "moonshot" ? {} : { temperature: 0.4 }),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: user },
         ],
-        ...(isOpenAI
+        ...(supportsJsonSchema
           ? {
               response_format: {
                 type: "json_schema",

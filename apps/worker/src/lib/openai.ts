@@ -4,6 +4,7 @@ import { config } from "./config";
 const BASE_URLS: Record<string, string> = {
   openai: "https://api.openai.com/v1",
   openlimits: "https://openlimits.app/v1",
+  moonshot: "https://api.moonshot.ai/v1",
 };
 
 let client: OpenAI | null = null;
