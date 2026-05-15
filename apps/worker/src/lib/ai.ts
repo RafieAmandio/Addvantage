@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions";
-import { config } from "./config";
+import { config, type LLMProvider } from "./config";
 
 export interface ChatRequest {
   model?: string;
@@ -20,13 +20,20 @@ export interface VisionRequest {
   prompt: string;
 }
 
+interface ProviderOpts {
+  jsonSchema: boolean;
+  temperature?: number;
+}
+
 export abstract class AIProvider {
   protected client: OpenAI;
+  protected baseURL: string;
 
   constructor(
     protected apiKey: string,
     baseURL: string,
   ) {
+    this.baseURL = baseURL;
     this.client = new OpenAI({ apiKey, baseURL });
   }
 
@@ -85,9 +92,21 @@ export abstract class AIProvider {
   }
 }
 
-class OpenAIProvider extends AIProvider {
+class StandardProvider extends AIProvider {
+  constructor(
+    apiKey: string,
+    baseURL: string,
+    private opts: ProviderOpts,
+  ) {
+    super(apiKey, baseURL);
+  }
+
   get supportsJsonSchema() {
-    return true;
+    return this.opts.jsonSchema;
+  }
+
+  protected override get defaultTemperature(): number | undefined {
+    return this.opts.temperature;
   }
 }
 
@@ -97,8 +116,8 @@ class OpenLimitsProvider extends AIProvider {
   }
 
   override async vision(req: VisionRequest): Promise<string> {
-    const baseURL = config.LLM_BASE_URL ?? "https://openlimits.app";
-    const res = await fetch(`${baseURL}/v1/messages`, {
+    const messagesURL = this.baseURL.replace(/\/v1\/?$/, "") + "/v1/messages";
+    const res = await fetch(messagesURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,41 +150,38 @@ class OpenLimitsProvider extends AIProvider {
     }
 
     const raw = await res.text();
+    let text: string | undefined;
+
     if (raw.startsWith("{")) {
       const json = JSON.parse(raw) as { content?: Array<{ type: string; text?: string }> };
-      return json.content?.find((c) => c.type === "text")?.text?.trim() ?? "";
+      text = json.content?.find((c) => c.type === "text")?.text?.trim();
+    } else {
+      // OpenLimits sometimes ignores stream:false and returns SSE
+      const chunks: string[] = [];
+      for (const line of raw.split("\n")) {
+        if (!line.startsWith("data: ")) continue;
+        try {
+          const evt = JSON.parse(line.slice(6));
+          if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
+            chunks.push(evt.delta.text);
+          }
+        } catch {}
+      }
+      text = chunks.join("").trim();
     }
 
-    const chunks: string[] = [];
-    for (const line of raw.split("\n")) {
-      if (!line.startsWith("data: ")) continue;
-      try {
-        const evt = JSON.parse(line.slice(6));
-        if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
-          chunks.push(evt.delta.text);
-        }
-      } catch {}
-    }
-    const text = chunks.join("").trim();
     if (!text) throw new Error("vision: empty response");
     return text;
   }
 }
 
-class MoonshotProvider extends AIProvider {
-  get supportsJsonSchema() {
-    return true;
-  }
-
-  protected override get defaultTemperature(): number | undefined {
-    return undefined;
-  }
-}
-
-const PROVIDERS: Record<string, (apiKey: string) => AIProvider> = {
-  openai: (key) => new OpenAIProvider(key, "https://api.openai.com/v1"),
-  openlimits: (key) => new OpenLimitsProvider(key, "https://openlimits.app/v1"),
-  moonshot: (key) => new MoonshotProvider(key, "https://api.moonshot.ai/v1"),
+const PROVIDERS: Record<LLMProvider, (apiKey: string, baseURL?: string) => AIProvider> = {
+  openai: (key, url) =>
+    new StandardProvider(key, url ?? "https://api.openai.com/v1", { jsonSchema: true }),
+  openlimits: (key, url) =>
+    new OpenLimitsProvider(key, url ?? "https://openlimits.app/v1"),
+  moonshot: (key, url) =>
+    new StandardProvider(key, url ?? "https://api.moonshot.ai/v1", { jsonSchema: true, temperature: undefined }),
 };
 
 let instance: AIProvider | null = null;
@@ -176,12 +192,6 @@ export function ai(): AIProvider {
     throw new Error("LLM_API_KEY is not set — required for the AI pipeline");
   }
   const factory = PROVIDERS[config.LLM_PROVIDER];
-  if (!factory) throw new Error(`Unknown LLM provider: ${config.LLM_PROVIDER}`);
-
-  if (config.LLM_BASE_URL) {
-    instance = new OpenAIProvider(config.LLM_API_KEY, config.LLM_BASE_URL);
-  } else {
-    instance = factory(config.LLM_API_KEY);
-  }
+  instance = factory(config.LLM_API_KEY, config.LLM_BASE_URL);
   return instance;
 }
