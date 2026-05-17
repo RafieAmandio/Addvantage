@@ -10,6 +10,7 @@ const nextConfig = {
   transpilePackages: ["@tradevantage/shared", "@tradevantage/db"],
   // Tell Next the real workspace root so its file-trace collection doesn't
   // stop at apps/web and miss hoisted pnpm deps.
+  output: "standalone",
   experimental: {
     outputFileTracingRoot: path.join(__dirname, "../../"),
   },
