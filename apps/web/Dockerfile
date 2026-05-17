@@ -11,6 +11,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* turbo.json ./
 COPY apps/web/package.json apps/web/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/db/package.json packages/db/package.json
+COPY packages/db/prisma packages/db/prisma
 RUN pnpm install --frozen-lockfile
 
 # ---------- build ----------
