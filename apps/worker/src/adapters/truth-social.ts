@@ -51,7 +51,7 @@ export class TruthSocialAdapter implements SourceAdapter {
 
         if (pageImages.length > 0) {
           try {
-            const described = await describeImage(pageImages[0], ctx);
+            const described = await describeImage(pageImages[0]!, ctx);
             rawText = [title, `[Image content]: ${described}`]
               .filter(Boolean)
               .join("\n\n")
@@ -195,7 +195,7 @@ async function downloadImageAsBase64(url: string): Promise<{ base64: string; med
   if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
   const contentType = res.headers.get("content-type") ?? "image/jpeg";
-  const mediaType = contentType.split(";")[0].trim();
+  const mediaType = contentType.split(";")[0]!.trim();
   return { base64: buf.toString("base64"), mediaType };
 }
 

@@ -20,9 +20,9 @@ const COUNTRY_CODE: Record<string, string> = {
 };
 
 // Currency index: USD=0, EUR=1, GBP=2, JPY=3, CHF=4, CAD=5, AUD=6
-const CURRENCY_IDX: Record<string, number> = {
+const CURRENCY_IDX = {
   USD: 0, EUR: 1, GBP: 2, JPY: 3, CHF: 4, CAD: 5, AUD: 6,
-};
+} as const;
 
 // Country → which currency it primarily affects
 const COUNTRY_CURRENCY: Record<string, string> = {
@@ -85,7 +85,7 @@ function buildScores(countryCode: string, impact: Impact): number[] {
   const currency = COUNTRY_CURRENCY[countryCode];
   if (!currency) return scores;
 
-  const idx = CURRENCY_IDX[currency];
+  const idx = CURRENCY_IDX[currency as keyof typeof CURRENCY_IDX];
   if (idx === undefined) return scores;
 
   const weight = impact === "high" ? 3 : impact === "medium" ? 2 : 1;
@@ -112,9 +112,9 @@ function parseEventTime(timeStr: string): Date | null {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
   if (!match) return null;
 
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const ampm = match[3].toUpperCase();
+  let hours = parseInt(match[1]!, 10);
+  const minutes = parseInt(match[2]!, 10);
+  const ampm = match[3]!.toUpperCase();
 
   if (ampm === "PM" && hours !== 12) hours += 12;
   if (ampm === "AM" && hours === 12) hours = 0;
