@@ -41,5 +41,5 @@ COPY --from=build /repo/apps/web/.next/static ./apps/web/.next/static
 COPY --from=build /repo/apps/web/public ./apps/web/public
 USER node
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "apps/web/server.js"]
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node apps/web/server.js"]
 EXPOSE 3000
