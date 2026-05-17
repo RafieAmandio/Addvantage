@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAppState, isPaid } from "@/lib/state";
+import { apiGet } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
@@ -57,10 +58,9 @@ export function Sidebar() {
   const lastFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    fetch("/api/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((json) => {
-        if (json?.is_admin) setIsAdmin(true);
+    apiGet<{ isAdmin: boolean }>("/users/me")
+      .then((data) => {
+        if (data?.isAdmin) setIsAdmin(true);
       })
       .catch(() => {});
   }, []);

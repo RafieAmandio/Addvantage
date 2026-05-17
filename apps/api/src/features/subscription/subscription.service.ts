@@ -94,6 +94,16 @@ export const subscriptionService = {
     };
   },
 
+  async downgrade(profileId: string) {
+    const profile = await subscriptionRepository.findProfile(profileId);
+    if (!profile) throw new AppError("Profile not found", 404);
+    if (profile.tier === "free") throw new AppError("Already on free tier", 400);
+
+    await subscriptionRepository.updateTier(profileId, "free");
+    logger.info({ scope: "subscription.downgrade", profileId }, "tier downgraded to free");
+    return { tier: "free" };
+  },
+
   async handleWebhook(req: Request) {
     const provider = getPaymentProvider();
     if (!provider) {

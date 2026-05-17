@@ -6,6 +6,12 @@ import { subscriptionService } from "./subscription.service.js";
 import type { CreateInvoiceInput } from "./subscription.validation.js";
 
 export const subscriptionController = {
+  downgrade: asyncHandler(async (req, res: Response) => {
+    const authReq = req as AuthRequest;
+    const result = await subscriptionService.downgrade(authReq.user.id);
+    sendSuccess(res, result, "Downgraded to free tier");
+  }),
+
   handleWebhook: asyncHandler(async (req, res: Response) => {
     const result = await subscriptionService.handleWebhook(req);
     sendSuccess(res, result);

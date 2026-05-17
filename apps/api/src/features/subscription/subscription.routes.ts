@@ -13,6 +13,13 @@ router.post(
   subscriptionController.handleWebhook,
 );
 
+router.post(
+  "/downgrade",
+  requireAuth,
+  userRateLimit({ limit: 5, windowSec: 60, action: "subscription:downgrade" }),
+  subscriptionController.downgrade,
+);
+
 router.get(
   "/status",
   requireAuth,

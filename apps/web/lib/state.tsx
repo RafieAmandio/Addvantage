@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiGet } from "@/lib/api/client";
 export type Tier = "visitor" | "free" | "vip";
 
 interface TraderProfile {
@@ -67,6 +68,17 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     } catch {}
     setHydrated(true);
   }, []);
+
+  // Sync tier from backend so localStorage reflects the real DB value.
+  useEffect(() => {
+    if (!hydrated) return;
+    apiGet<{ tier: string }>("/users/me")
+      .then((data) => {
+        const backendTier: Tier = data?.tier === "vip" ? "vip" : "free";
+        setTierState(backendTier);
+      })
+      .catch(() => {});
+  }, [hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;

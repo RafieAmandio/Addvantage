@@ -97,6 +97,7 @@ export class XenditProvider implements PaymentProvider {
       currency: opts.currency,
       description: opts.description,
       payer_email: opts.payerEmail,
+      should_send_email: true,
     };
 
     if (opts.metadata) body.metadata = opts.metadata;
