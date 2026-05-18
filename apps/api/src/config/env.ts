@@ -34,6 +34,7 @@ const EnvSchema = z.object({
 
   EMAIL_PROVIDER: z.preprocess(emptyToUndef, z.enum(["brevo", "resend"]).optional()),
   BREVO_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  RESEND_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   EMAIL_SENDER_EMAIL: z.preprocess(emptyToUndef, z.string().email().optional()),
   EMAIL_SENDER_NAME: z.preprocess(emptyToUndef, z.string().optional()),
 
