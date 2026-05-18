@@ -46,7 +46,7 @@ async function sendVerificationEmail(userId: string, email: string) {
   }
 
   const token = await signVerificationToken(userId, email);
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+  const siteUrl = env.SITE_URL;
   const verifyUrl = `${siteUrl}/auth/verify?token=${token}`;
   const { subject, html } = verifyEmailTemplate({ verifyUrl });
 

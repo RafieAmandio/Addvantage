@@ -37,6 +37,8 @@ const EnvSchema = z.object({
   EMAIL_SENDER_EMAIL: z.preprocess(emptyToUndef, z.string().email().optional()),
   EMAIL_SENDER_NAME: z.preprocess(emptyToUndef, z.string().optional()),
 
+  SITE_URL: z.preprocess(emptyToUndef, z.string().url().default("http://localhost:3000")),
+
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 
   STORAGE_PROVIDER: z.preprocess(emptyToUndef, z.enum(["supabase", "s3"]).optional()),

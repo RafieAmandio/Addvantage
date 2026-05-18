@@ -1,6 +1,7 @@
 import { jwtVerify } from "jose";
 import { NextResponse, type NextRequest } from "next/server";
 import { isMockMode } from "@/lib/config/public";
+import { serverConfig } from "@/lib/config/server";
 
 export async function updateSession(request: NextRequest) {
   if (isMockMode()) {
@@ -20,10 +21,7 @@ export async function updateSession(request: NextRequest) {
     return redirectToLogin(request, pathname);
   }
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    return redirectToLogin(request, pathname);
-  }
+  const secret = serverConfig.JWT_SECRET;
 
   try {
     await jwtVerify(token, new TextEncoder().encode(secret));

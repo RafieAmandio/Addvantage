@@ -5,11 +5,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { isMockMode } from "@/lib/config/public";
+import { serverConfig } from "@/lib/config/server";
 import { getSession } from "@/lib/auth/session";
 import { logger } from "@/lib/logger";
 import { apiPut, apiPost } from "@/lib/api/client-server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
+const API_BASE = serverConfig.NEXT_PUBLIC_API_URL;
 
 // ─── Token helpers ──────────────────────────────────────────────────
 
@@ -17,14 +18,14 @@ function setAuthCookies(accessToken: string, refreshToken: string) {
   const cookieStore = cookies();
   cookieStore.set("access_token", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: serverConfig.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 15 * 60, // 15 min
   });
   cookieStore.set("refresh_token", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: serverConfig.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60, // 7 days

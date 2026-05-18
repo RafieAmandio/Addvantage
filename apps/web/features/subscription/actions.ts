@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
 import { apiPost } from "@/lib/api/client-server";
+import { publicConfig } from "@/lib/config/public";
 
 interface ActionResult {
   ok: boolean;
@@ -19,8 +20,8 @@ export async function createSubscriptionInvoice(): Promise<ActionResult> {
       tier: "vip",
       amount: 4_500_000,
       currency: "IDR",
-      successRedirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscription`,
-      failureRedirectUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscription`,
+      successRedirectUrl: `${publicConfig.NEXT_PUBLIC_SITE_URL}/app/subscription`,
+      failureRedirectUrl: `${publicConfig.NEXT_PUBLIC_SITE_URL}/app/subscription`,
     });
     return { ok: true, invoiceUrl: data.invoiceUrl };
   } catch {

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
+import { serverConfig } from "@/lib/config/server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
+const API_BASE = serverConfig.NEXT_PUBLIC_API_URL;
 
 function getAccessToken(): string | null {
   const cookieStore = cookies();

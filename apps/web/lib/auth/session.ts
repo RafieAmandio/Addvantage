@@ -2,6 +2,7 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { isMockMode } from "@/lib/config/public";
+import { serverConfig } from "@/lib/config/server";
 import { apiGet } from "@/lib/api/client-server";
 
 const MOCK_USER = {
@@ -30,8 +31,7 @@ export const getSession = cache(async function getSession(): Promise<SessionUser
   const token = cookieStore.get("access_token")?.value;
   if (!token) return null;
 
-  const secret = process.env.JWT_SECRET;
-  if (!secret) return null;
+  const secret = serverConfig.JWT_SECRET;
 
   try {
     const { payload } = await jwtVerify(
