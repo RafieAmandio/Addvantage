@@ -19,7 +19,7 @@ function matchesQuery(n: NewsListItem, q: string): boolean {
   if (!q) return true;
   const haystack = [
     n.id,
-    n.source_code,
+    n.sourceCode,
     n.headline,
     n.analysis,
     n.author,

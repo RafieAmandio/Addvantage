@@ -10,7 +10,7 @@ const BiasSchema = z.enum(BIAS_LEVELS);
 
 export const NewsListRowSchema = z.object({
   id: z.string(),
-  source_code: z.string(),
+  sourceCode: z.string(),
   headline: z.string(),
   analysis: z.string(),
   impact: ImpactSchema,
@@ -18,10 +18,10 @@ export const NewsListRowSchema = z.object({
   affects: z.array(z.string()),
   tags: z.array(z.string()),
   author: z.string(),
-  published_at: z.string().nullable(),
-  fetched_at: z.string(),
+  publishedAt: z.string().nullable(),
+  fetchedAt: z.string(),
   status: z.string(),
-  related_plan_ids: z.array(z.string()).nullable(),
+  relatedPlanIds: z.array(z.string()).nullable(),
 });
 
 const NewsListItemSchema = NewsListRowSchema.omit({ status: true });
@@ -29,25 +29,25 @@ export type NewsListItem = z.infer<typeof NewsListItemSchema>;
 
 export type NewsAdminListItem = {
   id: string;
-  source_code: string;
+  sourceCode: string;
   headline: string;
   analysis: string;
   impact: string;
   bias: string;
   affects: string[];
   tags: string[];
-  fetched_at: string;
-  reviewed_at: string | null;
+  fetchedAt: string;
+  reviewedAt: string | null;
 };
 
 const NewsRowSchema = z.object({
   id: z.string(),
-  source_code: z.string(),
-  source_url: z.string().nullable(),
-  raw_text: z.string().nullable(),
-  content_hash: z.string(),
-  fetched_at: z.string(),
-  published_at: z.string().nullable(),
+  sourceCode: z.string(),
+  sourceUrl: z.string().nullable(),
+  rawText: z.string().nullable(),
+  contentHash: z.string(),
+  fetchedAt: z.string(),
+  publishedAt: z.string().nullable(),
   status: z.string(),
   headline: z.string(),
   rephrased: z.string().nullable(),
@@ -57,19 +57,19 @@ const NewsRowSchema = z.object({
   affects: z.array(z.string()),
   tags: z.array(z.string()),
   author: z.string(),
-  reviewed_at: z.string().nullable(),
-  reviewed_by: z.string().nullable(),
-  related_plan_ids: z.array(z.string()),
-  ai_system_prompt: z.string().nullable(),
-  ai_user_message: z.string().nullable(),
-  ai_raw_response: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
+  reviewedAt: z.string().nullable(),
+  reviewedBy: z.string().nullable(),
+  relatedPlanIds: z.array(z.string()),
+  aiSystemPrompt: z.string().nullable(),
+  aiUserMessage: z.string().nullable(),
+  aiRawResponse: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
-type NewsRow = z.infer<typeof NewsRowSchema>;
+export type NewsRow = z.infer<typeof NewsRowSchema>;
 
 export const NEWS_LIST_COLUMNS =
-  "id,source_code,headline,analysis,impact,bias,affects,tags,author,published_at,fetched_at,status,related_plan_ids";
+  "id,sourceCode,headline,analysis,impact,bias,affects,tags,author,publishedAt,fetchedAt,status,relatedPlanIds";
 
 export function toNewsListItem(row: z.infer<typeof NewsListRowSchema>): NewsListItem {
   const { status: _status, ...rest } = row;

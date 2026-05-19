@@ -62,8 +62,8 @@ export function useTimelineEvents({
           const matches = row.symbols.some((s) => symbolsSet.has(s));
           if (!matches) return;
 
-          if (from && row.occurred_at < from) return;
-          if (to && row.occurred_at > to) return;
+          if (from && row.occurredAt < from) return;
+          if (to && row.occurredAt > to) return;
 
           if (seenRef.current.has(row.id)) return;
           seenRef.current.add(row.id);

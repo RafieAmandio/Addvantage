@@ -61,7 +61,7 @@ export const planController = {
       entry: data.entry,
       stop: data.stop,
       target: data.target,
-      rMultiple: data.r_multiple,
+      rMultiple: data.rMultiple,
       setups: data.setups as Prisma.InputJsonValue,
       tags: data.tags,
       tier: data.tier,
@@ -80,7 +80,7 @@ export const planController = {
     if (data.entry !== undefined) updateData.entry = data.entry;
     if (data.stop !== undefined) updateData.stop = data.stop;
     if (data.target !== undefined) updateData.target = data.target;
-    if (data.r_multiple !== undefined) updateData.rMultiple = data.r_multiple;
+    if (data.rMultiple !== undefined) updateData.rMultiple = data.rMultiple;
     if (data.setups !== undefined) updateData.setups = data.setups;
     if (data.tags !== undefined) updateData.tags = data.tags;
     if (data.tier !== undefined) updateData.tier = data.tier;
@@ -99,7 +99,7 @@ export const planController = {
     const id = String(req.params.id);
     await planService.close(id, {
       outcome: req.body.outcome,
-      closePrice: req.body.close_price,
+      closePrice: req.body.closePrice,
     });
     sendSuccess(res, null, "Plan closed");
   }),

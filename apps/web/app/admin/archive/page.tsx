@@ -53,11 +53,11 @@ export default async function AdminArchivePage() {
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-                [{n.source_code}]
+                [{n.sourceCode}]
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                 rejected{" "}
-                {n.reviewed_at ? formatDate(n.reviewed_at) : "—"}
+                {n.reviewedAt ? formatDate(n.reviewedAt) : "—"}
               </div>
             </div>
             <div className="col-span-12 lg:col-span-10">

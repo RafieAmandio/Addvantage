@@ -9,7 +9,7 @@ function formatTime(iso: string): string {
 }
 
 function eventHref(e: TimelineEvent): string | null {
-  if (e.news_item_id) return `/app/news/${e.news_item_id}`;
+  if (e.newsItemId) return `/app/news/${e.newsItemId}`;
   return e.url ?? null;
 }
 
@@ -32,13 +32,13 @@ function EventCardInner({
         >
           {event.kind}
         </span>
-        {event.source_code && (
+        {event.sourceCode && (
           <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-            [{event.source_code}]
+            [{event.sourceCode}]
           </span>
         )}
         <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          {formatTime(event.occurred_at)}
+          {formatTime(event.occurredAt)}
         </span>
       </div>
       <div className="mt-1.5 text-sm leading-snug text-white">{event.title}</div>

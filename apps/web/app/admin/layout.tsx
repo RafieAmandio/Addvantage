@@ -14,7 +14,7 @@ export default async function AdminLayout({
   if (!profile) {
     redirect("/login?next=/admin/review");
   }
-  if (!profile.is_admin) {
+  if (!profile.isAdmin) {
     redirect("/app");
   }
   return (

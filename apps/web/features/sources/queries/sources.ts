@@ -6,10 +6,10 @@ const SourceRowSchema = z.object({
   name: z.string(),
   url: z.string(),
   enabled: z.boolean(),
-  poll_minutes: z.number(),
-  last_polled_at: z.string().nullable(),
-  last_success_at: z.string().nullable(),
-  last_error: z.string().nullable(),
+  pollMinutes: z.number(),
+  lastPolledAt: z.string().nullable(),
+  lastSuccessAt: z.string().nullable(),
+  lastError: z.string().nullable(),
 });
 
 type SourceRow = z.infer<typeof SourceRowSchema>;

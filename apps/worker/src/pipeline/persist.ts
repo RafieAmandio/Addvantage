@@ -34,6 +34,14 @@ export async function persistCandidates(
   };
 
   for (const c of candidates) {
+    // Skip candidates with barely any content — the LLM can't produce
+    // meaningful analysis from a headline alone.
+    if (c.rawText.length < 80) {
+      logger.warn({ externalId: c.externalId, len: c.rawText.length }, "skipping thin candidate");
+      result.skipped++;
+      continue;
+    }
+
     const hash = contentHash([sourceCode, c.externalId, c.rawText]);
     if (existingHashes.has(hash)) {
       result.skipped++;

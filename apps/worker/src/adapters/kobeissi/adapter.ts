@@ -75,7 +75,7 @@ export class KobeissiAdapter implements SourceAdapter {
 
       const out: Candidate[] = [];
 
-      for (const link of links.slice(0, 5)) {
+      for (const link of dedupeKblLinks(links).slice(0, 5)) {
         try {
           const article = await this.extractArticle(link.href, link.text, token);
           if (article) out.push(article);
@@ -102,44 +102,68 @@ export class KobeissiAdapter implements SourceAdapter {
     const html = await fetchAuth(url, token);
     const $ = cheerio.load(html);
 
-    $("nav, footer, script, style, header, [class*='sidebar']").remove();
+    $("nav, footer, script, style, header, aside, [class*='sidebar'], [class*='menu'], [class*='cookie'], [class*='share'], [class*='social'], [class*='related'], [class*='comment'], [class*='subscribe']").remove();
 
     const title =
       $("h1").first().text().trim() ||
       $("title").text().trim() ||
       fallbackTitle;
 
-    let body = "";
+    const body = this.extractBodyText($);
+
+    if (!body || body.length < 100) return null;
+
+    return {
+      externalId: url,
+      sourceUrl: url,
+      rawText: `The Kobeissi Letter — ${title}\n\n${body.slice(0, 8000)}`,
+      meta: { title, url },
+    };
+  }
+
+  private extractBodyText($: cheerio.CheerioAPI): string {
     const selectors = [
       "article",
       '[class*="newsletter"]',
+      '[class*="rich-text"]',
+      '[class*="blog-content"]',
+      '[class*="post-content"]',
       '[class*="content"]',
       '[class*="post-body"]',
-      '[class*="entry"]',
+      '[class*="entry-content"]',
+      '[class*="article-body"]',
+      '[data-content]',
       "main",
     ];
 
     for (const sel of selectors) {
       const el = $(sel);
-      if (el.length && el.text().trim().length > 200) {
-        body = el.text().replace(/\s+/g, " ").trim();
-        break;
+      if (el.length) {
+        const text = el.text().replace(/\s+/g, " ").trim();
+        if (text.length > 200) return text;
       }
     }
 
-    if (!body || body.length < 100) {
-      body = $("body").text().replace(/\s+/g, " ").trim();
+    // Paragraph-gathering fallback: collect all <p> tags from body
+    const paragraphs: string[] = [];
+    $("body p").each((_, el) => {
+      const text = $(el).text().replace(/\s+/g, " ").trim();
+      if (text.length > 30) paragraphs.push(text);
+    });
+    if (paragraphs.join(" ").length > 200) {
+      return paragraphs.join("\n\n");
     }
 
-    if (body.length < 100) return null;
-
-    const rawText = body.slice(0, 8000);
-
-    return {
-      externalId: url,
-      sourceUrl: url,
-      rawText: `The Kobeissi Letter — ${title}\n\n${rawText}`,
-      meta: { title, url },
-    };
+    const body = $("body").text().replace(/\s+/g, " ").trim();
+    return body;
   }
+}
+
+function dedupeKblLinks(links: { href: string; text: string }[]) {
+  const seen = new Set<string>();
+  return links.filter((l) => {
+    if (seen.has(l.href)) return false;
+    seen.add(l.href);
+    return true;
+  });
 }

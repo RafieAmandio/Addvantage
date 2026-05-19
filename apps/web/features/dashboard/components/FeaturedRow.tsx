@@ -48,7 +48,7 @@ export function FeaturedRow({
               <div className="mt-4 space-y-2">
                 {topNews.map((n) => {
                   const seen = seenHydrated && seenNewsIds.includes(n.id);
-                  const ts = n.published_at ?? n.fetched_at;
+                  const ts = n.publishedAt ?? n.fetchedAt;
                   return (
                     <Link
                       key={n.id}
@@ -60,7 +60,7 @@ export function FeaturedRow({
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-xs font-medium text-brand">
-                          {n.source_code}
+                          {n.sourceCode}
                         </span>
                         <ImpactPill level={n.impact} />
                         <BiasBadge bias={n.bias} />

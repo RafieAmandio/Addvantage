@@ -6,14 +6,13 @@ import { tradingPlans as mockPlans } from "@/features/plan/mock";
 import { calendar as mockCalendar } from "@/features/calendar/mock";
 
 function deriveSourceCode(author: string): string {
-  // Prototype mocks use ANTS author names, not valid source_codes — truncate to fit the byline chip.
   return author.slice(0, 4).toUpperCase();
 }
 
 export function mockApprovedNews(): NewsListItem[] {
   return mockNews.map((n) => ({
     id: n.id,
-    source_code: deriveSourceCode(n.author),
+    sourceCode: deriveSourceCode(n.author),
     headline: n.headline,
     analysis: n.analysis,
     impact: n.impact,
@@ -21,9 +20,9 @@ export function mockApprovedNews(): NewsListItem[] {
     affects: n.affects,
     tags: n.tags,
     author: n.author,
-    published_at: n.ts,
-    fetched_at: n.ts,
-    related_plan_ids: n.relatedPlanIds ?? [],
+    publishedAt: n.ts,
+    fetchedAt: n.ts,
+    relatedPlanIds: n.relatedPlanIds ?? [],
   }));
 }
 
@@ -43,13 +42,12 @@ export function mockPublishedPlans(): Plan[] {
       entry: null,
       stop: null,
       target: null,
-      r_multiple: null,
+      rMultiple: null,
       setups: p.setups.map((s) => ({
         label: s.instrument,
         trigger: s.entry,
         invalidation: s.invalidation,
         note: s.rationale,
-        // Extra prototype-only fields ride through via `.passthrough()`.
         instrument: s.instrument,
         direction: s.direction,
         bias: s.bias,
@@ -67,13 +65,13 @@ export function mockPublishedPlans(): Plan[] {
       tier: "free",
       status: isLatest ? "published" : "closed",
       outcome: isLatest ? null : "win",
-      close_price: null,
-      realized_r: isLatest ? null : 1.65,
-      author_id: null,
-      created_at: `${p.date}T08:00:00Z`,
-      updated_at: `${p.date}T08:00:00Z`,
-      published_at: `${p.date}T08:00:00Z`,
-      closed_at: isLatest ? null : `${p.date}T20:00:00Z`,
+      closePrice: null,
+      realizedR: isLatest ? null : 1.65,
+      authorId: null,
+      createdAt: `${p.date}T08:00:00Z`,
+      updatedAt: `${p.date}T08:00:00Z`,
+      publishedAt: `${p.date}T08:00:00Z`,
+      closedAt: isLatest ? null : `${p.date}T20:00:00Z`,
     };
   });
 }
@@ -118,15 +116,15 @@ function macroEvents(): TimelineEvent[] {
     (e): TimelineEvent => ({
       id: e.id,
       kind: "macro",
-      source_code: "FF",
-      occurred_at: e.ts,
+      sourceCode: "FF",
+      occurredAt: e.ts,
       symbols: [regionToSymbol(e.region)],
       title: e.title,
       body: e.notes ?? null,
       url: null,
       bias: null,
       impact: e.impact,
-      news_item_id: e.relatedNewsId ?? null,
+      newsItemId: e.relatedNewsId ?? null,
     })
   );
 }
@@ -136,15 +134,15 @@ function newsTimelineEvents(): TimelineEvent[] {
     (n): TimelineEvent => ({
       id: `te-news-${n.id}`,
       kind: "news",
-      source_code: deriveSourceCode(n.author),
-      occurred_at: n.ts,
+      sourceCode: deriveSourceCode(n.author),
+      occurredAt: n.ts,
       symbols: n.affects,
       title: n.headline,
       body: n.analysis,
       url: null,
       bias: n.bias,
       impact: n.impact,
-      news_item_id: n.id,
+      newsItemId: n.id,
     })
   );
 }
@@ -228,15 +226,15 @@ function tweetEvents(): TimelineEvent[] {
   return seeds.map((s, i) => ({
     id: `te-tweet-${i}`,
     kind: "tweet" as const,
-    source_code: "TRUMP",
-    occurred_at: hoursAgo(s.h),
+    sourceCode: "TRUMP",
+    occurredAt: hoursAgo(s.h),
     symbols: s.symbols,
     title: s.title,
     body: s.body,
     url: null,
     bias: s.bias,
     impact: s.impact,
-    news_item_id: null,
+    newsItemId: null,
   }));
 }
 

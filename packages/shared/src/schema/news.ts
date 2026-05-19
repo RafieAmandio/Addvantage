@@ -8,16 +8,15 @@ import {
 import { SOURCE_CODES } from "../constants/sources";
 
 /**
- * Canonical news item shape — mirrors the `news_items` table.
- * Used by web (display + edits) and worker (persist).
+ * Canonical news item shape — mirrors the `news_items` table (Prisma camelCase).
  */
 export const NewsItemSchema = z.object({
   id: z.string().uuid(),
-  source_code: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
-  source_url: z.string().url().nullable(),
-  content_hash: z.string(),
-  fetched_at: z.string(),
-  raw_text: z.string(),
+  sourceCode: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
+  sourceUrl: z.string().url().nullable(),
+  contentHash: z.string(),
+  fetchedAt: z.string(),
+  rawText: z.string(),
   headline: z.string().min(1).max(240),
   rephrased: z.string().min(1),
   analysis: z.string().min(1),
@@ -27,12 +26,12 @@ export const NewsItemSchema = z.object({
   tags: z.array(z.enum(HASHTAGS)).default([]),
   author: z.string(),
   status: z.enum(NEWS_STATUSES),
-  reviewed_by: z.string().uuid().nullable(),
-  reviewed_at: z.string().nullable(),
-  published_at: z.string().nullable(),
-  related_plan_ids: z.array(z.string()).default([]),
-  created_at: z.string(),
-  updated_at: z.string(),
+  reviewedBy: z.string().uuid().nullable(),
+  reviewedAt: z.string().nullable(),
+  publishedAt: z.string().nullable(),
+  relatedPlanIds: z.array(z.string()).default([]),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export type NewsItem = z.infer<typeof NewsItemSchema>;
@@ -55,8 +54,6 @@ export type NewsItemEdit = z.infer<typeof NewsItemEditSchema>;
 
 /**
  * Shape for manually creating a news item from the admin panel.
- * Covers all user-facing fields; server action fills id, content_hash,
- * timestamps, and review metadata.
  */
 export const NewsItemCreateSchema = z.object({
   headline: z.string().min(1, "Headline is required").max(240),
@@ -67,9 +64,9 @@ export const NewsItemCreateSchema = z.object({
   affects: z.array(z.string()),
   tags: z.array(z.enum(HASHTAGS)),
   author: z.string().min(1, "Author is required"),
-  source_code: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
-  source_url: z.string().url().nullable(),
-  raw_text: z.string().nullable(),
+  sourceCode: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
+  sourceUrl: z.string().url().nullable(),
+  rawText: z.string().nullable(),
 });
 
 export type NewsItemCreate = z.infer<typeof NewsItemCreateSchema>;

@@ -1,54 +1,25 @@
-import * as cheerio from "cheerio";
-import { fetchText } from "../lib/http";
-import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAdapter } from "./base";
+import { type AdapterContext, type Candidate, type SourceAdapter } from "./base";
 
 /**
- * S&P Dow Jones Indices — the entire `www.spglobal.com/spdji/` hostname is
- * behind a Cloudflare edge that requires a real browser JS challenge; no
- * header combination gets a 200 from a plain HTTP client. This adapter is
- * kept as a graceful no-op for now.
+ * S&P Dow Jones Indices — disabled. All S&P Global properties (spglobal.com,
+ * indexologyblog.com, press.spglobal.com) are behind Cloudflare JS challenges
+ * that reject plain HTTP clients. No public RSS feed is available.
  *
  * To actually ingest SPDJI you'd need one of:
- *   1. A headless browser worker (playwright) that completes the JS challenge.
- *   2. A paid Cloudflare-bypass service (FlareSolverr, ScrapFly, Bright Data).
- *   3. An RSS or API partnership with S&P.
+ *   1. A headless browser (Playwright) that completes the JS challenge.
+ *   2. A paid bypass service (FlareSolverr, ScrapFly, Bright Data).
+ *   3. An API/data partnership with S&P.
  *
- * We disable the source in the DB via migration 0006 so the scheduler skips
- * it. If you flip `sources.enabled = true` for 'SPDJI' manually, this adapter
- * will attempt the fetch and log a warning on failure rather than crashing.
+ * The source is disabled in the DB (migration 0006). This adapter exists so
+ * the registry stays complete and the scheduler doesn't crash if someone
+ * accidentally enables it.
  */
 export class SpdjiAdapter implements SourceAdapter {
   readonly code = "SPDJI";
   readonly name = "S&P Dow Jones Indices";
 
   async fetch(ctx: AdapterContext): Promise<Candidate[]> {
-    const url = "https://www.spglobal.com/spdji/en/news-research/";
-    try {
-      const html = await fetchText(url, { retries: 1 });
-      const $ = cheerio.load(html);
-      const out: Candidate[] = [];
-
-      $("a").each((_, el) => {
-        const href = $(el).attr("href") ?? "";
-        const title = $(el).text().trim();
-        if (!title || title.length < 20) return;
-        if (!/news|release|announcement|rebalance|methodology/i.test(href + title)) return;
-
-        const absUrl = href.startsWith("http")
-          ? href
-          : `https://www.spglobal.com${href}`;
-        out.push({
-          externalId: absUrl,
-          sourceUrl: absUrl,
-          rawText: `${title}\n\nSource: S&P Dow Jones Indices — ${absUrl}`,
-          meta: { href: absUrl },
-        });
-      });
-
-      return dedupeByExternalId(out).slice(0, 8);
-    } catch (err) {
-      ctx.logger.warn({ err: String(err) }, "spdji unavailable (Cloudflare)");
-      return [];
-    }
+    ctx.logger.info("spdji: adapter disabled — all S&P properties require Cloudflare JS challenge");
+    return [];
   }
 }

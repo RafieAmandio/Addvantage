@@ -93,11 +93,11 @@ export default async function TagPage({
                 >
                   <div className="flex items-baseline justify-between">
                     <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                      [{n.source_code}]
+                      [{n.sourceCode}]
                     </div>
-                    {n.published_at && (
+                    {n.publishedAt && (
                       <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                        {formatDate(n.published_at)}
+                        {formatDate(n.publishedAt)}
                       </div>
                     )}
                   </div>

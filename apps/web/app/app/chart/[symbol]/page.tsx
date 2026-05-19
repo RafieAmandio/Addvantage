@@ -88,10 +88,10 @@ export default async function ChartPage({
 
   const markers: ChartMarker[] = events.map((e) => ({
     id: e.id,
-    time: e.occurred_at,
+    time: e.occurredAt,
     kind: e.kind,
     title: e.title,
-    sourceCode: e.source_code,
+    sourceCode: e.sourceCode,
     body: e.body,
     bias: e.bias,
     impact: e.impact,

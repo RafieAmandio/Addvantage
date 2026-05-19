@@ -27,7 +27,7 @@ export const planCreateSchema = z.object({
   entry: nullableNumber,
   stop: nullableNumber,
   target: nullableNumber,
-  r_multiple: nullableNumber,
+  rMultiple: nullableNumber,
   setups: z.array(PlanSetupSchema).default([]),
   tags: z.array(z.string()).default([]),
   tier: z.enum(["free", "vip"]).default("free"),
@@ -37,5 +37,5 @@ export const planUpdateSchema = planCreateSchema.partial();
 
 export const planCloseSchema = z.object({
   outcome: z.enum(["win", "loss", "breakeven", "stopped"]),
-  close_price: nullableNumber,
+  closePrice: nullableNumber,
 });

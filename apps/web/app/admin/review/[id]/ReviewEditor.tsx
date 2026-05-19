@@ -5,9 +5,7 @@ import Link from "next/link";
 import { HASHTAGS, IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
 import { approveItem, rejectItem, saveDraft } from "./actions";
-import type { Database } from "@tradevantage/db";
-
-type NewsRow = Database["public"]["Tables"]["news_items"]["Row"];
+import type { NewsRow } from "@/features/news/queries/news";
 
 function Collapsible({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -90,7 +88,7 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
             /
           </span>
           <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            [{item.source_code}]
+            [{item.sourceCode}]
           </span>
           <span
             className={cn("border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2", statusChip)}
@@ -135,20 +133,20 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="border border-gray-3 bg-gray-2/20 p-6">
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-            ORIGINAL · [{item.source_code}]
+            ORIGINAL · [{item.sourceCode}]
           </div>
-          {item.source_url && (
+          {item.sourceUrl && (
             <a
-              href={item.source_url}
+              href={item.sourceUrl}
               target="_blank"
               rel="noreferrer"
               className="block truncate border border-gray-3 bg-black px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
-              ↗ {item.source_url}
+              ↗ {item.sourceUrl}
             </a>
           )}
           <pre className="mt-4 whitespace-pre-wrap font-mono text-xs leading-relaxed text-white/80">
-            {item.raw_text ?? "(no raw text stored)"}
+            {item.rawText ?? "(no raw text stored)"}
           </pre>
         </div>
 
@@ -260,30 +258,30 @@ export function ReviewEditor({ item }: { item: NewsRow }) {
         </div>
       </div>
 
-      {(item.ai_system_prompt || item.ai_user_message || item.ai_raw_response) && (
+      {(item.aiSystemPrompt || item.aiUserMessage || item.aiRawResponse) && (
         <div className="mt-6">
           <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
             AI PIPELINE · AUDIT TRAIL
           </div>
           <div className="space-y-px">
-            {item.ai_system_prompt && (
+            {item.aiSystemPrompt && (
               <Collapsible label="System prompt">
                 <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
-                  {item.ai_system_prompt}
+                  {item.aiSystemPrompt}
                 </pre>
               </Collapsible>
             )}
-            {item.ai_user_message && (
+            {item.aiUserMessage && (
               <Collapsible label="User message (sent to OpenAI)">
                 <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
-                  {item.ai_user_message}
+                  {item.aiUserMessage}
                 </pre>
               </Collapsible>
             )}
-            {item.ai_raw_response && (
+            {item.aiRawResponse && (
               <Collapsible label="Raw AI response (before parsing)">
                 <pre className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-white/70">
-                  {formatJson(item.ai_raw_response)}
+                  {formatJson(item.aiRawResponse)}
                 </pre>
               </Collapsible>
             )}

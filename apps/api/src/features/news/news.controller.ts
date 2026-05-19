@@ -47,9 +47,9 @@ export const newsController = {
       affects: data.affects,
       tags: data.tags,
       author: data.author,
-      sourceCode: data.source_code,
-      sourceUrl: data.source_url,
-      rawText: data.raw_text,
+      sourceCode: data.sourceCode,
+      sourceUrl: data.sourceUrl,
+      rawText: data.rawText,
     });
     sendSuccess(res, result, "News item created", 201);
   }),

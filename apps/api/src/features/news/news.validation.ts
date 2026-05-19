@@ -10,9 +10,9 @@ export const newsCreateSchema = z.object({
   affects: z.array(z.string()).default([]),
   tags: z.array(z.enum(HASHTAGS)).default([]),
   author: z.string().min(1),
-  source_code: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
-  source_url: z.string().url().nullable().default(null),
-  raw_text: z.string().nullable().default(null),
+  sourceCode: z.enum(SOURCE_CODES as unknown as [string, ...string[]]),
+  sourceUrl: z.string().url().nullable().default(null),
+  rawText: z.string().nullable().default(null),
 });
 
 export const newsEditSchema = z.object({

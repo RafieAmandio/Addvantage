@@ -55,7 +55,7 @@ export function NewsRows({
         <div className="mt-3">
           {highImpactFirst.map((n, i) => {
             const seen = seenHydrated && seenNewsIds.includes(n.id);
-            const ts = n.published_at ?? n.fetched_at;
+            const ts = n.publishedAt ?? n.fetchedAt;
             return (
               <Link
                 key={n.id}
@@ -67,7 +67,7 @@ export function NewsRows({
                 )}
               >
                 <span className="w-8 shrink-0 text-[11px] font-medium text-brand">
-                  {n.source_code}
+                  {n.sourceCode}
                 </span>
                 <ImpactPill level={n.impact} />
                 <span className="min-w-0 flex-1 truncate text-sm text-white transition-colors group-hover:text-brand">

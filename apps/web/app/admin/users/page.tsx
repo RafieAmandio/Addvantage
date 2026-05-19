@@ -11,11 +11,11 @@ type User = {
   email: string;
   handle: string | null;
   tier: string;
-  is_admin: boolean;
-  signed_liability: boolean;
-  joined_at: string;
-  trading_length: string | null;
-  longest_profitable: string | null;
+  isAdmin: boolean;
+  signedLiability: boolean;
+  joinedAt: string;
+  tradingLength: string | null;
+  longestProfitable: string | null;
   markets: string[];
 };
 
@@ -73,18 +73,18 @@ export default async function AdminUsersPage() {
                 >
                   {u.tier}
                 </span>
-                {u.is_admin && (
+                {u.isAdmin && (
                   <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
                     Admin
                   </span>
                 )}
                 <span className="text-white/10">·</span>
                 <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                  {u.signed_liability ? "Liability signed" : "No waiver"}
+                  {u.signedLiability ? "Liability signed" : "No waiver"}
                 </span>
                 <span className="text-white/10">·</span>
                 <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                  {u.trading_length ?? "—"} exp
+                  {u.tradingLength ?? "—"} exp
                 </span>
                 {u.markets.length > 0 && (
                   <>
@@ -101,7 +101,7 @@ export default async function AdminUsersPage() {
                 )}
                 <span className="text-white/10">·</span>
                 <span className="font-mono text-[9px] text-white/20">
-                  {formatDate(u.joined_at)}
+                  {formatDate(u.joinedAt)}
                 </span>
               </div>
             </div>

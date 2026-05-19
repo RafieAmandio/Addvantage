@@ -61,11 +61,18 @@ export abstract class AIProvider {
       };
     }
 
+    this.applyExtraParams(params);
+
     const res = await this.client.chat.completions.create(params);
-    const text = res.choices[0]?.message?.content;
+    const msg = res.choices[0]?.message;
+    const text = msg?.content
+      || (msg as unknown as Record<string, string>)?.reasoning_content
+      || null;
     if (!text) throw new Error("ai: empty response");
     return text;
   }
+
+  protected applyExtraParams(_params: ChatCompletionCreateParamsNonStreaming): void {}
 
   async vision(req: VisionRequest): Promise<string> {
     const res = await this.client.chat.completions.create({
@@ -107,6 +114,14 @@ class StandardProvider extends AIProvider {
 
   protected override get defaultTemperature(): number | undefined {
     return this.opts.temperature;
+  }
+}
+
+class MoonshotProvider extends StandardProvider {
+  protected override applyExtraParams(params: ChatCompletionCreateParamsNonStreaming): void {
+    // kimi-k2.6 is a reasoning model that puts output in reasoning_content
+    // and returns empty content unless thinking is explicitly disabled.
+    (params as unknown as Record<string, unknown>).thinking = { type: "disabled" };
   }
 }
 
@@ -181,7 +196,7 @@ const PROVIDERS: Record<LLMProvider, (apiKey: string, baseURL?: string) => AIPro
   openlimits: (key, url) =>
     new OpenLimitsProvider(key, url ?? "https://openlimits.app/v1"),
   moonshot: (key, url) =>
-    new StandardProvider(key, url ?? "https://api.moonshot.ai/v1", { jsonSchema: true, temperature: undefined }),
+    new MoonshotProvider(key, url ?? "https://api.moonshot.ai/v1", { jsonSchema: true, temperature: undefined }),
 };
 
 let instance: AIProvider | null = null;

@@ -34,7 +34,7 @@ export function BriefClient({ news, plan }: Props) {
     : 0;
 
   const latestTs = news[0]
-    ? (news[0].published_at ?? news[0].fetched_at)
+    ? (news[0].publishedAt ?? news[0].fetchedAt)
     : null;
 
   return (
@@ -91,7 +91,7 @@ export function BriefClient({ news, plan }: Props) {
             <div className="mt-4 space-y-px bg-gray-3">
               {topNews.map((n) => {
                 const seen = seenHydrated && seenIds.includes(n.id);
-                const ts = n.published_at ?? n.fetched_at;
+                const ts = n.publishedAt ?? n.fetchedAt;
                 return (
                   <Link
                     key={n.id}
@@ -103,7 +103,7 @@ export function BriefClient({ news, plan }: Props) {
                   >
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                        [{n.source_code}]
+                        [{n.sourceCode}]
                       </span>
                       <ImpactPill level={n.impact} />
                       <BiasBadge bias={n.bias} />

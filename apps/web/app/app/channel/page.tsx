@@ -12,10 +12,10 @@ interface ChannelPost {
   id: string;
   author: string;
   body: string;
-  image_url: string | null;
+  imageUrl: string | null;
   tags: string[];
   pinned: boolean;
-  created_at: string;
+  createdAt: string;
 }
 
 export default async function ChannelPage() {
@@ -73,7 +73,7 @@ export default async function ChannelPage() {
               <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-brand" />
               <div className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2">
                 <span className="text-white/60">
-                  {formatDate(p.created_at)} · {formatTime(p.created_at)}Z
+                  {formatDate(p.createdAt)} · {formatTime(p.createdAt)}Z
                 </span>
                 <span className="text-white/40">·</span>
                 <span className="text-brand">BY {p.author.toUpperCase()}</span>
@@ -87,11 +87,11 @@ export default async function ChannelPage() {
               <p className="mt-3 font-display text-xl leading-snug text-white whitespace-pre-wrap">
                 {p.body}
               </p>
-              {p.image_url && (
+              {p.imageUrl && (
                 <div className="mt-4">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={p.image_url}
+                    src={p.imageUrl}
                     alt=""
                     className="max-w-full rounded border border-gray-3"
                   />

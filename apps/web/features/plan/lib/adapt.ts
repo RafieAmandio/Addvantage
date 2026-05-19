@@ -161,7 +161,7 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
 
   const risks = extractRisks(plan.setups);
 
-  const date = plan.published_at ?? plan.created_at;
+  const date = plan.publishedAt ?? plan.createdAt;
   const isoDate = date.length >= 10 ? date.slice(0, 10) : date;
 
   return {

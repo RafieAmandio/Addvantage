@@ -15,15 +15,15 @@ export type TimelineKind = (typeof TIMELINE_KINDS)[number];
 export const TimelineEventSchema = z.object({
   id: z.string(),
   kind: z.enum(TIMELINE_KINDS),
-  source_code: z.string().nullable(),
-  occurred_at: z.string(),
+  sourceCode: z.string().nullable(),
+  occurredAt: z.string(),
   symbols: z.array(z.string()),
   title: z.string(),
   body: z.string().nullable(),
   url: z.string().nullable(),
   bias: z.enum(BIAS_LEVELS).nullable(),
   impact: z.enum(IMPACT_LEVELS).nullable(),
-  news_item_id: z.string().nullable(),
+  newsItemId: z.string().nullable(),
 });
 export type TimelineEvent = z.infer<typeof TimelineEventSchema>;
 

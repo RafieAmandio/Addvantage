@@ -17,12 +17,12 @@ function rowToMessage(row: {
   id: string;
   role: string;
   content: string;
-  created_at: string;
+  createdAt: string;
 }): ConsultMessage {
   return {
     id: row.id,
     role: row.role === "user" ? "user" : "ai",
-    ts: row.created_at,
+    ts: row.createdAt,
     body: row.content,
     tags: [],
   };
@@ -38,8 +38,8 @@ export default async function ConsultPage({
   const sessions: LocalSession[] = rows.map((r) => ({
     id: r.id,
     title: r.title,
-    startedAt: r.created_at,
-    lastAt: r.updated_at,
+    startedAt: r.createdAt,
+    lastAt: r.updatedAt,
     tags: [],
     messages: [],
   }));

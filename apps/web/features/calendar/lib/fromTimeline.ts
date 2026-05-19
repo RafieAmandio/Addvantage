@@ -30,12 +30,12 @@ export function timelineEventToCalendarEvent(
 
   return {
     id: row.id,
-    ts: row.occurred_at,
+    ts: row.occurredAt,
     region,
     title: row.title,
     impact: row.impact ?? "low",
     scores,
     ...(row.body ? { notes: row.body } : {}),
-    ...(row.news_item_id ? { relatedNewsId: row.news_item_id } : {}),
+    ...(row.newsItemId ? { relatedNewsId: row.newsItemId } : {}),
   };
 }

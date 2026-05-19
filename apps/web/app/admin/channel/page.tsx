@@ -7,11 +7,11 @@ interface ChannelPost {
   id: string;
   author: string;
   body: string;
-  image_url: string | null;
+  imageUrl: string | null;
   tags: string[];
   pinned: boolean;
   published: boolean;
-  created_at: string;
+  createdAt: string;
 }
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
@@ -82,7 +82,7 @@ export default function AdminChannelPage() {
     setAuthor(post.author);
     setTags(post.tags.join(", "));
     setPinned(post.pinned);
-    setImagePreview(post.image_url);
+    setImagePreview(post.imageUrl);
     setImageFile(null);
     setEditId(post.id);
     setShowForm(true);
@@ -109,7 +109,7 @@ export default function AdminChannelPage() {
       const payload = {
         body: body.trim(),
         author,
-        image_url: imageUrl,
+        imageUrl,
         tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
         pinned,
         published: true,
@@ -330,7 +330,7 @@ export default function AdminChannelPage() {
                     )}
                   </div>
                   <div className="mt-0.5 font-mono text-[9px] text-white/30">
-                    {new Date(post.created_at).toLocaleString()}
+                    {new Date(post.createdAt).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -359,11 +359,11 @@ export default function AdminChannelPage() {
               <p className="font-mono text-sm font-light leading-relaxed text-white/80 whitespace-pre-wrap">
                 {post.body}
               </p>
-              {post.image_url && (
+              {post.imageUrl && (
                 <div className="mt-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={post.image_url}
+                    src={post.imageUrl}
                     alt=""
                     className="max-h-64 border border-gray-3"
                   />

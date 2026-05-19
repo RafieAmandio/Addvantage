@@ -78,7 +78,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
     [relatedFeed, item.id, item.tags]
   );
 
-  const ts = item.published_at ?? item.fetched_at;
+  const ts = item.publishedAt ?? item.fetchedAt;
 
   return (
     <div className="bg-grid-fine stagger">
@@ -88,13 +88,13 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             items={[
               { label: "Home", href: "/app" },
               { label: "News", href: "/app/news" },
-              { label: `[${item.source_code}]` },
+              { label: `[${item.sourceCode}]` },
             ]}
           />
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-              [{item.source_code}]
+              [{item.sourceCode}]
             </span>
             <ImpactPill level={item.impact} />
             <BiasBadge bias={item.bias} />
@@ -141,7 +141,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           <div className="col-span-12 md:col-span-5">
             <SectionNumber n="03 /" label="METADATA" />
             <dl className="mt-4 space-y-2 border border-gray-3 bg-gray-2/30 p-4 font-mono text-xs">
-              <Row label="Source" value={`[${item.source_code}]`} />
+              <Row label="Source" value={`[${item.sourceCode}]`} />
               <Row label="Author" value={item.author} />
               <Row label="Captured" value={`${formatTime(ts)}Z`} />
               <Row label="Impact" value={item.impact.toUpperCase()} />
@@ -150,13 +150,13 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
           </div>
         </div>
 
-        {(item.related_plan_ids ?? []).length > 0 && (
+        {(item.relatedPlanIds ?? []).length > 0 && (
           <>
             <div className="mt-8 sm:mt-12">
               <SectionNumber n="04 /" label="LINKED PLANS" />
             </div>
             <RelatedPlansChips
-              planIds={item.related_plan_ids}
+              planIds={item.relatedPlanIds}
               className="mt-4"
             />
           </>
@@ -197,7 +197,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        [{n.source_code}]
+                        [{n.sourceCode}]
                       </span>
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                         · BY {n.author.toUpperCase()}

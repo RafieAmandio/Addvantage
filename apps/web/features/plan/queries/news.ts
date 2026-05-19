@@ -3,10 +3,10 @@ import { apiGet } from "@/lib/api/client-server";
 
 const NewsForPlanRowSchema = z.object({
   id: z.string(),
-  source_code: z.string(),
+  sourceCode: z.string(),
   headline: z.string(),
-  fetched_at: z.string(),
-  published_at: z.string().nullable(),
+  fetchedAt: z.string(),
+  publishedAt: z.string().nullable(),
 });
 type NewsForPlanRow = z.infer<typeof NewsForPlanRowSchema>;
 

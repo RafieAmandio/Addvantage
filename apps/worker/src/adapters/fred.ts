@@ -56,9 +56,15 @@ export class FredAdapter implements SourceAdapter {
         const [latest, prev] = obs.observations;
         if (!latest || latest.value === ".") continue;
 
-        const rawText = prev && prev.value !== "."
-          ? `${s.label} (${s.id}): latest observation ${latest.value} for ${latest.date}, previous ${prev.value} for ${prev.date}.`
-          : `${s.label} (${s.id}): latest observation ${latest.value} for ${latest.date}.`;
+        let rawText = `${s.label} (${s.id}): latest observation ${latest.value} for ${latest.date}.`;
+        if (prev && prev.value !== ".") {
+          const cur = parseFloat(latest.value);
+          const prv = parseFloat(prev.value);
+          const delta = cur - prv;
+          const pct = prv !== 0 ? ((delta / Math.abs(prv)) * 100).toFixed(2) : "N/A";
+          const dir = delta > 0 ? "up" : delta < 0 ? "down" : "unchanged";
+          rawText = `${s.label} (${s.id}): latest ${latest.value} (${latest.date}), previous ${prev.value} (${prev.date}). Change: ${dir} ${Math.abs(delta).toFixed(4)} (${pct}%).`;
+        }
 
         out.push({
           externalId: `${s.id}:${latest.date}`,

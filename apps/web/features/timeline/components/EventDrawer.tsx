@@ -78,13 +78,13 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
               >
                 {event.kind}
               </span>
-              {event.source_code && (
+              {event.sourceCode && (
                 <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                  [{event.source_code}]
+                  [{event.sourceCode}]
                 </span>
               )}
               <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {formatOccurredAt(event.occurred_at)}
+                {formatOccurredAt(event.occurredAt)}
               </span>
             </div>
           </div>

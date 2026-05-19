@@ -21,7 +21,7 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
         </header>
         <ul className="divide-y divide-gray-3">
           {rows.map((n) => {
-            const ts = n.published_at ?? n.fetched_at;
+            const ts = n.publishedAt ?? n.fetchedAt;
             return (
               <li key={n.id}>
                 <Link
@@ -29,7 +29,7 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
                   className="group block px-4 py-3 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
                 >
                   <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                    <span className="text-brand">[{n.source_code}]</span>
+                    <span className="text-brand">[{n.sourceCode}]</span>
                     <span>
                       · {formatDate(ts)} · {formatTime(ts)}Z
                     </span>

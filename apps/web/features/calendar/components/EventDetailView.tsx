@@ -27,7 +27,7 @@ export function EventDetailView({
               /
             </span>
             <DataLabel>
-              {event.kind.toUpperCase()} · {formatTime(event.occurred_at)}Z
+              {event.kind.toUpperCase()} · {formatTime(event.occurredAt)}Z
             </DataLabel>
           </div>
           <h1 className="mt-3 font-display text-4xl leading-tight text-white">

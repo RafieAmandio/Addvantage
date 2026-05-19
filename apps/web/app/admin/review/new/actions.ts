@@ -25,8 +25,8 @@ export async function createNewsItem(
 ): Promise<CreateFormState> {
   await requireAdmin();
 
-  const sourceUrl = formData.get("source_url");
-  const rawText = formData.get("raw_text");
+  const sourceUrl = formData.get("sourceUrl");
+  const rawText = formData.get("rawText");
 
   const parse = NewsItemCreateSchema.safeParse({
     headline: formData.get("headline"),
@@ -37,9 +37,9 @@ export async function createNewsItem(
     affects: parseArrayField(formData.get("affects")),
     tags: parseArrayField(formData.get("tags")),
     author: formData.get("author"),
-    source_code: formData.get("source_code"),
-    source_url: sourceUrl ? String(sourceUrl) : null,
-    raw_text: rawText ? String(rawText) : null,
+    sourceCode: formData.get("sourceCode"),
+    sourceUrl: sourceUrl ? String(sourceUrl) : null,
+    rawText: rawText ? String(rawText) : null,
   });
 
   if (!parse.success) {

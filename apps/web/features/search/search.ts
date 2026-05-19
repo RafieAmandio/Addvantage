@@ -137,7 +137,7 @@ function scoreHaystack(
 
 interface NewsApiResult {
   id: string;
-  source_code: string;
+  sourceCode: string;
   headline: string;
   analysis: string;
   impact: string;
@@ -145,8 +145,8 @@ interface NewsApiResult {
   affects: string[];
   tags: string[];
   author: string;
-  published_at: string | null;
-  fetched_at: string;
+  publishedAt: string | null;
+  fetchedAt: string;
 }
 
 async function fetchNewsResults(query: string): Promise<SearchResult[]> {

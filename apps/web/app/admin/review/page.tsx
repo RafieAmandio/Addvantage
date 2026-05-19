@@ -78,11 +78,11 @@ export default async function AdminReviewQueuePage() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                  [{n.source_code}]
+                  [{n.sourceCode}]
                 </span>
               </div>
               <div className="mt-2 pl-7 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                {formatDateTime(n.fetched_at)}
+                {formatDateTime(n.fetchedAt)}
               </div>
               <div className="mt-2 flex gap-2 pl-7 font-mono text-[9px] uppercase tracking-widest2">
                 <span className="text-brand">{n.impact}</span>

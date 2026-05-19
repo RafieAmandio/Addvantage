@@ -68,17 +68,17 @@ export default async function AdminSourcesPage() {
                 <div className="mt-3 grid grid-cols-1 gap-4 font-mono text-[9px] uppercase tracking-widest2 sm:grid-cols-3">
                   <Stat
                     label="Last poll"
-                    value={s.last_polled_at ? formatDateTime(s.last_polled_at) : "—"}
+                    value={s.lastPolledAt ? formatDateTime(s.lastPolledAt) : "—"}
                   />
                   <Stat
                     label="Last success"
-                    value={s.last_success_at ? formatDateTime(s.last_success_at) : "—"}
+                    value={s.lastSuccessAt ? formatDateTime(s.lastSuccessAt) : "—"}
                   />
-                  <Stat label="Interval" value={`${s.poll_minutes}m`} />
+                  <Stat label="Interval" value={`${s.pollMinutes}m`} />
                 </div>
-                {s.last_error && (
+                {s.lastError && (
                   <div className="mt-2 border border-blood-bright/30 bg-blood-bright/5 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-                    ● {s.last_error}
+                    ● {s.lastError}
                   </div>
                 )}
               </div>

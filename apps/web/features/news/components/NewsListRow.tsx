@@ -18,7 +18,7 @@ interface NewsListRowProps {
 }
 
 function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
-  const ts = item.published_at ?? item.fetched_at;
+  const ts = item.publishedAt ?? item.fetchedAt;
   return (
     <Link
       href={`/app/news/${item.id}`}
@@ -30,7 +30,7 @@ function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
       <div className="col-span-12 lg:col-span-2">
         <div className="flex items-center gap-2">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            [{item.source_code}]
+            [{item.sourceCode}]
           </div>
           {isSeen && (
             <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/40">

@@ -24,11 +24,11 @@ export const channelController = {
   }),
 
   create: asyncHandler(async (req, res: Response) => {
-    const { body, author, image_url, tags, pinned, published } = req.body;
+    const { body, author, imageUrl, tags, pinned, published } = req.body;
     const post = await channelService.create({
       body,
       author,
-      imageUrl: image_url,
+      imageUrl,
       tags: tags ?? [],
       pinned: pinned ?? false,
       published: published ?? true,
@@ -37,11 +37,11 @@ export const channelController = {
   }),
 
   update: asyncHandler(async (req, res: Response) => {
-    const { body, author, image_url, tags, pinned, published } = req.body;
+    const { body, author, imageUrl, tags, pinned, published } = req.body;
     const post = await channelService.update(req.params.id, {
       body,
       author,
-      imageUrl: image_url,
+      imageUrl,
       tags,
       pinned,
       published,

@@ -41,16 +41,16 @@ type ConsultMessageRole = (typeof CONSULT_MESSAGE_ROLES)[number];
 export const ConsultSessionRowSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 export type ConsultSessionRow = z.infer<typeof ConsultSessionRowSchema>;
 
 export const ConsultMessageRowSchema = z.object({
   id: z.string().uuid(),
-  session_id: z.string().uuid(),
+  sessionId: z.string().uuid(),
   role: z.enum(CONSULT_MESSAGE_ROLES),
   content: z.string(),
-  created_at: z.string(),
+  createdAt: z.string(),
 });
 export type ConsultMessageRow = z.infer<typeof ConsultMessageRowSchema>;

@@ -14,9 +14,9 @@ const MOCK_PROFILE: ProfileSummary = {
   id: MOCK_USER.id,
   email: MOCK_USER.email,
   handle: "demo-operator",
-  is_admin: true,
+  isAdmin: true,
   tier: "vip",
-  signed_liability: true,
+  signedLiability: true,
 };
 
 interface SessionUser {
@@ -51,9 +51,9 @@ interface ProfileSummary {
   id: string;
   email: string | null;
   handle: string | null;
-  is_admin: boolean;
+  isAdmin: boolean;
   tier: string;
-  signed_liability: boolean;
+  signedLiability: boolean;
 }
 
 export const getProfile = cache(async function getProfile(): Promise<ProfileSummary | null> {
@@ -69,7 +69,7 @@ export const getProfile = cache(async function getProfile(): Promise<ProfileSumm
 
 export async function requireAdmin(): Promise<ProfileSummary> {
   const profile = await getProfile();
-  if (!profile || !profile.is_admin) {
+  if (!profile || !profile.isAdmin) {
     throw new Error("Forbidden");
   }
   return profile;

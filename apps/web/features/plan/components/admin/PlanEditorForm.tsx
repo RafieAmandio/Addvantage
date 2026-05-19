@@ -171,8 +171,8 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
           </Field>
           <Field label="R multiple">
             <input
-              name="r_multiple"
-              defaultValue={num(plan?.r_multiple ?? null)}
+              name="rMultiple"
+              defaultValue={num(plan?.rMultiple ?? null)}
               type="number"
               step="any"
               className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
@@ -240,7 +240,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
                   ))}
                 </select>
                 <input
-                  name="close_price"
+                  name="closePrice"
                   type="number"
                   step="any"
                   placeholder="Close price"

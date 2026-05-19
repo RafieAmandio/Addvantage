@@ -74,7 +74,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
           ) : (
             <div className="mt-3 space-y-px bg-gray-3">
               {newsItems.slice(0, 4).map((n) => {
-                const ts = n.published_at ?? n.fetched_at;
+                const ts = n.publishedAt ?? n.fetchedAt;
                 return (
                   <Link
                     key={n.id}
@@ -83,7 +83,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                   >
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        [{n.source_code}]
+                        [{n.sourceCode}]
                       </span>
                       <ImpactPill level={n.impact} />
                       <BiasBadge bias={n.bias} />

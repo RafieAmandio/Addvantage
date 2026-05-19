@@ -53,7 +53,7 @@ export function NewsCreateForm() {
 
             <Field label="Source">
               <select
-                name="source_code"
+                name="sourceCode"
                 defaultValue="FRED"
                 className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
               >
@@ -67,7 +67,7 @@ export function NewsCreateForm() {
 
             <Field label="Source URL (optional)">
               <input
-                name="source_url"
+                name="sourceUrl"
                 type="url"
                 placeholder="https://..."
                 className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
@@ -76,7 +76,7 @@ export function NewsCreateForm() {
 
             <Field label="Raw text (optional — for audit trail)">
               <textarea
-                name="raw_text"
+                name="rawText"
                 rows={8}
                 placeholder="Paste the original text here..."
                 className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"

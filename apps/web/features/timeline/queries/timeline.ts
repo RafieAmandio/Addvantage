@@ -28,9 +28,9 @@ export async function listTimelineEvents(
     const all = mockTimelineEvents()
       .filter((r) => (kinds ? kinds.includes(r.kind) : true))
       .filter((r) => (symbols ? r.symbols.some((s) => symbols.includes(s)) : true))
-      .filter((r) => (from ? r.occurred_at >= from : true))
-      .filter((r) => (to ? r.occurred_at <= to : true))
-      .sort((a, b) => (a.occurred_at < b.occurred_at ? 1 : -1));
+      .filter((r) => (from ? r.occurredAt >= from : true))
+      .filter((r) => (to ? r.occurredAt <= to : true))
+      .sort((a, b) => (a.occurredAt < b.occurredAt ? 1 : -1));
     return all.slice(0, limit);
   }
 

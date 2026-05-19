@@ -20,7 +20,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   return (
     <div className="space-y-px bg-gray-3">
       {news.map((n) => {
-        const ts = n.published_at ?? n.fetched_at;
+        const ts = n.publishedAt ?? n.fetchedAt;
         return (
           <Link
             key={n.id}
@@ -29,7 +29,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
           >
             <div className="col-span-12 lg:col-span-3">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                [{n.source_code}]
+                [{n.sourceCode}]
               </div>
               <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
                 {formatTime(ts)}Z

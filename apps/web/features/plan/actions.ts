@@ -74,7 +74,7 @@ export const PlanCreateInputSchema = z.object({
   entry: nullableNumber,
   stop: nullableNumber,
   target: nullableNumber,
-  r_multiple: nullableNumber,
+  rMultiple: nullableNumber,
   setups: setupsField,
   tags: csvArray,
   tier: PlanTierSchema,
@@ -84,7 +84,7 @@ export const PlanUpdateInputSchema = PlanCreateInputSchema.partial();
 
 export const PlanCloseInputSchema = z.object({
   outcome: PlanOutcomeSchema,
-  close_price: nullableNumber,
+  closePrice: nullableNumber,
 });
 
 function readPlanForm(fd: FormData) {
@@ -95,7 +95,7 @@ function readPlanForm(fd: FormData) {
     entry: fd.get("entry"),
     stop: fd.get("stop"),
     target: fd.get("target"),
-    r_multiple: fd.get("r_multiple"),
+    rMultiple: fd.get("rMultiple"),
     setups: fd.get("setups"),
     tags: fd.get("tags"),
     tier: fd.get("tier"),
@@ -164,7 +164,7 @@ export async function closePlan(id: string, formData: FormData): Promise<void> {
 
   const parse = PlanCloseInputSchema.safeParse({
     outcome: formData.get("outcome"),
-    close_price: formData.get("close_price"),
+    closePrice: formData.get("closePrice"),
   });
   if (!parse.success) {
     throw new Error(parse.error.issues[0]?.message ?? "validation failed");

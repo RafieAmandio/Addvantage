@@ -35,7 +35,7 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
               {p.symbol}
             </div>
             <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-              {fmt(p.updated_at)}
+              {fmt(p.updatedAt)}
             </div>
             <div className="mt-2 flex gap-2 font-mono text-[9px] uppercase tracking-widest2">
               <span className="text-white/70">{p.direction}</span>
@@ -51,7 +51,7 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
               {p.entry !== null && <span>E {p.entry}</span>}
               {p.stop !== null && <span>S {p.stop}</span>}
               {p.target !== null && <span>T {p.target}</span>}
-              {p.r_multiple !== null && <span>R {p.r_multiple}</span>}
+              {p.rMultiple !== null && <span>R {p.rMultiple}</span>}
               {p.tags.map((t) => (
                 <span
                   key={t}
