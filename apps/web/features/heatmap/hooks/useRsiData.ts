@@ -3,18 +3,12 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "@/lib/api/client";
 
-function usePollingFetch<T>(endpoint: string | null, deps: unknown[] = []) {
+function usePollingFetch<T>(endpoint: string, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(!!endpoint);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!endpoint) {
-      setData(null);
-      setLoading(false);
-      return;
-    }
-
     let cancelled = false;
 
     const fetchData = async () => {
@@ -42,15 +36,15 @@ function usePollingFetch<T>(endpoint: string | null, deps: unknown[] = []) {
   return { data, loading, error };
 }
 
-export function useRsiData(interval: string, enabled = true) {
+export function useRsiData(interval: string) {
   return usePollingFetch<import("../types").RsiHeatmapData>(
-    enabled ? `/rsi/heatmap?interval=${interval}` : null,
+    `/rsi/heatmap?interval=${interval}`,
     [interval],
   );
 }
 
-export function useRsiTableData(enabled = true) {
+export function useRsiTableData() {
   return usePollingFetch<import("../types").RsiTableData>(
-    enabled ? `/rsi/heatmap?interval=all` : null,
+    `/rsi/heatmap?interval=all`,
   );
 }

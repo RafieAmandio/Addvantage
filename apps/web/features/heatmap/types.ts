@@ -32,5 +32,3 @@ export interface RsiTableData {
   updatedAt: string | null;
   pairs: RsiTableRow[];
 }
-
-export type ViewMode = "chart" | "table";

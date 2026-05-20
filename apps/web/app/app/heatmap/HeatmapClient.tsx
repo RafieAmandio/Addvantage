@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { RsiZoneId, ViewMode } from "@/features/heatmap/types";
+import type { RsiZoneId } from "@/features/heatmap/types";
 import { ZONES_ORDERED } from "@/features/heatmap/lib/zones";
 import { useRsiData, useRsiTableData } from "@/features/heatmap/hooks/useRsiData";
 import { RsiToolbar } from "@/features/heatmap/components/RsiToolbar";
@@ -11,16 +11,12 @@ import { RsiTable } from "@/features/heatmap/components/RsiTable";
 
 export default function HeatmapClient() {
   const [interval, setChartInterval] = useState("4h");
-  const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [activeZones, setActiveZones] = useState<Set<RsiZoneId>>(
     () => new Set(ZONES_ORDERED),
   );
 
-  const isTable = viewMode === "table";
-  const chartData = useRsiData(interval, !isTable);
-  const tableData = useRsiTableData(isTable);
-  const loading = isTable ? tableData.loading : chartData.loading;
-  const error = isTable ? tableData.error : chartData.error;
+  const chartData = useRsiData(interval);
+  const tableData = useRsiTableData();
 
   const toggleZone = useCallback((z: RsiZoneId) => {
     setActiveZones((prev) => {
@@ -36,13 +32,7 @@ export default function HeatmapClient() {
     return chartData.data.pairs.filter((p) => activeZones.has(p.zone));
   }, [chartData.data, activeZones]);
 
-  const updatedAt = isTable ? tableData.data?.updatedAt : chartData.data?.updatedAt;
-  const totalCount = isTable
-    ? (tableData.data?.pairs.length ?? 0)
-    : (chartData.data?.pairs.length ?? 0);
-  const visibleCount = isTable
-    ? (tableData.data?.pairs.length ?? 0)
-    : filteredPairs.length;
+  const totalCount = chartData.data?.pairs.length ?? 0;
 
   return (
     <div className="min-h-screen">
@@ -51,7 +41,7 @@ export default function HeatmapClient() {
           <h1 className="font-mono text-lg font-bold text-white">
             Forex RSI Heatmap
           </h1>
-          {!loading && !error && totalCount > 0 && (
+          {!chartData.loading && !chartData.error && totalCount > 0 && (
             <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
               <span className="led" aria-hidden />
               {totalCount} instruments
@@ -69,33 +59,28 @@ export default function HeatmapClient() {
         onIntervalChange={setChartInterval}
         activeZones={activeZones}
         onToggleZone={toggleZone}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        pairCount={visibleCount}
+        pairCount={filteredPairs.length}
         totalCount={totalCount}
-        updatedAt={updatedAt ?? null}
+        updatedAt={chartData.data?.updatedAt ?? null}
       />
 
-      {loading && (
+      {/* Scatter chart */}
+      {chartData.loading && (
         <div className="flex items-center justify-center py-32">
           <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-brand">
             <span className="led" aria-hidden />
-            Scanning {isTable ? "all frequencies" : `${interval} frequency`}
+            Scanning {interval} frequency
           </div>
         </div>
       )}
 
-      {error && (
+      {chartData.error && (
         <div className="px-4 py-12 text-center text-sm text-white/40 sm:px-6">
-          {error}
+          {chartData.error}
         </div>
       )}
 
-      {!loading && !error && isTable && tableData.data && (
-        <RsiTable pairs={tableData.data.pairs} />
-      )}
-
-      {!loading && !error && !isTable && filteredPairs.length === 0 && (
+      {!chartData.loading && !chartData.error && filteredPairs.length === 0 && (
         <div className="px-4 py-20 text-center sm:px-6">
           <p className="text-sm text-white/30">
             {chartData.data && chartData.data.pairs.length === 0
@@ -105,7 +90,7 @@ export default function HeatmapClient() {
         </div>
       )}
 
-      {!loading && !error && !isTable && filteredPairs.length > 0 && (
+      {!chartData.loading && !chartData.error && filteredPairs.length > 0 && (
         <>
           <div className="hidden md:block">
             <RsiHeatmap pairs={filteredPairs} />
@@ -114,6 +99,18 @@ export default function HeatmapClient() {
             <RsiList pairs={filteredPairs} />
           </div>
         </>
+      )}
+
+      {/* Table below chart */}
+      {!tableData.loading && !tableData.error && tableData.data && tableData.data.pairs.length > 0 && (
+        <div className="border-t border-white/[0.06]">
+          <div className="px-4 py-4 sm:px-6">
+            <h2 className="font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
+              All Instruments
+            </h2>
+          </div>
+          <RsiTable pairs={tableData.data.pairs} />
+        </div>
       )}
     </div>
   );

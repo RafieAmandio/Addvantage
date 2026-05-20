@@ -104,7 +104,7 @@ export default function InstrumentClient({ symbol }: { symbol: string }) {
       </div>
 
       <div className="border-b border-white/[0.06] p-4 sm:p-6" style={sectionStyle(100)}>
-        <TradingViewChart symbol={symbol} height={420} />
+        <TradingViewChart symbol={symbol} height={600} />
       </div>
 
       <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6" style={sectionStyle(200)}>
