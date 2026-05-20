@@ -17,7 +17,7 @@ const API_BASE = serverConfig.NEXT_PUBLIC_API_URL;
 function setAuthCookies(accessToken: string, refreshToken: string) {
   const cookieStore = cookies();
   cookieStore.set("access_token", accessToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: serverConfig.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
