@@ -115,9 +115,12 @@ function parseDateHeader(text: string): Date | null {
     January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
     July: 6, August: 7, September: 8, October: 9, November: 10, December: 11,
   };
-  const month = months[match[1]];
+  const monthName = match[1]!;
+  const day = match[2]!;
+  const year = match[3]!;
+  const month = months[monthName];
   if (month === undefined) return null;
-  return new Date(Date.UTC(parseInt(match[3], 10), month, parseInt(match[2], 10)));
+  return new Date(Date.UTC(parseInt(year, 10), month, parseInt(day, 10)));
 }
 
 // Parse "04:00 AM" or "01:30 PM" combined with a base date

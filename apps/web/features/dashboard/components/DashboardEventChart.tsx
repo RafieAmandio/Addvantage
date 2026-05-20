@@ -19,15 +19,12 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 import { cn } from "@/lib/cn";
-import {
-  getMockBars,
-  getMockEvents,
-  SYMBOLS,
-  type MockEvent,
-  type MockSymbol,
-  type Timeframe,
-} from "@/features/dashboard/lib/mock-chart-data";
+import { useLiveBars, buildParams, type Timeframe } from "@/features/dashboard/hooks/useLiveBars";
+import { useChartEvents, type ChartEvent } from "@/features/dashboard/hooks/useChartEvents";
 import type { TimelineKind } from "@/features/timeline/types";
+
+const SYMBOLS = ["AAPL", "NVDA", "TSLA", "MSFT", "GOOGL", "AMZN", "META"] as const;
+type Symbol = (typeof SYMBOLS)[number];
 
 const CHART_HEIGHT = 320;
 
@@ -86,14 +83,14 @@ interface MarkerLayout {
   x: number;
   y: number;
   chartHeight: number;
-  events: MockEvent[];
+  events: ChartEvent[];
   primaryKind: TimelineKind;
 }
 
 const GROUP_THRESHOLD_PX = 24;
 
 function groupMarkers(
-  raw: Array<{ x: number; y: number; event: MockEvent }>,
+  raw: Array<{ x: number; y: number; event: ChartEvent }>,
   chartHeight: number,
 ): MarkerLayout[] {
   if (raw.length === 0) return [];
@@ -130,15 +127,18 @@ function groupMarkers(
 
 export function DashboardEventChart() {
   const router = useRouter();
-  const [symbol, setSymbol] = useState<MockSymbol>("NVDA");
+  const [symbol, setSymbol] = useState<Symbol>("AAPL");
   const [timeframe, setTimeframe] = useState<Timeframe>("1M");
   const [activeKinds, setActiveKinds] = useState<Set<TimelineKind>>(
     () => new Set(FILTER_KINDS),
   );
   const [layoutTick, setLayoutTick] = useState(0);
 
-  const bars = useMemo(() => getMockBars(symbol, timeframe), [symbol, timeframe]);
-  const allEvents = useMemo(() => getMockEvents(bars), [bars]);
+  const { bars, loading: barsLoading } = useLiveBars(symbol, timeframe);
+
+  const { from, to } = useMemo(() => buildParams(symbol, timeframe), [symbol, timeframe]);
+  const { events: allEvents, loading: eventsLoading } = useChartEvents(from, to, FILTER_KINDS);
+
   const events = useMemo(
     () => allEvents.filter((e) => activeKinds.has(e.kind)),
     [allEvents, activeKinds],
@@ -159,7 +159,7 @@ export function DashboardEventChart() {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || bars.length === 0) return;
 
     const chart = createChart(container, {
       autoSize: true,
@@ -237,14 +237,13 @@ export function DashboardEventChart() {
     void layoutTick;
     const chart = chartRef.current;
     const series = seriesRef.current;
-    if (!chart || !series || events.length === 0) return [];
+    if (!chart || !series || events.length === 0 || bars.length === 0) return [];
 
     const barIndex = bars
       .map((b) => ({ bar: b, t: toEpochSec(b.time) }))
       .sort((a, b) => a.t - b.t);
-    if (barIndex.length === 0) return [];
 
-    const raw: Array<{ x: number; y: number; event: MockEvent }> = [];
+    const raw: Array<{ x: number; y: number; event: ChartEvent }> = [];
 
     for (const ev of events) {
       const t = toEpochSec(ev.time);
@@ -269,7 +268,7 @@ export function DashboardEventChart() {
   }, [events, bars, layoutTick]);
 
   const handleEventClick = useCallback(
-    (ev: MockEvent) => {
+    (ev: ChartEvent) => {
       if (ev.newsItemId) {
         router.push(`/app/news/${ev.newsItemId}`);
       } else if (ev.kind === "macro") {
@@ -307,7 +306,24 @@ export function DashboardEventChart() {
             ))}
           </div>
 
-          {events.length === 0 && (
+          {barsLoading && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center">
+              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                <span className="led" aria-hidden />
+                Loading {symbol}
+              </div>
+            </div>
+          )}
+
+          {!barsLoading && bars.length === 0 && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center">
+              <span className="text-xs text-white/50">
+                No market data available for {symbol}
+              </span>
+            </div>
+          )}
+
+          {events.length === 0 && !eventsLoading && bars.length > 0 && (
             <div className="absolute inset-0 z-20 flex items-center justify-center">
               <span className="text-xs text-white/50">
                 No events in this range
@@ -315,7 +331,6 @@ export function DashboardEventChart() {
             </div>
           )}
 
-          {/* Zoom reset */}
           <button
             onClick={() => chartRef.current?.timeScale().fitContent()}
             className="absolute bottom-3 right-3 z-20 rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[11px] text-white/50 opacity-0 transition-opacity hover:bg-white/[0.1] hover:text-white/70 focus-visible:opacity-100 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none [div:hover>&]:opacity-100"
@@ -338,8 +353,8 @@ function ChartToolbar({
   onToggleKind,
   eventCount,
 }: {
-  symbol: MockSymbol;
-  onSymbolChange: (s: MockSymbol) => void;
+  symbol: Symbol;
+  onSymbolChange: (s: Symbol) => void;
   timeframe: Timeframe;
   onTimeframeChange: (t: Timeframe) => void;
   activeKinds: Set<TimelineKind>;
@@ -364,7 +379,6 @@ function ChartToolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.04] px-4 py-3">
-      {/* Symbol selector */}
       <div className="relative">
         <button
           onClick={() => {
@@ -479,7 +493,6 @@ function ChartToolbar({
         )}
       </div>
 
-      {/* Timeframe toggle */}
       <div className="flex gap-0.5 rounded-lg bg-white/[0.03] p-0.5" role="radiogroup" aria-label="Timeframe">
         {(["1D", "1W", "1M"] as const).map((tf) => (
           <button
@@ -501,7 +514,6 @@ function ChartToolbar({
 
       <div className="h-4 w-px bg-white/[0.06]" aria-hidden />
 
-      {/* Event type filters */}
       <div className="flex flex-wrap gap-1" role="group" aria-label="Event type filters">
         {FILTER_KINDS.map((kind) => {
           const cfg = KIND_CONFIG[kind];
@@ -540,7 +552,7 @@ function MarkerDot({
   onEventClick,
 }: {
   group: MarkerLayout;
-  onEventClick: (ev: MockEvent) => void;
+  onEventClick: (ev: ChartEvent) => void;
 }) {
   const { x, y, chartHeight, events: evts } = group;
   const isGroup = evts.length > 1;
@@ -558,7 +570,6 @@ function MarkerDot({
 
   return (
     <>
-      {/* Vertical event line */}
       <div
         className="pointer-events-none absolute z-[1] transition-opacity duration-150"
         style={{
@@ -570,7 +581,6 @@ function MarkerDot({
         }}
       />
 
-      {/* Marker dot + tooltip */}
       <div
         className="group pointer-events-auto absolute z-[2]"
         style={{
@@ -617,7 +627,7 @@ function SingleEventTooltip({
   event,
   onClick,
 }: {
-  event: MockEvent;
+  event: ChartEvent;
   onClick: () => void;
 }) {
   const cfg = KIND_CONFIG[event.kind];
@@ -681,8 +691,8 @@ function GroupedEventTooltip({
   events,
   onEventClick,
 }: {
-  events: MockEvent[];
-  onEventClick: (ev: MockEvent) => void;
+  events: ChartEvent[];
+  onEventClick: (ev: ChartEvent) => void;
 }) {
   return (
     <div>
