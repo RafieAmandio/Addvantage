@@ -64,33 +64,13 @@ export default async function AdminReviewQueuePage({
         </div>
       </div>
 
-      {/* Filters */}
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           Source
         </span>
-        <Link
-          href={buildUrl({ source: undefined, page: "1" })}
-          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
-            !source
-              ? "border-brand bg-brand/10 text-brand"
-              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-          }`}
-        >
-          All
-        </Link>
+        <Chip href={buildUrl({ source: undefined, page: "1" })} active={!source}>All</Chip>
         {SOURCE_CODES.map((code) => (
-          <Link
-            key={code}
-            href={buildUrl({ source: code, page: "1" })}
-            className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
-              source === code
-                ? "border-brand bg-brand/10 text-brand"
-                : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-            }`}
-          >
-            {code}
-          </Link>
+          <Chip key={code} href={buildUrl({ source: code, page: "1" })} active={source === code}>{code}</Chip>
         ))}
 
         <div className="mx-2 h-4 w-px bg-white/10" />
@@ -98,26 +78,8 @@ export default async function AdminReviewQueuePage({
         <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           Sort
         </span>
-        <Link
-          href={buildUrl({ sort: "desc", page: "1" })}
-          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
-            sort === "desc"
-              ? "border-brand bg-brand/10 text-brand"
-              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-          }`}
-        >
-          Newest
-        </Link>
-        <Link
-          href={buildUrl({ sort: "asc", page: "1" })}
-          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
-            sort === "asc"
-              ? "border-brand bg-brand/10 text-brand"
-              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-          }`}
-        >
-          Oldest
-        </Link>
+        <Chip href={buildUrl({ sort: "desc", page: "1" })} active={sort === "desc"}>Newest</Chip>
+        <Chip href={buildUrl({ sort: "asc", page: "1" })} active={sort === "asc"}>Oldest</Chip>
       </div>
 
       <div className="mt-4 h-px bg-white/20" />
@@ -212,7 +174,6 @@ export default async function AdminReviewQueuePage({
         ))}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-8 flex items-center justify-between">
           <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
@@ -239,5 +200,20 @@ export default async function AdminReviewQueuePage({
         </div>
       )}
     </div>
+  );
+}
+
+function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+        active
+          ? "border-brand bg-brand/10 text-brand"
+          : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }

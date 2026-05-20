@@ -1,4 +1,5 @@
 import { prisma } from "@/config/database.js";
+import type { Prisma } from "@tradevantage/db";
 import type { PaginationOpts } from "@/core/utils/pagination.js";
 
 const LIST_SELECT = {
@@ -76,8 +77,10 @@ export const newsRepository = {
     }),
 
   findPending: (opts: PaginationOpts & { source?: string; sort?: "asc" | "desc" }) => {
-    const where: Record<string, unknown> = { status: "pending" };
-    if (opts.source) where.sourceCode = opts.source;
+    const where: Prisma.NewsItemWhereInput = {
+      status: "pending",
+      ...(opts.source && { sourceCode: opts.source }),
+    };
     return prisma.newsItem.findMany({
       where,
       select: ADMIN_LIST_SELECT,
@@ -88,8 +91,10 @@ export const newsRepository = {
   },
 
   countPending: (source?: string) => {
-    const where: Record<string, unknown> = { status: "pending" };
-    if (source) where.sourceCode = source;
+    const where: Prisma.NewsItemWhereInput = {
+      status: "pending",
+      ...(source && { sourceCode: source }),
+    };
     return prisma.newsItem.count({ where });
   },
 
