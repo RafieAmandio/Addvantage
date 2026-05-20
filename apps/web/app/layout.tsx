@@ -3,8 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "ANTS — Alpha Network Trading System",
-    template: "%s · ANTS // DOMAIN",
+    default: "+Vantage — Market Intelligence",
+    template: "%s · +Vantage",
   },
   description:
     "DOMAIN — Directional Outlook & Macro Alpha Intelligence. A market radar powered by AI and professionals. Built for operators, not beginners.",
@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     "market intelligence",
     "alpha",
     "domain",
-    "ants",
+    "addvantage",
     "macro",
   ],
   openGraph: {
-    title: "ANTS — Welcome to the DOMAIN",
+    title: "+Vantage — Market Intelligence",
     description:
       "Alpha Intelligence for global markets. No community. No chat. Operator eyes only.",
     type: "website",

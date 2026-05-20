@@ -116,10 +116,12 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
 
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
         <SectionNumber n="01 /" label="WHAT THIS MEANS FOR PRICE" />
-        <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-4 sm:p-6">
-          <p className="font-display text-base leading-relaxed text-white/90 sm:text-xl">
-            {item.analysis}
-          </p>
+        <div className="mt-4 space-y-4 border-l-4 border-brand bg-gray-2/40 p-4 sm:p-6">
+          {item.analysis.split("\n\n").map((para, i) => (
+            <p key={i} className="font-display text-base leading-relaxed text-white/90 sm:text-xl">
+              {para}
+            </p>
+          ))}
         </div>
 
         <div className="mt-8 grid grid-cols-12 gap-4 sm:mt-12 sm:gap-6">

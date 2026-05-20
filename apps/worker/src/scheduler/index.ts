@@ -6,9 +6,11 @@ import { config } from "../lib/config";
 import { runSource } from "../pipeline/runSource";
 import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
+import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
 
 let scheduledTask: ScheduledTask | null = null;
 let renewalTask: ScheduledTask | null = null;
+let calendarTask: ScheduledTask | null = null;
 let inFlightTick: Promise<void> | null = null;
 
 /**
@@ -24,6 +26,18 @@ export function startScheduler(): void {
   });
 
   void tick();
+
+  calendarTask = cron.schedule("7 */6 * * *", () => {
+    syncTradingEconomicsCalendar().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "te-calendar.cron" } });
+      logger.error({ err: String(err) }, "te-calendar: scheduled sync failed");
+    });
+  });
+
+  syncTradingEconomicsCalendar().catch((err) => {
+    Sentry.captureException(err, { tags: { scope: "te-calendar.boot" } });
+    logger.error({ err: String(err) }, "te-calendar: boot sync failed");
+  });
 
   if (config.EMAIL_PROVIDER) {
     renewalTask = cron.schedule("0 9 * * *", () => {
@@ -62,6 +76,10 @@ export async function stopScheduler(): Promise<void> {
   if (renewalTask) {
     renewalTask.stop();
     renewalTask = null;
+  }
+  if (calendarTask) {
+    calendarTask.stop();
+    calendarTask = null;
   }
   if (inFlightTick) {
     try {

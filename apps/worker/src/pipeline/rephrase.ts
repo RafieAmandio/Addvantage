@@ -18,7 +18,10 @@ RULES:
   Paragraph 1 — THE SETUP: What's the backdrop? Give the macro context or why this matters right now. Ground the reader in 2–3 sentences.
   Paragraph 2 — WHAT HAPPENED: The actual data, event, or development. Be specific — numbers, dates, comparisons to prior. 2–3 sentences.
   Paragraph 3 — SO WHAT: The trading implication. What moves, what to watch, what's the directional lean. 2–3 sentences. Speak directly to the trader.
-- "analysis" = 1–3 tight sentences, pure price-action angle. Think desk color — the kind of thing a PM mutters on the squawk.
+- "analysis" MUST be exactly 3 paragraphs separated by \\n\\n. This is the "What This Means For Price" section — the most valuable part:
+  Paragraph 1 — IMMEDIATE REACTION: What moves first? Which instruments gap, which spreads widen, which flows trigger. Be specific about direction and magnitude expectations.
+  Paragraph 2 — SECOND-ORDER EFFECTS: What does this change downstream? Rate expectations, positioning shifts, sector rotation, cross-asset spillover. Connect the dots the headline-scanners miss.
+  Paragraph 3 — TRADE SETUP: Concrete levels, structures, or conditions to watch. "If X holds above Y, look for Z." Give the trader something actionable, not a vague lean.
 - No "analysts say", no "experts believe", no hedging filler. No rhetorical questions.
 - Tone: tactical, dense, slightly antagonistic — you're briefing experienced traders, not writing a blog post.
 - "affects" = list only tickers/instruments that are materially moved (e.g. ["SPX","DXY"]). Max 6.
