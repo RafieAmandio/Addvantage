@@ -20,7 +20,9 @@ export const newsController = {
 
   listPending: asyncHandler(async (req, res: Response) => {
     const opts = parsePagination(req.query);
-    const result = await newsService.listPending(opts);
+    const source = req.query.source ? String(req.query.source) : undefined;
+    const sort = req.query.sort === "asc" ? "asc" as const : "desc" as const;
+    const result = await newsService.listPending({ ...opts, source, sort });
     sendPaginatedSuccess(res, result);
   }),
 

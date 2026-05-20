@@ -12,6 +12,9 @@ interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
+  total?: number;
+  page?: number;
+  limit?: number;
 }
 
 export async function apiGet<T>(path: string, opts?: { token?: string }): Promise<T> {
@@ -120,6 +123,24 @@ export async function apiStream(
     if (done) break;
     onChunk(decoder.decode(value, { stream: true }));
   }
+}
+
+export async function apiGetRaw<T>(path: string, opts?: { token?: string }): Promise<ApiResponse<T>> {
+  const token = opts?.token ?? getAccessToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "GET",
+    headers,
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`API ${res.status}: ${path}`);
+  }
+
+  return (await res.json()) as ApiResponse<T>;
 }
 
 export { API_BASE };

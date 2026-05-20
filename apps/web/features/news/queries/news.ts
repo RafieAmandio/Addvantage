@@ -3,7 +3,7 @@ import { z } from "zod";
 import { IMPACT_LEVELS, BIAS_LEVELS } from "@tradevantage/shared";
 import { isMockMode } from "@/lib/config/public";
 import { mockApprovedNews, mockApprovedNewsById } from "@/lib/mock/fixtures";
-import { apiGet } from "@/lib/api/client-server";
+import { apiGet, apiGetRaw } from "@/lib/api/client-server";
 
 const ImpactSchema = z.enum(IMPACT_LEVELS);
 const BiasSchema = z.enum(BIAS_LEVELS);
@@ -95,12 +95,35 @@ export const getApprovedNewsById = cache(async function getApprovedNewsById(id: 
   }
 });
 
-export async function listPendingNews(): Promise<NewsAdminListItem[]> {
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export async function listPendingNews(opts?: {
+  page?: number;
+  limit?: number;
+  source?: string;
+  sort?: "asc" | "desc";
+}): Promise<PaginatedResult<NewsAdminListItem>> {
   try {
-    const data = await apiGet<{ content: NewsAdminListItem[] }>("/news/admin/pending");
-    return (data as unknown as NewsAdminListItem[]) ?? [];
+    const params = new URLSearchParams();
+    if (opts?.page) params.set("page", String(opts.page));
+    if (opts?.limit) params.set("limit", String(opts.limit));
+    if (opts?.source) params.set("source", opts.source);
+    if (opts?.sort) params.set("sort", opts.sort);
+    const qs = params.toString();
+    const raw = await apiGetRaw<NewsAdminListItem[]>(`/news/admin/pending${qs ? `?${qs}` : ""}`);
+    return {
+      items: raw.data ?? [],
+      total: raw.total ?? 0,
+      page: raw.page ?? opts?.page ?? 1,
+      limit: raw.limit ?? opts?.limit ?? 20,
+    };
   } catch {
-    return [];
+    return { items: [], total: 0, page: 1, limit: 20 };
   }
 }
 

@@ -75,17 +75,23 @@ export const newsRepository = {
       select: LIST_SELECT,
     }),
 
-  findPending: (opts: PaginationOpts) =>
-    prisma.newsItem.findMany({
-      where: { status: "pending" },
+  findPending: (opts: PaginationOpts & { source?: string; sort?: "asc" | "desc" }) => {
+    const where: Record<string, unknown> = { status: "pending" };
+    if (opts.source) where.sourceCode = opts.source;
+    return prisma.newsItem.findMany({
+      where,
       select: ADMIN_LIST_SELECT,
-      orderBy: { fetchedAt: "asc" },
+      orderBy: { fetchedAt: opts.sort ?? "desc" },
       skip: opts.skip,
       take: opts.limit,
-    }),
+    });
+  },
 
-  countPending: () =>
-    prisma.newsItem.count({ where: { status: "pending" } }),
+  countPending: (source?: string) => {
+    const where: Record<string, unknown> = { status: "pending" };
+    if (source) where.sourceCode = source;
+    return prisma.newsItem.count({ where });
+  },
 
   findRejected: (opts: PaginationOpts) =>
     prisma.newsItem.findMany({

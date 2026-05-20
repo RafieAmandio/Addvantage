@@ -2,13 +2,43 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { listPendingNews } from "@/features/news/queries/news";
 import { formatDateTime } from "@/lib/cn";
+import { SOURCE_CODES } from "@tradevantage/shared";
 
 export const metadata: Metadata = { title: "Review Queue" };
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function AdminReviewQueuePage() {
-  const items = await listPendingNews();
+const PER_PAGE = 20;
+
+export default async function AdminReviewQueuePage({
+  searchParams,
+}: {
+  searchParams?: { page?: string; source?: string; sort?: string };
+}) {
+  const page = Math.max(1, Number(searchParams?.page) || 1);
+  const source = searchParams?.source || undefined;
+  const sort = searchParams?.sort === "asc" ? "asc" as const : "desc" as const;
+
+  const { items, total } = await listPendingNews({
+    page,
+    limit: PER_PAGE,
+    source,
+    sort,
+  });
+
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+
+  function buildUrl(overrides: Record<string, string | undefined>) {
+    const params = new URLSearchParams();
+    const merged = { page: String(page), source, sort, ...overrides };
+    for (const [k, v] of Object.entries(merged)) {
+      if (v && v !== "all" && !(k === "page" && v === "1") && !(k === "sort" && v === "desc")) {
+        params.set(k, v);
+      }
+    }
+    const qs = params.toString();
+    return `/admin/review${qs ? `?${qs}` : ""}`;
+  }
 
   return (
     <div>
@@ -23,7 +53,7 @@ export default async function AdminReviewQueuePage() {
         </div>
         <div className="flex items-center gap-4">
           <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            {items.length} pending
+            {total} pending
           </span>
           <Link
             href="/admin/review/new"
@@ -34,32 +64,92 @@ export default async function AdminReviewQueuePage() {
         </div>
       </div>
 
-      <div className="mt-8 h-px bg-white/20" />
+      {/* Filters */}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+          Source
+        </span>
+        <Link
+          href={buildUrl({ source: undefined, page: "1" })}
+          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+            !source
+              ? "border-brand bg-brand/10 text-brand"
+              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
+          }`}
+        >
+          All
+        </Link>
+        {SOURCE_CODES.map((code) => (
+          <Link
+            key={code}
+            href={buildUrl({ source: code, page: "1" })}
+            className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+              source === code
+                ? "border-brand bg-brand/10 text-brand"
+                : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
+            }`}
+          >
+            {code}
+          </Link>
+        ))}
+
+        <div className="mx-2 h-4 w-px bg-white/10" />
+
+        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+          Sort
+        </span>
+        <Link
+          href={buildUrl({ sort: "desc", page: "1" })}
+          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+            sort === "desc"
+              ? "border-brand bg-brand/10 text-brand"
+              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
+          }`}
+        >
+          Newest
+        </Link>
+        <Link
+          href={buildUrl({ sort: "asc", page: "1" })}
+          className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+            sort === "asc"
+              ? "border-brand bg-brand/10 text-brand"
+              : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
+          }`}
+        >
+          Oldest
+        </Link>
+      </div>
+
+      <div className="mt-4 h-px bg-white/20" />
 
       {items.length === 0 && (
         <div className="py-20 text-center">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-moss">
-            ● Inbox Clear
+            {source ? `No pending items from [${source}]` : "● Inbox Clear"}
           </div>
           <div className="mt-4 font-mono text-xl font-bold text-white">
-            No items pending review.
+            {source ? "Try a different source filter." : "No items pending review."}
           </div>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            New items appear here after the worker ingests and rephrases a
-            source.
-          </p>
+          {!source && (
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/30">
+              New items appear here after the worker ingests and rephrases a
+              source.
+            </p>
+          )}
           <div className="mt-8 flex items-center justify-center gap-3">
+            {source && (
+              <Link
+                href="/admin/review"
+                className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              >
+                Clear filter
+              </Link>
+            )}
             <Link
               href="/admin/logs"
-              className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Pipeline logs →
-            </Link>
-            <Link
-              href="/admin/sources"
               className="border border-white/20 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
-              Check sources
+              Pipeline logs →
             </Link>
           </div>
         </div>
@@ -75,7 +165,7 @@ export default async function AdminReviewQueuePage() {
             <div className="col-span-12 lg:col-span-2">
               <div className="flex items-center gap-3">
                 <span className="font-mono text-[10px] tabular-nums text-white/20">
-                  {String(i + 1).padStart(2, "0")}
+                  {String((page - 1) * PER_PAGE + i + 1).padStart(2, "0")}
                 </span>
                 <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                   [{n.sourceCode}]
@@ -121,6 +211,33 @@ export default async function AdminReviewQueuePage() {
           </Link>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-between">
+          <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+            Page {page} of {totalPages} · {total} items
+          </span>
+          <div className="flex items-center gap-2">
+            {page > 1 && (
+              <Link
+                href={buildUrl({ page: String(page - 1) })}
+                className="border border-white/20 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              >
+                ← Prev
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link
+                href={buildUrl({ page: String(page + 1) })}
+                className="border border-white/20 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              >
+                Next →
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
