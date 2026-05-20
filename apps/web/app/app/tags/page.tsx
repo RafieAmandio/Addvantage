@@ -75,12 +75,11 @@ function TagsView() {
     fetch(`${apiBase}/tags/counts`)
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
-        if (!cancelled && json?.data) {
-          const counts = json.data as Record<string, number>;
+        if (!cancelled && json?.data && Array.isArray(json.data)) {
           setTagCounts(
-            Object.entries(counts).map(([tag, total]) => ({
-              tag: tag as Hashtag,
-              c: total,
+            (json.data as Array<{ tag: string; total: number }>).map((item) => ({
+              tag: item.tag as Hashtag,
+              c: item.total,
             })),
           );
         }
