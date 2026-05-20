@@ -219,6 +219,8 @@ async function downloadImageAsBase64(url: string): Promise<{ base64: string; med
   const res = await fetch(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "Referer": "https://truthsocial.com/",
+      "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
     },
   });
   if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
