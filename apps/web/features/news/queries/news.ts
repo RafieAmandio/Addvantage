@@ -36,6 +36,7 @@ export type NewsAdminListItem = {
   bias: string;
   affects: string[];
   tags: string[];
+  status: string;
   fetchedAt: string;
   reviewedAt: string | null;
 };
@@ -102,17 +103,27 @@ export interface PaginatedResult<T> {
   limit: number;
 }
 
-export async function listPendingNews(opts?: {
+export interface AdminFilterParams {
   page?: number;
   limit?: number;
   source?: string;
+  impact?: string;
+  bias?: string;
+  tags?: string;
+  status?: string;
   sort?: "asc" | "desc";
-}): Promise<PaginatedResult<NewsAdminListItem>> {
+}
+
+export async function listPendingNews(opts?: AdminFilterParams): Promise<PaginatedResult<NewsAdminListItem>> {
   try {
     const params = new URLSearchParams();
     if (opts?.page) params.set("page", String(opts.page));
     if (opts?.limit) params.set("limit", String(opts.limit));
     if (opts?.source) params.set("source", opts.source);
+    if (opts?.impact) params.set("impact", opts.impact);
+    if (opts?.bias) params.set("bias", opts.bias);
+    if (opts?.tags) params.set("tags", opts.tags);
+    if (opts?.status) params.set("status", opts.status);
     if (opts?.sort) params.set("sort", opts.sort);
     const qs = params.toString();
     const raw = await apiGetRaw<NewsAdminListItem[]>(`/news/admin/pending${qs ? `?${qs}` : ""}`);

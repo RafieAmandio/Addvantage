@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
 import type { PaginationOpts } from "@/core/utils/pagination.js";
-import { newsRepository } from "./news.repository.js";
+import { newsRepository, type AdminFilterOpts } from "./news.repository.js";
 
 function contentHash(parts: (string | null | undefined)[]): string {
   const joined = parts
@@ -30,6 +30,14 @@ export const newsService = {
     const [content, total] = await Promise.all([
       newsRepository.findPending(opts),
       newsRepository.countPending(opts.source),
+    ]);
+    return { content, total, page: opts.page, limit: opts.limit };
+  },
+
+  async listFiltered(opts: PaginationOpts & AdminFilterOpts) {
+    const [content, total] = await Promise.all([
+      newsRepository.findFiltered(opts),
+      newsRepository.countFiltered(opts),
     ]);
     return { content, total, page: opts.page, limit: opts.limit };
   },

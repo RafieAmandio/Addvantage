@@ -26,6 +26,7 @@ const ADMIN_LIST_SELECT = {
   bias: true,
   affects: true,
   tags: true,
+  status: true,
   fetchedAt: true,
   reviewedAt: true,
 } as const;
@@ -56,6 +57,25 @@ const DETAIL_SELECT = {
   createdAt: true,
   updatedAt: true,
 } as const;
+
+export interface AdminFilterOpts {
+  sources?: string[];
+  impacts?: string[];
+  biases?: string[];
+  tags?: string[];
+  status?: string;
+  sort?: "asc" | "desc";
+}
+
+function buildAdminWhere(opts: AdminFilterOpts): Prisma.NewsItemWhereInput {
+  return {
+    status: opts.status ?? "pending",
+    ...(opts.sources?.length && { sourceCode: { in: opts.sources } }),
+    ...(opts.impacts?.length && { impact: { in: opts.impacts } }),
+    ...(opts.biases?.length && { bias: { in: opts.biases } }),
+    ...(opts.tags?.length && { tags: { hasSome: opts.tags } }),
+  };
+}
 
 export const newsRepository = {
   findApproved: (opts: PaginationOpts) =>
@@ -97,6 +117,20 @@ export const newsRepository = {
     };
     return prisma.newsItem.count({ where });
   },
+
+  findFiltered: (opts: PaginationOpts & AdminFilterOpts) => {
+    const where = buildAdminWhere(opts);
+    return prisma.newsItem.findMany({
+      where,
+      select: ADMIN_LIST_SELECT,
+      orderBy: { fetchedAt: opts.sort ?? "desc" },
+      skip: opts.skip,
+      take: opts.limit,
+    });
+  },
+
+  countFiltered: (opts: AdminFilterOpts) =>
+    prisma.newsItem.count({ where: buildAdminWhere(opts) }),
 
   findRejected: (opts: PaginationOpts) =>
     prisma.newsItem.findMany({
