@@ -36,6 +36,7 @@ export interface TradingPlan {
   setups: TradingSetup[];
   risks: string[];
   authoredBy: string;
+  imageUrl?: string | null;
 }
 
 export type HorizonFilter = "all" | TradingPlan["horizon"];
@@ -99,6 +100,8 @@ export const PlanRowSchema = z.object({
   updatedAt: z.string(),
   publishedAt: z.string().nullable(),
   closedAt: z.string().nullable(),
+  imageUrl: z.string().nullable().optional(),
+  imageKey: z.string().nullable().optional(),
 });
 
 export type Plan = z.infer<typeof PlanRowSchema>;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import {
   createPlan,
@@ -12,6 +13,8 @@ import {
 } from "@/features/plan/actions";
 import { cn } from "@/lib/cn";
 import type { Plan } from "@/features/plan/types";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
 const INITIAL: PlanActionState = { ok: false };
 
@@ -208,6 +211,10 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
       </form>
 
       {plan && (
+        <PlanImageUpload planId={plan.id} imageUrl={plan.imageUrl ?? null} />
+      )}
+
+      {plan && (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border border-gray-3 bg-gray-2/20 p-4">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
             Lifecycle
@@ -266,6 +273,119 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function getToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.split("; ").find((c) => c.startsWith("access_token="));
+  return match ? match.split("=")[1] : null;
+}
+
+function PlanImageUpload({ planId, imageUrl: initial }: { planId: string; imageUrl: string | null }) {
+  const [imageUrl, setImageUrl] = useState(initial);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const token = getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`${API_BASE}/plans/${planId}/image`, {
+        method: "POST",
+        headers,
+        body: fd,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(body.message ?? `Upload failed (${res.status})`);
+      }
+      const json = await res.json();
+      setImageUrl(json.data?.imageUrl ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const remove = async () => {
+    setUploading(true);
+    setError(null);
+    try {
+      const token = getToken();
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(`${API_BASE}/plans/${planId}/image`, {
+        method: "DELETE",
+        headers,
+      });
+      if (!res.ok) throw new Error("Remove failed");
+      setImageUrl(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Remove failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 border border-gray-3 bg-gray-2/20 p-4">
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
+        Chart Image
+      </div>
+
+      {error && (
+        <div className="mb-3 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
+          {error}
+        </div>
+      )}
+
+      {imageUrl && (
+        <div className="mb-3">
+          <a href={imageUrl} target="_blank" rel="noopener noreferrer">
+            <img
+              src={imageUrl}
+              alt="Plan chart"
+              className="max-h-64 w-full rounded border border-gray-3 object-contain"
+            />
+          </a>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={uploading}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) upload(f);
+          }}
+          className="font-mono text-[10px] text-white/60 file:mr-3 file:border file:border-gray-3 file:bg-gray-2 file:px-3 file:py-1.5 file:font-mono file:text-[10px] file:uppercase file:tracking-widest2 file:text-white/60 file:transition-colors hover:file:border-brand hover:file:text-brand disabled:opacity-40"
+        />
+        {imageUrl && (
+          <button
+            type="button"
+            onClick={remove}
+            disabled={uploading}
+            className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright disabled:opacity-40"
+          >
+            {uploading ? "…" : "Remove"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

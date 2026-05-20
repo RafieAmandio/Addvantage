@@ -88,6 +88,20 @@ export function PlanDetail({
                 {plan.thesis}
               </p>
             </div>
+            {plan.imageUrl && (
+              <a
+                href={plan.imageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 block"
+              >
+                <img
+                  src={plan.imageUrl}
+                  alt={`Chart for ${plan.id}`}
+                  className="max-h-[600px] w-full rounded border border-gray-3 object-contain"
+                />
+              </a>
+            )}
           </section>
 
           {showOutcome && outcome && (

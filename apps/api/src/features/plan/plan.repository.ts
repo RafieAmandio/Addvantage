@@ -23,6 +23,8 @@ const PLAN_SELECT = {
   updatedAt: true,
   publishedAt: true,
   closedAt: true,
+  imageUrl: true,
+  imageKey: true,
 } as const;
 
 export const planRepository = {

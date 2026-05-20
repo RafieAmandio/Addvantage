@@ -172,5 +172,6 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
     setups,
     risks,
     authoredBy: "Desk",
+    imageUrl: plan.imageUrl ?? null,
   };
 }

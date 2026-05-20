@@ -1,6 +1,7 @@
 import type { Prisma } from "@tradevantage/db";
-import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
+import { NotFoundError, ForbiddenError, AppError } from "@/core/errors/index.js";
 import type { PaginationOpts } from "@/core/utils/pagination.js";
+import { getStorageProvider } from "@/integrations/storage/index.js";
 import { planRepository } from "./plan.repository.js";
 
 function computeRealizedR(input: {
@@ -170,5 +171,39 @@ export const planService = {
     const plan = await planRepository.findById(id);
     if (!plan) throw new NotFoundError("Plan not found");
     return planRepository.remove(id);
+  },
+
+  async uploadImage(id: string, file: { buffer: Buffer; originalname: string; mimetype: string }) {
+    const storage = getStorageProvider();
+    if (!storage) throw new AppError("File uploads not configured", 503);
+
+    const plan = await planRepository.findById(id);
+    if (!plan) throw new NotFoundError("Plan not found");
+
+    if (plan.imageKey) {
+      await storage.delete(plan.imageKey).catch(() => {});
+    }
+
+    const result = await storage.upload({
+      buffer: file.buffer,
+      originalName: file.originalname,
+      contentType: file.mimetype,
+      folder: "plans",
+    });
+
+    await planRepository.update(id, { imageUrl: result.url, imageKey: result.key });
+    return { imageUrl: result.url };
+  },
+
+  async removeImage(id: string) {
+    const storage = getStorageProvider();
+    const plan = await planRepository.findById(id);
+    if (!plan) throw new NotFoundError("Plan not found");
+
+    if (plan.imageKey && storage) {
+      await storage.delete(plan.imageKey).catch(() => {});
+    }
+
+    await planRepository.update(id, { imageUrl: null, imageKey: null });
   },
 };

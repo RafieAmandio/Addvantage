@@ -3,6 +3,7 @@ import type { Prisma } from "@tradevantage/db";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess, sendPaginatedSuccess } from "@/core/utils/response.js";
 import { parsePagination } from "@/core/utils/pagination.js";
+import { ValidationError } from "@/core/errors/index.js";
 import type { AdminRequest } from "@/core/types/request.js";
 import { planService } from "./plan.service.js";
 
@@ -84,6 +85,7 @@ export const planController = {
     if (data.setups !== undefined) updateData.setups = data.setups;
     if (data.tags !== undefined) updateData.tags = data.tags;
     if (data.tier !== undefined) updateData.tier = data.tier;
+    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
 
     await planService.update(id, updateData);
     sendSuccess(res, null, "Plan updated");
@@ -108,5 +110,20 @@ export const planController = {
     const id = String(req.params.id);
     await planService.remove(id);
     sendSuccess(res, null, "Plan deleted");
+  }),
+
+  uploadImage: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    const file = (req as unknown as { file?: Express.Multer.File }).file;
+    if (!file) throw new ValidationError(["No file provided"]);
+
+    const result = await planService.uploadImage(id, file);
+    sendSuccess(res, result, "Image uploaded", 201);
+  }),
+
+  removeImage: asyncHandler(async (req, res: Response) => {
+    const id = String(req.params.id);
+    await planService.removeImage(id);
+    sendSuccess(res, null, "Image removed");
   }),
 };

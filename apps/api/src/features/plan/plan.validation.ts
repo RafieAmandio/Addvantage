@@ -31,6 +31,7 @@ export const planCreateSchema = z.object({
   setups: z.array(PlanSetupSchema).default([]),
   tags: z.array(z.string()).default([]),
   tier: z.enum(["free", "vip"]).default("free"),
+  imageUrl: z.string().url().nullable().optional(),
 });
 
 export const planUpdateSchema = planCreateSchema.partial();

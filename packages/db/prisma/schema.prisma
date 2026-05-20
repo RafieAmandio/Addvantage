@@ -181,6 +181,8 @@ model TradingPlan {
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
   closedAt    DateTime? @map("closed_at") @db.Timestamptz(6)
+  imageUrl    String?   @map("image_url")
+  imageKey    String?   @map("image_key")
   author      Profile?  @relation(fields: [authorId], references: [id], onUpdate: NoAction)
 
   @@index([symbol])

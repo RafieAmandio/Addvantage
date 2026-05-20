@@ -3,6 +3,7 @@ import { requireAuth } from "@/core/middleware/auth.middleware.js";
 import { requireAdmin } from "@/core/middleware/admin.middleware.js";
 import { adminRateLimit } from "@/core/middleware/rate-limit.middleware.js";
 import { validate } from "@/core/middleware/validate.middleware.js";
+import { upload } from "@/core/middleware/upload.middleware.js";
 import { planController } from "./plan.controller.js";
 import { planCreateSchema, planUpdateSchema, planCloseSchema } from "./plan.validation.js";
 
@@ -22,6 +23,8 @@ router.post("/", ...adminWrite, validate({ body: planCreateSchema }), planContro
 router.put("/:id", ...adminWrite, validate({ body: planUpdateSchema }), planController.update);
 router.put("/:id/publish", ...adminWrite, planController.publish);
 router.put("/:id/close", ...adminWrite, validate({ body: planCloseSchema }), planController.close);
+router.post("/:id/image", ...adminWrite, upload.single("image"), planController.uploadImage);
+router.delete("/:id/image", ...adminWrite, planController.removeImage);
 router.delete("/:id", ...adminWrite, planController.remove);
 
 export { router as planRoutes };
