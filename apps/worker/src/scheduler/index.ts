@@ -7,10 +7,12 @@ import { runSource } from "../pipeline/runSource";
 import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
 import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
+import { syncRsi } from "../rsi/sync-rsi";
 
 let scheduledTask: ScheduledTask | null = null;
 let renewalTask: ScheduledTask | null = null;
 let calendarTask: ScheduledTask | null = null;
+let rsiTask: ScheduledTask | null = null;
 let inFlightTick: Promise<void> | null = null;
 
 /**
@@ -38,6 +40,20 @@ export function startScheduler(): void {
     Sentry.captureException(err, { tags: { scope: "te-calendar.boot" } });
     logger.error({ err: String(err) }, "te-calendar: boot sync failed");
   });
+
+  if (config.MARKET_DATA_PROVIDER) {
+    rsiTask = cron.schedule("10 */4 * * *", () => {
+      syncRsi().catch((err) => {
+        Sentry.captureException(err, { tags: { scope: "rsi-sync.cron" } });
+        logger.error({ err: String(err) }, "rsi-sync: scheduled sync failed");
+      });
+    });
+
+    syncRsi().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "rsi-sync.boot" } });
+      logger.error({ err: String(err) }, "rsi-sync: boot sync failed");
+    });
+  }
 
   if (config.EMAIL_PROVIDER) {
     renewalTask = cron.schedule("0 9 * * *", () => {
@@ -80,6 +96,10 @@ export async function stopScheduler(): Promise<void> {
   if (calendarTask) {
     calendarTask.stop();
     calendarTask = null;
+  }
+  if (rsiTask) {
+    rsiTask.stop();
+    rsiTask = null;
   }
   if (inFlightTick) {
     try {

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { config } from "../../lib/config";
 import { retry } from "../../lib/retry";
+import { toIsoUtc } from "../../lib/date";
 import type { Bar, BarsAdapter, FetchBarsInput, Interval } from "./base";
 
 /**
@@ -51,13 +52,6 @@ const ErrorResponseSchema = z.object({
 });
 
 const ResponseSchema = z.union([OkResponseSchema, ErrorResponseSchema]);
-
-function toIsoUtc(datetime: string): string {
-  // Twelve Data returns "YYYY-MM-DD HH:MM:SS" (UTC) or "YYYY-MM-DD" for 1day.
-  const withT = datetime.includes(" ") ? datetime.replace(" ", "T") : datetime;
-  const withTime = withT.length === 10 ? `${withT}T00:00:00` : withT;
-  return `${withTime}Z`;
-}
 
 function parseNumber(s: string): number {
   const n = Number(s);
