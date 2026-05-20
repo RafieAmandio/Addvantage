@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPlanById } from "@/features/plan/queries/plans";
+import { getPlanByIdForAdmin } from "@/features/plan/queries/plans";
 import { requireAdmin } from "@/lib/auth/session";
 import { PlanEditorForm } from "@/features/plan/components/admin/PlanEditorForm";
 
@@ -12,7 +12,7 @@ export async function generateMetadata({
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const plan = await getPlanById(params.id);
+  const plan = await getPlanByIdForAdmin(params.id);
   if (!plan) return { title: "Not Found" };
   return { title: `Edit: ${plan.symbol} ${plan.direction}` };
 }
@@ -23,7 +23,7 @@ export default async function AdminPlanEditorPage({
   params: { id: string };
 }) {
   await requireAdmin();
-  const plan = await getPlanById(params.id);
+  const plan = await getPlanByIdForAdmin(params.id);
   if (!plan) return notFound();
   return <PlanEditorForm plan={plan} />;
 }

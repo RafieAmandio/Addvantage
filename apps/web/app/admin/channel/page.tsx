@@ -88,12 +88,14 @@ export default function AdminChannelPage() {
     setShowForm(true);
   }
 
-  async function handleImageUpload(file: File): Promise<string> {
-    const reader = new FileReader();
-    return new Promise((resolve) => {
-      reader.onload = () => resolve(reader.result as string);
-      reader.readAsDataURL(file);
+  async function uploadImageToStorage(file: File): Promise<string> {
+    const fd = new FormData();
+    fd.append("image", file);
+    const json = await apiFetch("/channel/upload", {
+      method: "POST",
+      body: fd,
     });
+    return json.data?.imageUrl;
   }
 
   async function onSubmit() {
@@ -103,7 +105,7 @@ export default function AdminChannelPage() {
     try {
       let imageUrl = imagePreview;
       if (imageFile) {
-        imageUrl = await handleImageUpload(imageFile);
+        imageUrl = await uploadImageToStorage(imageFile);
       }
 
       const payload = {

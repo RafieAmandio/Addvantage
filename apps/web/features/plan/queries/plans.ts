@@ -35,6 +35,14 @@ export const getPlanById = cache(async function getPlanById(id: string): Promise
   }
 });
 
+export const getPlanByIdForAdmin = cache(async function getPlanByIdForAdmin(id: string): Promise<Plan | null> {
+  try {
+    return await apiGet<Plan>(`/plans/admin/${id}`);
+  } catch {
+    return null;
+  }
+});
+
 export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
   try {
     const data = await apiGet<{ content: Plan[] }>(`/plans/admin/all?limit=${limit}`);

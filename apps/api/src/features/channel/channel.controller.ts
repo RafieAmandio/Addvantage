@@ -1,6 +1,8 @@
 import type { Response } from "express";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
+import { ValidationError, AppError } from "@/core/errors/index.js";
+import { getStorageProvider } from "@/integrations/storage/index.js";
 import { channelService } from "./channel.service.js";
 
 export const channelController = {
@@ -52,5 +54,22 @@ export const channelController = {
   delete: asyncHandler(async (req, res: Response) => {
     await channelService.delete(req.params.id);
     sendSuccess(res, null, "Post deleted");
+  }),
+
+  uploadImage: asyncHandler(async (req, res: Response) => {
+    const storage = getStorageProvider();
+    if (!storage) throw new AppError("File uploads not configured", 503);
+
+    const file = (req as unknown as { file?: Express.Multer.File }).file;
+    if (!file) throw new ValidationError(["No file provided"]);
+
+    const result = await storage.upload({
+      buffer: file.buffer,
+      originalName: file.originalname,
+      contentType: file.mimetype,
+      folder: "channel",
+    });
+
+    sendSuccess(res, { imageUrl: result.url }, "Image uploaded", 201);
   }),
 };
