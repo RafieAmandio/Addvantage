@@ -5,15 +5,11 @@ import { dedupeByExternalId, type AdapterContext, type Candidate, type SourceAda
 
 /**
  * Truth Social adapter — polls a public RSS mirror of Donald Trump's Truth
- * Social posts (`trumpstruth.org/feed` by default, overridable via
- * `TRUTH_SOCIAL_RSS_URL`). Truth Social has no official API; this mirror is
- * the least-fragile public endpoint. We parse RSS 2.0 with a minimal regex
- * extractor rather than pull in a new dep for one adapter.
- *
- * Each `<item>` becomes one `Candidate`. Dedupe key downstream is
- * `contentHash([sourceCode, externalId, rawText])` where externalId is the
- * item guid/link (stable per post). The pipeline's rephrase layer then
- * summarises the post into the editorial tone.
+ * Social posts. The RSS includes `truth:originalUrl` pointing to the actual
+ * truthsocial.com post. For image-only posts, we scrape images from both the
+ * mirror page and the original Truth Social page, preferring the
+ * `static-assets-1.truthsocial.com` CDN which is globally reachable (the
+ * `truth-archive` Linode CDN is often blocked).
  */
 export class TruthSocialAdapter implements SourceAdapter {
   readonly code = "TRUMP";
@@ -31,7 +27,7 @@ export class TruthSocialAdapter implements SourceAdapter {
       return [];
     }
 
-    const items = extractItems(xml).slice(0, 5);
+    const items = extractItems(xml).slice(0, 10);
     const out: Candidate[] = [];
     for (const item of items) {
       const link = item.link ?? item.guid;
@@ -39,25 +35,20 @@ export class TruthSocialAdapter implements SourceAdapter {
       const externalId = item.guid ?? link;
       const title = cleanText(item.title ?? "");
       const body = cleanText(stripHtml(item.description ?? ""));
-      const imageUrls = extractImageUrls(item.description ?? "");
       let rawText = [title, body].filter(Boolean).join("\n\n").trim();
 
-      // If the post has little/no text, fetch the post page to find images
-      const textOnly = body.trim();
-      if (textOnly.length === 0) {
-        const pageImages = imageUrls.length > 0
-          ? imageUrls
-          : await scrapePostImages(link, ctx);
-
-        if (pageImages.length > 0) {
+      // For image-only posts, try to describe the image via vision
+      if (body.trim().length === 0) {
+        const imageUrl = await this.findImage(item, link, ctx);
+        if (imageUrl) {
           try {
-            const described = await describeImage(pageImages[0]!, ctx);
+            const described = await describeImage(imageUrl, ctx);
             rawText = [title, `[Image content]: ${described}`]
               .filter(Boolean)
               .join("\n\n")
               .trim();
           } catch (err) {
-            ctx.logger.warn({ err: String(err), url: pageImages[0] }, "vision describe failed");
+            ctx.logger.warn({ err: String(err), url: imageUrl }, "vision describe failed");
           }
         }
       }
@@ -70,18 +61,44 @@ export class TruthSocialAdapter implements SourceAdapter {
 
       out.push({
         externalId,
-        sourceUrl: link,
+        sourceUrl: item.originalUrl ?? link,
         rawText,
         meta: {
           title,
           link,
           pubDate: item.pubDate ?? "",
-          hasImage: imageUrls.length > 0 ? "true" : "false",
+          hasImage: "true",
         },
         occurredAt,
       });
     }
     return dedupeByExternalId(out);
+  }
+
+  private async findImage(
+    item: RssItem,
+    mirrorUrl: string,
+    ctx: AdapterContext,
+  ): Promise<string | null> {
+    // 1. Check RSS description for inline images
+    const inlineImages = extractImageUrls(item.description ?? "");
+    const cdnImage = pickCdnImage(inlineImages);
+    if (cdnImage) return cdnImage;
+
+    // 2. Scrape the mirror post page (trumpstruth.org)
+    const mirrorImages = await scrapePageImages(mirrorUrl, ctx);
+    const mirrorCdn = pickCdnImage(mirrorImages);
+    if (mirrorCdn) return mirrorCdn;
+
+    // 3. Scrape the original Truth Social page
+    if (item.originalUrl) {
+      const origImages = await scrapePageImages(item.originalUrl, ctx);
+      const origCdn = pickCdnImage(origImages);
+      if (origCdn) return origCdn;
+    }
+
+    // 4. Fall back to any image we found (even archive URLs)
+    return mirrorImages[0] ?? inlineImages[0] ?? null;
   }
 }
 
@@ -91,14 +108,9 @@ interface RssItem {
   guid?: string;
   pubDate?: string;
   description?: string;
+  originalUrl?: string;
 }
 
-/**
- * Extract `<item>…</item>` blocks from an RSS 2.0 document. Deliberately
- * minimal — supports both CDATA and escaped-entity payloads, which covers
- * trumpstruth.org and most other mirrors. If we ever need Atom or namespaced
- * extensions, switch to `fast-xml-parser`.
- */
 function extractItems(xml: string): RssItem[] {
   const items: RssItem[] = [];
   const re = /<item\b[^>]*>([\s\S]*?)<\/item>/gi;
@@ -112,13 +124,15 @@ function extractItems(xml: string): RssItem[] {
       guid: readTag(block, "guid"),
       pubDate: readTag(block, "pubDate"),
       description: readTag(block, "description"),
+      originalUrl: readTag(block, "truth:originalUrl"),
     });
   }
   return items;
 }
 
 function readTag(block: string, tag: string): string | undefined {
-  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
+  const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`<${escaped}\\b[^>]*>([\\s\\S]*?)<\\/${escaped}>`, "i");
   const match = block.match(re);
   const inner = match?.[1];
   if (inner === undefined) return undefined;
@@ -154,15 +168,15 @@ function parseRssDate(s: string): string | undefined {
   return Number.isFinite(d.getTime()) ? d.toISOString() : undefined;
 }
 
-async function scrapePostImages(
-  postUrl: string,
+async function scrapePageImages(
+  pageUrl: string,
   ctx: AdapterContext,
 ): Promise<string[]> {
   try {
-    const html = await fetchText(postUrl);
+    const html = await fetchText(pageUrl, { timeoutMs: 10_000, retries: 1 });
     return extractImageUrls(html);
   } catch (err) {
-    ctx.logger.warn({ err: String(err), url: postUrl }, "truth-social: failed to scrape post page");
+    ctx.logger.warn({ err: String(err), url: pageUrl }, "truth-social: failed to scrape page");
     return [];
   }
 }
@@ -177,13 +191,28 @@ function extractImageUrls(html: string): string[] {
     if (src.includes("emoji") || src.includes("avatar") || src.includes("favicon") || src.includes("logo") || src.endsWith(".svg")) continue;
     urls.push(src);
   }
-  // Prefer full-size images (archive URLs or "original" in path) over thumbnails
-  urls.sort((a, b) => {
-    const aFull = a.includes("archive") || a.includes("original") ? 0 : 1;
-    const bFull = b.includes("archive") || b.includes("original") ? 0 : 1;
-    return aFull - bFull;
-  });
+
+  // Also find og:image meta tags
+  const ogRe = /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/gi;
+  while ((m = ogRe.exec(html)) !== null) {
+    if (m[1]) urls.push(m[1]);
+  }
+
   return urls;
+}
+
+/**
+ * Prefer Truth Social CDN URLs over the archive mirror. The archive
+ * (truth-archive.us-iad-1.linodeobjects.com) is often unreachable from VPS
+ * hosts, while static-assets-1.truthsocial.com works globally.
+ */
+function pickCdnImage(urls: string[]): string | null {
+  const cdn = urls.find((u) => u.includes("static-assets") && u.includes("truthsocial"));
+  if (cdn) {
+    // Prefer original size over small thumbnail
+    return cdn.replace("/small/", "/original/");
+  }
+  return null;
 }
 
 async function downloadImageAsBase64(url: string): Promise<{ base64: string; mediaType: string }> {
@@ -212,4 +241,3 @@ async function describeImage(
     prompt: "Read and transcribe ALL text in this image. If it's a screenshot of a statement, article, or social media post, extract the full text verbatim. If it's a chart or graph, describe what it shows including any numbers, labels, and trends. Be thorough — every word matters for market analysis.",
   });
 }
-
