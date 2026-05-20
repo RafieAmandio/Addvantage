@@ -30,6 +30,8 @@ router.post(
   authController.resendVerification,
 );
 
+router.post("/service-token", authController.serviceToken);
+
 router.post("/refresh", requireAuth, authController.refresh);
 router.post("/logout", requireAuth, authController.logout);
 

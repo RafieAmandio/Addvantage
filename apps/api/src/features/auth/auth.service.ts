@@ -118,6 +118,28 @@ export const authService = {
     }
   },
 
+  serviceToken: async (serviceSecret: string) => {
+    if (!env.SERVICE_TOKEN_SECRET) {
+      throw new AppError("Service tokens not configured", 503);
+    }
+    if (serviceSecret !== env.SERVICE_TOKEN_SECRET) {
+      throw new AppError("Invalid service secret", 401);
+    }
+
+    const profile = await authRepository.findByEmail("tradevantage.gg@gmail.com");
+    if (!profile) throw new AppError("Service account not found", 500);
+
+    const now = Math.floor(Date.now() / 1000);
+    const accessToken = await new SignJWT({ email: profile.email })
+      .setProtectedHeader({ alg: "HS256" })
+      .setSubject(profile.id)
+      .setIssuedAt(now)
+      .setExpirationTime(now + 24 * 60 * 60)
+      .sign(secret);
+
+    return { accessToken };
+  },
+
   resendVerification: async (userId: string) => {
     const profile = await authRepository.findById(userId);
     if (!profile) throw new AppError("User not found", 404);

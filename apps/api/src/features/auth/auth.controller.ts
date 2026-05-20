@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
+import { AppError } from "@/core/errors/index.js";
 import type { AuthRequest } from "@/core/types/request.js";
 import { logger } from "@/config/logger.js";
 import { authService } from "./auth.service.js";
@@ -35,6 +36,13 @@ export const authController = {
     const authReq = req as AuthRequest;
     const result = await authService.resendVerification(authReq.user.id);
     sendSuccess(res, result, "Verification email sent");
+  }),
+
+  serviceToken: asyncHandler(async (req: Request, res: Response) => {
+    const secret = req.headers["x-service-secret"] as string;
+    if (!secret) throw new AppError("Missing X-Service-Secret header", 401);
+    const result = await authService.serviceToken(secret);
+    sendSuccess(res, result, "Service token issued");
   }),
 
   logout: asyncHandler(async (req, res: Response) => {

@@ -42,6 +42,8 @@ const EnvSchema = z.object({
 
   SENTRY_DSN: z.preprocess(emptyToUndef, z.string().url().optional()),
 
+  SERVICE_TOKEN_SECRET: z.preprocess(emptyToUndef, z.string().min(32).optional()),
+
   STORAGE_PROVIDER: z.preprocess(emptyToUndef, z.enum(["supabase", "s3"]).optional()),
   STORAGE_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
