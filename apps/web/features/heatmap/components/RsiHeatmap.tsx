@@ -191,12 +191,15 @@ export function RsiHeatmap({ pairs }: RsiHeatmapProps) {
         })}
 
         {/* Dots with vertical dashed lines */}
-        {dots.map(({ pair, x, y }) => {
+        {dots.map(({ pair, x, y }, idx) => {
           const cfg = ZONE_CONFIG[pair.zone];
           const isHovered = hovered?.pair.symbol === pair.symbol;
+          const stagger = Math.min(idx * 25, 800);
           return (
-            <g key={pair.symbol}>
-              {/* Vertical dashed stem */}
+            <g
+              key={pair.symbol}
+              style={{ animation: `rsi-dot-in 0.4s ease-out ${stagger}ms both` }}
+            >
               <line
                 x1={x}
                 y1={y + DOT_RADIUS}
@@ -207,7 +210,6 @@ export function RsiHeatmap({ pairs }: RsiHeatmapProps) {
                 strokeDasharray="2 3"
                 opacity={isHovered ? 0.5 : 0.15}
               />
-              {/* Dot */}
               <circle
                 cx={x}
                 cy={y}
@@ -220,7 +222,6 @@ export function RsiHeatmap({ pairs }: RsiHeatmapProps) {
                 onMouseEnter={() => handleMouseEnter(pair, x, y)}
                 onMouseLeave={handleMouseLeave}
               />
-              {/* Label */}
               <text
                 x={x}
                 y={y - DOT_RADIUS - 4}

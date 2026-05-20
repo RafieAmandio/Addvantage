@@ -78,17 +78,27 @@ function buildAdminWhere(opts: AdminFilterOpts): Prisma.NewsItemWhereInput {
 }
 
 export const newsRepository = {
-  findApproved: (opts: PaginationOpts) =>
-    prisma.newsItem.findMany({
-      where: { status: "approved" },
+  findApproved: (opts: PaginationOpts & { affects?: string }) => {
+    const where: Prisma.NewsItemWhereInput = {
+      status: "approved",
+      ...(opts.affects && { affects: { has: opts.affects } }),
+    };
+    return prisma.newsItem.findMany({
+      where,
       select: LIST_SELECT,
       orderBy: [{ publishedAt: "desc" }, { fetchedAt: "desc" }],
       skip: opts.skip,
       take: opts.limit,
-    }),
+    });
+  },
 
-  countApproved: () =>
-    prisma.newsItem.count({ where: { status: "approved" } }),
+  countApproved: (affects?: string) =>
+    prisma.newsItem.count({
+      where: {
+        status: "approved",
+        ...(affects && { affects: { has: affects } }),
+      },
+    }),
 
   findApprovedById: (id: string) =>
     prisma.newsItem.findFirst({

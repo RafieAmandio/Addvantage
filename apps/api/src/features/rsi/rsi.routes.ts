@@ -5,7 +5,7 @@ import { tierRateLimit } from "@/core/middleware/rate-limit.middleware.js";
 import { validate } from "@/core/middleware/validate.middleware.js";
 import type { AuthUser } from "@/core/types/request.js";
 import { rsiController } from "./rsi.controller.js";
-import { rsiHeatmapQuerySchema } from "./rsi.validation.js";
+import { rsiHeatmapQuerySchema, rsiDetailParamsSchema } from "./rsi.validation.js";
 
 const router = Router();
 
@@ -20,6 +20,14 @@ router.get(
   tierRateLimit("api:rsi", getTier),
   validate({ query: rsiHeatmapQuerySchema }),
   rsiController.getHeatmap,
+);
+
+router.get(
+  "/detail/:symbol",
+  optionalAuth,
+  tierRateLimit("api:rsi", getTier),
+  validate({ params: rsiDetailParamsSchema }),
+  rsiController.getDetail,
 );
 
 export { router as rsiRoutes };

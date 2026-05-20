@@ -12,10 +12,10 @@ function contentHash(parts: (string | null | undefined)[]): string {
 }
 
 export const newsService = {
-  async listApproved(opts: PaginationOpts) {
+  async listApproved(opts: PaginationOpts & { affects?: string }) {
     const [content, total] = await Promise.all([
       newsRepository.findApproved(opts),
-      newsRepository.countApproved(),
+      newsRepository.countApproved(opts.affects),
     ]);
     return { content, total, page: opts.page, limit: opts.limit };
   },

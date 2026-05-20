@@ -1,20 +1,26 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { RsiZoneId } from "@/features/heatmap/types";
+import type { RsiZoneId, ViewMode } from "@/features/heatmap/types";
 import { ZONES_ORDERED } from "@/features/heatmap/lib/zones";
-import { useRsiData } from "@/features/heatmap/hooks/useRsiData";
+import { useRsiData, useRsiTableData } from "@/features/heatmap/hooks/useRsiData";
 import { RsiToolbar } from "@/features/heatmap/components/RsiToolbar";
 import { RsiHeatmap } from "@/features/heatmap/components/RsiHeatmap";
 import { RsiList } from "@/features/heatmap/components/RsiList";
+import { RsiTable } from "@/features/heatmap/components/RsiTable";
 
 export default function HeatmapClient() {
   const [interval, setChartInterval] = useState("4h");
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [activeZones, setActiveZones] = useState<Set<RsiZoneId>>(
     () => new Set(ZONES_ORDERED),
   );
 
-  const { data, loading, error } = useRsiData(interval);
+  const isTable = viewMode === "table";
+  const chartData = useRsiData(interval, !isTable);
+  const tableData = useRsiTableData(isTable);
+  const loading = isTable ? tableData.loading : chartData.loading;
+  const error = isTable ? tableData.error : chartData.error;
 
   const toggleZone = useCallback((z: RsiZoneId) => {
     setActiveZones((prev) => {
@@ -26,38 +32,56 @@ export default function HeatmapClient() {
   }, []);
 
   const filteredPairs = useMemo(() => {
-    if (!data) return [];
-    return data.pairs.filter((p) => activeZones.has(p.zone));
-  }, [data, activeZones]);
+    if (!chartData.data) return [];
+    return chartData.data.pairs.filter((p) => activeZones.has(p.zone));
+  }, [chartData.data, activeZones]);
+
+  const updatedAt = isTable ? tableData.data?.updatedAt : chartData.data?.updatedAt;
+  const totalCount = isTable
+    ? (tableData.data?.pairs.length ?? 0)
+    : (chartData.data?.pairs.length ?? 0);
+  const visibleCount = isTable
+    ? (tableData.data?.pairs.length ?? 0)
+    : filteredPairs.length;
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-        <h1 className="font-mono text-lg font-bold text-white">
-          Forex RSI Heatmap
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-mono text-lg font-bold text-white">
+            Forex RSI Heatmap
+          </h1>
+          {!loading && !error && totalCount > 0 && (
+            <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
+              <span className="led" aria-hidden />
+              {totalCount} instruments
+            </span>
+          )}
+        </div>
         <p className="mt-1 text-xs text-white/30">
           14-period RSI across major pairs, crosses, commodities, and indices.
           Refreshed every 4 hours.
         </p>
       </div>
 
-      {/* Toolbar */}
       <RsiToolbar
         interval={interval}
         onIntervalChange={setChartInterval}
         activeZones={activeZones}
         onToggleZone={toggleZone}
-        pairCount={filteredPairs.length}
-        totalCount={data?.pairs.length ?? 0}
-        updatedAt={data?.updatedAt ?? null}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        pairCount={visibleCount}
+        totalCount={totalCount}
+        updatedAt={updatedAt ?? null}
       />
 
-      {/* Content */}
       {loading && (
         <div className="flex items-center justify-center py-32">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-brand">
+            <span className="led" aria-hidden />
+            Scanning {isTable ? "all frequencies" : `${interval} frequency`}
+          </div>
         </div>
       )}
 
@@ -67,23 +91,25 @@ export default function HeatmapClient() {
         </div>
       )}
 
-      {!loading && !error && filteredPairs.length === 0 && (
+      {!loading && !error && isTable && tableData.data && (
+        <RsiTable pairs={tableData.data.pairs} />
+      )}
+
+      {!loading && !error && !isTable && filteredPairs.length === 0 && (
         <div className="px-4 py-20 text-center sm:px-6">
           <p className="text-sm text-white/30">
-            {data && data.pairs.length === 0
+            {chartData.data && chartData.data.pairs.length === 0
               ? "No RSI data available yet. The worker syncs every 4 hours."
               : "No pairs match the selected filters."}
           </p>
         </div>
       )}
 
-      {!loading && !error && filteredPairs.length > 0 && (
+      {!loading && !error && !isTable && filteredPairs.length > 0 && (
         <>
-          {/* Desktop: SVG scatter chart */}
           <div className="hidden md:block">
             <RsiHeatmap pairs={filteredPairs} />
           </div>
-          {/* Mobile: list view */}
           <div className="md:hidden">
             <RsiList pairs={filteredPairs} />
           </div>

@@ -12,7 +12,8 @@ function splitCsv(v: unknown): string[] | undefined {
 export const newsController = {
   listApproved: asyncHandler(async (req, res: Response) => {
     const opts = parsePagination(req.query);
-    const result = await newsService.listApproved(opts);
+    const affects = req.query.affects ? String(req.query.affects) : undefined;
+    const result = await newsService.listApproved({ ...opts, affects });
     sendPaginatedSuccess(res, result);
   }),
 

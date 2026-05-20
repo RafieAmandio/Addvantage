@@ -1,5 +1,13 @@
 import type { RsiZoneId } from "../types";
 
+export const GROUP_LABELS: Record<string, string> = {
+  major: "Major",
+  cross: "Cross",
+  commodity: "Commodity",
+  exotic: "Exotic",
+  index: "Index",
+};
+
 export const ZONE_CONFIG: Record<
   RsiZoneId,
   { label: string; color: string; bg: string; min: number; max: number }
