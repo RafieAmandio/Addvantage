@@ -216,18 +216,44 @@ function pickCdnImage(urls: string[]): string | null {
 }
 
 async function downloadImageAsBase64(url: string): Promise<{ base64: string; mediaType: string }> {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      "Referer": "https://truthsocial.com/",
-      "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
-    },
+  // Use native https.get — Node's fetch (undici) gets 403'd by the CDN's
+  // TLS fingerprinting, but the native http stack passes.
+  const { default: https } = await import("https");
+  const parsed = new URL(url);
+
+  return new Promise((resolve, reject) => {
+    const req = https.get(
+      {
+        hostname: parsed.hostname,
+        path: parsed.pathname + parsed.search,
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+          "Referer": "https://truthsocial.com/",
+          "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+        },
+      },
+      (res) => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`Failed to download image: ${res.statusCode}`));
+          res.resume();
+          return;
+        }
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk: Buffer) => chunks.push(chunk));
+        res.on("end", () => {
+          const buf = Buffer.concat(chunks);
+          const contentType = res.headers["content-type"] ?? "image/jpeg";
+          const mediaType = contentType.split(";")[0]!.trim();
+          resolve({ base64: buf.toString("base64"), mediaType });
+        });
+      },
+    );
+    req.on("error", reject);
+    req.setTimeout(15_000, () => {
+      req.destroy();
+      reject(new Error("Image download timed out"));
+    });
   });
-  if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
-  const buf = Buffer.from(await res.arrayBuffer());
-  const contentType = res.headers.get("content-type") ?? "image/jpeg";
-  const mediaType = contentType.split(";")[0]!.trim();
-  return { base64: buf.toString("base64"), mediaType };
 }
 
 async function describeImage(
