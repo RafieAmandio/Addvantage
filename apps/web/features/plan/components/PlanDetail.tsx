@@ -97,7 +97,7 @@ export function PlanDetail({
               >
                 <img
                   src={plan.imageUrl}
-                  alt={`Chart for ${plan.id}`}
+                  alt={`Chart for ${plan.setups[0]?.instrument ?? "plan"}`}
                   className="max-h-[600px] w-full rounded border border-gray-3 object-contain"
                 />
               </a>

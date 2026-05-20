@@ -16,3 +16,7 @@ export interface AdminRequest extends AuthRequest {
     isAdmin: true;
   };
 }
+
+export interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}

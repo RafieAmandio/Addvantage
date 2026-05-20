@@ -4,7 +4,7 @@ import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess, sendPaginatedSuccess } from "@/core/utils/response.js";
 import { parsePagination } from "@/core/utils/pagination.js";
 import { ValidationError } from "@/core/errors/index.js";
-import type { AdminRequest } from "@/core/types/request.js";
+import type { AdminRequest, MulterRequest } from "@/core/types/request.js";
 import { planService } from "./plan.service.js";
 
 export const planController = {
@@ -114,7 +114,7 @@ export const planController = {
 
   uploadImage: asyncHandler(async (req, res: Response) => {
     const id = String(req.params.id);
-    const file = (req as unknown as { file?: Express.Multer.File }).file;
+    const file = (req as MulterRequest).file;
     if (!file) throw new ValidationError(["No file provided"]);
 
     const result = await planService.uploadImage(id, file);

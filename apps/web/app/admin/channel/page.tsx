@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/cn";
+import { API_BASE, getAccessToken } from "@/lib/api/client";
 
 interface ChannelPost {
   id: string;
@@ -14,20 +15,9 @@ interface ChannelPost {
   createdAt: string;
 }
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
-
-function getToken(): string | null {
-  return document.cookie
-    .split("; ")
-    .find((c) => c.startsWith("access_token="))
-    ?.split("=")
-    .slice(1)
-    .join("=") ?? null;
-}
-
 async function apiFetch(path: string, opts: RequestInit = {}) {
-  const token = getToken();
-  const res = await fetch(`${API}${path}`, {
+  const token = getAccessToken();
+  const res = await fetch(`${API_BASE}${path}`, {
     ...opts,
     headers: {
       ...(opts.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
@@ -71,6 +61,7 @@ export default function AdminChannelPage() {
     setAuthor("Anthony");
     setTags("");
     setPinned(false);
+    if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
     setImageFile(null);
     setEditId(null);
@@ -131,6 +122,8 @@ export default function AdminChannelPage() {
 
       resetForm();
       await load();
+    } catch {
+      // upload or save failed — error surfaced by apiFetch throwing
     } finally {
       setSaving(false);
     }
@@ -210,9 +203,9 @@ export default function AdminChannelPage() {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
+                  if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
                   setImageFile(file);
-                  const url = URL.createObjectURL(file);
-                  setImagePreview(url);
+                  setImagePreview(URL.createObjectURL(file));
                 }
               }}
               className="w-full font-mono text-[10px] text-white/50 file:mr-3 file:border file:border-gray-3 file:bg-gray-2 file:px-3 file:py-1.5 file:font-mono file:text-[10px] file:uppercase file:tracking-widest2 file:text-brand file:transition-colors hover:file:bg-brand hover:file:text-black"

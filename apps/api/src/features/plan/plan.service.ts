@@ -180,16 +180,16 @@ export const planService = {
     const plan = await planRepository.findById(id);
     if (!plan) throw new NotFoundError("Plan not found");
 
-    if (plan.imageKey) {
-      await storage.delete(plan.imageKey).catch(() => {});
-    }
-
-    const result = await storage.upload({
+    const uploadPromise = storage.upload({
       buffer: file.buffer,
       originalName: file.originalname,
       contentType: file.mimetype,
       folder: "plans",
     });
+    if (plan.imageKey) {
+      await Promise.all([uploadPromise, storage.delete(plan.imageKey).catch(() => {})]);
+    }
+    const result = await uploadPromise;
 
     await planRepository.update(id, { imageUrl: result.url, imageKey: result.key });
     return { imageUrl: result.url };

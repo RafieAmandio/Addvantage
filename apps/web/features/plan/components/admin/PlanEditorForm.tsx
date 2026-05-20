@@ -12,9 +12,8 @@ import {
   type PlanActionState,
 } from "@/features/plan/actions";
 import { cn } from "@/lib/cn";
+import { API_BASE, getAccessToken } from "@/lib/api/client";
 import type { Plan } from "@/features/plan/types";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
 const INITIAL: PlanActionState = { ok: false };
 
@@ -211,7 +210,7 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
       </form>
 
       {plan && (
-        <PlanImageUpload planId={plan.id} imageUrl={plan.imageUrl ?? null} />
+        <PlanImageUpload key={plan.id} planId={plan.id} imageUrl={plan.imageUrl ?? null} />
       )}
 
       {plan && (
@@ -277,12 +276,6 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
   );
 }
 
-function getToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.split("; ").find((c) => c.startsWith("access_token="));
-  return match ? match.split("=")[1] : null;
-}
-
 function PlanImageUpload({ planId, imageUrl: initial }: { planId: string; imageUrl: string | null }) {
   const [imageUrl, setImageUrl] = useState(initial);
   const [uploading, setUploading] = useState(false);
@@ -295,7 +288,7 @@ function PlanImageUpload({ planId, imageUrl: initial }: { planId: string; imageU
     try {
       const fd = new FormData();
       fd.append("image", file);
-      const token = getToken();
+      const token = getAccessToken();
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -322,7 +315,7 @@ function PlanImageUpload({ planId, imageUrl: initial }: { planId: string; imageU
     setUploading(true);
     setError(null);
     try {
-      const token = getToken();
+      const token = getAccessToken();
       const headers: Record<string, string> = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 

@@ -1,11 +1,11 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
 
-function getAccessToken(): string | null {
+export function getAccessToken(): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie
     .split("; ")
     .find((c) => c.startsWith("access_token="));
-  return match ? match.split("=")[1] : null;
+  return match ? match.split("=").slice(1).join("=") : null;
 }
 
 interface ApiResponse<T> {
