@@ -63,7 +63,7 @@ export interface AdminFilterOpts {
   impacts?: string[];
   biases?: string[];
   tags?: string[];
-  status?: string;
+  status?: "pending" | "approved" | "rejected";
   sort?: "asc" | "desc";
 }
 
@@ -95,28 +95,6 @@ export const newsRepository = {
       where: { id, status: "approved" },
       select: LIST_SELECT,
     }),
-
-  findPending: (opts: PaginationOpts & { source?: string; sort?: "asc" | "desc" }) => {
-    const where: Prisma.NewsItemWhereInput = {
-      status: "pending",
-      ...(opts.source && { sourceCode: opts.source }),
-    };
-    return prisma.newsItem.findMany({
-      where,
-      select: ADMIN_LIST_SELECT,
-      orderBy: { fetchedAt: opts.sort ?? "desc" },
-      skip: opts.skip,
-      take: opts.limit,
-    });
-  },
-
-  countPending: (source?: string) => {
-    const where: Prisma.NewsItemWhereInput = {
-      status: "pending",
-      ...(source && { sourceCode: source }),
-    };
-    return prisma.newsItem.count({ where });
-  },
 
   findFiltered: (opts: PaginationOpts & AdminFilterOpts) => {
     const where = buildAdminWhere(opts);

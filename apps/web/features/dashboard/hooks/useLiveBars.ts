@@ -1,19 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiGet } from "@/lib/api/client";
+import { toChartBars } from "@/features/chart/lib/bars";
 import type { Bar } from "@/features/chart/components/PriceChart";
+import type { Bar as DbBar } from "@/features/chart/queries/bars";
 
 export type Timeframe = "1D" | "1W" | "1M";
-
-interface BarsResponse {
-  bars: Array<{
-    ts: string;
-    open: number | null;
-    high: number | null;
-    low: number | null;
-    close: number | null;
-    volume: number | null;
-  }>;
-}
 
 function buildParams(symbol: string, tf: Timeframe) {
   const now = new Date();
@@ -40,6 +31,7 @@ function buildParams(symbol: string, tf: Timeframe) {
 }
 
 export function useLiveBars(symbol: string, tf: Timeframe) {
+  const params = useMemo(() => buildParams(symbol, tf), [symbol, tf]);
   const [bars, setBars] = useState<Bar[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,25 +39,16 @@ export function useLiveBars(symbol: string, tf: Timeframe) {
     let cancelled = false;
     setLoading(true);
 
-    const { interval, from, to } = buildParams(symbol, tf);
-    const qs = new URLSearchParams({ symbol, interval, from, to });
+    const qs = new URLSearchParams({
+      symbol,
+      interval: params.interval,
+      from: params.from,
+      to: params.to,
+    });
 
-    apiGet<BarsResponse>(`/bars?${qs}`)
+    apiGet<{ bars: DbBar[] }>(`/bars?${qs}`)
       .then((data) => {
-        if (cancelled) return;
-        const mapped: Bar[] = [];
-        for (const b of data.bars) {
-          if (b.open === null || b.high === null || b.low === null || b.close === null) continue;
-          mapped.push({
-            time: b.ts,
-            open: b.open,
-            high: b.high,
-            low: b.low,
-            close: b.close,
-            volume: b.volume ?? undefined,
-          });
-        }
-        setBars(mapped);
+        if (!cancelled) setBars(toChartBars(data.bars));
       })
       .catch(() => {
         if (!cancelled) setBars([]);
@@ -75,9 +58,7 @@ export function useLiveBars(symbol: string, tf: Timeframe) {
       });
 
     return () => { cancelled = true; };
-  }, [symbol, tf]);
+  }, [symbol, params]);
 
-  return { bars, loading };
+  return { bars, loading, from: params.from, to: params.to };
 }
-
-export { buildParams };

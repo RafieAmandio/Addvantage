@@ -5,6 +5,10 @@ import { parsePagination } from "@/core/utils/pagination.js";
 import type { AdminRequest } from "@/core/types/request.js";
 import { newsService } from "./news.service.js";
 
+function splitCsv(v: unknown): string[] | undefined {
+  return v ? String(v).split(",").filter(Boolean) : undefined;
+}
+
 export const newsController = {
   listApproved: asyncHandler(async (req, res: Response) => {
     const opts = parsePagination(req.query);
@@ -20,12 +24,12 @@ export const newsController = {
 
   listPending: asyncHandler(async (req, res: Response) => {
     const opts = parsePagination(req.query);
-    const split = (v: unknown) => v ? String(v).split(",").filter(Boolean) : undefined;
-    const sources = split(req.query.source);
-    const impacts = split(req.query.impact);
-    const biases = split(req.query.bias);
-    const tags = split(req.query.tags);
-    const status = req.query.status ? String(req.query.status) : undefined;
+    const sources = splitCsv(req.query.source);
+    const impacts = splitCsv(req.query.impact);
+    const biases = splitCsv(req.query.bias);
+    const tags = splitCsv(req.query.tags);
+    const rawStatus = req.query.status ? String(req.query.status) : undefined;
+    const status = rawStatus === "pending" || rawStatus === "approved" || rawStatus === "rejected" ? rawStatus : undefined;
     const sort = req.query.sort === "asc" ? "asc" as const : "desc" as const;
     const result = await newsService.listFiltered({ ...opts, sources, impacts, biases, tags, status, sort });
     sendPaginatedSuccess(res, result);

@@ -19,7 +19,7 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 import { cn } from "@/lib/cn";
-import { useLiveBars, buildParams, type Timeframe } from "@/features/dashboard/hooks/useLiveBars";
+import { useLiveBars, type Timeframe } from "@/features/dashboard/hooks/useLiveBars";
 import { useChartEvents, type ChartEvent } from "@/features/dashboard/hooks/useChartEvents";
 import type { TimelineKind } from "@/features/timeline/types";
 
@@ -134,9 +134,7 @@ export function DashboardEventChart() {
   );
   const [layoutTick, setLayoutTick] = useState(0);
 
-  const { bars, loading: barsLoading } = useLiveBars(symbol, timeframe);
-
-  const { from, to } = useMemo(() => buildParams(symbol, timeframe), [symbol, timeframe]);
+  const { bars, loading: barsLoading, from, to } = useLiveBars(symbol, timeframe);
   const { events: allEvents, loading: eventsLoading } = useChartEvents(from, to, FILTER_KINDS);
 
   const events = useMemo(

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { listPendingNews } from "@/features/news/queries/news";
+import { listFilteredNews } from "@/features/news/queries/news";
 import { formatDateTime } from "@/lib/cn";
 import { SOURCE_CODES } from "@tradevantage/shared";
 import { IMPACT_LEVELS, BIAS_LEVELS, HASHTAGS } from "@tradevantage/shared";
@@ -44,7 +44,7 @@ export default async function AdminReviewQueuePage({
   const status = searchParams?.status || "pending";
   const sort = searchParams?.sort === "asc" ? ("asc" as const) : ("desc" as const);
 
-  const { items, total } = await listPendingNews({
+  const { items, total } = await listFilteredNews({
     page,
     limit: PER_PAGE,
     source: sources.length ? sources.join(",") : undefined,
@@ -90,6 +90,10 @@ export default async function AdminReviewQueuePage({
 
   const activeFilterCount =
     sources.length + impacts.length + biases.length + tags.length;
+
+  const clearAllUrl = buildUrl({
+    source: undefined, impact: undefined, bias: undefined, tags: undefined, page: "1",
+  });
 
   return (
     <div>
@@ -161,7 +165,7 @@ export default async function AdminReviewQueuePage({
         {activeFilterCount > 0 && (
           <div className="flex items-center gap-2 pt-1">
             <Link
-              href={buildUrl({ source: undefined, impact: undefined, bias: undefined, tags: undefined, page: "1" })}
+              href={clearAllUrl}
               className="border border-blood-bright/40 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright transition-colors hover:bg-blood-bright/10 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
             >
               Clear all filters ({activeFilterCount})
@@ -189,7 +193,7 @@ export default async function AdminReviewQueuePage({
           {activeFilterCount > 0 && (
             <div className="mt-8">
               <Link
-                href={buildUrl({ source: undefined, impact: undefined, bias: undefined, tags: undefined, page: "1" })}
+                href={clearAllUrl}
                 className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
               >
                 Clear all filters

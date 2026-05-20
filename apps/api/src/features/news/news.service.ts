@@ -26,14 +26,6 @@ export const newsService = {
     return item;
   },
 
-  async listPending(opts: PaginationOpts & { source?: string; sort?: "asc" | "desc" }) {
-    const [content, total] = await Promise.all([
-      newsRepository.findPending(opts),
-      newsRepository.countPending(opts.source),
-    ]);
-    return { content, total, page: opts.page, limit: opts.limit };
-  },
-
   async listFiltered(opts: PaginationOpts & AdminFilterOpts) {
     const [content, total] = await Promise.all([
       newsRepository.findFiltered(opts),

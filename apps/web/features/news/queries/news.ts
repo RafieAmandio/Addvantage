@@ -114,7 +114,7 @@ export interface AdminFilterParams {
   sort?: "asc" | "desc";
 }
 
-export async function listPendingNews(opts?: AdminFilterParams): Promise<PaginatedResult<NewsAdminListItem>> {
+export async function listFilteredNews(opts?: AdminFilterParams): Promise<PaginatedResult<NewsAdminListItem>> {
   try {
     const params = new URLSearchParams();
     if (opts?.page) params.set("page", String(opts.page));
