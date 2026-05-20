@@ -18,7 +18,7 @@ export async function createSubscriptionInvoice(): Promise<ActionResult> {
   try {
     const data = await apiPost<{ invoiceUrl: string }>("/subscription/invoice", {
       tier: "vip",
-      amount: 4_500_000,
+      amount: 17_500_000,
       currency: "IDR",
       successRedirectUrl: `${publicConfig.NEXT_PUBLIC_SITE_URL}/app/subscription`,
       failureRedirectUrl: `${publicConfig.NEXT_PUBLIC_SITE_URL}/app/subscription`,

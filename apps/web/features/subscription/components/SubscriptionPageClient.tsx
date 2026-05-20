@@ -13,7 +13,7 @@ interface SubscriptionPlan {
   id: string;
   name: string;
   priceIDR: number;
-  cadence: "3-month";
+  cadence: string;
   features: string[];
   highlight?: boolean;
 }
@@ -35,8 +35,8 @@ const PLANS: SubscriptionPlan[] = [
   {
     id: "vip-trader",
     name: "VIP+ Trader",
-    priceIDR: 4_500_000,
-    cadence: "3-month",
+    priceIDR: 17_500_000,
+    cadence: "1-year",
     highlight: true,
     features: [
       "Everything in Free",

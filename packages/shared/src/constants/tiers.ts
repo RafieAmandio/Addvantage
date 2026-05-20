@@ -9,10 +9,9 @@ export function isPaidTier(t: string): t is PaidTier {
   return (PAID_TIERS as readonly string[]).includes(t);
 }
 
-// Indonesian Rupiah (IDR) checkout amount per paid tier.
-// TODO(price): placeholders from tick 48 — confirm with user before live use.
+// Indonesian Rupiah (IDR) checkout amount per paid tier (annual).
 export const TIER_PRICE_IDR: Record<PaidTier, number> = {
-  vip: 199_000,
+  vip: 17_500_000,
 };
 
 // Hourly request budget per tier for tier-gated APIs (consult LLM, etc.).
