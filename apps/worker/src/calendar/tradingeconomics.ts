@@ -107,8 +107,21 @@ function buildScores(countryCode: string, impact: Impact): number[] {
   return scores;
 }
 
-// Parse "04:00 AM" or "01:30 PM" into a Date for today
-function parseEventTime(timeStr: string): Date | null {
+// Parse "Tuesday May 19 2026" from thead date headers
+function parseDateHeader(text: string): Date | null {
+  const match = text.trim().match(/\w+\s+(\w+)\s+(\d{1,2})\s+(\d{4})/);
+  if (!match) return null;
+  const months: Record<string, number> = {
+    January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
+    July: 6, August: 7, September: 8, October: 9, November: 10, December: 11,
+  };
+  const month = months[match[1]];
+  if (month === undefined) return null;
+  return new Date(Date.UTC(parseInt(match[3], 10), month, parseInt(match[2], 10)));
+}
+
+// Parse "04:00 AM" or "01:30 PM" combined with a base date
+function parseEventTime(timeStr: string, baseDate: Date): Date | null {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
   if (!match) return null;
 
@@ -119,9 +132,10 @@ function parseEventTime(timeStr: string): Date | null {
   if (ampm === "PM" && hours !== 12) hours += 12;
   if (ampm === "AM" && hours === 12) hours = 0;
 
-  const now = new Date();
-  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hours, minutes));
-  return d;
+  return new Date(Date.UTC(
+    baseDate.getUTCFullYear(), baseDate.getUTCMonth(), baseDate.getUTCDate(),
+    hours, minutes,
+  ));
 }
 
 function stableHash(s: string): string {
@@ -149,13 +163,26 @@ function parseEvents(html: string): CalendarEvent[] {
   const $ = cheerio.load(html);
   const out: CalendarEvent[] = [];
 
-  $("tr[data-event]").each((_, el) => {
-    const $row = $(el);
-    const event = $row.attr("data-event") ?? "";
-    const country = $row.attr("data-country") ?? "";
-    const category = $row.attr("data-category") ?? "";
-    const url = $row.attr("data-url") ?? "";
-    const id = $row.attr("data-id") ?? "";
+  // Build a map: for each thead, find its date and collect all tr[data-event]
+  // that belong to it (sibling tbody rows until the next thead).
+  let currentDate = new Date();
+
+  // Walk all thead + tr[data-event] in document order
+  $("thead.table-header, tr[data-event]").each((_, el) => {
+    const $el = $(el);
+
+    if (el.tagName === "thead") {
+      const headerText = $el.find("th").first().text();
+      const parsed = parseDateHeader(headerText);
+      if (parsed) currentDate = parsed;
+      return;
+    }
+
+    const event = $el.attr("data-event") ?? "";
+    const country = $el.attr("data-country") ?? "";
+    const category = $el.attr("data-category") ?? "";
+    const url = $el.attr("data-url") ?? "";
+    const id = $el.attr("data-id") ?? "";
 
     if (!event || !country) return;
     if (!FOCUS_COUNTRIES.has(country.toLowerCase())) return;
@@ -163,10 +190,10 @@ function parseEvents(html: string): CalendarEvent[] {
     const score = scoreEvent(event);
     if (!score) return;
 
-    const tds = $row.find("td").map((_, td) => $(td).text().trim()).get();
+    const tds = $el.find("td").map((_, td) => $(td).text().trim()).get();
     const time = tds[0] ?? "";
     const countryCode = COUNTRY_CODE[country.toLowerCase()] ?? country.slice(0, 2).toUpperCase();
-    const occurredAt = parseEventTime(time) ?? new Date();
+    const occurredAt = parseEventTime(time, currentDate) ?? currentDate;
     const scores = buildScores(countryCode, score.impact);
 
     out.push({
