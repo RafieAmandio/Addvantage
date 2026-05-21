@@ -7,13 +7,18 @@ import { getClosedPlanStats } from "@/features/plan/queries/stats";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { PlanDetail } from "@/features/plan/components/PlanDetail";
 import { PlanStatsBadges } from "@/features/plan/components/PlanStatsBadges";
+import { PlanArchiveRow } from "@/features/plan/components/PlanArchiveRow";
+import { SectionNumber } from "@/components/ui/Marker";
 
 export default async function PlanPage() {
   const [plans, stats] = await Promise.all([
-    listPublishedPlans({ limit: 1 }),
+    listPublishedPlans({ limit: 50 }),
     getClosedPlanStats(),
   ]);
-  const latest = plans[0];
+
+  const allPlans = plans.map(dbPlanToTradingPlan);
+  const latest = allPlans[0];
+  const previous = allPlans.slice(1);
 
   if (!latest) {
     return (
@@ -33,19 +38,11 @@ export default async function PlanPage() {
               The desk hasn&apos;t published a plan for this cycle. Check back
               soon.
             </p>
-            <Link
-              href="/app/plan/archive"
-              className="mt-6 inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              View archive →
-            </Link>
           </div>
         </div>
       </div>
     );
   }
-
-  const plan = dbPlanToTradingPlan(latest);
 
   return (
     <div className="bg-grid-fine">
@@ -53,7 +50,7 @@ export default async function PlanPage() {
         <PlanStatsBadges stats={stats} />
       </div>
       <PlanDetail
-        plan={plan}
+        plan={latest}
         isLatest
         headerExtra={
           <Link
@@ -64,6 +61,35 @@ export default async function PlanPage() {
           </Link>
         }
       />
+
+      {previous.length > 0 && (
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+          <SectionNumber
+            n={`0${latest.setups.length > 0 ? 4 : 2} /`}
+            label={`PREVIOUS PLANS · ${previous.length}`}
+          />
+          <div className="mt-4 space-y-px bg-gray-3">
+            {previous.map((p) => (
+              <PlanArchiveRow
+                key={p.id}
+                plan={p}
+                isLatest={false}
+                query=""
+              />
+            ))}
+          </div>
+          {allPlans.length >= 50 && (
+            <div className="mt-4 text-center">
+              <Link
+                href="/app/plan/archive"
+                className="inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand"
+              >
+                View full archive →
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
