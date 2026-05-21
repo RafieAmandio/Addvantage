@@ -1,6 +1,7 @@
 "use client";
 
-import { DataLabel } from "@/components/ui/Marker";
+import { cn } from "@/lib/cn";
+import { DataLabel, BiasBadge } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
 import { useToast } from "@/lib/toast";
 import type { TradingPlan } from "@/features/plan/types";
@@ -57,6 +58,7 @@ export function PlanDetailHeader({
                   ARCHIVE
                 </span>
               )}
+              {plan.bias && <BiasBadge bias={plan.bias} />}
             </div>
             <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
               Trading <span className="italic text-brand">Plan</span>

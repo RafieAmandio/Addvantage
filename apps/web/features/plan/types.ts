@@ -26,12 +26,14 @@ export interface TradingSetup {
   outcome?: SetupOutcome;
   outcomeNotes?: string;
   outcomeR?: string;
+  imageUrl?: string | null;
 }
 
 export interface TradingPlan {
   id: string;
   date: string;
   horizon: "intraday" | "swing" | "weekly";
+  bias: Bias;
   thesis: string;
   setups: TradingSetup[];
   risks: string[];
@@ -79,17 +81,21 @@ export const PlanSetupSchema = z
   .passthrough();
 type PlanSetup = z.infer<typeof PlanSetupSchema>;
 
+export const PlanBiasSchema = z.enum(["bullish", "bearish", "neutral"]);
+
 export const PlanRowSchema = z.object({
   id: z.string(),
   symbol: z.string(),
   thesis: z.string(),
   direction: PlanDirectionSchema,
+  bias: PlanBiasSchema.default("neutral"),
   entry: z.number().nullable(),
   stop: z.number().nullable(),
   target: z.number().nullable(),
   rMultiple: z.number().nullable(),
   setups: z.array(PlanSetupSchema).default([]),
   tags: z.array(z.string()),
+  risks: z.array(z.string()).default([]),
   tier: PlanTierSchema,
   status: PlanStatusSchema,
   outcome: PlanOutcomeSchema.nullable(),

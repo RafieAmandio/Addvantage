@@ -7,12 +7,14 @@ const PLAN_SELECT = {
   symbol: true,
   thesis: true,
   direction: true,
+  bias: true,
   entry: true,
   stop: true,
   target: true,
   rMultiple: true,
   setups: true,
   tags: true,
+  risks: true,
   tier: true,
   status: true,
   outcome: true,
@@ -117,12 +119,14 @@ export const planRepository = {
     symbol: string;
     thesis: string;
     direction: string;
+    bias?: string;
     entry?: number | null;
     stop?: number | null;
     target?: number | null;
     rMultiple?: number | null;
     setups: Prisma.InputJsonValue;
     tags: string[];
+    risks?: string[];
     tier: string;
     authorId: string;
   }) =>

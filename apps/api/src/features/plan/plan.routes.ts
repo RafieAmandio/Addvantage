@@ -19,6 +19,7 @@ router.get("/", planController.listPublished);
 
 const adminWrite = [requireAuth, requireAdmin, adminRateLimit({ action: "plan" })] as const;
 
+router.post("/upload", ...adminWrite, upload.single("image"), planController.uploadSetupImage);
 router.post("/", ...adminWrite, validate({ body: planCreateSchema }), planController.create);
 router.put("/:id", ...adminWrite, validate({ body: planUpdateSchema }), planController.update);
 router.put("/:id/publish", ...adminWrite, planController.publish);

@@ -22,13 +22,9 @@ import {
 
 const INITIAL: PlanActionState = { ok: false };
 
-const DIRECTIONS = ["long", "short"] as const;
+const BIASES = ["bullish", "bearish", "neutral"] as const;
 const TIERS = ["free", "vip"] as const;
 const OUTCOMES = ["win", "loss", "breakeven", "stopped"] as const;
-
-function num(v: number | null): string {
-  return v === null ? "" : String(v);
-}
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -90,6 +86,7 @@ function initSetups(plan: Plan | null): SetupEntry[] {
         tags: Array.isArray(raw.tags)
           ? (raw.tags as string[])
           : [],
+        imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : null,
       });
     } else {
       entries.push({
@@ -105,6 +102,7 @@ function initSetups(plan: Plan | null): SetupEntry[] {
         rationale: typeof raw.note === "string" ? raw.note : "",
         confidence: 3,
         tags: [],
+        imageUrl: null,
       });
     }
   }
@@ -114,6 +112,7 @@ function initSetups(plan: Plan | null): SetupEntry[] {
 
 function initRisks(plan: Plan | null): string[] {
   if (!plan) return [];
+  if (plan.risks && plan.risks.length > 0) return plan.risks;
   for (const s of plan.setups) {
     const raw = s as RichCandidate;
     if (raw.label === "__risks__" && Array.isArray(raw.items)) {
@@ -134,8 +133,18 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
 
   const [setups, setSetups] = useState<SetupEntry[]>(() => initSetups(plan));
   const [risks, setRisks] = useState<string[]>(() => initRisks(plan));
+  const [bias, setBias] = useState<"bullish" | "bearish" | "neutral">(
+    () => {
+      if (plan?.bias === "bullish" || plan?.bias === "bearish" || plan?.bias === "neutral") return plan.bias;
+      if (plan?.direction === "long") return "bullish";
+      if (plan?.direction === "short") return "bearish";
+      return "neutral";
+    },
+  );
 
-  const serialized = useMemo(() => {
+  const derivedDirection = setups[0]?.direction ?? "long";
+
+  const serializedSetups = useMemo(() => {
     const arr: Record<string, unknown>[] = setups.map((s) => ({
       label: s.instrument || s.id,
       id: s.id,
@@ -149,15 +158,15 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
       rationale: s.rationale,
       confidence: s.confidence,
       tags: s.tags,
+      imageUrl: s.imageUrl,
     }));
-
-    const riskItems = risks.filter(Boolean);
-    if (riskItems.length > 0) {
-      arr.push({ label: "__risks__", items: riskItems });
-    }
-
     return JSON.stringify(arr);
-  }, [setups, risks]);
+  }, [setups]);
+
+  const serializedRisks = useMemo(
+    () => JSON.stringify(risks.filter(Boolean)),
+    [risks],
+  );
 
   const updateSetup = (index: number, updated: SetupEntry) => {
     setSetups((prev) => prev.map((s, i) => (i === index ? updated : s)));
@@ -248,15 +257,15 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
               className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             />
           </Field>
-          <Field label="Direction">
+          <Field label="Market Bias">
             <select
-              name="direction"
-              defaultValue={plan?.direction ?? "long"}
+              value={bias}
+              onChange={(e) => setBias(e.target.value as typeof bias)}
               className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
             >
-              {DIRECTIONS.map((d) => (
-                <option key={d} value={d}>
-                  {d}
+              {BIASES.map((b) => (
+                <option key={b} value={b}>
+                  {b}
                 </option>
               ))}
             </select>
@@ -282,49 +291,10 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
             rows={4}
             required
             defaultValue={plan?.thesis ?? ""}
-            placeholder="Why this trade, what breaks it"
+            placeholder="Market outlook — why this bias, what breaks it"
             className="mt-4 w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
           />
         </Field>
-
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Field label="Entry">
-            <input
-              name="entry"
-              defaultValue={num(plan?.entry ?? null)}
-              type="number"
-              step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </Field>
-          <Field label="Stop">
-            <input
-              name="stop"
-              defaultValue={num(plan?.stop ?? null)}
-              type="number"
-              step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </Field>
-          <Field label="Target">
-            <input
-              name="target"
-              defaultValue={num(plan?.target ?? null)}
-              type="number"
-              step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </Field>
-          <Field label="R multiple">
-            <input
-              name="rMultiple"
-              defaultValue={num(plan?.rMultiple ?? null)}
-              type="number"
-              step="any"
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </Field>
-        </div>
 
         <Field label="Tags (comma-separated)">
           <input
@@ -335,8 +305,11 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
           />
         </Field>
 
-        {/* Hidden field: serialized setups + risks */}
-        <input type="hidden" name="setups" value={serialized} />
+        {/* Hidden fields */}
+        <input type="hidden" name="bias" value={bias} />
+        <input type="hidden" name="direction" value={derivedDirection} />
+        <input type="hidden" name="setups" value={serializedSetups} />
+        <input type="hidden" name="risks" value={serializedRisks} />
 
         {/* Setups editor */}
         <div className="mt-6">

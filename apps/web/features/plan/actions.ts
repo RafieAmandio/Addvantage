@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
 import { apiPost, apiPut, apiDelete } from "@/lib/api/client-server";
 import {
+  PlanBiasSchema,
   PlanDirectionSchema,
   PlanOutcomeSchema,
   PlanSetupSchema,
@@ -65,16 +66,31 @@ const setupsField = z
     }
   });
 
+const risksField = z
+  .union([z.string(), z.null(), z.undefined()])
+  .transform((v) => {
+    if (!v) return [] as string[];
+    const text = String(v).trim();
+    if (text === "" || text === "[]") return [] as string[];
+    try {
+      const raw = JSON.parse(text);
+      if (Array.isArray(raw)) return raw.filter((s: unknown): s is string => typeof s === "string" && s.length > 0);
+    } catch {}
+    return [] as string[];
+  });
+
 const PlanCreateInputSchema = z.object({
   symbol: z.string().min(1).max(32),
   thesis: z.string().min(1),
-  direction: PlanDirectionSchema,
+  direction: PlanDirectionSchema.default("long"),
+  bias: PlanBiasSchema.default("neutral"),
   entry: nullableNumber,
   stop: nullableNumber,
   target: nullableNumber,
   rMultiple: nullableNumber,
   setups: setupsField,
   tags: csvArray,
+  risks: risksField,
   tier: PlanTierSchema,
 });
 
@@ -90,12 +106,14 @@ function readPlanForm(fd: FormData) {
     symbol: fd.get("symbol"),
     thesis: fd.get("thesis"),
     direction: fd.get("direction"),
+    bias: fd.get("bias"),
     entry: fd.get("entry"),
     stop: fd.get("stop"),
     target: fd.get("target"),
     rMultiple: fd.get("rMultiple"),
     setups: fd.get("setups"),
     tags: fd.get("tags"),
+    risks: fd.get("risks"),
     tier: fd.get("tier"),
   };
 }

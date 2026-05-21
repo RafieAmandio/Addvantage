@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { API_BASE, getAccessToken } from "@/lib/api/client";
 import { HASHTAGS } from "@tradevantage/shared";
 
 const DIRECTIONS = ["long", "short"] as const;
@@ -18,6 +20,7 @@ export interface SetupEntry {
   rationale: string;
   confidence: 1 | 2 | 3 | 4 | 5;
   tags: string[];
+  imageUrl: string | null;
 }
 
 export function emptySetup(index: number): SetupEntry {
@@ -33,6 +36,7 @@ export function emptySetup(index: number): SetupEntry {
     rationale: "",
     confidence: 3,
     tags: [],
+    imageUrl: null,
   };
 }
 
@@ -87,6 +91,12 @@ export function SetupEditorCard({
           </button>
         )}
       </div>
+
+      <SetupImageUpload
+        imageUrl={setup.imageUrl}
+        onUploaded={(url) => update("imageUrl", url)}
+        onRemoved={() => update("imageUrl", null)}
+      />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Label text="Instrument">
@@ -250,6 +260,95 @@ export function SetupEditorCard({
             </button>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SetupImageUpload({
+  imageUrl,
+  onUploaded,
+  onRemoved,
+}: {
+  imageUrl: string | null;
+  onUploaded: (url: string) => void;
+  onRemoved: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const upload = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const token = getAccessToken();
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/plans/upload`, {
+        method: "POST",
+        headers,
+        body: fd,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(body.message ?? `Upload failed (${res.status})`);
+      }
+      const json = await res.json();
+      onUploaded(json.data?.imageUrl ?? "");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+        Chart Image
+      </span>
+      {error && (
+        <div className="mb-2 border border-blood bg-blood/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
+          {error}
+        </div>
+      )}
+      {imageUrl && (
+        <div className="mb-2">
+          <a href={imageUrl} target="_blank" rel="noopener noreferrer">
+            <img
+              src={imageUrl}
+              alt="Setup chart"
+              className="max-h-48 w-full rounded border border-gray-3 object-contain"
+            />
+          </a>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={uploading}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) upload(f);
+          }}
+          className="font-mono text-[9px] text-white/60 file:mr-2 file:border file:border-gray-3 file:bg-gray-2 file:px-2 file:py-1 file:font-mono file:text-[9px] file:uppercase file:tracking-widest2 file:text-white/60 file:transition-colors hover:file:border-brand hover:file:text-brand disabled:opacity-40"
+        />
+        {imageUrl && (
+          <button
+            type="button"
+            onClick={onRemoved}
+            disabled={uploading}
+            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright disabled:opacity-40"
+          >
+            {uploading ? "…" : "Remove"}
+          </button>
+        )}
       </div>
     </div>
   );

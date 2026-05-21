@@ -23,13 +23,15 @@ const PlanSetupSchema = z
 export const planCreateSchema = z.object({
   symbol: z.string().min(1).max(32),
   thesis: z.string().min(1),
-  direction: z.enum(["long", "short"]),
+  direction: z.enum(["long", "short"]).default("long"),
+  bias: z.enum(["bullish", "bearish", "neutral"]).default("neutral"),
   entry: nullableNumber,
   stop: nullableNumber,
   target: nullableNumber,
   rMultiple: nullableNumber,
   setups: z.array(PlanSetupSchema).default([]),
   tags: z.array(z.string()).default([]),
+  risks: z.array(z.string()).default([]),
   tier: z.enum(["free", "vip"]).default("free"),
   imageUrl: z.string().url().nullable().optional(),
 });

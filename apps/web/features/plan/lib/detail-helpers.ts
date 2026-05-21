@@ -22,6 +22,7 @@ export function planToMarkdown(plan: TradingPlan): string {
     ``,
     `**Date:** ${formatDate(plan.date)}  `,
     `**Horizon:** ${plan.horizon}  `,
+    `**Bias:** ${plan.bias}  `,
     `**Author:** ${plan.authoredBy}`,
     ``,
     `## Thesis`,
@@ -42,6 +43,9 @@ export function planToMarkdown(plan: TradingPlan): string {
     );
     lines.push(`- **Invalidation:** ${s.invalidation}`);
     lines.push(`- **Confidence:** ${s.confidence} / 5`);
+    if (s.imageUrl) {
+      lines.push(`- **Chart:** ${s.imageUrl}`);
+    }
     if (s.tags.length > 0) {
       lines.push(`- **Tags:** ${s.tags.map((t) => `#${t}`).join(", ")}`);
     }

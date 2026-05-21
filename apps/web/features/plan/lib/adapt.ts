@@ -39,6 +39,7 @@ type RichSetupCandidate = {
   outcome?: unknown;
   outcomeNotes?: unknown;
   outcomeR?: unknown;
+  imageUrl?: unknown;
 };
 
 function tryRichSetup(
@@ -80,6 +81,7 @@ function tryRichSetup(
     rationale: typeof raw.rationale === "string" ? raw.rationale : "",
     confidence: conf,
     tags,
+    imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : null,
   };
   if (typeof raw.outcome === "string") {
     const o = raw.outcome;
@@ -159,7 +161,15 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
   const setups =
     richAttempts.length > 0 ? richAttempts : [synthesizeSetup(plan)];
 
-  const risks = extractRisks(plan.setups);
+  const risks =
+    plan.risks && plan.risks.length > 0
+      ? plan.risks
+      : extractRisks(plan.setups);
+
+  const bias: TradingPlan["bias"] =
+    plan.bias === "bullish" || plan.bias === "bearish" || plan.bias === "neutral"
+      ? plan.bias
+      : mapDirectionToBias(plan.direction);
 
   const date = plan.publishedAt ?? plan.createdAt;
   const isoDate = date.length >= 10 ? date.slice(0, 10) : date;
@@ -168,6 +178,7 @@ export function dbPlanToTradingPlan(plan: Plan): TradingPlan {
     id: plan.id,
     date: isoDate,
     horizon,
+    bias,
     thesis: plan.thesis,
     setups,
     risks,

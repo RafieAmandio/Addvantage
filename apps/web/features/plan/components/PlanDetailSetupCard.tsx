@@ -121,6 +121,21 @@ export function PlanDetailSetupCard({
         </span>
       </div>
 
+      {s.imageUrl && (
+        <a
+          href={s.imageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 block"
+        >
+          <img
+            src={s.imageUrl}
+            alt={`Chart: ${s.instrument}`}
+            className="max-h-[400px] w-full rounded border border-gray-3 object-contain"
+          />
+        </a>
+      )}
+
       <div className="mt-4 space-y-2">
         <Field label="Entry">{s.entry}</Field>
         <Field label="Stop" highlight>

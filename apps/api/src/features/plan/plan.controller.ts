@@ -59,12 +59,14 @@ export const planController = {
       symbol: data.symbol,
       thesis: data.thesis,
       direction: data.direction,
+      bias: data.bias,
       entry: data.entry,
       stop: data.stop,
       target: data.target,
       rMultiple: data.rMultiple,
       setups: data.setups as Prisma.InputJsonValue,
       tags: data.tags,
+      risks: data.risks,
       tier: data.tier,
       authorId: adminReq.user.id,
     });
@@ -78,12 +80,14 @@ export const planController = {
     if (data.symbol !== undefined) updateData.symbol = data.symbol;
     if (data.thesis !== undefined) updateData.thesis = data.thesis;
     if (data.direction !== undefined) updateData.direction = data.direction;
+    if (data.bias !== undefined) updateData.bias = data.bias;
     if (data.entry !== undefined) updateData.entry = data.entry;
     if (data.stop !== undefined) updateData.stop = data.stop;
     if (data.target !== undefined) updateData.target = data.target;
     if (data.rMultiple !== undefined) updateData.rMultiple = data.rMultiple;
     if (data.setups !== undefined) updateData.setups = data.setups;
     if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.risks !== undefined) updateData.risks = data.risks;
     if (data.tier !== undefined) updateData.tier = data.tier;
     if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
 
@@ -110,6 +114,14 @@ export const planController = {
     const id = String(req.params.id);
     await planService.remove(id);
     sendSuccess(res, null, "Plan deleted");
+  }),
+
+  uploadSetupImage: asyncHandler(async (req, res: Response) => {
+    const file = (req as MulterRequest).file;
+    if (!file) throw new ValidationError(["No file provided"]);
+
+    const result = await planService.uploadSetupImage(file);
+    sendSuccess(res, result, "Image uploaded", 201);
   }),
 
   uploadImage: asyncHandler(async (req, res: Response) => {

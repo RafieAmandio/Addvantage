@@ -82,7 +82,7 @@ export function PlanDetail({
           className={!paid ? "pointer-events-none select-none blur-sm" : ""}
         >
           <section>
-            <SectionNumber n="01 /" label="DIRECTIONAL THESIS" />
+            <SectionNumber n="01 /" label="MARKET THESIS" />
             <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
               <p className="font-display text-xl leading-relaxed text-white">
                 {plan.thesis}

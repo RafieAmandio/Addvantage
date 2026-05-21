@@ -165,12 +165,14 @@ model TradingPlan {
   symbol      String
   thesis      String
   direction   String
+  bias        String    @default("neutral")
   entry       Decimal?  @db.Decimal
   stop        Decimal?  @db.Decimal
   target      Decimal?  @db.Decimal
   rMultiple   Decimal?  @map("r_multiple") @db.Decimal
   setups      Json      @default("[]")
   tags        String[]  @default([])
+  risks       String[]  @default([])
   tier        String    @default("free")
   status      String    @default("draft")
   outcome     String?

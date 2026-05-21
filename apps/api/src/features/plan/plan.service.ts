@@ -97,12 +97,14 @@ export const planService = {
     symbol: string;
     thesis: string;
     direction: string;
+    bias: string;
     entry: number | null;
     stop: number | null;
     target: number | null;
     rMultiple: number | null;
     setups: Prisma.InputJsonValue;
     tags: string[];
+    risks: string[];
     tier: string;
     authorId: string;
   }) {
@@ -115,12 +117,14 @@ export const planService = {
       symbol?: string;
       thesis?: string;
       direction?: string;
+      bias?: string;
       entry?: number | null;
       stop?: number | null;
       target?: number | null;
       rMultiple?: number | null;
       setups?: Prisma.InputJsonValue;
       tags?: string[];
+      risks?: string[];
       tier?: string;
     },
   ) {
@@ -193,6 +197,19 @@ export const planService = {
 
     await planRepository.update(id, { imageUrl: result.url, imageKey: result.key });
     return { imageUrl: result.url };
+  },
+
+  async uploadSetupImage(file: { buffer: Buffer; originalname: string; mimetype: string }) {
+    const storage = getStorageProvider();
+    if (!storage) throw new AppError("File uploads not configured", 503);
+
+    const result = await storage.upload({
+      buffer: file.buffer,
+      originalName: file.originalname,
+      contentType: file.mimetype,
+      folder: "plan-setups",
+    });
+    return { imageUrl: result.url, imageKey: result.key };
   },
 
   async removeImage(id: string) {

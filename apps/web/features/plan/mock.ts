@@ -5,6 +5,7 @@ export const tradingPlans: TradingPlan[] = [
     id: "TP-2604-A",
     date: "2026-04-07",
     horizon: "swing",
+    bias: "bearish",
     thesis:
       "Macro is repricing the cut path. Front-end yields rise, growth de-rates, defensives bid. Asia liquidity backstop creates a tactical long window in HSI but the structural read is still rotation, not risk-on. Energy lag trade is the cleanest expression — short-dated calls on XLE underperformers, sized small.",
     authoredBy: "Anthony",
@@ -77,6 +78,7 @@ export const tradingPlans: TradingPlan[] = [
     id: "TP-2604-B",
     date: "2026-04-04",
     horizon: "weekly",
+    bias: "bearish",
     authoredBy: "Anthony",
     thesis:
       "Pre-NFP positioning. Dollar index held 104 for a week — that's a level that matters. Weak payroll print flushes the whole DXY long, which is the exit liquidity for Asia FX shorts. Don't predict the number, trade the reaction.",
@@ -125,6 +127,7 @@ export const tradingPlans: TradingPlan[] = [
     id: "TP-2604-C",
     date: "2026-04-01",
     horizon: "intraday",
+    bias: "bullish",
     authoredBy: "Anthony",
     thesis:
       "Month-end rebalance flows. Equity outperformed bonds in March — sell-side pensions will be mechanically selling SPX into the 15:30 ET close for rebalancing. Fade the close, scalp the bounce.",
@@ -156,6 +159,7 @@ export const tradingPlans: TradingPlan[] = [
     id: "TP-2603-D",
     date: "2026-03-28",
     horizon: "swing",
+    bias: "bearish",
     authoredBy: "Anthony",
     thesis:
       "Quarter-end dollar funding squeeze. Every Q-end the dollar gets bid on repo pressure — cross-currency basis widens, USDJPY leads. The trade isn't the move, it's the fade when the pressure releases at 09:00 Tokyo on Apr 1.",
@@ -203,6 +207,7 @@ export const tradingPlans: TradingPlan[] = [
     id: "TP-2603-E",
     date: "2026-03-24",
     horizon: "weekly",
+    bias: "bearish",
     authoredBy: "Anthony",
     thesis:
       "Regional bank stress returning. KRE has been leading SPX lower for 3 sessions — credit spreads are widening but HY indices haven't caught up. The gap closes one way: HY gets repriced lower, fast.",
