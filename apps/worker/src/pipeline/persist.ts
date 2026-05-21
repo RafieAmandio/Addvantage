@@ -12,9 +12,9 @@ interface PersistResult {
   insertedIds: string[];
 }
 
-const STATIC_SOURCE_URLS = new Set([
-  "https://www.slickcharts.com/sp500",
-]);
+// Sources where each item has a unique source_url (safe for URL-based dedup).
+// Most scraped sources reuse the same page URL for different observations.
+const URL_DEDUP_SOURCES = new Set(["TRUMP"]);
 
 /**
  * Takes fresh Candidates from an adapter and:
@@ -48,7 +48,7 @@ export async function persistCandidates(
       continue;
     }
 
-    if (c.sourceUrl && existingUrls.has(c.sourceUrl) && !STATIC_SOURCE_URLS.has(c.sourceUrl)) {
+    if (URL_DEDUP_SOURCES.has(sourceCode) && c.sourceUrl && existingUrls.has(c.sourceUrl)) {
       result.skipped++;
       continue;
     }
