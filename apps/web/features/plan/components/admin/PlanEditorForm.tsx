@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import {
   createPlan,
@@ -14,6 +14,11 @@ import {
 import { cn } from "@/lib/cn";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
 import type { Plan } from "@/features/plan/types";
+import {
+  SetupEditorCard,
+  emptySetup,
+  type SetupEntry,
+} from "./SetupEditorCard";
 
 const INITIAL: PlanActionState = { ok: false };
 
@@ -38,12 +43,151 @@ function SubmitButton({ label }: { label: string }) {
   );
 }
 
+type RichCandidate = Record<string, unknown>;
+
+function initSetups(plan: Plan | null): SetupEntry[] {
+  if (!plan || plan.setups.length === 0) return [emptySetup(0)];
+
+  const entries: SetupEntry[] = [];
+  for (let i = 0; i < plan.setups.length; i++) {
+    const raw = plan.setups[i] as RichCandidate;
+    if (raw.label === "__risks__") continue;
+
+    const isRich =
+      typeof raw.instrument === "string" &&
+      (raw.direction === "long" || raw.direction === "short");
+
+    if (isRich) {
+      entries.push({
+        id:
+          typeof raw.id === "string"
+            ? raw.id
+            : `S-${String(entries.length + 1).padStart(2, "0")}`,
+        instrument: raw.instrument as string,
+        direction: raw.direction as "long" | "short",
+        bias:
+          raw.bias === "bullish" || raw.bias === "bearish" || raw.bias === "neutral"
+            ? (raw.bias as SetupEntry["bias"])
+            : raw.direction === "long"
+              ? "bullish"
+              : "bearish",
+        entry: typeof raw.entry === "string" ? raw.entry : "",
+        stop: typeof raw.stop === "string" ? raw.stop : "",
+        targets: Array.isArray(raw.targets)
+          ? (raw.targets as string[]).length > 0
+            ? (raw.targets as string[])
+            : [""]
+          : [""],
+        invalidation:
+          typeof raw.invalidation === "string" ? raw.invalidation : "",
+        rationale: typeof raw.rationale === "string" ? raw.rationale : "",
+        confidence:
+          typeof raw.confidence === "number" &&
+          raw.confidence >= 1 &&
+          raw.confidence <= 5
+            ? (raw.confidence as 1 | 2 | 3 | 4 | 5)
+            : 3,
+        tags: Array.isArray(raw.tags)
+          ? (raw.tags as string[])
+          : [],
+      });
+    } else {
+      entries.push({
+        id: `S-${String(entries.length + 1).padStart(2, "0")}`,
+        instrument: typeof raw.label === "string" ? raw.label : "",
+        direction: "long",
+        bias: "bullish",
+        entry: typeof raw.trigger === "string" ? raw.trigger : "",
+        stop: "",
+        targets: [""],
+        invalidation:
+          typeof raw.invalidation === "string" ? raw.invalidation : "",
+        rationale: typeof raw.note === "string" ? raw.note : "",
+        confidence: 3,
+        tags: [],
+      });
+    }
+  }
+
+  return entries.length > 0 ? entries : [emptySetup(0)];
+}
+
+function initRisks(plan: Plan | null): string[] {
+  if (!plan) return [];
+  for (const s of plan.setups) {
+    const raw = s as RichCandidate;
+    if (raw.label === "__risks__" && Array.isArray(raw.items)) {
+      return (raw.items as string[]).filter(
+        (v): v is string => typeof v === "string",
+      );
+    }
+  }
+  return [];
+}
+
 export function PlanEditorForm({ plan }: { plan: Plan | null }) {
   const isNew = plan === null;
 
   const action = isNew ? createPlan : updatePlan.bind(null, plan.id);
 
   const [state, formAction] = useFormState(action, INITIAL);
+
+  const [setups, setSetups] = useState<SetupEntry[]>(() => initSetups(plan));
+  const [risks, setRisks] = useState<string[]>(() => initRisks(plan));
+
+  const serialized = useMemo(() => {
+    const arr: Record<string, unknown>[] = setups.map((s) => ({
+      label: s.instrument || s.id,
+      id: s.id,
+      instrument: s.instrument,
+      direction: s.direction,
+      bias: s.bias,
+      entry: s.entry,
+      stop: s.stop,
+      targets: s.targets.filter(Boolean),
+      invalidation: s.invalidation,
+      rationale: s.rationale,
+      confidence: s.confidence,
+      tags: s.tags,
+    }));
+
+    const riskItems = risks.filter(Boolean);
+    if (riskItems.length > 0) {
+      arr.push({ label: "__risks__", items: riskItems });
+    }
+
+    return JSON.stringify(arr);
+  }, [setups, risks]);
+
+  const updateSetup = (index: number, updated: SetupEntry) => {
+    setSetups((prev) => prev.map((s, i) => (i === index ? updated : s)));
+  };
+
+  const removeSetup = (index: number) => {
+    setSetups((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.map((s, i) => ({
+        ...s,
+        id: `S-${String(i + 1).padStart(2, "0")}`,
+      }));
+    });
+  };
+
+  const addSetup = () => {
+    setSetups((prev) => [...prev, emptySetup(prev.length)]);
+  };
+
+  const updateRisk = (index: number, val: string) => {
+    setRisks((prev) => prev.map((r, i) => (i === index ? val : r)));
+  };
+
+  const removeRisk = (index: number) => {
+    setRisks((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addRisk = () => {
+    setRisks((prev) => [...prev, ""]);
+  };
 
   const statusChip = plan
     ? {
@@ -191,18 +335,76 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
           />
         </Field>
 
-        <Field label="Setups (JSON array — [{label, trigger?, invalidation?, note?}])">
-          <textarea
-            name="setups"
-            rows={6}
-            defaultValue={
-              plan && plan.setups.length > 0
-                ? JSON.stringify(plan.setups, null, 2)
-                : "[]"
-            }
-            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-          />
-        </Field>
+        {/* Hidden field: serialized setups + risks */}
+        <input type="hidden" name="setups" value={serialized} />
+
+        {/* Setups editor */}
+        <div className="mt-6">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+              Setups ({setups.length})
+            </span>
+            <button
+              type="button"
+              onClick={addSetup}
+              className="font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
+            >
+              + Add setup
+            </button>
+          </div>
+          <div className="space-y-4">
+            {setups.map((s, i) => (
+              <SetupEditorCard
+                key={s.id}
+                setup={s}
+                index={i}
+                onChange={(updated) => updateSetup(i, updated)}
+                onRemove={() => removeSetup(i)}
+                canRemove={setups.length > 1}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Risks editor */}
+        <div className="mt-6">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+              Risks ({risks.length})
+            </span>
+            <button
+              type="button"
+              onClick={addRisk}
+              className="font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
+            >
+              + Add risk
+            </button>
+          </div>
+          {risks.length > 0 && (
+            <div className="space-y-2 border border-gray-3 bg-gray-2/20 p-4">
+              {risks.map((r, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="font-mono text-[9px] text-white/30">
+                    {i + 1}.
+                  </span>
+                  <input
+                    value={r}
+                    onChange={(e) => updateRisk(i, e.target.value)}
+                    placeholder="Risk factor"
+                    className="flex-1 border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeRisk(i)}
+                    className="font-mono text-[9px] text-white/30 transition-colors hover:text-blood-bright"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="mt-6 flex items-center justify-end gap-2">
           <SubmitButton label={isNew ? "Create draft" : "Save draft"} />
