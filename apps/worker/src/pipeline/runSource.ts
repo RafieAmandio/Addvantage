@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/node";
 import { prisma } from "@tradevantage/db";
 import { logger } from "../lib/logger";
 import { getAdapter } from "../adapters";
-import { loadExistingHashes, persistCandidates } from "./persist";
+import { loadExistingHashes, loadExistingSourceUrls, persistCandidates } from "./persist";
 import { notifyPending } from "../telegram/notify";
 
 /**
@@ -23,11 +23,14 @@ export async function runSource(sourceCode: string): Promise<void> {
 
   const started = Date.now();
   try {
-    const existingHashes = await loadExistingHashes(sourceCode);
+    const [existingHashes, existingUrls] = await Promise.all([
+      loadExistingHashes(sourceCode),
+      loadExistingSourceUrls(sourceCode),
+    ]);
     const candidates = await adapter.fetch({ logger, existingHashes });
     logger.info({ sourceCode, count: candidates.length }, "fetched candidates");
 
-    const result = await persistCandidates(sourceCode, candidates, existingHashes);
+    const result = await persistCandidates(sourceCode, candidates, existingHashes, existingUrls);
     logger.info({ sourceCode, ...result }, "persisted");
 
     if (result.insertedIds.length > 0) {

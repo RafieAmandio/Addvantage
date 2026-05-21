@@ -12,18 +12,24 @@ interface PersistResult {
   insertedIds: string[];
 }
 
+const STATIC_SOURCE_URLS = new Set([
+  "https://www.slickcharts.com/sp500",
+]);
+
 /**
  * Takes fresh Candidates from an adapter and:
- *   1. Computes content_hash.
- *   2. Skips any hash already present (dedupe).
- *   3. Calls OpenAI to rephrase.
- *   4. INSERTs rows with status='pending'.
+ *   1. Checks source_url (catches dupes where rawText varies per run).
+ *   2. Computes content_hash from (sourceCode, externalId).
+ *   3. Skips any hash already present (dedupe).
+ *   4. Calls OpenAI to rephrase.
+ *   5. INSERTs rows with status='pending'.
  * Returns counters + ids the bot can notify on.
  */
 export async function persistCandidates(
   sourceCode: string,
   candidates: Candidate[],
-  existingHashes: Set<string>
+  existingHashes: Set<string>,
+  existingUrls: Set<string> = new Set(),
 ): Promise<PersistResult> {
   const result: PersistResult = {
     inserted: 0,
@@ -42,12 +48,18 @@ export async function persistCandidates(
       continue;
     }
 
-    const hash = contentHash([sourceCode, c.externalId, c.rawText]);
+    if (c.sourceUrl && existingUrls.has(c.sourceUrl) && !STATIC_SOURCE_URLS.has(c.sourceUrl)) {
+      result.skipped++;
+      continue;
+    }
+
+    const hash = contentHash([sourceCode, c.externalId]);
     if (existingHashes.has(hash)) {
       result.skipped++;
       continue;
     }
     existingHashes.add(hash);
+    if (c.sourceUrl) existingUrls.add(c.sourceUrl);
 
     let rephraseResult;
     try {
@@ -111,6 +123,25 @@ export async function loadExistingHashes(sourceCode: string): Promise<Set<string
     return new Set(rows.map((r) => r.contentHash));
   } catch (err) {
     logger.error({ err: String(err), sourceCode }, "loadExistingHashes failed");
+    return new Set();
+  }
+}
+
+/**
+ * Load existing source_urls for a source. Used as a secondary dedup layer
+ * to catch items where the rawText varies between runs (e.g. AI vision
+ * descriptions, live market data) but the source URL stays the same.
+ */
+export async function loadExistingSourceUrls(sourceCode: string): Promise<Set<string>> {
+  try {
+    const rows = await prisma.newsItem.findMany({
+      where: { sourceCode },
+      select: { sourceUrl: true },
+      distinct: ["sourceUrl"],
+    });
+    return new Set(rows.map((r) => r.sourceUrl).filter((u): u is string => u != null));
+  } catch (err) {
+    logger.error({ err: String(err), sourceCode }, "loadExistingSourceUrls failed");
     return new Set();
   }
 }
