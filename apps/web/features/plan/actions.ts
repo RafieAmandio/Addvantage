@@ -106,7 +106,11 @@ export async function createPlan(
   _prev: PlanActionState,
   formData: FormData,
 ): Promise<PlanActionState> {
-  await requireAdmin();
+  try {
+    await requireAdmin();
+  } catch {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   const parse = PlanCreateInputSchema.safeParse(readPlanForm(formData));
   if (!parse.success) {
@@ -131,7 +135,11 @@ export async function updatePlan(
   _prev: PlanActionState,
   formData: FormData,
 ): Promise<PlanActionState> {
-  await requireAdmin();
+  try {
+    await requireAdmin();
+  } catch {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   const parse = PlanUpdateInputSchema.safeParse(readPlanForm(formData));
   if (!parse.success) {

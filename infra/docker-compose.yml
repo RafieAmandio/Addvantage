@@ -16,9 +16,10 @@ services:
         max-size: "10m"
         max-file: "5"
     # Liveness: container is considered unhealthy if no node process is running.
-    # The worker is a long-poll bot + cron, no HTTP port to probe.
+    # The worker runs via `tsx src/index.ts` which spawns a `node` process
+    # with the tsx loader — match on `tsx` to catch it reliably.
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'node dist/index.js' > /dev/null || exit 1"]
+      test: ["CMD-SHELL", "pgrep -f 'tsx' > /dev/null || pgrep -f 'node' > /dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

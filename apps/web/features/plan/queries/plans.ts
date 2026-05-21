@@ -19,8 +19,8 @@ export async function listPublishedPlans(
     if (input.limit) params.set("limit", String(input.limit));
     if (input.symbol) params.set("symbol", input.symbol);
     const qs = params.toString();
-    const data = await apiGet<{ content: Plan[] }>(`/plans${qs ? `?${qs}` : ""}`);
-    return (data as unknown as { content: Plan[] }).content ?? [];
+    const data = await apiGet<Plan[]>(`/plans${qs ? `?${qs}` : ""}`);
+    return data ?? [];
   } catch {
     return [];
   }
@@ -45,8 +45,8 @@ export const getPlanByIdForAdmin = cache(async function getPlanByIdForAdmin(id: 
 
 export async function listAllPlansForAdmin(limit = 100): Promise<Plan[]> {
   try {
-    const data = await apiGet<{ content: Plan[] }>(`/plans/admin/all?limit=${limit}`);
-    return (data as unknown as { content: Plan[] }).content ?? [];
+    const data = await apiGet<Plan[]>(`/plans/admin/all?limit=${limit}`);
+    return data ?? [];
   } catch {
     return [];
   }
@@ -57,8 +57,8 @@ export async function listMyDraftPlans(
 ): Promise<Plan[]> {
   try {
     const limit = input.limit ?? 50;
-    const data = await apiGet<{ content: Plan[] }>(`/plans/admin/drafts?limit=${limit}`);
-    return (data as unknown as { content: Plan[] }).content ?? [];
+    const data = await apiGet<Plan[]>(`/plans/admin/drafts?limit=${limit}`);
+    return data ?? [];
   } catch {
     return [];
   }
