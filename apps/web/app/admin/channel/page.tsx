@@ -42,6 +42,7 @@ export default function AdminChannelPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -92,6 +93,7 @@ export default function AdminChannelPage() {
   async function onSubmit() {
     if (!body.trim()) return;
     setSaving(true);
+    setSaveError(null);
 
     try {
       let imageUrl = imagePreview;
@@ -122,8 +124,8 @@ export default function AdminChannelPage() {
 
       resetForm();
       await load();
-    } catch {
-      // upload or save failed — error surfaced by apiFetch throwing
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
     }
@@ -179,6 +181,12 @@ export default function AdminChannelPage() {
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
             {editId ? "Edit Post" : "New Broadcast"}
           </div>
+
+          {saveError && (
+            <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
+              {saveError}
+            </div>
+          )}
 
           <label className="mb-4 block">
             <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
