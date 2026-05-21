@@ -120,14 +120,16 @@ export async function createPlan(
     };
   }
 
+  let newId: string;
   try {
     const data = await apiPost<{ id: string }>("/plans", parse.data);
-    revalidatePath("/admin/plans");
-    redirect(`/admin/plans/${data.id}`);
+    newId = data.id;
   } catch (err) {
-    if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) throw err;
-    return { ok: false, error: "insert failed" };
+    return { ok: false, error: err instanceof Error ? err.message : "insert failed" };
   }
+
+  revalidatePath("/admin/plans");
+  redirect(`/admin/plans/${newId}`);
 }
 
 export async function updatePlan(
