@@ -12,13 +12,11 @@ import {
   PlanTierSchema,
 } from "@/features/plan/types";
 
-const ADMIN_SCOPE = "admin.plan";
-
-export interface PlanActionState {
+export type PlanActionState = {
   ok: boolean;
   error?: string;
   id?: string;
-}
+};
 
 const nullableNumber = z
   .union([z.string(), z.number(), z.null(), z.undefined()])
@@ -67,7 +65,7 @@ const setupsField = z
     }
   });
 
-export const PlanCreateInputSchema = z.object({
+const PlanCreateInputSchema = z.object({
   symbol: z.string().min(1).max(32),
   thesis: z.string().min(1),
   direction: PlanDirectionSchema,
@@ -80,9 +78,9 @@ export const PlanCreateInputSchema = z.object({
   tier: PlanTierSchema,
 });
 
-export const PlanUpdateInputSchema = PlanCreateInputSchema.partial();
+const PlanUpdateInputSchema = PlanCreateInputSchema.partial();
 
-export const PlanCloseInputSchema = z.object({
+const PlanCloseInputSchema = z.object({
   outcome: PlanOutcomeSchema,
   closePrice: nullableNumber,
 });
