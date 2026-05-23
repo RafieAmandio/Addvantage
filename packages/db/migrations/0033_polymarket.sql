@@ -73,7 +73,7 @@ create policy polymarket_snapshots_admin_delete on public.polymarket_snapshots
 -- ─── Seed tracked markets ────────────────────────────────────────────
 -- Initial curated set. Worker will auto-rotate event_id/slug for monthly markets.
 insert into public.polymarket_tracked (category, label, search_query, event_id, event_slug, event_title, sort_order) values
-  ('CRYPTO',      'BTC',   'bitcoin price',       'pending-btc',   '', 'BTC Price Prediction',       0),
-  ('COMMODITIES', 'OIL',   'oil price',           'pending-oil',   '', 'Oil Price Prediction',       1),
-  ('EQUITIES',    'SPX',   'sp500',               'pending-spx',   '', 'S&P 500 Level Prediction',   2),
-  ('MACRO',       'RATES', 'fed rate cuts 2026',  'pending-rates', '', 'Fed Rate Cuts 2026',         3);
+  ('CRYPTO',      'BTC',   'what price will bitcoin hit',  'pending-btc',   '', 'BTC Price Prediction',       0),
+  ('COMMODITIES', 'OIL',   'crude oil hit',                'pending-oil',   '', 'Oil Price Prediction',       1),
+  ('EQUITIES',    'SPX',   'sp500 hit',                    'pending-spx',   '', 'S&P 500 Level Prediction',   2),
+  ('MACRO',       'RATES', 'how many fed rate cuts',       'pending-rates', '', 'Fed Rate Cuts 2026',         3);

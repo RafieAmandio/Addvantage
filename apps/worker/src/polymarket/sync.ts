@@ -201,13 +201,24 @@ export async function rotatePolymarketSlugs(): Promise<void> {
 
   for (const t of tracked) {
     try {
-      const events = await searchEvents(t.searchQuery, 5);
+      const events = await searchEvents(t.searchQuery, 10);
       if (events.length === 0) {
         logger.warn({ query: t.searchQuery, label: t.label }, "polymarket-rotate: no events found");
         continue;
       }
 
-      const best = events[0]!;
+      // Pick the best candidate: active, multi-outcome, highest volume
+      const candidates = events
+        .filter((e) => e.markets.length >= 3 && (e.volume ?? 0) > 10_000);
+
+      if (candidates.length === 0) {
+        logger.debug({ query: t.searchQuery, label: t.label }, "polymarket-rotate: no suitable candidates");
+        continue;
+      }
+
+      const best = candidates.reduce((a, b) =>
+        (b.volume ?? 0) > (a.volume ?? 0) ? b : a,
+      );
 
       if (best.id !== t.eventId) {
         await prisma.polymarketTracked.update({
@@ -220,7 +231,7 @@ export async function rotatePolymarketSlugs(): Promise<void> {
           },
         });
         logger.info(
-          { label: t.label, oldEventId: t.eventId, newEventId: best.id, newTitle: best.title },
+          { label: t.label, oldEventId: t.eventId, newEventId: best.id, newTitle: best.title, volume: best.volume },
           "polymarket-rotate: slug rotated",
         );
         updated++;
