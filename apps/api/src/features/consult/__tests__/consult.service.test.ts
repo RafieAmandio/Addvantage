@@ -11,19 +11,19 @@ vi.mock("../consult.repository.js", () => ({
     listMessages: vi.fn(),
     createMessage: vi.fn(),
     touchSession: vi.fn(),
-    getDailyTokensUsed: vi.fn(),
-    getProfileTier: vi.fn(),
+    updateSessionFlags: vi.fn(),
+    listAllSessions: vi.fn(),
+    getSessionStats: vi.fn(),
+    getLatestMessage: vi.fn(),
   },
 }));
 
-vi.mock("@/config/openai.js", () => ({
-  getOpenAI: vi.fn(() => null),
-  LLM_MODEL: "gpt-4o-mini",
+vi.mock("@/integrations/telegram/notify.js", () => ({
+  notifyAdminsConsult: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { consultService } from "../consult.service.js";
 import { consultRepository } from "../consult.repository.js";
-import { FREE_DAILY_TOKEN_CAP } from "../consult.lib.js";
 
 const repo = vi.mocked(consultRepository);
 
@@ -31,6 +31,9 @@ const mockSession = (overrides: Partial<{ id: string; userId: string }> = {}) =>
   id: overrides.id ?? "session-1",
   userId: overrides.userId ?? "user-1",
   title: "Test session",
+  status: "open",
+  unreadAdmin: false,
+  unreadUser: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 });
@@ -67,6 +70,7 @@ describe("consultService", () => {
       repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
       repo.createMessage.mockResolvedValue({ id: "m-1" } as never);
       repo.touchSession.mockResolvedValue(undefined as never);
+      repo.updateSessionFlags.mockResolvedValue(undefined as never);
 
       const result = await consultService.appendMessage("user-1", "session-1", {
         role: "user",
@@ -83,6 +87,23 @@ describe("consultService", () => {
           content: "hi",
         }),
       ).rejects.toThrow(ForbiddenError);
+    });
+
+    it("sets awaiting_reply flag when user sends", async () => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      repo.createMessage.mockResolvedValue({ id: "m-1" } as never);
+      repo.touchSession.mockResolvedValue(undefined as never);
+      repo.updateSessionFlags.mockResolvedValue(undefined as never);
+
+      await consultService.appendMessage("user-1", "session-1", {
+        role: "user",
+        content: "hello",
+      });
+
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
+        unreadAdmin: true,
+        status: "awaiting_reply",
+      });
     });
   });
 
@@ -116,70 +137,54 @@ describe("consultService", () => {
     });
   });
 
-  describe("getUserTier", () => {
-    it("returns vip for vip profiles", async () => {
-      repo.getProfileTier.mockResolvedValue({ tier: "vip" } as never);
-      expect(await consultService.getUserTier("user-1")).toBe("vip");
-    });
-
-    it("defaults to free for unknown tiers", async () => {
-      repo.getProfileTier.mockResolvedValue({ tier: "unknown" } as never);
-      expect(await consultService.getUserTier("user-1")).toBe("free");
-    });
-
-    it("defaults to free when profile is null", async () => {
-      repo.getProfileTier.mockResolvedValue(null as never);
-      expect(await consultService.getUserTier("user-1")).toBe("free");
-    });
-  });
-
-  describe("checkDailyTokenCap", () => {
-    it("allows when under cap", async () => {
-      repo.getDailyTokensUsed.mockResolvedValue([{ total: BigInt(100) }] as never);
-      const result = await consultService.checkDailyTokenCap("user-1");
-      expect(result.allowed).toBe(true);
-      expect(result.used).toBe(100);
-    });
-
-    it("blocks when at cap", async () => {
-      repo.getDailyTokensUsed.mockResolvedValue([{ total: BigInt(FREE_DAILY_TOKEN_CAP) }] as never);
-      const result = await consultService.checkDailyTokenCap("user-1");
-      expect(result.allowed).toBe(false);
-    });
-
-    it("blocks when over cap", async () => {
-      repo.getDailyTokensUsed.mockResolvedValue([{ total: BigInt(FREE_DAILY_TOKEN_CAP + 1) }] as never);
-      const result = await consultService.checkDailyTokenCap("user-1");
-      expect(result.allowed).toBe(false);
-    });
-  });
-
-  describe("streamResponse — canned fallback", () => {
-    it("uses canned reply when OpenAI is unavailable", async () => {
-      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
-      repo.createMessage.mockResolvedValue({ id: "m-1" } as never);
+  describe("adminSendMessage", () => {
+    it("sends admin reply and updates flags", async () => {
+      repo.findSessionById.mockResolvedValue(mockSession() as never);
+      repo.createMessage.mockResolvedValue({ id: "m-admin" } as never);
       repo.touchSession.mockResolvedValue(undefined as never);
-      repo.listMessages.mockResolvedValue([] as never);
+      repo.updateSessionFlags.mockResolvedValue(undefined as never);
 
-      const chunks: string[] = [];
-      const result = await consultService.streamResponse(
-        "user-1",
-        "session-1",
-        "What about my position size?",
-        (text) => chunks.push(text),
+      const result = await consultService.adminSendMessage("admin-1", "session-1", "Reply");
+      expect(result.id).toBe("m-admin");
+      expect(repo.createMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ role: "admin", userId: "admin-1" }),
       );
-
-      expect(chunks.length).toBeGreaterThan(0);
-      expect(result.metadata.model).toBe("fallback.pickReply");
-      expect(repo.createMessage).toHaveBeenCalledTimes(2);
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
+        unreadUser: true,
+        status: "open",
+      });
     });
 
-    it("blocks non-owner from streaming", async () => {
-      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
-
+    it("throws NotFoundError for missing session", async () => {
+      repo.findSessionById.mockResolvedValue(null as never);
       await expect(
-        consultService.streamResponse("user-other", "session-1", "hi", vi.fn()),
+        consultService.adminSendMessage("admin-1", "missing", "Reply"),
+      ).rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe("pollSession", () => {
+    it("returns hasNew=false when no messages", async () => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      repo.getLatestMessage.mockResolvedValue(null as never);
+      const result = await consultService.pollSession("user-1", "session-1");
+      expect(result.hasNew).toBe(false);
+    });
+
+    it("throws ForbiddenError for non-owner", async () => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      await expect(
+        consultService.pollSession("user-other", "session-1"),
       ).rejects.toThrow(ForbiddenError);
+    });
+
+    it("returns hasNew=true when newer message exists", async () => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      const now = new Date();
+      const earlier = new Date(now.getTime() - 60000);
+      repo.getLatestMessage.mockResolvedValue({ id: "m-1", createdAt: now } as never);
+      const result = await consultService.pollSession("user-1", "session-1", earlier.toISOString());
+      expect(result.hasNew).toBe(true);
     });
   });
 });

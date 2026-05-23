@@ -306,7 +306,7 @@ export function AccessSection() {
               </span>
             </div>
             <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4]">
-              <ScramblePrice text="IDR 4.5M" trigger={inView} delay={500} />
+              <ScramblePrice text="IDR 17.5M" trigger={inView} delay={500} />
             </p>
             <p
               className="font-mono text-base font-light leading-[1.4] transition-all duration-500"
@@ -316,13 +316,13 @@ export function AccessSection() {
                 transitionDelay: "600ms",
               }}
             >
-              Per quarter · 3-month commitment
+              Per year · Annual commitment
             </p>
             <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4]">
               {[
                 "Everything in Free",
                 "Daily / weekly Trading Plan",
-                "1v1 Consultation (AI + team)",
+                "1v1 Consultation (founders)",
                 "Full Education library",
                 "Hashtag explorer (full)",
                 "All collab channels",

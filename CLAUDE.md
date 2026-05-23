@@ -4,14 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repo shape
 
-pnpm + Turborepo monorepo. Node >= 20 (see `.nvmrc`). Two apps and two shared packages:
+pnpm + Turborepo monorepo. Node >= 20 (see `.nvmrc`). Three apps and two shared packages:
 
 - `apps/web` — Next.js 14 App Router. Public site, paid dashboard at `/app/*` (news, consult, chart, plan, watchlist, calendar, education, brief, channel, subscription, tags), admin console at `/admin/*` (review, archive, plans, sources). API routes under `app/api/*` include `consult/stream` (SSE), `bars`, `events`, `health`, `webhooks/xendit`.
+- `apps/api` — Express.js backend on `:3100`. Feature-based architecture (`src/features/*/`), Prisma ORM, JWT auth, Zod validation. Handles plans, news, users, channels, RSI, subscriptions, payments, consult.
 - `apps/worker` — Long-lived Node service. Runs the hourly ingestion scheduler, the grammY Telegram bot, the daily renewal-reminder cron (when email is configured), the heartbeat pinger, and the bars CLI — **all in one process**.
 - `packages/shared` — zod schemas, hashtag taxonomy, source registry. Imported by both apps as raw `.ts` (no build step).
-- `packages/db` — SQL migrations + generated Supabase `Database` type re-exported from `src/index.ts`.
-
-Note: `apps/web/README.md` describes a pre-production mock-only prototype. That README is stale — the root README and commit `663be9a` ("Turn mock prototype into production monorepo with real ingestion") are authoritative. The web app is wired to real Supabase.
+- `packages/db` — Prisma schema + migrations. `@tradevantage/db` re-exports the Prisma client and `Database` type.
 
 ## Commands
 
@@ -37,13 +36,11 @@ pnpm lint
 
 No test framework is configured. Don't invent one — if the user asks for a test, ask which runner they want first.
 
-Web-only Vercel deploy uses `pnpm turbo run build --filter=@tradevantage/web...` (see `vercel.json`). The worker is **not** deployed to Vercel; it runs on a VPS under `infra/docker-compose.yml`. Full walkthrough: `infra/deploy/DEPLOY.md`.
-
 ## Ingestion pipeline (end-to-end)
 
 This is the core flow and spans five files. Read them together when touching anything here.
 
-1. `apps/worker/src/scheduler/index.ts` — `node-cron` fires at minute 3 every hour (and once at boot). Reads `public.sources.enabled` from Supabase; `ENABLED_SOURCES` env overrides the DB list. Iterates `ADAPTERS` and calls `runSource(code)`.
+1. `apps/worker/src/scheduler/index.ts` — `setInterval(30s)` poll loop fires adapters on schedule (and once at boot). Reads `public.sources.enabled` from Supabase; `ENABLED_SOURCES` env overrides the DB list. Iterates `ADAPTERS` and calls `runSource(code)`.
 2. `apps/worker/src/pipeline/runSource.ts` — opens an `ingestion_runs` row, calls the adapter, persists, pings Telegram, closes the run row with counters and updates `sources.last_*`.
 3. `apps/worker/src/adapters/*.ts` — one file per source, each implementing `SourceAdapter` from `adapters/base.ts` and registered in `adapters/index.ts`. Currently: FRED, SC, SPDJI, YRD, RBC, TRUMP (Truth Social RSS), FF (ForexFactory RSS + indicators variant). Returns `Candidate[]`; must **not** pre-summarise. Side-adapter families with their own registries live in `adapters/bars/`, `adapters/payment/`, and `adapters/email/` — same self-register pattern.
 4. `apps/worker/src/pipeline/persist.ts` — `contentHash([sourceCode, externalId, rawText])` is the dedupe key, stored in `news_items.content_hash` with unique `(source_code, content_hash)`. Existing hashes are pre-loaded per run to avoid per-row round-trips.
@@ -73,7 +70,7 @@ Hashtags, impact, and bias are a **closed set**. When adding a value, update all
 
 - Migrations in `packages/db/migrations/` are **append-only and numbered**. Never edit a committed migration — add a new file. See `packages/db/README.md`.
 - Every new table must ship RLS in the same migration. `public.is_admin()` (SQL helper) is the canonical admin check; reuse it instead of inlining `select is_admin from profiles`.
-- After any schema change, regenerate types: `supabase gen types typescript --project-id qawrdgttfpslyelocfmx > packages/db/src/types.ts` (or the MCP equivalent). `@tradevantage/db` re-exports `Database` — both apps type-check against it.
+- After any schema change, run `pnpm --filter @tradevantage/db generate` (or `npx prisma generate` inside `packages/db`) to regenerate the Prisma client.
 - RLS summary: `profiles` self-read + admin override, `news_items` public read only if `status='approved'`, `ingestion_runs` admin-read, `telegram_admins` admin-only.
 
 ## Supabase clients (web)
@@ -112,8 +109,56 @@ Don't assume the worker is only the news pipeline. Other things it runs:
 
 `apps/web/lib/state.tsx` (`AppStateProvider`) persists `tier`, `liabilitySigned`, operator name, and sidebar collapse state in `localStorage` — leftover from the mock prototype. Real tier comes from `profiles.tier` via `getProfile()`. Don't treat the localStorage tier as authoritative for gating; it exists for dev convenience on pages that haven't been converted yet.
 
+## Deployment (Dokploy on VPS)
+
+All services deploy to a Hostinger VPS (4GB RAM, Ubuntu 24.04) via Dokploy (Docker Swarm + Traefik). DNS through Cloudflare (Full strict TLS).
+
+| Service | URL | Dokploy App ID | Docker App Name |
+|---------|-----|----------------|-----------------|
+| Web | https://tradevantage.gg | `g-kctMkTjn_hr_n9I_GAD` | `tradevantage-web-vrcahi` |
+| API | https://api.tradevantage.gg | `llgO8uAqXsHJYILDxDorp` | `tradevantage-api-wa9jn3` |
+| Worker | (no public URL) | `5Az6Gqlcv7l2yH6PfAvAB` | `tradevantage-worker-cc8pw2` |
+| Hermes | https://hermes.tradevantage.gg | `B1Tw_Mkr6YRc9yMQ9api2` | `app-copy-redundant-application-796153` |
+| Dokploy | https://dashboard.tradevantage.gg | — | — |
+
+**SSH:** `ssh tradevantage` (key: `~/.ssh/id_ed25519_tradevantage`, IP: `76.13.198.76`).
+
+**Deploying via Dokploy API (preferred):**
+
+```bash
+# 1. Push to main
+git push origin main
+
+# 2. Authenticate with Dokploy
+ssh tradevantage "curl -s -X POST 'http://localhost:3000/api/auth/sign-in/email' \
+  -H 'Content-Type: application/json' \
+  -c /tmp/dk \
+  -d '{\"email\":\"tradevantage.gg@gmail.com\",\"password\":\"Bitcoinmaxi88\"}'"
+
+# 3. Trigger deploy (replace APP_ID with the Dokploy App ID from the table above)
+ssh tradevantage "curl -s -X POST 'http://localhost:3000/api/trpc/application.deploy' \
+  -H 'Content-Type: application/json' \
+  -b /tmp/dk \
+  -d '{\"json\":{\"applicationId\":\"APP_ID\"}}'"
+```
+
+Dokploy handles git pull, docker build (with env/build-args), and service update automatically. Do NOT manually `docker build` or `docker service update` — let Dokploy manage the full lifecycle.
+
+**Key production env vars** (set in Dokploy, NOT in .env files):
+- Web: `HOSTNAME=0.0.0.0` (critical — Swarm overrides HOSTNAME), `NEXT_PUBLIC_API_URL=https://api.tradevantage.gg`, `JWT_SECRET`
+- API: `DATABASE_URL` (Supabase pooler), `JWT_SECRET` (same as web), `CORS_ORIGIN=https://tradevantage.gg,https://www.tradevantage.gg`, `LLM_*` (Moonshot kimi-k2.6)
+- Worker: `DATABASE_URL`, `LLM_*`, `FRED_API_KEY`, `SITE_URL=https://tradevantage.gg`
+- Full env reference: `DEPLOYMENT.md`
+
+**Dockerfiles:** `apps/web/Dockerfile`, `apps/api/Dockerfile`, `apps/worker/Dockerfile`. All copy `packages/db/prisma` before install for Prisma codegen. Web uses `output: "standalone"`. API + Worker use `tsx` at runtime (ESM compat).
+
+## Server action rules
+
+`"use server"` files can **only export async functions**. Exporting constants, objects, or variables (e.g., Zod schemas) breaks server action registration and causes 500s in production. Keep non-function values as `const` (not `export const`) or move them to a separate file.
+
 ## Gotchas
 
-- Shared packages (`@tradevantage/shared`, `@tradevantage/db`) ship raw `.ts` from `src/`. `apps/web/next.config.js` lists them in `transpilePackages` and sets `experimental.outputFileTracingRoot` to the monorepo root — both are required for Vercel builds. Don't remove.
-- Worker runs the Telegram bot via long-polling. If scaling to multiple replicas, switch to webhook mode (see `DEPLOY.md` §10) — do not run two long-pollers against one bot token.
-- `vercel.json` at repo root and `apps/web/vercel.json` are both present as fallbacks for different Vercel "Root Directory" settings. Keep them in sync if you change the build command.
+- Shared packages (`@tradevantage/shared`, `@tradevantage/db`) ship raw `.ts` from `src/`. `apps/web/next.config.js` lists them in `transpilePackages` and sets `experimental.outputFileTracingRoot` to the monorepo root — both are required for builds. Don't remove.
+- Worker runs the Telegram bot via long-polling. If scaling to multiple replicas, switch to webhook mode — do not run two long-pollers against one bot token.
+- After deploying web, users must hard-refresh (Cmd+Shift+R) to pick up new server action IDs. Cloudflare may cache stale JS bundles.
+- Express async middleware (`requireAuth`, `requireAdmin`, `adminRateLimit`) must be wrapped in `asyncHandler` — Express 4 doesn't catch thrown errors from async middleware, causing process crashes.

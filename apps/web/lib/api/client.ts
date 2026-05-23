@@ -79,19 +79,4 @@ export async function apiDelete(path: string): Promise<void> {
   }
 }
 
-export async function apiStreamFetch(
-  path: string,
-  body: unknown,
-): Promise<Response> {
-  const token = getAccessToken();
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  return fetch(`${API_BASE}${path}`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-}
-
 export { API_BASE };

@@ -16,7 +16,7 @@ function signTokens(userId: string, email: string) {
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt(now)
-    .setExpirationTime(now + 15 * 60) // 15 min
+    .setExpirationTime(now + 60 * 60) // 1 hour
     .sign(secret);
 
   const refreshToken = new SignJWT({ type: "refresh" })
@@ -102,6 +102,23 @@ export const authService = {
 
     const [accessToken, refreshToken] = await signTokens(profile.id, profile.email);
     return { accessToken, refreshToken };
+  },
+
+  refreshFromToken: async (token: string) => {
+    try {
+      const { payload } = await jwtVerify(token, secret);
+      if (payload.type !== "refresh" || !payload.sub) {
+        throw new AppError("Invalid refresh token", 401);
+      }
+      const profile = await authRepository.findById(payload.sub);
+      if (!profile) throw new AppError("User not found", 401);
+
+      const [accessToken, refreshToken] = await signTokens(profile.id, profile.email);
+      return { accessToken, refreshToken };
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError("Invalid or expired refresh token", 401);
+    }
   },
 
   verifyEmail: async (token: string) => {

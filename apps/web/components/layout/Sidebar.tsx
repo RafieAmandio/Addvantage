@@ -8,6 +8,16 @@ import { apiGet } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
 
+interface ReferralPartner {
+  id: string;
+  name: string;
+  category: string;
+  tagline: string;
+  url: string;
+  iconUrl: string | null;
+  sortOrder: number;
+}
+
 const nav = [
   { label: "Home", href: "/app", group: "main", icon: "home" },
   { label: "Today's Brief", href: "/app/brief", group: "main", icon: "brief" },
@@ -56,6 +66,8 @@ export function Sidebar() {
   } = useAppState();
   const paid = isPaid(tier);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [partners, setPartners] = useState<ReferralPartner[]>([]);
+  const [partnersOpen, setPartnersOpen] = useState(true);
   const drawerRef = useRef<HTMLElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
 
@@ -64,6 +76,9 @@ export function Sidebar() {
       .then((data) => {
         if (data?.isAdmin) setIsAdmin(true);
       })
+      .catch(() => {});
+    apiGet<ReferralPartner[]>("/referral/partners")
+      .then((data) => { if (data) setPartners(data); })
       .catch(() => {});
   }, []);
 
@@ -157,6 +172,65 @@ export function Sidebar() {
             <NavItem key={n.href} {...n} active={pathname === n.href} paid={paid} />
           ))}
         </NavGroup>
+        {partners.length > 0 && (
+          <div className="mb-5">
+            <button
+              onClick={() => setPartnersOpen((o) => !o)}
+              className="mb-1.5 flex w-full items-center justify-between px-3 text-[11px] font-medium uppercase tracking-wider text-white/25 hover:text-white/40 transition-colors"
+            >
+              Trading Platform
+              <svg
+                width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"
+                className={cn("transition-transform duration-200", partnersOpen ? "rotate-0" : "-rotate-90")}
+              >
+                <path d="M3 4.5L6 7.5L9 4.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {partnersOpen && (
+              <div className="space-y-0.5">
+                {["crypto_exchange", "broker"].map((cat) => {
+                  const items = partners.filter((p) => p.category === cat);
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={cat}>
+                      <div className="px-3 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wider text-white/20">
+                        {cat === "crypto_exchange" ? "Crypto Exchange" : "Broker"}
+                      </div>
+                      {items.map((p) => (
+                        <a
+                          key={p.id}
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all duration-150 hover:bg-white/[0.04] hover:text-white"
+                        >
+                          {p.iconUrl ? (
+                            <img src={p.iconUrl} alt="" width={20} height={20} className="shrink-0 rounded" />
+                          ) : (
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-white/10 text-[10px] font-bold text-white/60">
+                              {p.name.charAt(0)}
+                            </span>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1">
+                              <span className="truncate">{p.name}</span>
+                              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2" className="shrink-0 text-white/30 group-hover:text-white/60">
+                                <path d="M3 1h6v6M9 1L4 6" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </div>
+                            {p.tagline && (
+                              <div className="truncate text-[11px] text-white/30 group-hover:text-white/40">{p.tagline}</div>
+                            )}
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
         {isAdmin && (
           <NavGroup label="Admin">
             {nav.filter((n) => n.group === "admin").map((n) => (

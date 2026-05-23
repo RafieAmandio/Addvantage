@@ -21,7 +21,7 @@ function setAuthCookies(accessToken: string, refreshToken: string) {
     secure: serverConfig.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 15 * 60, // 15 min
+    maxAge: 60 * 60, // 1 hour
   });
   cookieStore.set("refresh_token", refreshToken, {
     httpOnly: true,

@@ -30,7 +30,7 @@ export async function createConsultSession(
 
 export async function appendConsultMessage(input: {
   sessionId: string;
-  role: "user" | "assistant";
+  role: "user" | "admin";
   content: string;
   metadata?: Record<string, unknown>;
 }): Promise<ActionState> {
@@ -67,42 +67,6 @@ export async function renameConsultSession(input: {
     return { ok: true };
   } catch {
     return { ok: false, error: "update_failed" };
-  }
-}
-
-export type SendConsultReason = "rate_limited" | "daily_token_cap";
-
-export type SendConsultResult =
-  | { ok: true; assistantMessageId: string; assistantContent: string }
-  | { ok: false; error: string; reason?: SendConsultReason };
-
-export async function sendConsultMessage(input: {
-  sessionId: string;
-  body: string;
-}): Promise<SendConsultResult> {
-  const user = await getSession();
-  if (!user) return { ok: false, error: "unauthorized" };
-
-  try {
-    const data = await apiPost<{
-      assistantMessageId: string;
-      assistantContent: string;
-    }>("/consult/stream", {
-      sessionId: input.sessionId,
-      body: input.body,
-    });
-    revalidatePath("/app/consult");
-    return {
-      ok: true,
-      assistantMessageId: data.assistantMessageId,
-      assistantContent: data.assistantContent,
-    };
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "unknown";
-    if (msg.includes("429")) {
-      return { ok: false, error: "rate_limited", reason: "rate_limited" };
-    }
-    return { ok: false, error: msg };
   }
 }
 

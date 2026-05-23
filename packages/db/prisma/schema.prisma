@@ -195,15 +195,19 @@ model TradingPlan {
 }
 
 model ConsultSession {
-  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  title     String           @default("New session")
-  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  messages  ConsultMessage[]
-  user      Profile          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String           @map("user_id") @db.Uuid
+  title       String           @default("New session")
+  status      String           @default("open")
+  unreadAdmin Boolean          @default(true) @map("unread_admin")
+  unreadUser  Boolean          @default(false) @map("unread_user")
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  messages    ConsultMessage[]
+  user        Profile          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([userId, updatedAt(sort: Desc)], map: "consult_sessions_user_idx")
+  @@index([status, updatedAt(sort: Desc)], map: "consult_sessions_status_idx")
   @@map("consult_sessions")
 }
 
@@ -314,4 +318,18 @@ model ChannelPost {
   @@index([createdAt(sort: Desc)])
   @@index([tags], type: Gin)
   @@map("channel_posts")
+}
+
+model ReferralPartner {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  category  String
+  tagline   String   @default("")
+  url       String
+  iconUrl   String?  @map("icon_url")
+  sortOrder Int      @default(0) @map("sort_order")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("referral_partners")
 }

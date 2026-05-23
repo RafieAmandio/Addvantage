@@ -12,6 +12,7 @@ import {
 import { useConsultKeyboard } from "@/features/consult/hooks/useConsultKeyboard";
 import { useSessionQueryParam } from "@/features/consult/hooks/useSessionQueryParam";
 import { useConsultActions } from "@/features/consult/hooks/useConsultActions";
+import { useConsultPolling } from "@/features/consult/hooks/useConsultPolling";
 import { useAppState, isPaid } from "@/lib/state";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -65,7 +66,6 @@ export function ConsultPageView({
   const {
     draft,
     setDraft,
-    typing,
     pendingDelete,
     setPendingDelete,
     startNewSession,
@@ -84,13 +84,21 @@ export function ConsultPageView({
     setLocalSessions,
   });
 
+  useConsultPolling({
+    activeId,
+    extrasBySession,
+    setExtrasBySession,
+    setLocalSessions,
+    enabled: paid && !!activeId,
+  });
+
   useLayoutEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeId]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [extras, typing]);
+  }, [extras]);
 
   const layoutProps = {
     sessions: visibleSessions,
@@ -106,7 +114,6 @@ export function ConsultPageView({
     setDraft,
     send,
     endRef,
-    typing,
     onNewSession: startNewSession,
     onRenameSession: renameSession,
     onDeleteSession: requestDeleteSession,
@@ -134,7 +141,7 @@ export function ConsultPageView({
           <div className="relative h-[60vh]">
             <PaywallOverlay
               surface="1v1 Consultation"
-              reason="Private consultation with the AI and the desk is restricted to VIP+ Trader. Upgrade to open a session and have the desk review your trades."
+              reason="Private consultation with the founding desk is restricted to VIP+ Trader. Upgrade to open a session."
             />
             <div className="pointer-events-none h-full select-none blur-sm">
               <ConsultLayout {...layoutProps} />

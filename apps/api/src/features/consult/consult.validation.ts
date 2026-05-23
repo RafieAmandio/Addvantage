@@ -9,12 +9,11 @@ export const renameSessionSchema = z.object({
 });
 
 export const appendMessageSchema = z.object({
-  role: z.enum(["user", "assistant"]),
+  role: z.literal("user"),
   content: z.string().trim().min(1).max(10000),
   metadata: z.record(z.unknown()).optional(),
 });
 
-export const streamBodySchema = z.object({
-  sessionId: z.string().uuid(),
-  body: z.string().trim().min(1).max(10000),
+export const adminAppendMessageSchema = z.object({
+  content: z.string().trim().min(1).max(10000),
 });

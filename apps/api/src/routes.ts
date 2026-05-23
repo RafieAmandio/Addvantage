@@ -16,6 +16,7 @@ import { subscriptionRoutes } from "./features/subscription/subscription.routes.
 import { ingestionRoutes } from "./features/ingestion/ingestion.routes.js";
 import { channelRoutes } from "./features/channel/channel.routes.js";
 import { rsiRoutes } from "./features/rsi/rsi.routes.js";
+import { referralRoutes } from "./features/referral/referral.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -35,4 +36,5 @@ export function mountRoutes(app: Express) {
   app.use("/ingestion", ingestionRoutes);
   app.use("/channel", channelRoutes);
   app.use("/rsi", rsiRoutes);
+  app.use("/referral", referralRoutes);
 }

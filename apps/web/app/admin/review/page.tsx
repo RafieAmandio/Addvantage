@@ -4,6 +4,7 @@ import { listFilteredNews } from "@/features/news/queries/news";
 import { formatDateTime } from "@/lib/cn";
 import { SOURCE_CODES } from "@tradevantage/shared";
 import { IMPACT_LEVELS, BIAS_LEVELS, HASHTAGS } from "@tradevantage/shared";
+import { ReviewActions } from "./ReviewActions";
 
 export const metadata: Metadata = { title: "Review Queue" };
 export const dynamic = "force-dynamic";
@@ -208,7 +209,7 @@ export default async function AdminReviewQueuePage({
           <Link
             key={n.id}
             href={`/admin/review/${n.id}`}
-            className="group grid grid-cols-12 gap-4 border-b border-white/[0.08] py-6 transition-all hover:bg-white/[0.02] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6"
+            className="group relative grid grid-cols-12 gap-4 border-b border-white/[0.08] py-6 transition-all hover:bg-white/[0.02] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6"
           >
             <div className="col-span-12 lg:col-span-2">
               <div className="flex items-center gap-3">
@@ -243,7 +244,7 @@ export default async function AdminReviewQueuePage({
                 </div>
               )}
             </div>
-            <div className="col-span-12 lg:col-span-10">
+            <div className="col-span-12 lg:col-span-9">
               <div className="font-mono text-lg font-bold text-white transition-colors group-hover:text-brand">
                 {n.headline}
               </div>
@@ -270,6 +271,9 @@ export default async function AdminReviewQueuePage({
                   ))}
                 </div>
               )}
+            </div>
+            <div className="col-span-12 flex items-center justify-end lg:col-span-1">
+              <ReviewActions id={n.id} status={n.status} />
             </div>
           </Link>
         ))}

@@ -45,6 +45,13 @@ export const authController = {
     sendSuccess(res, result, "Service token issued");
   }),
 
+  refreshToken: asyncHandler(async (req: Request, res: Response) => {
+    const { refreshToken } = req.body as { refreshToken?: string };
+    if (!refreshToken) throw new AppError("Missing refresh token", 400);
+    const result = await authService.refreshFromToken(refreshToken);
+    sendSuccess(res, result, "Token refreshed");
+  }),
+
   logout: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
     logger.info({ userId: authReq.user.id, scope: "auth.logout" }, "user logged out");

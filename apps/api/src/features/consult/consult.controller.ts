@@ -45,7 +45,7 @@ export const consultController = {
   appendMessage: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
     const sessionId = String(req.params.id);
-    const result = await consultService.appendMessage(authReq.user.id, sessionId, req.body);
+    const result = await consultService.appendMessage(authReq.user.id, sessionId, req.body, authReq.user.email);
     sendSuccess(res, result, "Message appended", 201);
   }),
 
@@ -89,28 +89,43 @@ export const consultController = {
     sendSuccess(res, { ...message, imageUrl: result.url }, "Image uploaded", 201);
   }),
 
-  stream: asyncHandler(async (req, res: Response) => {
+  pollSession: asyncHandler(async (req, res: Response) => {
     const authReq = req as AuthRequest;
-    const { sessionId, body } = req.body;
-    const userId = authReq.user.id;
+    const sessionId = String(req.params.id);
+    const after = req.query.after ? String(req.query.after) : undefined;
+    const result = await consultService.pollSession(authReq.user.id, sessionId, after);
+    sendSuccess(res, result);
+  }),
 
-    const tier = await consultService.getUserTier(userId);
-    if (tier === "free") {
-      const { allowed } = await consultService.checkDailyTokenCap(userId);
-      if (!allowed) {
-        throw new AppError("Daily token cap reached", 429);
-      }
-    }
+  // ── Admin handlers ──
 
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    res.setHeader("X-Accel-Buffering", "no");
-    res.flushHeaders();
+  adminListSessions: asyncHandler(async (_req, res: Response) => {
+    const status = _req.query.status ? String(_req.query.status) : undefined;
+    const sessions = await consultService.adminListSessions(status ? { status } : undefined);
+    sendSuccess(res, sessions);
+  }),
 
-    await consultService.streamResponse(userId, sessionId, body, (chunk) => {
-      res.write(chunk);
-    });
+  adminListMessages: asyncHandler(async (req, res: Response) => {
+    const sessionId = String(req.params.id);
+    const messages = await consultService.adminListMessages(sessionId);
+    sendSuccess(res, messages);
+  }),
 
-    res.end();
+  adminSendMessage: asyncHandler(async (req, res: Response) => {
+    const authReq = req as AuthRequest;
+    const sessionId = String(req.params.id);
+    const result = await consultService.adminSendMessage(authReq.user.id, sessionId, req.body.content);
+    sendSuccess(res, result, "Message sent", 201);
+  }),
+
+  adminCloseSession: asyncHandler(async (req, res: Response) => {
+    const sessionId = String(req.params.id);
+    await consultService.adminCloseSession(sessionId);
+    sendSuccess(res, null, "Session closed");
+  }),
+
+  adminGetStats: asyncHandler(async (_req, res: Response) => {
+    const stats = await consultService.getSessionStats();
+    sendSuccess(res, stats);
   }),
 };

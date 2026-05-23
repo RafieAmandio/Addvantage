@@ -6,10 +6,10 @@ import {
   createConsultSession,
   renameConsultSession,
   deleteConsultSession,
+  appendConsultMessage,
 } from "@/features/consult/actions";
 import type { ConsultMessage, ConsultSession, LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
-import { apiStreamFetch } from "@/lib/api/client";
 
 export function useConsultActions({
   active,
@@ -30,7 +30,6 @@ export function useConsultActions({
 }) {
   const toast = useToast();
   const [draft, setDraft] = useState("");
-  const [typing, setTyping] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<{
     id: string;
     title: string;
@@ -91,112 +90,26 @@ export function useConsultActions({
       [sessionId]: [...(prev[sessionId] ?? []), userMsg],
     }));
     setLocalSessions((prev) =>
-      prev.map((s) => (s.id === sessionId ? { ...s, lastAt: nowIso } : s))
+      prev.map((s) => (s.id === sessionId ? { ...s, lastAt: nowIso, status: "awaiting_reply" } : s))
     );
 
     const userBody = draft;
     setDraft("");
-    setTyping(true);
 
-    const bubbleId = `M-x${Date.now() + 1}`;
-    const streamMessage = async () => {
-      const res = await apiStreamFetch("/consult/stream", {
-        sessionId,
-        body: userBody,
-      });
-      if (!res.ok || !res.body) {
-        let errCode: string | undefined;
-        let reason: string | undefined;
-        try {
-          const j = (await res.json()) as {
-            error?: string;
-            reason?: string;
-          };
-          errCode = j.error;
-          reason = j.reason;
-        } catch {
-          /* non-JSON body */
-        }
-        const description =
-          reason === "daily_token_cap"
-            ? "Daily token cap reached — upgrade for more."
-            : errCode === "rate_limited"
-              ? "Slow down — too many messages per minute."
-              : "Desk didn't respond. Try again.";
+    appendConsultMessage({
+      sessionId,
+      role: "user",
+      content: userBody,
+    }).then((res) => {
+      if (!res.ok) {
         toast.push({
           tone: "error",
           title: "Message not sent",
-          description,
-          duration: 3500,
-        });
-        setTyping(false);
-        return;
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let acc = "";
-      let bubbleCreated = false;
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        const delta = decoder.decode(value, { stream: true });
-        if (!delta) continue;
-        acc += delta;
-        if (!bubbleCreated) {
-          bubbleCreated = true;
-          setTyping(false);
-          const replyMsg: ConsultMessage = {
-            id: bubbleId,
-            role: "ai",
-            ts: new Date().toISOString(),
-            body: acc,
-            tags: [],
-          };
-          setExtrasBySession((prev) => ({
-            ...prev,
-            [sessionId]: [...(prev[sessionId] ?? []), replyMsg],
-          }));
-          setLocalSessions((prev) =>
-            prev.map((s) =>
-              s.id === sessionId
-                ? { ...s, lastAt: new Date().toISOString() }
-                : s
-            )
-          );
-        } else {
-          const bodyNow = acc;
-          setExtrasBySession((prev) => ({
-            ...prev,
-            [sessionId]: (prev[sessionId] ?? []).map((m) =>
-              m.id === bubbleId ? { ...m, body: bodyNow } : m
-            ),
-          }));
-        }
-      }
-      const tail = decoder.decode();
-      if (tail) {
-        acc += tail;
-        const bodyNow = acc;
-        setExtrasBySession((prev) => ({
-          ...prev,
-          [sessionId]: (prev[sessionId] ?? []).map((m) =>
-            m.id === bubbleId ? { ...m, body: bodyNow } : m
-          ),
-        }));
-      }
-      if (!bubbleCreated) {
-        setTyping(false);
-        toast.push({
-          tone: "error",
-          title: "Message not sent",
-          description: "Desk didn't respond. Try again.",
+          description: "Failed to reach the desk. Try again.",
           duration: 3500,
         });
       }
-    };
-    streamMessage().catch(() => {
-      setTyping(false);
+    }).catch(() => {
       toast.push({
         tone: "error",
         title: "Message not sent",
@@ -275,7 +188,6 @@ export function useConsultActions({
   return {
     draft,
     setDraft,
-    typing,
     pendingDelete,
     setPendingDelete,
     startNewSession,

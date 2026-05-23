@@ -46,6 +46,8 @@ const EnvSchema = z.object({
 
   SERVICE_TOKEN_SECRET: z.preprocess(emptyToUndef, z.string().min(32).optional()),
 
+  TELEGRAM_BOT_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   STORAGE_PROVIDER: z.preprocess(emptyToUndef, z.enum(["supabase", "s3"]).optional()),
   STORAGE_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 

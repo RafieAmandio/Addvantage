@@ -6,12 +6,10 @@ import type { ConsultMessage } from "@/features/consult/types";
 export function ScrollableConversation({
   children,
   bottomRef,
-  typing,
   messages,
 }: {
   children: React.ReactNode;
   bottomRef: React.RefObject<HTMLDivElement>;
-  typing: boolean;
   messages: ConsultMessage[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,7 +24,7 @@ export function ScrollableConversation({
     onScroll();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-  }, [messages.length, typing]);
+  }, [messages.length]);
 
   return (
     <div className="relative flex-1 min-h-0">

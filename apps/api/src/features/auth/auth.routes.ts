@@ -33,6 +33,11 @@ router.post(
 router.post("/service-token", authController.serviceToken);
 
 router.post("/refresh", requireAuth, authController.refresh);
+router.post(
+  "/refresh-token",
+  ipRateLimit({ limit: 10, windowSec: 60, action: "auth:refresh-token" }),
+  authController.refreshToken,
+);
 router.post("/logout", requireAuth, authController.logout);
 
 export { router as authRoutes };

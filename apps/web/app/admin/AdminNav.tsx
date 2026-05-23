@@ -12,6 +12,8 @@ const LINKS = [
   { href: "/admin/channel", label: "Channel", code: "05" },
   { href: "/admin/users", label: "Users", code: "06" },
   { href: "/admin/logs", label: "Logs", code: "07" },
+  { href: "/admin/consult", label: "Consult", code: "08" },
+  { href: "/admin/referral", label: "Referral", code: "09" },
 ] as const;
 
 export function AdminNav() {

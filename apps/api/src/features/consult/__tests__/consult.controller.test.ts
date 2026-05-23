@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import express from "express";
 import request from "supertest";
 import { errorHandler } from "@/core/middleware/error.middleware.js";
-import { NotFoundError } from "@/core/errors/index.js";
 import { TEST_USER, mockAuthMiddleware } from "@/test/helpers.js";
 
 const {
@@ -13,9 +12,7 @@ const {
   mockListMessages,
   mockAppendMessage,
   mockVerifyOwnership,
-  mockGetUserTier,
-  mockCheckDailyTokenCap,
-  mockStreamResponse,
+  mockPollSession,
 } = vi.hoisted(() => ({
   mockListSessions: vi.fn(),
   mockCreateSession: vi.fn(),
@@ -24,9 +21,7 @@ const {
   mockListMessages: vi.fn(),
   mockAppendMessage: vi.fn(),
   mockVerifyOwnership: vi.fn(),
-  mockGetUserTier: vi.fn(),
-  mockCheckDailyTokenCap: vi.fn(),
-  mockStreamResponse: vi.fn(),
+  mockPollSession: vi.fn(),
 }));
 
 vi.mock("../consult.service.js", () => ({
@@ -38,9 +33,12 @@ vi.mock("../consult.service.js", () => ({
     listMessages: mockListMessages,
     appendMessage: mockAppendMessage,
     verifySessionOwnership: mockVerifyOwnership,
-    getUserTier: mockGetUserTier,
-    checkDailyTokenCap: mockCheckDailyTokenCap,
-    streamResponse: mockStreamResponse,
+    pollSession: mockPollSession,
+    adminListSessions: vi.fn(),
+    adminListMessages: vi.fn(),
+    adminSendMessage: vi.fn(),
+    adminCloseSession: vi.fn(),
+    getSessionStats: vi.fn(),
   },
 }));
 
@@ -60,7 +58,7 @@ function createApp() {
   app.delete("/sessions/:id", consultController.deleteSession);
   app.get("/sessions/:id/messages", consultController.listMessages);
   app.post("/sessions/:id/messages", consultController.appendMessage);
-  app.post("/stream", consultController.stream);
+  app.get("/sessions/:id/poll", consultController.pollSession);
   app.use(errorHandler);
   return app;
 }
@@ -145,7 +143,7 @@ describe("consultController", () => {
     it("returns messages for a session", async () => {
       mockListMessages.mockResolvedValue([
         { id: "m1", role: "user", content: "Hello" },
-        { id: "m2", role: "assistant", content: "Hi there" },
+        { id: "m2", role: "admin", content: "Hi there" },
       ]);
 
       const res = await request(createApp()).get("/sessions/s1/messages");
@@ -169,35 +167,19 @@ describe("consultController", () => {
         TEST_USER.id,
         "s1",
         expect.objectContaining({ role: "user", content: "test message" }),
+        TEST_USER.email,
       );
     });
   });
 
-  describe("POST /stream", () => {
-    it("streams a response for VIP users", async () => {
-      mockGetUserTier.mockResolvedValue("vip");
-      mockStreamResponse.mockImplementation((_uid, _sid, _body, write) => {
-        write("chunk1");
-        write("chunk2");
-      });
+  describe("GET /sessions/:id/poll", () => {
+    it("polls for new messages", async () => {
+      mockPollSession.mockResolvedValue({ hasNew: false, latestMessageId: null, latestAt: null });
 
-      const res = await request(createApp())
-        .post("/stream")
-        .send({ sessionId: "550e8400-e29b-41d4-a716-446655440000", body: "What is AAPL?" });
+      const res = await request(createApp()).get("/sessions/s1/poll");
 
       expect(res.status).toBe(200);
-      expect(res.text).toBe("chunk1chunk2");
-    });
-
-    it("blocks free users at daily cap", async () => {
-      mockGetUserTier.mockResolvedValue("free");
-      mockCheckDailyTokenCap.mockResolvedValue({ allowed: false });
-
-      const res = await request(createApp())
-        .post("/stream")
-        .send({ sessionId: "550e8400-e29b-41d4-a716-446655440000", body: "test" });
-
-      expect(res.status).toBe(429);
+      expect(res.body.data.hasNew).toBe(false);
     });
   });
 });

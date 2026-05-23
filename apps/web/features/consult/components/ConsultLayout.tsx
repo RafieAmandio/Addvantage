@@ -6,7 +6,6 @@ import type { ConsultMessage, ConsultSession } from "@/features/consult/types";
 import { SectionNumber } from "@/components/ui/Marker";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { Bubble } from "@/features/consult/components/Bubble";
-import { TypingIndicator } from "@/features/consult/components/TypingIndicator";
 import { ScrollableConversation } from "@/features/consult/components/ScrollableConversation";
 
 function shortSessionCode(id: string): string {
@@ -28,7 +27,6 @@ export function ConsultLayout({
   setDraft,
   send,
   endRef,
-  typing,
   onNewSession,
   onRenameSession,
   onDeleteSession,
@@ -48,7 +46,6 @@ export function ConsultLayout({
   setDraft: (s: string) => void;
   send: () => void;
   endRef: React.RefObject<HTMLDivElement>;
-  typing: boolean;
   onNewSession: () => void;
   onRenameSession: (id: string, newTitle: string) => void;
   onDeleteSession: (id: string, title: string) => void;
@@ -57,6 +54,9 @@ export function ConsultLayout({
 }) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const awaitingReply = active.status === "awaiting_reply";
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <aside className={cn("col-span-12 lg:col-span-3", !sidebarOpen && "hidden lg:block")}>
@@ -96,7 +96,7 @@ export function ConsultLayout({
               ● NO MATCHES
             </div>
             <div className="mt-1 font-mono text-[10px] text-white/50">
-              No sessions match "{sessionQuery}".
+              No sessions match &quot;{sessionQuery}&quot;.
             </div>
             <button
               onClick={() => setSessionQuery("")}
@@ -248,27 +248,30 @@ export function ConsultLayout({
 
         <ScrollableConversation
           bottomRef={endRef}
-          typing={typing}
           messages={messages}
         >
-          {messages.length === 0 && !typing && (
+          {messages.length === 0 && (
             <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center">
               <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                 ● SESSION OPEN · AWAITING FIRST TRANSMISSION
               </div>
               <div className="mt-4 max-w-sm font-display text-xl italic text-white/70">
-                The desk is standing by. Describe your situation — position
-                size, entry, stop, and what you're feeling about it.
+                The desk is standing by. Describe your situation and a founder will respond.
               </div>
               <div className="mt-4 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                Transmission is one-way until you send the first message.
+                Typical response time: within a few hours during market sessions.
               </div>
             </div>
           )}
           {messages.map((m) => (
             <Bubble key={m.id} msg={m} />
           ))}
-          {typing && <TypingIndicator />}
+          {awaitingReply && (
+            <div className="mt-2 flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+              <span className="led animate-pulse" aria-hidden />
+              Awaiting desk response
+            </div>
+          )}
           <div ref={endRef} />
         </ScrollableConversation>
 
@@ -283,7 +286,6 @@ export function ConsultLayout({
                   e.preventDefault();
                   send();
                 } else if (e.key === "Escape") {
-                  // Vim-style normal mode — blur back to shortcut layer
                   e.preventDefault();
                   (e.target as HTMLTextAreaElement).blur();
                   window.dispatchEvent(
@@ -292,7 +294,7 @@ export function ConsultLayout({
                 }
               }}
               rows={2}
-              placeholder="Describe your situation. Include position size, entry, stop, and what you're feeling about it…  (press i to focus, esc to blur)"
+              placeholder="Describe your situation. Include position size, entry, stop, and what you're feeling about it…"
               className="flex-1 resize-none border border-gray-3 bg-black p-3 font-mono text-sm text-white placeholder:text-white/30 outline-none transition-colors focus-visible:border-brand"
             />
             <button

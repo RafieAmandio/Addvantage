@@ -20,8 +20,8 @@ export function ConsultHeroHeader({
               1v1 <span className="text-brand">Consultation</span>
             </h1>
             <p className="mt-2 max-w-2xl text-base text-white/50">
-              Private chat with the AI and the desk. Trade reviews, second
-              opinions, blind-spot checks.
+              Private consultation with the founding desk. Trade reviews,
+              second opinions, blind-spot checks.
             </p>
           </div>
           <div className="text-sm">

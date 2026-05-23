@@ -8,25 +8,10 @@ import {
   listConsultMessages,
 } from "@/features/consult/queries/messages";
 import type { InitialConsultData } from "@/features/consult/hooks/useConsultPersistence";
-import type { LocalSession } from "@/features/consult/types";
-import type { ConsultMessage } from "@/features/consult/types";
+import type { ConsultMessage, LocalSession } from "@/features/consult/types";
+import { rowToMessage } from "@/features/consult/lib/mappers";
 
 export const dynamic = "force-dynamic";
-
-function rowToMessage(row: {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: string;
-}): ConsultMessage {
-  return {
-    id: row.id,
-    role: row.role === "user" ? "user" : "ai",
-    ts: row.createdAt,
-    body: row.content,
-    tags: [],
-  };
-}
 
 export default async function ConsultPage({
   searchParams,
@@ -40,6 +25,7 @@ export default async function ConsultPage({
     title: r.title,
     startedAt: r.createdAt,
     lastAt: r.updatedAt,
+    status: r.status,
     tags: [],
     messages: [],
   }));

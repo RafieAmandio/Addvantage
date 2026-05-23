@@ -3,17 +3,10 @@ import type { ConsultMessage } from "@/features/consult/types";
 
 export function Bubble({ msg }: { msg: ConsultMessage }) {
   const isUser = msg.role === "user";
-  const isAi = msg.role === "ai";
   const align = isUser ? "items-end" : "items-start";
-  const tagColor = isUser
-    ? "text-brand"
-    : isAi
-    ? "text-moss"
-    : "text-white";
+  const tagColor = isUser ? "text-brand" : "text-white";
   const bg = isUser
     ? "bg-brand/10 border-brand/40"
-    : isAi
-    ? "bg-gray-2 border-gray-3"
     : "bg-gray-2 border-brand/40";
 
   return (
@@ -22,7 +15,7 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
         <span
           className={cn("font-mono text-[9px] uppercase tracking-widest2", tagColor)}
         >
-          ● {isUser ? "OPERATOR" : isAi ? "ANTS · AI" : `DESK · ${msg.author ?? "TEAM"}`}
+          ● {isUser ? "OPERATOR" : `DESK · ${msg.author ?? "TEAM"}`}
         </span>
         <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           {formatTime(msg.ts)}Z

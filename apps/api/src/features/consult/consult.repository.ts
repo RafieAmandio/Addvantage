@@ -4,6 +4,9 @@ import type { Prisma } from "@tradevantage/db";
 const SESSION_SELECT = {
   id: true,
   title: true,
+  status: true,
+  unreadAdmin: true,
+  unreadUser: true,
   createdAt: true,
   updatedAt: true,
 } as const;
@@ -11,6 +14,7 @@ const SESSION_SELECT = {
 const MESSAGE_SELECT = {
   id: true,
   sessionId: true,
+  userId: true,
   role: true,
   content: true,
   metadata: true,
@@ -34,7 +38,7 @@ export const consultRepository = {
 
   createSession: (userId: string, title: string) =>
     prisma.consultSession.create({
-      data: { userId, title },
+      data: { userId, title, status: "open", unreadAdmin: true },
       select: { id: true },
     }),
 
@@ -75,19 +79,41 @@ export const consultRepository = {
       data: { updatedAt: new Date() },
     }),
 
-  getDailyTokensUsed: (userId: string) =>
-    prisma.$queryRaw<[{ total: bigint }]>`
-      SELECT COALESCE(SUM((metadata->>'total_tokens')::int), 0) AS total
-      FROM consult_messages
-      WHERE user_id = ${userId}::uuid
-        AND role = 'assistant'
-        AND metadata->>'total_tokens' IS NOT NULL
-        AND created_at >= (CURRENT_DATE AT TIME ZONE 'UTC')
-    `,
+  updateSessionFlags: (
+    id: string,
+    data: { status?: string; unreadAdmin?: boolean; unreadUser?: boolean; updatedAt?: Date },
+  ) =>
+    prisma.consultSession.update({
+      where: { id },
+      data,
+    }),
 
-  getProfileTier: (userId: string) =>
-    prisma.profile.findUnique({
-      where: { id: userId },
-      select: { tier: true },
+  // ── Admin queries ──
+
+  listAllSessions: (filters?: { status?: string }, limit = 50) =>
+    prisma.consultSession.findMany({
+      where: filters?.status ? { status: filters.status } : undefined,
+      select: {
+        ...SESSION_SELECT,
+        userId: true,
+        user: { select: { email: true, handle: true } },
+        _count: { select: { messages: true } },
+      },
+      orderBy: { updatedAt: "desc" },
+      take: limit,
+    }),
+
+  getSessionStats: () =>
+    Promise.all([
+      prisma.consultSession.count({ where: { status: "open" } }),
+      prisma.consultSession.count({ where: { status: "awaiting_reply" } }),
+      prisma.consultSession.count({ where: { unreadAdmin: true, status: { not: "closed" } } }),
+    ]).then(([open, awaitingReply, unread]) => ({ open, awaitingReply, unread })),
+
+  getLatestMessage: (sessionId: string) =>
+    prisma.consultMessage.findFirst({
+      where: { sessionId },
+      select: { id: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
     }),
 };

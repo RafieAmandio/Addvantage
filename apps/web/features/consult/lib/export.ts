@@ -21,9 +21,7 @@ export function sessionToMarkdown(
     const who =
       m.role === "user"
         ? "Operator"
-        : m.role === "ai"
-          ? "ANTS · AI"
-          : `Desk · ${m.author ?? "Team"}`;
+        : `Desk · ${m.author ?? "Team"}`;
     const ts = new Date(m.ts).toUTCString();
     lines.push(`### ${who} · ${ts}`);
     lines.push(``);

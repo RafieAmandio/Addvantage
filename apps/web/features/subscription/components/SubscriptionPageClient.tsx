@@ -23,7 +23,7 @@ const PLANS: SubscriptionPlan[] = [
     id: "free",
     name: "Free",
     priceIDR: 0,
-    cadence: "3-month",
+    cadence: "forever",
     features: [
       "Unfiltered news + impact analysis",
       "Economic calendar",
@@ -41,7 +41,7 @@ const PLANS: SubscriptionPlan[] = [
     features: [
       "Everything in Free",
       "Daily / weekly Trading Plan",
-      "1v1 Consultation (AI + team)",
+      "1v1 Consultation (founders)",
       "Full Education library",
       "Full Hashtag explorer",
       "Access to all collab channels",
@@ -149,7 +149,7 @@ export function SubscriptionPageClient({ status, history }: Props) {
             <div className="col-span-6 lg:col-span-3">
               <DataLabel>Cadence</DataLabel>
               <div className="mt-2 font-mono text-white">
-                {paid ? "3-month" : "—"}
+                {paid ? "1-year" : "—"}
               </div>
             </div>
             <div className="col-span-6 lg:col-span-3">
@@ -335,8 +335,8 @@ export function SubscriptionPageClient({ status, history }: Props) {
         </section>
 
         <div className="mt-12 border border-gray-3 bg-gray-2/30 p-4 font-mono text-[10px] uppercase tracking-widest2 text-white/50 sm:p-6">
-          ALL PRICING IN INDONESIAN RUPIAH (IDR). 3-MONTH BILLING IS A
-          DELIBERATE FILTER — ANYONE UNWILLING TO COMMIT A QUARTER IS NOT THE
+          ALL PRICING IN INDONESIAN RUPIAH (IDR). ANNUAL BILLING IS A
+          DELIBERATE FILTER — ANYONE UNWILLING TO COMMIT A YEAR IS NOT THE
           TARGET AUDIENCE. NO PRO-RATING. NO REFUNDS.
         </div>
       </div>
