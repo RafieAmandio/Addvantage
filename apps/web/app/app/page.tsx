@@ -12,7 +12,10 @@ export default async function HomePage() {
   const [news, plans, predictions] = await Promise.all([
     listApprovedNews(),
     listPublishedPlans({ limit: 20 }),
-    listPredictions().catch(() => []),
+    listPredictions().catch((err) => {
+      console.error("[predictions] query failed:", err);
+      return [];
+    }),
   ]);
   return <DashboardClient news={news} plans={plans} predictions={predictions} />;
 }
