@@ -5,6 +5,8 @@ import { historyQuerySchema } from "./prediction.validation.js";
 
 const router = Router();
 
+router.get("/", predictionController.list);
+
 router.get(
   "/history",
   validate({ query: historyQuerySchema }),

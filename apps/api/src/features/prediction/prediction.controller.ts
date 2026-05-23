@@ -6,6 +6,12 @@ import { predictionService } from "./prediction.service.js";
 import type { historyQuerySchema } from "./prediction.validation.js";
 
 export const predictionController = {
+  list: asyncHandler(async (_req, res: Response) => {
+    const result = await predictionService.list();
+    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");
+    sendSuccess(res, result);
+  }),
+
   getHistory: asyncHandler(async (req, res: Response) => {
     const query = req.query as unknown as z.infer<typeof historyQuerySchema>;
     const result = await predictionService.getHistory(query);
