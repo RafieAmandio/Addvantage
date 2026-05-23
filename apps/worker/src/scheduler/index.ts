@@ -7,6 +7,7 @@ import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
 import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
 import { syncRsi } from "../rsi/sync-rsi";
+import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
 
 // ---------------------------------------------------------------------------
 // Robust minute-aligned scheduler
@@ -34,6 +35,10 @@ const SCHEDULE = {
   rsi: { minute: 10, divisorHour: 4 },
   /** Renewal reminders — daily at 09:00 (requires EMAIL_PROVIDER) */
   renewal: { minute: 0, fixedHour: 9, divisorHour: 24 },
+  /** Polymarket snapshots — every 2 hours at :15 */
+  polymarket: { minute: 15, divisorHour: 2 },
+  /** Polymarket slug rotation — daily at 06:00 */
+  polymarketRotate: { minute: 0, fixedHour: 6, divisorHour: 24 },
 } as const;
 
 type JobName = keyof typeof SCHEDULE;
@@ -44,6 +49,8 @@ const lastFiredAt: Record<JobName, number> = {
   calendar: -1,
   rsi: -1,
   renewal: -1,
+  polymarket: -1,
+  polymarketRotate: -1,
 };
 
 function shouldFire(
@@ -102,6 +109,13 @@ export function startScheduler(): void {
     });
   }
 
+  rotatePolymarketSlugs()
+    .then(() => syncPolymarketSnapshots())
+    .catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "polymarket.boot" } });
+      logger.error({ err: String(err) }, "polymarket: boot sync failed");
+    });
+
   // ---- recurring poll (every 30 s) ----
   pollTimer = setInterval(() => {
     try {
@@ -118,6 +132,8 @@ export function startScheduler(): void {
       calendar: "m7 every 6h",
       rsi: config.MARKET_DATA_PROVIDER ? "m10 every 4h" : "disabled",
       renewal: config.EMAIL_PROVIDER ? "09:00 daily" : "disabled",
+      polymarket: "m15 every 2h",
+      polymarketRotate: "06:00 daily",
     },
     "scheduler: started (setInterval 30s poll)",
   );
@@ -165,6 +181,26 @@ function pollJobs(): void {
         { err: String(err) },
         "renewal-reminder: scheduled run failed",
       );
+    });
+  }
+
+  // -- polymarket snapshots (every 2h at :15) --
+  if (shouldFire("polymarket", now)) {
+    markFired("polymarket", now);
+    logger.info("scheduler: firing polymarket snapshot sync");
+    syncPolymarketSnapshots().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "polymarket-sync.cron" } });
+      logger.error({ err: String(err) }, "polymarket-sync: scheduled run failed");
+    });
+  }
+
+  // -- polymarket slug rotation (daily at 06:00) --
+  if (shouldFire("polymarketRotate", now)) {
+    markFired("polymarketRotate", now);
+    logger.info("scheduler: firing polymarket slug rotation");
+    rotatePolymarketSlugs().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "polymarket-rotate.cron" } });
+      logger.error({ err: String(err) }, "polymarket-rotate: scheduled run failed");
     });
   }
 }

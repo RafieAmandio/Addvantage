@@ -12,20 +12,22 @@ import {
   filterSetupsByWatch,
 } from "@/features/dashboard/lib/watchlist-mentions";
 import { DashboardHero } from "@/features/dashboard/components/DashboardHero";
-import { DashboardEventChart } from "@/features/dashboard/components/DashboardEventChart";
+import { PredictionGrid } from "@/features/predictions/components/PredictionGrid";
 import { CalendarStrip } from "@/features/dashboard/components/CalendarStrip";
 import { ActivePlanSection } from "@/features/dashboard/components/ActivePlanSection";
 import { WatchlistSection } from "@/features/dashboard/components/WatchlistSection";
 import { NewsRows } from "@/features/dashboard/components/NewsRows";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan } from "@/features/plan/types";
+import type { PredictionCardData } from "@/features/predictions/types";
 
 interface Props {
   news: NewsListItem[];
   plans: Plan[];
+  predictions: PredictionCardData[];
 }
 
-export function DashboardClient({ news, plans }: Props) {
+export function DashboardClient({ news, plans, predictions }: Props) {
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
   const { ids: seenNewsIds, hydrated: seenHydrated } = useSeenNews();
@@ -76,7 +78,6 @@ export function DashboardClient({ news, plans }: Props) {
 
   return (
     <div className="stagger">
-      {/* Hero: tight top, greeting bar */}
       <DashboardHero
         stamp={stamp}
         greet={greet}
@@ -85,14 +86,15 @@ export function DashboardClient({ news, plans }: Props) {
         openSetups={openSetups}
       />
 
-      {/* Chart + Calendar: grouped visually (chart has own padding) */}
-      <DashboardEventChart />
+      <PredictionGrid
+        predictions={predictions.length > 0 ? predictions : null}
+        className="py-5"
+      />
+
       <CalendarStrip />
 
-      {/* Plan: primary content, most generous spacing */}
       <ActivePlanSection plan={plan} paid={paid} />
 
-      {/* Watchlist: secondary, tighter */}
       <WatchlistSection
         tickers={tickers}
         watchHydrated={watchHydrated}
@@ -102,7 +104,6 @@ export function DashboardClient({ news, plans }: Props) {
         planId={plan?.id ?? null}
       />
 
-      {/* News: dense rows, tightest data section */}
       <NewsRows
         news={news}
         seenNewsIds={seenNewsIds}
