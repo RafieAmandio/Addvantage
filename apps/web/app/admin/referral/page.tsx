@@ -28,6 +28,20 @@ async function apiFetch(path: string, opts: RequestInit = {}) {
   return res.json();
 }
 
+async function uploadIcon(file: File): Promise<string> {
+  const token = getAccessToken();
+  const fd = new FormData();
+  fd.append("image", file);
+  const res = await fetch(`${API_BASE}/referral/admin/upload`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: fd,
+  });
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  const json = await res.json();
+  return json.data?.imageUrl;
+}
+
 export default function AdminReferralPage() {
   const [partners, setPartners] = useState<ReferralPartner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +55,7 @@ export default function AdminReferralPage() {
   const [iconUrl, setIconUrl] = useState("");
   const [sortOrder, setSortOrder] = useState(0);
   const [active, setActive] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -231,17 +246,48 @@ export default function AdminReferralPage() {
                 className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
             </label>
-            <label className="block">
+            <div className="block">
               <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Icon URL (optional)
+                Icon
               </span>
-              <input
-                value={iconUrl}
-                onChange={(e) => setIconUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
+              <div className="flex items-center gap-3">
+                {iconUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={iconUrl} alt="" width={32} height={32} className="shrink-0 rounded border border-gray-3" />
+                )}
+                <label className="flex cursor-pointer items-center gap-2 border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploading(true);
+                      setSaveError(null);
+                      try {
+                        const url = await uploadIcon(file);
+                        setIconUrl(url);
+                      } catch (err) {
+                        setSaveError(err instanceof Error ? err.message : "Upload failed");
+                      } finally {
+                        setUploading(false);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  {uploading ? "Uploading..." : "Upload"}
+                </label>
+                <span className="font-mono text-[9px] text-white/30">or</span>
+                <input
+                  value={iconUrl}
+                  onChange={(e) => setIconUrl(e.target.value)}
+                  placeholder="Paste URL"
+                  className="min-w-0 flex-1 border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="mb-4 grid grid-cols-2 gap-4">
