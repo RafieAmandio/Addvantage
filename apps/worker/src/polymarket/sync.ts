@@ -119,6 +119,7 @@ function parseOutcomes(markets: z.infer<typeof GammaMarketSchema>[]): OutcomeSna
   }
 
   return outcomes
+    .filter((o) => o.probability > 0 && o.probability < 100)
     .sort((a, b) => b.probability - a.probability)
     .slice(0, 10);
 }
