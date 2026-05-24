@@ -4,6 +4,14 @@ import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/cn";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
 
+interface ChannelThread {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  sortOrder: number;
+}
+
 interface ChannelPost {
   id: string;
   author: string;
@@ -13,6 +21,7 @@ interface ChannelPost {
   pinned: boolean;
   published: boolean;
   createdAt: string;
+  thread: { id: string; title: string; slug: string } | null;
 }
 
 async function apiFetch(path: string, opts: RequestInit = {}) {
@@ -31,25 +40,40 @@ async function apiFetch(path: string, opts: RequestInit = {}) {
 
 export default function AdminChannelPage() {
   const [posts, setPosts] = useState<ChannelPost[]>([]);
+  const [threads, setThreads] = useState<ChannelThread[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [showThreadForm, setShowThreadForm] = useState(false);
+  const [editThreadId, setEditThreadId] = useState<string | null>(null);
 
+  // post form
   const [body, setBody] = useState("");
   const [author, setAuthor] = useState("Anthony");
   const [tags, setTags] = useState("");
   const [pinned, setPinned] = useState(false);
+  const [threadId, setThreadId] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  // thread form
+  const [threadTitle, setThreadTitle] = useState("");
+  const [threadDesc, setThreadDesc] = useState("");
+  const [savingThread, setSavingThread] = useState(false);
+
   const load = useCallback(async () => {
     try {
-      const json = await apiFetch("/channel/admin/all");
-      setPosts(json.data ?? []);
+      const [postsJson, threadsJson] = await Promise.all([
+        apiFetch("/channel/admin/all"),
+        apiFetch("/channel/threads"),
+      ]);
+      setPosts(postsJson.data ?? []);
+      setThreads(threadsJson.data ?? []);
     } catch {
       setPosts([]);
+      setThreads([]);
     } finally {
       setLoading(false);
     }
@@ -62,11 +86,20 @@ export default function AdminChannelPage() {
     setAuthor("Anthony");
     setTags("");
     setPinned(false);
+    setThreadId("");
     if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
     setImageFile(null);
     setEditId(null);
     setShowForm(false);
+    setSaveError(null);
+  }
+
+  function resetThreadForm() {
+    setThreadTitle("");
+    setThreadDesc("");
+    setEditThreadId(null);
+    setShowThreadForm(false);
   }
 
   function startEdit(post: ChannelPost) {
@@ -74,19 +107,24 @@ export default function AdminChannelPage() {
     setAuthor(post.author);
     setTags(post.tags.join(", "));
     setPinned(post.pinned);
+    setThreadId(post.thread?.id ?? "");
     setImagePreview(post.imageUrl);
     setImageFile(null);
     setEditId(post.id);
     setShowForm(true);
   }
 
+  function startEditThread(thread: ChannelThread) {
+    setThreadTitle(thread.title);
+    setThreadDesc(thread.description ?? "");
+    setEditThreadId(thread.id);
+    setShowThreadForm(true);
+  }
+
   async function uploadImageToStorage(file: File): Promise<string> {
     const fd = new FormData();
     fd.append("image", file);
-    const json = await apiFetch("/channel/upload", {
-      method: "POST",
-      body: fd,
-    });
+    const json = await apiFetch("/channel/upload", { method: "POST", body: fd });
     return json.data?.imageUrl;
   }
 
@@ -108,18 +146,13 @@ export default function AdminChannelPage() {
         tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
         pinned,
         published: true,
+        threadId: threadId || null,
       };
 
       if (editId) {
-        await apiFetch(`/channel/${editId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        await apiFetch(`/channel/${editId}`, { method: "PUT", body: JSON.stringify(payload) });
       } else {
-        await apiFetch("/channel", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        await apiFetch("/channel", { method: "POST", body: JSON.stringify(payload) });
       }
 
       resetForm();
@@ -145,6 +178,52 @@ export default function AdminChannelPage() {
     await load();
   }
 
+  async function onThreadSubmit() {
+    if (!threadTitle.trim()) return;
+    setSavingThread(true);
+    try {
+      const payload = {
+        title: threadTitle.trim(),
+        description: threadDesc.trim() || undefined,
+      };
+      if (editThreadId) {
+        await apiFetch(`/channel/threads/${editThreadId}`, { method: "PUT", body: JSON.stringify(payload) });
+      } else {
+        await apiFetch("/channel/threads", { method: "POST", body: JSON.stringify(payload) });
+      }
+      resetThreadForm();
+      await load();
+    } catch {
+      // silent
+    } finally {
+      setSavingThread(false);
+    }
+  }
+
+  async function onDeleteThread(id: string) {
+    if (!confirm("Delete this thread? Posts will become unthreaded.")) return;
+    await apiFetch(`/channel/threads/${id}`, { method: "DELETE" });
+    await load();
+  }
+
+  async function moveThread(id: string, direction: "up" | "down") {
+    const idx = threads.findIndex((t) => t.id === id);
+    if (idx < 0) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= threads.length) return;
+    await Promise.all([
+      apiFetch(`/channel/threads/${threads[idx].id}`, {
+        method: "PUT",
+        body: JSON.stringify({ sortOrder: threads[swapIdx].sortOrder }),
+      }),
+      apiFetch(`/channel/threads/${threads[swapIdx].id}`, {
+        method: "PUT",
+        body: JSON.stringify({ sortOrder: threads[idx].sortOrder }),
+      }),
+    ]);
+    await load();
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
@@ -166,16 +245,126 @@ export default function AdminChannelPage() {
             My Channel
           </h1>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-        >
-          + New Post
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { resetThreadForm(); setShowThreadForm(true); }}
+            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          >
+            + Thread
+          </button>
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          >
+            + New Post
+          </button>
+        </div>
       </div>
 
       <div className="mt-8 h-px bg-white/20" />
 
+      {/* ─── thread management ─────────────────────────────────────────── */}
+      {threads.length > 0 && !showThreadForm && (
+        <div className="mt-6">
+          <div className="mb-3 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+            Threads
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {threads.map((t, i) => (
+              <div
+                key={t.id}
+                className="flex items-center gap-1 border border-gray-3 bg-gray-2/50 px-2 py-1"
+              >
+                <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/70">
+                  {t.title}
+                </span>
+                <button
+                  onClick={() => moveThread(t.id, "up")}
+                  disabled={i === 0}
+                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand disabled:opacity-20"
+                  title="Move up"
+                >
+                  ▲
+                </button>
+                <button
+                  onClick={() => moveThread(t.id, "down")}
+                  disabled={i === threads.length - 1}
+                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand disabled:opacity-20"
+                  title="Move down"
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => startEditThread(t)}
+                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand"
+                  title="Edit"
+                >
+                  ✎
+                </button>
+                <button
+                  onClick={() => onDeleteThread(t.id)}
+                  className="px-1 font-mono text-[9px] text-blood-bright/50 transition-colors hover:text-blood-bright"
+                  title="Delete"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ─── thread form ───────────────────────────────────────────────── */}
+      {showThreadForm && (
+        <div className="mt-6 border border-white/10 bg-black p-4">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
+            {editThreadId ? "Edit Thread" : "New Thread"}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+                Title
+              </span>
+              <input
+                value={threadTitle}
+                onChange={(e) => setThreadTitle(e.target.value)}
+                maxLength={50}
+                placeholder="e.g. Gold Thesis"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+                Description (optional)
+              </span>
+              <input
+                value={threadDesc}
+                onChange={(e) => setThreadDesc(e.target.value)}
+                maxLength={200}
+                placeholder="Short description"
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+              />
+            </label>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={onThreadSubmit}
+              disabled={savingThread || !threadTitle.trim()}
+              className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              {savingThread ? "Saving..." : editThreadId ? "Update" : "Create"}
+            </button>
+            <button
+              onClick={resetThreadForm}
+              className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── post form ─────────────────────────────────────────────────── */}
       {showForm && (
         <div className="mt-6 border border-brand/40 bg-black p-6">
           <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
@@ -237,7 +426,7 @@ export default function AdminChannelPage() {
             )}
           </label>
 
-          <div className="mb-4 grid grid-cols-2 gap-4">
+          <div className="mb-4 grid grid-cols-3 gap-4">
             <label className="block">
               <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                 Author
@@ -258,6 +447,21 @@ export default function AdminChannelPage() {
                 placeholder="macro, outlook"
                 className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
               />
+            </label>
+            <label className="block">
+              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+                Thread
+              </span>
+              <select
+                value={threadId}
+                onChange={(e) => setThreadId(e.target.value)}
+                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+              >
+                <option value="">None</option>
+                {threads.map((t) => (
+                  <option key={t.id} value={t.id}>{t.title}</option>
+                ))}
+              </select>
             </label>
           </div>
 
@@ -291,6 +495,7 @@ export default function AdminChannelPage() {
         </div>
       )}
 
+      {/* ─── post list ─────────────────────────────────────────────────── */}
       {posts.length === 0 && !showForm && (
         <div className="py-20 text-center">
           <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
@@ -321,6 +526,11 @@ export default function AdminChannelPage() {
                     <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
                       {post.author}
                     </span>
+                    {post.thread && (
+                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+                        {post.thread.title}
+                      </span>
+                    )}
                     {post.pinned && (
                       <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand/60">
                         Pinned

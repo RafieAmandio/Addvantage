@@ -3,10 +3,18 @@ import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate, formatTime } from "@/lib/cn";
 import { apiGet } from "@/lib/api/client-server";
 import Link from "next/link";
+import { ChannelThreadNav } from "./ChannelThreadNav";
 
 export const metadata: Metadata = { title: "Channel" };
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+interface ChannelThread {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+}
 
 interface ChannelPost {
   id: string;
@@ -16,12 +24,31 @@ interface ChannelPost {
   tags: string[];
   pinned: boolean;
   createdAt: string;
+  thread: { id: string; title: string; slug: string } | null;
 }
 
-export default async function ChannelPage() {
+export default async function ChannelPage({
+  searchParams,
+}: {
+  searchParams: { thread?: string };
+}) {
+  let threads: ChannelThread[] = [];
   let posts: ChannelPost[] = [];
+  const activeSlug = searchParams.thread ?? null;
+
   try {
-    posts = (await apiGet<ChannelPost[]>("/channel")) ?? [];
+    threads = (await apiGet<ChannelThread[]>("/channel/threads")) ?? [];
+  } catch {
+    threads = [];
+  }
+
+  const activeThread = activeSlug
+    ? threads.find((t) => t.slug === activeSlug) ?? null
+    : null;
+
+  try {
+    const query = activeThread ? `?threadId=${activeThread.id}` : "";
+    posts = (await apiGet<ChannelPost[]>(`/channel${query}`)) ?? [];
   } catch {
     posts = [];
   }
@@ -47,19 +74,31 @@ export default async function ChannelPage() {
               <div className="mt-2 text-moss">● BROADCASTING</div>
             </div>
           </div>
+
+          {threads.length > 0 && (
+            <ChannelThreadNav threads={threads} activeSlug={activeSlug} />
+          )}
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+        {activeThread?.description && (
+          <p className="mb-6 font-display text-base text-white/50">
+            {activeThread.description}
+          </p>
+        )}
+
         <SectionNumber n="—" label={`${posts.length} POSTS`} />
 
         {posts.length === 0 && (
           <div className="mt-10 border border-gray-3 bg-gray-2/30 px-6 py-12 text-center">
             <p className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              NO BROADCASTS YET
+              {activeThread ? "NO POSTS IN THIS THREAD" : "NO BROADCASTS YET"}
             </p>
             <p className="mt-2 font-display text-lg text-white/60">
-              Channel posts will appear here once broadcasting begins.
+              {activeThread
+                ? "Posts assigned to this thread will appear here."
+                : "Channel posts will appear here once broadcasting begins."}
             </p>
           </div>
         )}
@@ -81,6 +120,17 @@ export default async function ChannelPage() {
                   <>
                     <span className="text-white/40">·</span>
                     <span className="text-brand/60">PINNED</span>
+                  </>
+                )}
+                {p.thread && !activeThread && (
+                  <>
+                    <span className="text-white/40">·</span>
+                    <Link
+                      href={`/app/channel?thread=${p.thread.slug}`}
+                      className="text-white/40 transition-colors hover:text-brand"
+                    >
+                      {p.thread.title.toUpperCase()}
+                    </Link>
                   </>
                 )}
               </div>

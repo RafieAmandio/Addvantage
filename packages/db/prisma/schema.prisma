@@ -303,20 +303,38 @@ model RsiSnapshot {
   @@map("rsi_snapshots")
 }
 
+// ─── channel_threads ─────────────────────────────────────────────────
+model ChannelThread {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  slug        String        @unique
+  description String?
+  sortOrder   Int           @default(0) @map("sort_order")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  posts       ChannelPost[]
+
+  @@index([sortOrder])
+  @@map("channel_threads")
+}
+
 // ─── channel_posts ───────────────────────────────────────────────────
 model ChannelPost {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  author    String   @default("Anthony")
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  author    String          @default("Anthony")
   body      String
-  imageUrl  String?  @map("image_url")
-  tags      String[] @default([])
-  pinned    Boolean  @default(false)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  imageUrl  String?         @map("image_url")
+  tags      String[]        @default([])
+  pinned    Boolean         @default(false)
+  published Boolean         @default(true)
+  threadId  String?         @map("thread_id") @db.Uuid
+  thread    ChannelThread?  @relation(fields: [threadId], references: [id])
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([createdAt(sort: Desc)])
   @@index([tags], type: Gin)
+  @@index([threadId])
   @@map("channel_posts")
 }
 
