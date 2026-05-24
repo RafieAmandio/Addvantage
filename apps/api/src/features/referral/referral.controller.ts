@@ -1,9 +1,7 @@
 import type { Response } from "express";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
-import { AppError, ValidationError } from "@/core/errors/index.js";
-import { getStorageProvider } from "@/integrations/storage/index.js";
-import type { MulterRequest } from "@/core/types/request.js";
+import { handleImageUpload } from "@/core/utils/upload-handler.js";
 import { referralRepository } from "./referral.repository.js";
 
 export const referralController = {
@@ -34,20 +32,5 @@ export const referralController = {
     sendSuccess(res, null, "Partner deleted");
   }),
 
-  adminUploadIcon: asyncHandler(async (req, res: Response) => {
-    const storage = getStorageProvider();
-    if (!storage) throw new AppError("File uploads not configured", 503);
-
-    const file = (req as MulterRequest).file;
-    if (!file) throw new ValidationError(["No file provided"]);
-
-    const result = await storage.upload({
-      buffer: file.buffer,
-      originalName: file.originalname,
-      contentType: file.mimetype,
-      folder: "referral",
-    });
-
-    sendSuccess(res, { imageUrl: result.url }, "Icon uploaded", 201);
-  }),
+  adminUploadIcon: asyncHandler(handleImageUpload("referral")),
 };
