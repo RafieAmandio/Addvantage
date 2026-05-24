@@ -129,7 +129,20 @@ export const graphService = {
 
     const edges = computeEdges(nodes);
 
-    const result = { nodes, edges };
+    // compute symbol clusters for labels
+    const clusterMap = new Map<string, string[]>();
+    for (const n of nodes) {
+      const primary = n.symbols[0];
+      if (!primary) continue;
+      const arr = clusterMap.get(primary);
+      if (arr) arr.push(n.id);
+      else clusterMap.set(primary, [n.id]);
+    }
+    const clusters = [...clusterMap.entries()]
+      .filter(([, ids]) => ids.length >= 2)
+      .map(([symbol, ids]) => ({ symbol, nodeIds: ids }));
+
+    const result = { nodes, edges, clusters };
 
     if (redis) {
       try {
@@ -162,7 +175,11 @@ function computeEdges(nodes: GraphNode[]): GraphEdge[] {
     }
   }
 
+  // skip symbols that appear in >25% of nodes — they create noise, not signal
+  const freqThreshold = Math.max(nodes.length * 0.25, 3);
+
   for (const [symbol, ids] of symbolIndex) {
+    if (ids.length > freqThreshold) continue;
     for (let i = 0; i < ids.length; i++) {
       const src = ids[i]!;
       for (let j = i + 1; j < ids.length; j++) {
@@ -176,6 +193,7 @@ function computeEdges(nodes: GraphNode[]): GraphEdge[] {
   }
 
   for (const [tag, ids] of tagIndex) {
+    if (ids.length > freqThreshold) continue;
     for (let i = 0; i < ids.length; i++) {
       const src = ids[i]!;
       for (let j = i + 1; j < ids.length; j++) {

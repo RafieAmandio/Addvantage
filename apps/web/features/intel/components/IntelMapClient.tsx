@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
   forceSimulation,
   forceLink,
   forceManyBody,
-  forceCenter,
   forceCollide,
+  forceX,
+  forceY,
   type SimulationNodeDatum,
   type SimulationLinkDatum,
 } from "d3-force";
@@ -18,13 +19,19 @@ import { IntelDetailPanel } from "./IntelDetailPanel";
 
 interface SimNode extends SimulationNodeDatum {
   data: GraphNode;
+  cluster?: string;
 }
 
 interface SimLink extends SimulationLinkDatum<SimNode> {
   data: GraphEdge;
 }
 
-const NODE_RADIUS = 8;
+interface Cluster {
+  symbol: string;
+  nodeIds: string[];
+}
+
+const NODE_R = 6;
 
 const TYPE_COLORS: Record<string, string> = {
   news: "#FFD400",
@@ -42,16 +49,18 @@ const TIME_RANGES = [
 
 const CONTENT_TYPES = ["news", "plan", "channel", "event"] as const;
 
-function nodePath(type: string): string {
+function nodePath(type: string, r: number): string {
   switch (type) {
-    case "news": // diamond
-      return `M0,-${NODE_RADIUS} L${NODE_RADIUS},0 L0,${NODE_RADIUS} L-${NODE_RADIUS},0 Z`;
-    case "plan": // triangle
-      return `M0,-${NODE_RADIUS} L${NODE_RADIUS},${NODE_RADIUS * 0.7} L-${NODE_RADIUS},${NODE_RADIUS * 0.7} Z`;
-    case "channel": // square
-      return `M-${NODE_RADIUS * 0.7},-${NODE_RADIUS * 0.7} L${NODE_RADIUS * 0.7},-${NODE_RADIUS * 0.7} L${NODE_RADIUS * 0.7},${NODE_RADIUS * 0.7} L-${NODE_RADIUS * 0.7},${NODE_RADIUS * 0.7} Z`;
-    default: // circle approximation (octagon)
-      return `M0,-${NODE_RADIUS} L${NODE_RADIUS * 0.7},-${NODE_RADIUS * 0.7} L${NODE_RADIUS},0 L${NODE_RADIUS * 0.7},${NODE_RADIUS * 0.7} L0,${NODE_RADIUS} L-${NODE_RADIUS * 0.7},${NODE_RADIUS * 0.7} L-${NODE_RADIUS},0 L-${NODE_RADIUS * 0.7},-${NODE_RADIUS * 0.7} Z`;
+    case "news":
+      return `M0,-${r} L${r},0 L0,${r} L-${r},0 Z`;
+    case "plan":
+      return `M0,-${r} L${r},${r * 0.8} L-${r},${r * 0.8} Z`;
+    case "channel": {
+      const s = r * 0.75;
+      return `M-${s},-${s} L${s},-${s} L${s},${s} L-${s},${s} Z`;
+    }
+    default:
+      return `M0,-${r} A${r},${r} 0 1,1 0,${r} A${r},${r} 0 1,1 0,-${r} Z`;
   }
 }
 
@@ -59,8 +68,8 @@ function nodeColor(node: GraphNode): string {
   if (node.type === "news") {
     const impact = node.meta.impact as string;
     if (impact === "high") return "#FFD400";
-    if (impact === "medium") return "rgba(255,255,255,0.6)";
-    return "rgba(255,255,255,0.3)";
+    if (impact === "medium") return "rgba(255,255,255,0.55)";
+    return "rgba(255,255,255,0.25)";
   }
   if (node.type === "plan") {
     const dir = node.meta.direction as string;
@@ -69,10 +78,10 @@ function nodeColor(node: GraphNode): string {
   return TYPE_COLORS[node.type] ?? "#6B7280";
 }
 
-function edgeDash(relation: string): string {
-  if (relation === "tag") return "4 3";
-  if (relation === "timeline") return "2 4";
-  return "";
+function edgeStroke(relation: string): { dash: string; opacity: number } {
+  if (relation === "tag") return { dash: "3 4", opacity: 0.12 };
+  if (relation === "timeline") return { dash: "2 3", opacity: 0.2 };
+  return { dash: "", opacity: 0.1 };
 }
 
 export function IntelMapClient() {
@@ -80,13 +89,14 @@ export function IntelMapClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<SimNode[]>([]);
   const [links, setLinks] = useState<SimLink[]>([]);
+  const [clusters, setClusters] = useState<Cluster[]>([]);
   const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 });
   const [selected, setSelected] = useState<GraphNode | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ node: GraphNode; x: number; y: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // filters
   const [activeTypes, setActiveTypes] = useState<Set<string>>(new Set(CONTENT_TYPES));
   const [timeRange, setTimeRange] = useState<(typeof TIME_RANGES)[number]>(TIME_RANGES[3]);
   const [symbolSearch, setSymbolSearch] = useState("");
@@ -108,10 +118,37 @@ export function IntelMapClient() {
         filters.symbols = symbolSearch.split(",").map((s) => s.trim()).filter(Boolean);
       }
       const data = await fetchGraph(filters);
+      const serverClusters: Cluster[] = data.clusters ?? [];
+
+      // assign each node a primary cluster
+      const nodeCluster = new Map<string, string>();
+      for (const c of serverClusters) {
+        for (const id of c.nodeIds) {
+          if (!nodeCluster.has(id)) nodeCluster.set(id, c.symbol);
+        }
+      }
+
+      // position clusters in a ring layout
+      const clusterCenters = new Map<string, { x: number; y: number }>();
+      const ringRadius = Math.max(150, serverClusters.length * 40);
+      serverClusters.forEach((c, i) => {
+        const angle = (2 * Math.PI * i) / serverClusters.length - Math.PI / 2;
+        clusterCenters.set(c.symbol, {
+          x: Math.cos(angle) * ringRadius,
+          y: Math.sin(angle) * ringRadius,
+        });
+      });
 
       const nodeMap = new Map<string, SimNode>();
       const simNodes: SimNode[] = data.nodes.map((n) => {
-        const sn: SimNode = { data: n };
+        const cl = nodeCluster.get(n.id);
+        const center = cl ? clusterCenters.get(cl) : undefined;
+        const sn: SimNode = {
+          data: n,
+          cluster: cl,
+          x: center ? center.x + (Math.random() - 0.5) * 60 : (Math.random() - 0.5) * 200,
+          y: center ? center.y + (Math.random() - 0.5) * 60 : (Math.random() - 0.5) * 200,
+        };
         nodeMap.set(n.id, sn);
         return sn;
       });
@@ -126,15 +163,39 @@ export function IntelMapClient() {
 
       setNodes(simNodes);
       setLinks(simLinks);
+      setClusters(serverClusters);
       setSelected(null);
 
       if (simRef.current) simRef.current.stop();
 
       const sim = forceSimulation<SimNode>(simNodes)
-        .force("link", forceLink<SimNode, SimLink>(simLinks).distance(80).strength(0.3))
-        .force("charge", forceManyBody().strength(-120))
-        .force("center", forceCenter(0, 0))
-        .force("collide", forceCollide<SimNode>(NODE_RADIUS * 2))
+        .force(
+          "link",
+          forceLink<SimNode, SimLink>(simLinks)
+            .id((d) => d.data.id)
+            .distance(50)
+            .strength(0.15),
+        )
+        .force("charge", forceManyBody().strength(-60).distanceMax(300))
+        .force("collide", forceCollide<SimNode>(NODE_R + 3).strength(0.8))
+        .force(
+          "clusterX",
+          forceX<SimNode>((d) => {
+            const c = d.cluster ? clusterCenters.get(d.cluster) : undefined;
+            return c ? c.x : 0;
+          }).strength(0.15),
+        )
+        .force(
+          "clusterY",
+          forceY<SimNode>((d) => {
+            const c = d.cluster ? clusterCenters.get(d.cluster) : undefined;
+            return c ? c.y : 0;
+          }).strength(0.15),
+        )
+        .force("centerX", forceX(0).strength(0.02))
+        .force("centerY", forceY(0).strength(0.02))
+        .alpha(0.8)
+        .alphaDecay(0.02)
         .on("tick", () => {
           setNodes((prev) => [...prev]);
           setLinks((prev) => [...prev]);
@@ -153,13 +214,12 @@ export function IntelMapClient() {
     return () => { simRef.current?.stop(); };
   }, [loadGraph]);
 
-  // d3-zoom
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
 
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 4])
+      .scaleExtent([0.15, 5])
       .on("zoom", (e: D3ZoomEvent<SVGSVGElement, unknown>) => {
         setTransform({ x: e.transform.x, y: e.transform.y, k: e.transform.k });
       });
@@ -183,24 +243,57 @@ export function IntelMapClient() {
   const w = containerRef.current?.clientWidth ?? 800;
   const h = containerRef.current?.clientHeight ?? 600;
 
-  const connectedEdges = selected
-    ? links.filter(
-        (l) =>
-          (l.source as SimNode).data.id === selected.id ||
-          (l.target as SimNode).data.id === selected.id,
-      )
-    : [];
+  // compute cluster centroids from actual node positions
+  const clusterCentroids = useMemo(() => {
+    const map = new Map<string, { x: number; y: number; count: number }>();
+    for (const n of nodes) {
+      if (!n.cluster || n.x == null || n.y == null) continue;
+      const c = map.get(n.cluster);
+      if (c) {
+        c.x += n.x;
+        c.y += n.y;
+        c.count++;
+      } else {
+        map.set(n.cluster, { x: n.x, y: n.y, count: 1 });
+      }
+    }
+    return new Map(
+      [...map.entries()].map(([k, v]) => [k, { x: v.x / v.count, y: v.y / v.count }]),
+    );
+  }, [nodes]);
+
+  const focusId = selected?.id ?? hovered;
+
+  const connectedIds = useMemo(() => {
+    if (!focusId) return new Set<string>();
+    const ids = new Set<string>();
+    for (const l of links) {
+      const srcId = (l.source as SimNode).data.id;
+      const tgtId = (l.target as SimNode).data.id;
+      if (srcId === focusId || tgtId === focusId) {
+        ids.add(srcId);
+        ids.add(tgtId);
+      }
+    }
+    return ids;
+  }, [focusId, links]);
 
   const connectedNodes = selected
-    ? connectedEdges.map((l) => {
-        const src = (l.source as SimNode).data;
-        const tgt = (l.target as SimNode).data;
-        return {
-          node: src.id === selected.id ? tgt : src,
-          relation: l.data.relation,
-          label: l.data.label,
-        };
-      })
+    ? links
+        .filter(
+          (l) =>
+            (l.source as SimNode).data.id === selected.id ||
+            (l.target as SimNode).data.id === selected.id,
+        )
+        .map((l) => {
+          const src = (l.source as SimNode).data;
+          const tgt = (l.target as SimNode).data;
+          return {
+            node: src.id === selected.id ? tgt : src,
+            relation: l.data.relation,
+            label: l.data.label,
+          };
+        })
     : [];
 
   return (
@@ -313,9 +406,11 @@ export function IntelMapClient() {
                 const src = l.source as SimNode;
                 const tgt = l.target as SimNode;
                 if (src.x == null || tgt.x == null) return null;
-                const isConnected =
-                  selected &&
-                  (src.data.id === selected.id || tgt.data.id === selected.id);
+                const isFocused =
+                  focusId &&
+                  (src.data.id === focusId || tgt.data.id === focusId);
+                if (focusId && !isFocused) return null;
+                const style = edgeStroke(l.data.relation);
                 return (
                   <line
                     key={i}
@@ -323,25 +418,37 @@ export function IntelMapClient() {
                     y1={src.y}
                     x2={tgt.x}
                     y2={tgt.y}
-                    stroke={isConnected ? "rgba(255,212,0,0.3)" : "rgba(255,255,255,0.06)"}
-                    strokeWidth={isConnected ? 1.5 : 0.5}
-                    strokeDasharray={edgeDash(l.data.relation)}
+                    stroke={isFocused ? "rgba(255,212,0,0.35)" : `rgba(255,255,255,${style.opacity})`}
+                    strokeWidth={isFocused ? 1 : 0.5}
+                    strokeDasharray={style.dash}
                   />
                 );
               })}
+
+              {/* cluster labels */}
+              {clusterCentroids.size > 0 &&
+                [...clusterCentroids.entries()].map(([symbol, pos]) => (
+                  <text
+                    key={symbol}
+                    x={pos.x}
+                    y={pos.y - 30}
+                    textAnchor="middle"
+                    fill="rgba(255,255,255,0.2)"
+                    fontSize="9"
+                    fontFamily="monospace"
+                    letterSpacing="0.15em"
+                  >
+                    {symbol}
+                  </text>
+                ))}
 
               {/* nodes */}
               {nodes.map((n) => {
                 if (n.x == null || n.y == null) return null;
                 const isSelected = selected?.id === n.data.id;
-                const isConnected =
-                  selected &&
-                  connectedEdges.some(
-                    (l) =>
-                      (l.source as SimNode).data.id === n.data.id ||
-                      (l.target as SimNode).data.id === n.data.id,
-                  );
-                const dimmed = selected && !isSelected && !isConnected;
+                const isHovered = hovered === n.data.id;
+                const isConnected = focusId && connectedIds.has(n.data.id);
+                const dimmed = focusId && !isSelected && !isHovered && !isConnected;
                 return (
                   <g
                     key={n.data.id}
@@ -349,6 +456,7 @@ export function IntelMapClient() {
                     className="cursor-pointer"
                     onClick={() => setSelected(isSelected ? null : n.data)}
                     onMouseEnter={(e) => {
+                      setHovered(n.data.id);
                       const rect = svgRef.current?.getBoundingClientRect();
                       if (rect) {
                         setTooltip({
@@ -358,23 +466,24 @@ export function IntelMapClient() {
                         });
                       }
                     }}
-                    onMouseLeave={() => setTooltip(null)}
+                    onMouseLeave={() => {
+                      setHovered(null);
+                      setTooltip(null);
+                    }}
                   >
                     {isSelected && (
                       <circle
-                        r={NODE_RADIUS + 4}
+                        r={NODE_R + 6}
                         fill="none"
                         stroke="#FFD400"
-                        strokeWidth={1}
-                        opacity={0.6}
+                        strokeWidth={0.5}
+                        opacity={0.5}
                       />
                     )}
                     <path
-                      d={nodePath(n.data.type)}
+                      d={nodePath(n.data.type, NODE_R)}
                       fill={nodeColor(n.data)}
-                      opacity={dimmed ? 0.15 : 1}
-                      stroke={isSelected ? "#FFD400" : "none"}
-                      strokeWidth={isSelected ? 1.5 : 0}
+                      opacity={dimmed ? 0.1 : isHovered ? 1 : 0.85}
                     />
                   </g>
                 );
@@ -385,7 +494,7 @@ export function IntelMapClient() {
           {/* tooltip */}
           {tooltip && (
             <div
-              className="pointer-events-none absolute z-20 border border-gray-3 bg-black/90 px-2 py-1"
+              className="pointer-events-none absolute z-20 border border-gray-3 bg-black/95 px-3 py-2"
               style={{ left: tooltip.x, top: tooltip.y }}
             >
               <div className="flex items-center gap-2">
@@ -396,8 +505,13 @@ export function IntelMapClient() {
                 <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
                   {tooltip.node.type}
                 </span>
+                {tooltip.node.symbols.length > 0 && (
+                  <span className="font-mono text-[9px] text-brand/60">
+                    {tooltip.node.symbols.slice(0, 3).join(", ")}
+                  </span>
+                )}
               </div>
-              <div className="mt-0.5 max-w-[200px] truncate font-mono text-[10px] text-white">
+              <div className="mt-1 max-w-[240px] truncate font-mono text-[10px] text-white">
                 {tooltip.node.title}
               </div>
               <div className="mt-0.5 font-mono text-[8px] text-white/30">

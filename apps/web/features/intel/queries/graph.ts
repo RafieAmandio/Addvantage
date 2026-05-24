@@ -18,9 +18,15 @@ export interface GraphEdge {
   label: string;
 }
 
+export interface GraphCluster {
+  symbol: string;
+  nodeIds: string[];
+}
+
 export interface GraphData {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  clusters: GraphCluster[];
 }
 
 export interface GraphFilters {
