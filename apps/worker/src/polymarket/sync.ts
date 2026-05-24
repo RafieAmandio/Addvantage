@@ -156,6 +156,11 @@ export async function syncPolymarketSnapshots(): Promise<void> {
 
       const outcomes = parseOutcomes(event.markets);
 
+      if (outcomes.length === 0) {
+        logger.debug({ label: t.label, eventId: t.eventId }, "polymarket-sync: all outcomes resolved, skipping");
+        continue;
+      }
+
       await prisma.polymarketSnapshot.create({
         data: {
           trackedId: t.id,
@@ -208,12 +213,14 @@ export async function rotatePolymarketSlugs(): Promise<void> {
         continue;
       }
 
-      // Pick the best candidate: active, multi-outcome, highest volume
-      const candidates = events
-        .filter((e) => e.markets.length >= 3 && (e.volume ?? 0) > 10_000);
+      const candidates = events.filter((e) => {
+        if (e.markets.length < 3 || (e.volume ?? 0) < 10_000) return false;
+        const active = parseOutcomes(e.markets);
+        return active.length >= 2;
+      });
 
       if (candidates.length === 0) {
-        logger.debug({ query: t.searchQuery, label: t.label }, "polymarket-rotate: no suitable candidates");
+        logger.debug({ query: t.searchQuery, label: t.label }, "polymarket-rotate: no candidates with active outcomes");
         continue;
       }
 
