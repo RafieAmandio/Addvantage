@@ -70,7 +70,7 @@ export function userRateLimit(opts: { limit?: number; windowSec?: number; action
 }
 
 export type Tier = "free" | "vip";
-type TierAction = "consult:send" | "api:bars" | "api:events" | "api:rsi";
+type TierAction = "consult:send" | "api:bars" | "api:events" | "api:rsi" | "api:atr";
 
 const TIER_BUCKETS: Record<TierAction, Record<Tier, { limit: number; windowSec: number }>> = {
   "consult:send": {
@@ -86,6 +86,10 @@ const TIER_BUCKETS: Record<TierAction, Record<Tier, { limit: number; windowSec: 
     vip: { limit: 240, windowSec: 60 },
   },
   "api:rsi": {
+    free: { limit: 30, windowSec: 60 },
+    vip: { limit: 120, windowSec: 60 },
+  },
+  "api:atr": {
     free: { limit: 30, windowSec: 60 },
     vip: { limit: 120, windowSec: 60 },
   },

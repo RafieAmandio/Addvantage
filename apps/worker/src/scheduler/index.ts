@@ -7,6 +7,7 @@ import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
 import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
 import { syncRsi } from "../rsi/sync-rsi";
+import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
 
 // ---------------------------------------------------------------------------
@@ -33,6 +34,8 @@ const SCHEDULE = {
   calendar: { minute: 7, divisorHour: 6 },
   /** RSI sync — every 4 hours at :10 (requires MARKET_DATA_PROVIDER) */
   rsi: { minute: 10, divisorHour: 4 },
+  /** ATR daily levels — every 4 hours at :12 (requires MARKET_DATA_PROVIDER) */
+  atr: { minute: 12, divisorHour: 4 },
   /** Renewal reminders — daily at 09:00 (requires EMAIL_PROVIDER) */
   renewal: { minute: 0, fixedHour: 9, divisorHour: 24 },
   /** Polymarket snapshots — every 2 hours at :15 */
@@ -48,6 +51,7 @@ const lastFiredAt: Record<JobName, number> = {
   sources: -1,
   calendar: -1,
   rsi: -1,
+  atr: -1,
   renewal: -1,
   polymarket: -1,
   polymarketRotate: -1,
@@ -95,6 +99,10 @@ export function startScheduler(): void {
       Sentry.captureException(err, { tags: { scope: "rsi-sync.boot" } });
       logger.error({ err: String(err) }, "rsi-sync: boot sync failed");
     });
+    syncAtr().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "atr-sync.boot" } });
+      logger.error({ err: String(err) }, "atr-sync: boot sync failed");
+    });
   }
 
   if (config.EMAIL_PROVIDER) {
@@ -131,6 +139,7 @@ export function startScheduler(): void {
       sources: "m3 every 1h",
       calendar: "m7 every 6h",
       rsi: config.MARKET_DATA_PROVIDER ? "m10 every 4h" : "disabled",
+      atr: config.MARKET_DATA_PROVIDER ? "m12 every 4h" : "disabled",
       renewal: config.EMAIL_PROVIDER ? "09:00 daily" : "disabled",
       polymarket: "m15 every 2h",
       polymarketRotate: "06:00 daily",
@@ -166,6 +175,16 @@ function pollJobs(): void {
     syncRsi().catch((err) => {
       Sentry.captureException(err, { tags: { scope: "rsi-sync.cron" } });
       logger.error({ err: String(err) }, "rsi-sync: scheduled sync failed");
+    });
+  }
+
+  // -- ATR (every 4h at :12, requires market data) --
+  if (config.MARKET_DATA_PROVIDER && shouldFire("atr", now)) {
+    markFired("atr", now);
+    logger.info("scheduler: firing atr sync");
+    syncAtr().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "atr-sync.cron" } });
+      logger.error({ err: String(err) }, "atr-sync: scheduled sync failed");
     });
   }
 

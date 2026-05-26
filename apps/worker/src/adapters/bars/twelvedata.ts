@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { config } from "../../lib/config";
 import { retry } from "../../lib/retry";
 import { toIsoUtc } from "../../lib/date";
+import { getNextApiKey } from "../../lib/api-key-pool";
 import type { Bar, BarsAdapter, FetchBarsInput, Interval } from "./base";
 
 /**
@@ -71,12 +71,7 @@ export class TwelveDataAdapter implements BarsAdapter {
   readonly code = "twelvedata";
 
   async fetchBars(input: FetchBarsInput): Promise<Bar[]> {
-    const apiKey = config.MARKET_DATA_API_KEY;
-    if (!apiKey) {
-      throw new Error(
-        "twelvedata: MARKET_DATA_API_KEY is not set; cannot fetch bars"
-      );
-    }
+    const apiKey = getNextApiKey();
 
     const params = new URLSearchParams({
       symbol: input.symbol,

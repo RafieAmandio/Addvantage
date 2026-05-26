@@ -6,6 +6,7 @@ import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
 import { toIsoUtc, delay } from "../lib/date";
+import { getNextApiKey } from "../lib/api-key-pool";
 
 const BASE = "https://api.twelvedata.com";
 
@@ -131,8 +132,7 @@ async function fetchPrices(
 }
 
 export async function syncRsi(): Promise<void> {
-  const apiKey = config.MARKET_DATA_API_KEY;
-  if (!apiKey) {
+  if (!config.MARKET_DATA_API_KEY) {
     logger.debug("rsi-sync: MARKET_DATA_API_KEY not set, skipping");
     return;
   }
@@ -150,7 +150,7 @@ export async function syncRsi(): Promise<void> {
   for (const interval of RSI_INTERVALS) {
     for (const symbol of symbols) {
       try {
-        const r = await fetchRsi(symbol, interval, apiKey);
+        const r = await fetchRsi(symbol, interval, getNextApiKey());
         if (r) results.push(r);
         else errors++;
       } catch (err) {
@@ -161,7 +161,7 @@ export async function syncRsi(): Promise<void> {
     }
   }
 
-  const prices = await fetchPrices(symbols, apiKey);
+  const prices = await fetchPrices(symbols, getNextApiKey());
 
   if (results.length === 0) {
     logger.warn("rsi-sync: no results to persist");

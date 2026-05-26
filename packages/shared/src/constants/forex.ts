@@ -80,3 +80,25 @@ export function classifyRsi(rsi: number): RsiZoneId {
   if (rsi >= 30) return "weak";
   return "oversold";
 }
+
+// ── ATR Daily Levels ──────────────────────────────────────────────
+
+export const ATR_PERIOD = 20;
+
+export const ATR_ZONES = [
+  { id: "exceeded", label: "EXCEEDED", min: 100, max: Infinity, color: "#FF6B35" },
+  { id: "critical", label: "CRITICAL", min: 75, max: 100, color: "#FFD400" },
+  { id: "high", label: "HIGH", min: 50, max: 75, color: "#D4A017" },
+  { id: "moderate", label: "MODERATE", min: 25, max: 50, color: "#8B8B8B" },
+  { id: "fresh", label: "FRESH", min: 0, max: 25, color: "#4B6A88" },
+] as const;
+
+export type AtrZoneId = (typeof ATR_ZONES)[number]["id"];
+
+export function classifyAtrExhaustion(pct: number): AtrZoneId {
+  if (pct >= 100) return "exceeded";
+  if (pct >= 75) return "critical";
+  if (pct >= 50) return "high";
+  if (pct >= 25) return "moderate";
+  return "fresh";
+}
