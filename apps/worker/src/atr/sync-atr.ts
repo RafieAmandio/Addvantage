@@ -78,7 +78,7 @@ async function fetchDailyCandles(
   const params = new URLSearchParams({
     symbol,
     interval: "1day",
-    outputsize: "25",
+    outputsize: "100",
     apikey: apiKey,
     format: "JSON",
     timezone: "UTC",
