@@ -78,7 +78,7 @@ async function fetchDailyCandles(
   const params = new URLSearchParams({
     symbol,
     interval: "1day",
-    outputsize: "100",
+    outputsize: "200",
     apikey: apiKey,
     format: "JSON",
     timezone: "UTC",
@@ -113,7 +113,13 @@ async function fetchDailyCandles(
 
   // TwelveData returns newest-first; sort chronologically
   candles.sort((a, b) => (a.datetime < b.datetime ? -1 : 1));
-  return candles;
+
+  // TwelveData includes Sat/Sun candles with near-zero range that drag ATR
+  // down vs TradingView which only uses trading days. Filter weekends out.
+  return candles.filter((c) => {
+    const day = new Date(c.datetime).getUTCDay();
+    return day !== 0 && day !== 6;
+  });
 }
 
 export async function syncAtr(): Promise<void> {
