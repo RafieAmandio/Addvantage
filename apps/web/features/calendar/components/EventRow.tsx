@@ -15,7 +15,7 @@ export function EventRow({
   showTimeOffset?: boolean;
 }) {
   return (
-    <div className="group grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-black px-3 py-3 transition-colors hover:bg-gray-2">
+    <div className="group grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b border-gray-3 bg-black px-3 py-3 transition-colors hover:bg-gray-2">
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
           <Link
@@ -53,6 +53,16 @@ export function EventRow({
         >
           {IMPACT_LABEL[event.impact]}
         </span>
+      </div>
+
+      <div className="text-center font-mono text-[11px] text-white/80">
+        {event.actual ?? "—"}
+      </div>
+      <div className="text-center font-mono text-[11px] text-white/50">
+        {event.previous ?? "—"}
+      </div>
+      <div className="text-center font-mono text-[11px] text-white/50">
+        {event.consensus ?? "—"}
       </div>
 
       {event.scores.map((s, i) => (

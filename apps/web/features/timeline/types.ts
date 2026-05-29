@@ -24,6 +24,7 @@ export const TimelineEventSchema = z.object({
   bias: z.enum(BIAS_LEVELS).nullable(),
   impact: z.enum(IMPACT_LEVELS).nullable(),
   newsItemId: z.string().nullable(),
+  metadata: z.record(z.unknown()).nullable().optional(),
 });
 export type TimelineEvent = z.infer<typeof TimelineEventSchema>;
 

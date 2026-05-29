@@ -9,8 +9,10 @@ export interface CalendarEvent {
   title: string;
   impact: Impact;
   scores: CurrencyScores;
-  forecast?: string;
+  actual?: string;
   previous?: string;
+  consensus?: string;
+  forecast?: string;
   notes?: string;
   relatedNewsId?: string;
 }

@@ -12,6 +12,7 @@ const EVENT_SELECT = {
   bias: true,
   impact: true,
   newsItemId: true,
+  metadata: true,
 } as const;
 
 interface ListParams {

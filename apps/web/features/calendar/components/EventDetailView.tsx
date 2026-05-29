@@ -12,6 +12,7 @@ export function EventDetailView({
   event: TimelineEvent;
   news: NewsListItem[];
 }) {
+  const meta = (event.metadata ?? {}) as Record<string, string | undefined>;
   return (
     <div className="stagger bg-grid-fine">
       <div className="border-b border-gray-3 bg-gray-2/30">
@@ -55,6 +56,34 @@ export function EventDetailView({
               {event.body}
             </p>
           )}
+          {meta.actual || meta.previous || meta.consensus || meta.forecast ? (
+            <div className="mt-5 flex flex-wrap gap-4">
+              {meta.actual && (
+                <div className="border border-brand/30 bg-brand/5 px-3 py-2">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">Actual</div>
+                  <div className="font-mono text-sm text-brand">{meta.actual}</div>
+                </div>
+              )}
+              {meta.consensus && (
+                <div className="border border-white/10 bg-white/5 px-3 py-2">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">Consensus</div>
+                  <div className="font-mono text-sm text-white/80">{meta.consensus}</div>
+                </div>
+              )}
+              {meta.previous && (
+                <div className="border border-white/10 bg-white/5 px-3 py-2">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">Previous</div>
+                  <div className="font-mono text-sm text-white/60">{meta.previous}</div>
+                </div>
+              )}
+              {meta.forecast && (
+                <div className="border border-white/10 bg-white/5 px-3 py-2">
+                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">Forecast</div>
+                  <div className="font-mono text-sm text-white/60">{meta.forecast}</div>
+                </div>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 

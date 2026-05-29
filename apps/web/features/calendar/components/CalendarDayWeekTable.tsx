@@ -23,7 +23,7 @@ export function CalendarDayWeekTable({
   return (
     <div className={cn("overflow-x-auto border border-gray-3", className)}>
       <div className="min-w-[780px]">
-        <div className="sticky top-0 z-20 grid grid-cols-[minmax(220px,2fr)_72px_64px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
+        <div className="sticky top-0 z-20 grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
           <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Event
           </div>
@@ -32,6 +32,15 @@ export function CalendarDayWeekTable({
           </div>
           <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Impact
+          </div>
+          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+            Actual
+          </div>
+          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+            Prev
+          </div>
+          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+            Cons
           </div>
           {CURRENCIES.map((c) => (
             <div

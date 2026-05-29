@@ -58,6 +58,7 @@ export function timelineEventToCalendarEvent(
 ): CalendarEvent {
   const region = symbolToRegion(row.symbols[0]);
   const scores = deriveScores(row.symbols, row.impact);
+  const meta = (row.metadata ?? {}) as Record<string, unknown>;
 
   return {
     id: row.id,
@@ -66,6 +67,10 @@ export function timelineEventToCalendarEvent(
     title: row.title,
     impact: row.impact ?? "low",
     scores,
+    ...(meta.actual ? { actual: String(meta.actual) } : {}),
+    ...(meta.previous ? { previous: String(meta.previous) } : {}),
+    ...(meta.consensus ? { consensus: String(meta.consensus) } : {}),
+    ...(meta.forecast ? { forecast: String(meta.forecast) } : {}),
     ...(row.body ? { notes: row.body } : {}),
     ...(row.newsItemId ? { relatedNewsId: row.newsItemId } : {}),
   };
