@@ -3,11 +3,20 @@
 import { cn } from "@/lib/cn";
 import type { AtrZoneId } from "../types";
 import { ATR_ZONE_CONFIG, ATR_ZONES_ORDERED, GROUP_LABELS } from "../lib/zones";
-import type { ForexGroup } from "@tradevantage/shared";
+import type { ForexGroup, ForexTier } from "@tradevantage/shared";
 
 const GROUPS: ForexGroup[] = ["major", "cross", "commodity", "exotic", "index"];
 
+const TIER_TABS: { value: ForexTier | "all"; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "primary", label: "Primary" },
+  { value: "secondary", label: "Secondary" },
+  { value: "thirdliner", label: "Thirdliner" },
+];
+
 interface AtrToolbarProps {
+  activeTier: ForexTier | "all";
+  onTierChange: (t: ForexTier | "all") => void;
   activeZones: Set<AtrZoneId>;
   onToggleZone: (z: AtrZoneId) => void;
   activeGroups: Set<string>;
@@ -19,6 +28,8 @@ interface AtrToolbarProps {
 }
 
 export function AtrToolbar({
+  activeTier,
+  onTierChange,
   activeZones,
   onToggleZone,
   activeGroups,
@@ -30,6 +41,24 @@ export function AtrToolbar({
 }: AtrToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.06] px-4 py-3 sm:px-6">
+      {/* Tier tabs */}
+      <div className="flex items-center rounded-lg bg-white/[0.04] p-0.5">
+        {TIER_TABS.map((t) => (
+          <button
+            key={t.value}
+            onClick={() => onTierChange(t.value)}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+              activeTier === t.value
+                ? "bg-brand text-black"
+                : "text-white/40 hover:text-white/70",
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       {/* Zone filters */}
       <div className="flex items-center gap-1.5">
         {ATR_ZONES_ORDERED.map((z) => {

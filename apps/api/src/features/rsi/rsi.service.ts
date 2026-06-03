@@ -24,6 +24,7 @@ export const rsiService = {
       price: r.price !== null ? Number(r.price) : null,
       zone: classifyRsi(Number(r.rsi)),
       group: pairLookup.get(r.symbol)?.group ?? "unknown",
+      tier: pairLookup.get(r.symbol)?.tier ?? "thirdliner",
       ts: r.ts.toISOString(),
     }));
 
@@ -41,6 +42,7 @@ export const rsiService = {
     const grouped = new Map<string, {
       price: number | null;
       group: string;
+      tier: string;
       rsi1h: number | null; rsi4h: number | null; rsi1d: number | null;
       zone1h: string | null; zone4h: string | null; zone1d: string | null;
     }>();
@@ -51,6 +53,7 @@ export const rsiService = {
         grouped.set(sym, {
           price: r.price !== null ? Number(r.price) : null,
           group: pairLookup.get(sym)?.group ?? "unknown",
+          tier: pairLookup.get(sym)?.tier ?? "thirdliner",
           rsi1h: null, rsi4h: null, rsi1d: null,
           zone1h: null, zone4h: null, zone1d: null,
         });

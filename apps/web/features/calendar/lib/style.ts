@@ -2,7 +2,7 @@ import type { Impact } from "@/features/calendar/types";
 
 export const IMPACT_LABEL: Record<Impact, string> = {
   high: "High",
-  medium: "Mod",
+  medium: "Mid",
   low: "Low",
 };
 

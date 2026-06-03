@@ -21,6 +21,7 @@ export const atrService = {
       direction: r.direction as "bullish" | "bearish",
       zone: classifyAtrExhaustion(Number(r.exhaustionPct)),
       group: pairLookup.get(r.symbol)?.group ?? "unknown",
+      tier: pairLookup.get(r.symbol)?.tier ?? "thirdliner",
       ts: r.ts.toISOString(),
     }));
 
@@ -43,6 +44,7 @@ export const atrService = {
       symbol,
       label: pair?.label ?? symbol,
       group: pair?.group ?? "unknown",
+      tier: pair?.tier ?? "thirdliner",
       atr: Number(row.atr),
       price: row.price !== null ? Number(row.price) : null,
       dailyOpen: Number(row.dailyOpen),

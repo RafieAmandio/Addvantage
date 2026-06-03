@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/cn";
 import type { RsiZoneId } from "../types";
-import { ZONE_CONFIG, ZONES_ORDERED } from "../lib/zones";
+import type { ForexGroup } from "@tradevantage/shared";
+import { ZONE_CONFIG, ZONES_ORDERED, GROUP_LABELS, GROUPS_ORDERED, GROUP_COLORS } from "../lib/zones";
 
 const TIMEFRAMES = [
   { value: "1h", label: "1H" },
@@ -15,6 +16,8 @@ interface RsiToolbarProps {
   onIntervalChange: (v: string) => void;
   activeZones: Set<RsiZoneId>;
   onToggleZone: (z: RsiZoneId) => void;
+  activeGroups: Set<ForexGroup>;
+  onToggleGroup: (g: ForexGroup) => void;
   pairCount: number;
   totalCount: number;
   updatedAt: string | null;
@@ -25,6 +28,8 @@ export function RsiToolbar({
   onIntervalChange,
   activeZones,
   onToggleZone,
+  activeGroups,
+  onToggleGroup,
   pairCount,
   totalCount,
   updatedAt,
@@ -66,6 +71,27 @@ export function RsiToolbar({
                 style={{ backgroundColor: active ? cfg.color : "rgba(255,255,255,0.1)" }}
               />
               {cfg.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <span className="hidden h-4 w-px bg-white/10 sm:block" />
+
+      <div className="flex items-center gap-1.5">
+        {GROUPS_ORDERED.map((g) => {
+          const active = activeGroups.has(g);
+          return (
+            <button
+              key={g}
+              onClick={() => onToggleGroup(g)}
+              className={cn(
+                "rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition-all",
+                active ? "bg-white/[0.06] text-white/80" : "text-white/20 hover:text-white/40",
+              )}
+              style={active ? { color: GROUP_COLORS[g] } : undefined}
+            >
+              {GROUP_LABELS[g]}
             </button>
           );
         })}

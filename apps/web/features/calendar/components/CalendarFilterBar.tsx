@@ -40,7 +40,7 @@ export function CalendarFilterBar({
           options={[
             { value: "all", label: "All" },
             { value: "high", label: "High" },
-            { value: "medium", label: "Mod" },
+            { value: "medium", label: "Mid" },
             { value: "low", label: "Low" },
           ]}
           value={impactFilter}
@@ -55,7 +55,7 @@ export function CalendarFilterBar({
         <FilterChips
           options={[
             { value: "all", label: "All" },
-            ...REGIONS.map((r) => ({ value: r, label: r })),
+            ...REGIONS.map((r) => ({ value: r, label: r === "GLOBAL" ? "OTHER" : r })),
           ]}
           value={regionFilter}
           onChange={(v) => onRegionChange(v as RegionFilter)}

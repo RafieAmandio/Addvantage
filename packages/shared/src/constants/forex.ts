@@ -1,61 +1,70 @@
 export type ForexGroup = "major" | "cross" | "commodity" | "exotic" | "index";
+export type ForexTier = "primary" | "secondary" | "thirdliner";
 
 export interface ForexPair {
   symbol: string;
   label: string;
   group: ForexGroup;
+  tier: ForexTier;
 }
 
 export const FOREX_PAIRS: ForexPair[] = [
+  // ── Primary ────────────────────────────────────────────────────────
   // Majors
-  { symbol: "EUR/USD", label: "Euro / US Dollar", group: "major" },
-  { symbol: "USD/JPY", label: "US Dollar / Yen", group: "major" },
-  { symbol: "GBP/USD", label: "Pound / US Dollar", group: "major" },
-  { symbol: "USD/CHF", label: "US Dollar / Swiss Franc", group: "major" },
-  { symbol: "AUD/USD", label: "Aussie / US Dollar", group: "major" },
-  { symbol: "USD/CAD", label: "US Dollar / Canadian", group: "major" },
-  { symbol: "NZD/USD", label: "Kiwi / US Dollar", group: "major" },
-
-  // Crosses
-  { symbol: "EUR/GBP", label: "Euro / Pound", group: "cross" },
-  { symbol: "EUR/JPY", label: "Euro / Yen", group: "cross" },
-  { symbol: "EUR/AUD", label: "Euro / Aussie", group: "cross" },
-  { symbol: "EUR/CAD", label: "Euro / Canadian", group: "cross" },
-  { symbol: "EUR/CHF", label: "Euro / Swiss Franc", group: "cross" },
-  { symbol: "EUR/NZD", label: "Euro / Kiwi", group: "cross" },
-  { symbol: "GBP/JPY", label: "Pound / Yen", group: "cross" },
-  { symbol: "GBP/AUD", label: "Pound / Aussie", group: "cross" },
-  { symbol: "GBP/CHF", label: "Pound / Swiss Franc", group: "cross" },
-  { symbol: "GBP/CAD", label: "Pound / Canadian", group: "cross" },
-  { symbol: "GBP/NZD", label: "Pound / Kiwi", group: "cross" },
-  { symbol: "AUD/JPY", label: "Aussie / Yen", group: "cross" },
-  { symbol: "AUD/NZD", label: "Aussie / Kiwi", group: "cross" },
-  { symbol: "CAD/JPY", label: "Canadian / Yen", group: "cross" },
-  { symbol: "NZD/JPY", label: "Kiwi / Yen", group: "cross" },
-  { symbol: "CHF/JPY", label: "Swiss Franc / Yen", group: "cross" },
-
+  { symbol: "EUR/USD", label: "Euro / US Dollar", group: "major", tier: "primary" },
+  { symbol: "GBP/USD", label: "Pound / US Dollar", group: "major", tier: "primary" },
+  { symbol: "AUD/USD", label: "Aussie / US Dollar", group: "major", tier: "primary" },
+  { symbol: "NZD/USD", label: "Kiwi / US Dollar", group: "major", tier: "primary" },
+  { symbol: "USD/CHF", label: "US Dollar / Swiss Franc", group: "major", tier: "primary" },
+  { symbol: "USD/JPY", label: "US Dollar / Yen", group: "major", tier: "primary" },
+  { symbol: "USD/CAD", label: "US Dollar / Canadian", group: "major", tier: "primary" },
+  // Cross in primary
+  { symbol: "GBP/JPY", label: "Pound / Yen", group: "cross", tier: "primary" },
   // Commodities
-  { symbol: "XAU/USD", label: "Gold", group: "commodity" },
-  { symbol: "XAG/USD", label: "Silver", group: "commodity" },
-  { symbol: "XAU/EUR", label: "Gold / Euro", group: "commodity" },
-  { symbol: "WTI/USD", label: "Crude Oil WTI", group: "commodity" },
-
-  // Exotics
-  { symbol: "USD/SGD", label: "US Dollar / Singapore", group: "exotic" },
-  { symbol: "USD/MXN", label: "US Dollar / Mexican Peso", group: "exotic" },
-  { symbol: "USD/ZAR", label: "US Dollar / South African Rand", group: "exotic" },
-  { symbol: "USD/TRY", label: "US Dollar / Turkish Lira", group: "exotic" },
-  { symbol: "USD/THB", label: "US Dollar / Thai Baht", group: "exotic" },
-  { symbol: "EUR/PLN", label: "Euro / Polish Zloty", group: "exotic" },
-  { symbol: "USD/HKD", label: "US Dollar / Hong Kong Dollar", group: "exotic" },
-
+  { symbol: "XAU/USD", label: "Gold", group: "commodity", tier: "primary" },
+  { symbol: "XAG/USD", label: "Silver", group: "commodity", tier: "primary" },
+  { symbol: "HG1", label: "Copper", group: "commodity", tier: "primary" },
+  { symbol: "WTI/USD", label: "Crude Oil WTI", group: "commodity", tier: "primary" },
   // Indices
-  { symbol: "SPX", label: "S&P 500", group: "index" },
-  { symbol: "NDX", label: "Nasdaq 100", group: "index" },
-  { symbol: "DJI", label: "Dow Jones", group: "index" },
-  { symbol: "DXY", label: "US Dollar Index", group: "index" },
-  { symbol: "FTSE", label: "FTSE 100", group: "index" },
-  { symbol: "DAX", label: "DAX 40", group: "index" },
+  { symbol: "SPX", label: "S&P 500", group: "index", tier: "primary" },
+  { symbol: "NDX", label: "Nasdaq 100", group: "index", tier: "primary" },
+  { symbol: "STOXX50E", label: "Euro Stoxx 50", group: "index", tier: "primary" },
+  { symbol: "FTSE", label: "UK 100", group: "index", tier: "primary" },
+  { symbol: "FCHI", label: "CAC 40", group: "index", tier: "primary" },
+
+  // ── Secondary ──────────────────────────────────────────────────────
+  { symbol: "AUD/JPY", label: "Aussie / Yen", group: "cross", tier: "secondary" },
+  { symbol: "EUR/JPY", label: "Euro / Yen", group: "cross", tier: "secondary" },
+  { symbol: "EUR/GBP", label: "Euro / Pound", group: "cross", tier: "secondary" },
+
+  // ── Thirdliner (higher risk) ───────────────────────────────────────
+  // Remaining crosses
+  { symbol: "EUR/AUD", label: "Euro / Aussie", group: "cross", tier: "thirdliner" },
+  { symbol: "EUR/CAD", label: "Euro / Canadian", group: "cross", tier: "thirdliner" },
+  { symbol: "EUR/CHF", label: "Euro / Swiss Franc", group: "cross", tier: "thirdliner" },
+  { symbol: "EUR/NZD", label: "Euro / Kiwi", group: "cross", tier: "thirdliner" },
+  { symbol: "GBP/AUD", label: "Pound / Aussie", group: "cross", tier: "thirdliner" },
+  { symbol: "GBP/CHF", label: "Pound / Swiss Franc", group: "cross", tier: "thirdliner" },
+  { symbol: "GBP/CAD", label: "Pound / Canadian", group: "cross", tier: "thirdliner" },
+  { symbol: "GBP/NZD", label: "Pound / Kiwi", group: "cross", tier: "thirdliner" },
+  { symbol: "AUD/NZD", label: "Aussie / Kiwi", group: "cross", tier: "thirdliner" },
+  { symbol: "CAD/JPY", label: "Canadian / Yen", group: "cross", tier: "thirdliner" },
+  { symbol: "NZD/JPY", label: "Kiwi / Yen", group: "cross", tier: "thirdliner" },
+  { symbol: "CHF/JPY", label: "Swiss Franc / Yen", group: "cross", tier: "thirdliner" },
+  // Remaining commodities
+  { symbol: "XAU/EUR", label: "Gold / Euro", group: "commodity", tier: "thirdliner" },
+  // Exotics
+  { symbol: "USD/SGD", label: "US Dollar / Singapore", group: "exotic", tier: "thirdliner" },
+  { symbol: "USD/MXN", label: "US Dollar / Mexican Peso", group: "exotic", tier: "thirdliner" },
+  { symbol: "USD/ZAR", label: "US Dollar / South African Rand", group: "exotic", tier: "thirdliner" },
+  { symbol: "USD/TRY", label: "US Dollar / Turkish Lira", group: "exotic", tier: "thirdliner" },
+  { symbol: "USD/THB", label: "US Dollar / Thai Baht", group: "exotic", tier: "thirdliner" },
+  { symbol: "EUR/PLN", label: "Euro / Polish Zloty", group: "exotic", tier: "thirdliner" },
+  { symbol: "USD/HKD", label: "US Dollar / Hong Kong Dollar", group: "exotic", tier: "thirdliner" },
+  // Remaining indices
+  { symbol: "DJI", label: "Dow Jones", group: "index", tier: "thirdliner" },
+  { symbol: "DXY", label: "US Dollar Index", group: "index", tier: "thirdliner" },
+  { symbol: "DAX", label: "DAX 40", group: "index", tier: "thirdliner" },
 ];
 
 export const FOREX_SYMBOLS = FOREX_PAIRS.map((p) => p.symbol);

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { AtrZoneId } from "@/features/atr/types";
+import type { ForexTier } from "@tradevantage/shared";
 import { ATR_ZONES_ORDERED } from "@/features/atr/lib/zones";
 import { useAtrData } from "@/features/atr/hooks/useAtrData";
 import { AtrToolbar } from "@/features/atr/components/AtrToolbar";
@@ -12,6 +13,7 @@ import { AtrTable } from "@/features/atr/components/AtrTable";
 const ALL_GROUPS = new Set(["major", "cross", "commodity", "exotic", "index"]);
 
 export default function AtrClient() {
+  const [activeTier, setActiveTier] = useState<ForexTier | "all">("all");
   const [activeZones, setActiveZones] = useState<Set<AtrZoneId>>(
     () => new Set(ATR_ZONES_ORDERED),
   );
@@ -42,9 +44,12 @@ export default function AtrClient() {
   const filteredPairs = useMemo(() => {
     if (!data) return [];
     return data.pairs.filter(
-      (p) => activeZones.has(p.zone) && activeGroups.has(p.group),
+      (p) =>
+        activeZones.has(p.zone) &&
+        activeGroups.has(p.group) &&
+        (activeTier === "all" || p.tier === activeTier),
     );
-  }, [data, activeZones, activeGroups]);
+  }, [data, activeZones, activeGroups, activeTier]);
 
   const totalCount = data?.pairs.length ?? 0;
   const exceededCount = data?.pairs.filter((p) => p.zone === "exceeded").length ?? 0;
@@ -70,6 +75,8 @@ export default function AtrClient() {
       </div>
 
       <AtrToolbar
+        activeTier={activeTier}
+        onTierChange={setActiveTier}
         activeZones={activeZones}
         onToggleZone={toggleZone}
         activeGroups={activeGroups}

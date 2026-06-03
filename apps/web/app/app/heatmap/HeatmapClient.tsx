@@ -2,7 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { RsiZoneId } from "@/features/heatmap/types";
+import type { ForexGroup } from "@tradevantage/shared";
 import { ZONES_ORDERED } from "@/features/heatmap/lib/zones";
+import { GROUPS_ORDERED } from "@/features/heatmap/lib/zones";
 import { useRsiData, useRsiTableData } from "@/features/heatmap/hooks/useRsiData";
 import { RsiToolbar } from "@/features/heatmap/components/RsiToolbar";
 import { RsiHeatmap } from "@/features/heatmap/components/RsiHeatmap";
@@ -13,6 +15,9 @@ export default function HeatmapClient() {
   const [interval, setChartInterval] = useState("4h");
   const [activeZones, setActiveZones] = useState<Set<RsiZoneId>>(
     () => new Set(ZONES_ORDERED),
+  );
+  const [activeGroups, setActiveGroups] = useState<Set<ForexGroup>>(
+    () => new Set(GROUPS_ORDERED),
   );
 
   const chartData = useRsiData(interval);
@@ -27,10 +32,21 @@ export default function HeatmapClient() {
     });
   }, []);
 
+  const toggleGroup = useCallback((g: ForexGroup) => {
+    setActiveGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(g)) next.delete(g);
+      else next.add(g);
+      return next;
+    });
+  }, []);
+
   const filteredPairs = useMemo(() => {
     if (!chartData.data) return [];
-    return chartData.data.pairs.filter((p) => activeZones.has(p.zone));
-  }, [chartData.data, activeZones]);
+    return chartData.data.pairs.filter(
+      (p) => activeZones.has(p.zone) && activeGroups.has(p.group as ForexGroup),
+    );
+  }, [chartData.data, activeZones, activeGroups]);
 
   const totalCount = chartData.data?.pairs.length ?? 0;
 
@@ -59,6 +75,8 @@ export default function HeatmapClient() {
         onIntervalChange={setChartInterval}
         activeZones={activeZones}
         onToggleZone={toggleZone}
+        activeGroups={activeGroups}
+        onToggleGroup={toggleGroup}
         pairCount={filteredPairs.length}
         totalCount={totalCount}
         updatedAt={chartData.data?.updatedAt ?? null}

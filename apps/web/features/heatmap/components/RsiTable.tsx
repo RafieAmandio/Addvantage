@@ -21,7 +21,11 @@ const GROUP_COLORS: Record<string, string> = {
 };
 
 function RsiCell({ rsi, zone }: { rsi: number | null; zone: string | null }) {
-  if (rsi === null) return <td className="px-3 py-3 text-center font-mono text-xs text-white/15">—</td>;
+  if (rsi === null) return (
+    <td className="px-3 py-3 text-center font-mono text-xs text-white/15" title="Data unavailable for this timeframe">
+      —
+    </td>
+  );
   const cfg = zone ? ZONE_CONFIG[zone as RsiZoneId] : null;
   const color = cfg?.color ?? "#6B7280";
   return (

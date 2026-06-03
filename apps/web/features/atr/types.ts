@@ -14,6 +14,7 @@ export interface AtrPair {
   direction: "bullish" | "bearish";
   zone: AtrZoneId;
   group: string;
+  tier: string;
   ts: string;
 }
 
