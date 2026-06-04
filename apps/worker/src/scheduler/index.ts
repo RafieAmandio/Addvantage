@@ -9,6 +9,7 @@ import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
 import { syncRsi } from "../rsi/sync-rsi";
 import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
+import { syncGaps } from "../gap-screener/sync-gaps";
 
 // ---------------------------------------------------------------------------
 // Robust minute-aligned scheduler
@@ -38,6 +39,8 @@ const SCHEDULE = {
   atr: { minute: 12, divisorHour: 4 },
   /** Renewal reminders — daily at 09:00 (requires EMAIL_PROVIDER) */
   renewal: { minute: 0, fixedHour: 9, divisorHour: 24 },
+  /** Gap scanner — every 4 hours at :16 (requires MARKET_DATA_PROVIDER) */
+  gap: { minute: 16, divisorHour: 4 },
   /** Polymarket snapshots — every 2 hours at :15 */
   polymarket: { minute: 15, divisorHour: 2 },
   /** Polymarket slug rotation — daily at 06:00 */
@@ -53,6 +56,7 @@ const lastFiredAt: Record<JobName, number> = {
   rsi: -1,
   atr: -1,
   renewal: -1,
+  gap: -1,
   polymarket: -1,
   polymarketRotate: -1,
 };
@@ -103,6 +107,10 @@ export function startScheduler(): void {
       Sentry.captureException(err, { tags: { scope: "atr-sync.boot" } });
       logger.error({ err: String(err) }, "atr-sync: boot sync failed");
     });
+    syncGaps().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "gap-sync.boot" } });
+      logger.error({ err: String(err) }, "gap-sync: boot sync failed");
+    });
   }
 
   if (config.EMAIL_PROVIDER) {
@@ -140,6 +148,7 @@ export function startScheduler(): void {
       calendar: "m7 every 6h",
       rsi: config.MARKET_DATA_PROVIDER ? "m10 every 4h" : "disabled",
       atr: config.MARKET_DATA_PROVIDER ? "m12 every 4h" : "disabled",
+      gap: config.MARKET_DATA_PROVIDER ? "m16 every 4h" : "disabled",
       renewal: config.EMAIL_PROVIDER ? "09:00 daily" : "disabled",
       polymarket: "m15 every 2h",
       polymarketRotate: "06:00 daily",
@@ -185,6 +194,16 @@ function pollJobs(): void {
     syncAtr().catch((err) => {
       Sentry.captureException(err, { tags: { scope: "atr-sync.cron" } });
       logger.error({ err: String(err) }, "atr-sync: scheduled sync failed");
+    });
+  }
+
+  // -- Gap scanner (every 4h at :16, requires market data) --
+  if (config.MARKET_DATA_PROVIDER && shouldFire("gap", now)) {
+    markFired("gap", now);
+    logger.info("scheduler: firing gap sync");
+    syncGaps().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "gap-sync.cron" } });
+      logger.error({ err: String(err) }, "gap-sync: scheduled sync failed");
     });
   }
 

@@ -408,3 +408,21 @@ model PolymarketSnapshot {
   @@index([trackedId, fetchedAt(sort: Desc)])
   @@map("polymarket_snapshots")
 }
+
+// ─── gap_snapshots ──────────────────────────────────────────────────
+model GapSnapshot {
+  symbol       String
+  fridayClose  Decimal  @map("friday_close") @db.Decimal
+  mondayOpen   Decimal  @map("monday_open") @db.Decimal
+  currentPrice Decimal? @map("current_price") @db.Decimal
+  gapPct       Decimal  @map("gap_pct") @db.Decimal
+  gapDirection String   @map("gap_direction")
+  fillPct      Decimal  @default(0) @map("fill_pct") @db.Decimal
+  status       String   @default("active")
+  weekStart    DateTime @map("week_start") @db.Date
+  ts           DateTime @db.Timestamptz(6)
+  fetchedAt    DateTime @default(now()) @map("fetched_at") @db.Timestamptz(6)
+
+  @@id([symbol, weekStart])
+  @@map("gap_snapshots")
+}
