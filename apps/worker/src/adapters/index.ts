@@ -6,6 +6,7 @@ import { YardeniAdapter } from "./yardeni";
 import { RbcAdapter } from "./rbc";
 import { TruthSocialAdapter } from "./truth-social";
 import { ForexFactoryAdapter } from "./forexfactory";
+import { MktNewsAdapter } from "./mktnews";
 import { KobeissiAdapter } from "./kobeissi/adapter";
 // TradingEconomics is a calendar adapter, not a news adapter — see calendar/tradingeconomics.ts
 
@@ -18,6 +19,7 @@ export const ADAPTERS: SourceAdapter[] = [
   new RbcAdapter(),
   new TruthSocialAdapter(),
   new ForexFactoryAdapter(),
+  new MktNewsAdapter(),
   new KobeissiAdapter(),
 ];
 

@@ -52,6 +52,13 @@ export const SOURCES = [
     adapter: "forexfactory",
     pollMinutes: 360,
   },
+  {
+    code: "MKT",
+    name: "MKT News — Market Flash",
+    url: "https://www.mktnews.net",
+    adapter: "mktnews",
+    pollMinutes: 60,
+  },
 ] as const;
 
 export type SourceCode = (typeof SOURCES)[number]["code"];

@@ -22,7 +22,7 @@ const URL_DEDUP_SOURCES = new Set(["TRUMP"]);
  *   2. Computes content_hash from (sourceCode, externalId).
  *   3. Skips any hash already present (dedupe).
  *   4. Calls OpenAI to rephrase.
- *   5. INSERTs rows with status='pending'.
+ *   5. INSERTs rows with status='approved' (auto-published).
  * Returns counters + ids the bot can notify on.
  */
 export async function persistCandidates(
@@ -92,7 +92,8 @@ export async function persistCandidates(
           affects,
           tags: rephrased.tags,
           author: `[${sourceCode}]`,
-          status: "pending",
+          status: "approved",
+          publishedAt: new Date(),
           aiSystemPrompt: rephraseResult.systemPrompt,
           aiUserMessage: rephraseResult.userMessage,
           aiRawResponse: rephraseResult.rawResponse,
