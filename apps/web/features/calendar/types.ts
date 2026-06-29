@@ -1,14 +1,11 @@
 export type Impact = "high" | "medium" | "low";
 
-export type CurrencyScores = [number, number, number, number, number, number, number];
-
 export interface CalendarEvent {
   id: string;
   ts: string;
   region: "US" | "EU" | "UK" | "JP" | "CN" | "ID" | "GLOBAL";
   title: string;
   impact: Impact;
-  scores: CurrencyScores;
   actual?: string;
   previous?: string;
   consensus?: string;
@@ -39,5 +36,3 @@ export const REGIONS: ReadonlyArray<CalendarEvent["region"]> = [
   "ID",
   "GLOBAL",
 ];
-
-export const CURRENCIES = ["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD"] as const;

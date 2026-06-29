@@ -1,5 +1,4 @@
-import type { CalendarEvent, CurrencyScores } from "@/features/calendar/types";
-import { CURRENCIES } from "@/features/calendar/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 import type { TimelineEvent } from "@/features/timeline/types";
 
 const REGION_MAP: Record<string, CalendarEvent["region"]> = {
@@ -12,61 +11,38 @@ function symbolToRegion(sym: string | undefined): CalendarEvent["region"] {
   return REGION_MAP[sym.toUpperCase()] ?? "GLOBAL";
 }
 
-const IMPACT_SCORE: Record<string, number> = { high: 9, medium: 5, low: 2 };
-
-const CURRENCY_INDEX: Record<string, number> = {};
-for (let i = 0; i < CURRENCIES.length; i++) {
-  CURRENCY_INDEX[CURRENCIES[i]] = i;
-}
-
-// Also map common symbol names to their currency
-const SYMBOL_TO_CURRENCY: Record<string, string> = {
-  USD: "USD", DXY: "USD", SPX: "USD", US: "USD",
-  EUR: "EUR", EURUSD: "EUR", DE: "EUR",
-  GBP: "GBP", GBPUSD: "GBP", UK: "GBP",
-  JPY: "JPY", USDJPY: "JPY", JP: "JPY",
-  CHF: "CHF", USDCHF: "CHF",
-  CAD: "CAD", USDCAD: "CAD", CA: "CAD",
-  AUD: "AUD", AUDUSD: "AUD", AU: "AUD",
-  CNY: "USD", GOLD: "USD", BTC: "USD",
+// Display map: country/region code → its real currency. Used to relabel the
+// event title prefix (worker builds titles as "${country} — ${event}") so the
+// left column reads "JPY — …" instead of "JP — …". Distinct from any scoring
+// map — here we want the actual currency (e.g. CN → CNY, not USD).
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  US: "USD", EU: "EUR", DE: "EUR", UK: "GBP", GB: "GBP", JP: "JPY",
+  CN: "CNY", ID: "IDR", AU: "AUD", CA: "CAD", IN: "INR", CH: "CHF", NZ: "NZD",
 };
 
-function deriveScores(symbols: string[], impact: string | null): CurrencyScores {
-  const scores: CurrencyScores = [0, 0, 0, 0, 0, 0, 0];
-  const score = IMPACT_SCORE[impact ?? "low"] ?? 2;
-
-  for (const sym of symbols) {
-    const currency = SYMBOL_TO_CURRENCY[sym.toUpperCase()];
-    if (currency) {
-      const idx = CURRENCY_INDEX[currency];
-      if (idx !== undefined && score > scores[idx]) {
-        scores[idx] = score;
-      }
-    }
+function relabelTitle(title: string, symbol: string | undefined): string {
+  const code = (symbol ?? "").toUpperCase();
+  const cur = COUNTRY_TO_CURRENCY[code];
+  // Only swap when the title actually starts with the country prefix; otherwise
+  // leave it untouched (safe no-op for titles without a recognized prefix).
+  if (cur && title.toUpperCase().startsWith(`${code} — `)) {
+    return cur + title.slice(code.length); // "JP — x" → "JPY" + " — x"
   }
-
-  // If no currency matched, assign to USD as default
-  if (scores.every((s) => s === 0) && symbols.length > 0) {
-    scores[0] = score;
-  }
-
-  return scores;
+  return title;
 }
 
 export function timelineEventToCalendarEvent(
   row: TimelineEvent
 ): CalendarEvent {
   const region = symbolToRegion(row.symbols[0]);
-  const scores = deriveScores(row.symbols, row.impact);
   const meta = (row.metadata ?? {}) as Record<string, unknown>;
 
   return {
     id: row.id,
     ts: row.occurredAt,
     region,
-    title: row.title,
+    title: relabelTitle(row.title, row.symbols[0]),
     impact: row.impact ?? "low",
-    scores,
     ...(meta.actual ? { actual: String(meta.actual) } : {}),
     ...(meta.previous ? { previous: String(meta.previous) } : {}),
     ...(meta.consensus ? { consensus: String(meta.consensus) } : {}),

@@ -1,5 +1,4 @@
 import { cn } from "@/lib/cn";
-import { CURRENCIES } from "@/features/calendar/types";
 import type { CalendarEvent } from "@/features/calendar/types";
 import { formatDayHeader } from "@/features/calendar/lib/format";
 import { deriveSummary } from "@/features/calendar/lib/group";
@@ -22,8 +21,8 @@ export function CalendarDayWeekTable({
 }: Props) {
   return (
     <div className={cn("overflow-x-auto border border-gray-3", className)}>
-      <div className="min-w-[780px]">
-        <div className="sticky top-0 z-20 grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px_repeat(7,minmax(36px,1fr))] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
+      <div className="min-w-[640px]">
+        <div className="sticky top-0 z-20 grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
           <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Event
           </div>
@@ -42,14 +41,6 @@ export function CalendarDayWeekTable({
           <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
             Cons
           </div>
-          {CURRENCIES.map((c) => (
-            <div
-              key={c}
-              className="text-center font-mono text-[10px] uppercase tracking-widest2 text-brand"
-            >
-              {c}
-            </div>
-          ))}
         </div>
 
         {groups.length === 0 && (
