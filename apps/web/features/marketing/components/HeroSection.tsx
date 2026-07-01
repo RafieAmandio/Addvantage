@@ -122,7 +122,7 @@ export function HeroSection() {
               )}
             >
               <Flicker minWait={3000} maxWait={7000}>
-                <ScrambleReveal text="THE DOMAIN" delay={500} duration={900} />
+                <ScrambleReveal text="TRADEVANTAGE" delay={500} duration={900} />
               </Flicker>
               <Flicker className="text-brand" minWait={2000} maxWait={4000}>.</Flicker>
             </span>
