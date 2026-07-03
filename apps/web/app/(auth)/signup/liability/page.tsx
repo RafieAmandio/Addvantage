@@ -97,8 +97,7 @@ export default function LiabilityPage() {
             </p>
             <p>
               By signing below, you (the &ldquo;Operator&rdquo;) acknowledge and
-              accept the following terms regarding your access to ANTS and
-              DOMAIN:
+              accept the following terms regarding your access to TradeVantage:
             </p>
             <ol className="space-y-4 border-l-2 border-brand/30 pl-6">
               <li>
@@ -108,8 +107,8 @@ export default function LiabilityPage() {
               </li>
               <li>
                 <strong className="text-black">02. No fiduciary duty.</strong>{" "}
-                ANTS does not act as a financial advisor, broker, or fiduciary.
-                ANTS does not manage funds.
+                TradeVantage does not act as a financial advisor, broker, or fiduciary.
+                TradeVantage does not manage funds.
               </li>
               <li>
                 <strong className="text-black">
@@ -121,7 +120,7 @@ export default function LiabilityPage() {
               <li>
                 <strong className="text-black">04. Sole responsibility.</strong>{" "}
                 You are solely responsible for any decision to act on
-                information from the Platform. ANTS shall have no liability.
+                information from the Platform. TradeVantage shall have no liability.
               </li>
               <li>
                 <strong className="text-black">
@@ -155,7 +154,7 @@ export default function LiabilityPage() {
               {
                 k: "d",
                 label:
-                  "I release ANTS and affiliates from any liability for trading losses.",
+                  "I release TradeVantage and affiliates from any liability for trading losses.",
               },
             ].map((a) => (
               <label

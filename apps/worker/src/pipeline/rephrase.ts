@@ -9,7 +9,7 @@ import {
   type RephraseOutput,
 } from "@tradevantage/shared";
 
-const SYSTEM_PROMPT = `You are the editorial desk at TradeVantage (internal codename: ANTS / DOMAIN). You rewrite raw market research into punchy, trader-facing recaps.
+const SYSTEM_PROMPT = `You are the editorial desk at TradeVantage. You rewrite raw market research into punchy, trader-facing recaps.
 
 RULES:
 - Never credit the wire source in the text. The editorial byline is the source code ([FRED], [SC], etc.). Write as if the desk produced the analysis.

@@ -34,6 +34,6 @@ export function sessionToMarkdown(
   }
 
   lines.push(`---`);
-  lines.push(`*Exported from ANTS // DOMAIN · ${session.id}*`);
+  lines.push(`*Exported from TradeVantage · ${session.id}*`);
   return lines.join("\n");
 }

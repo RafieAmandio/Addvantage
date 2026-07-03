@@ -2,7 +2,7 @@
   "name": "tradevantage",
   "version": "0.1.0",
   "private": true,
-  "description": "TradeVantage — AI-filtered market intelligence. ANTS / DOMAIN product surface.",
+  "description": "TradeVantage — AI-filtered market intelligence.",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "dev:web": "turbo run dev --filter=@tradevantage/web",

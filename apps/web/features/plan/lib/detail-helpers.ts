@@ -11,7 +11,7 @@ export function setupToText(s: TradingSetup, planId: string): string {
     ``,
     `Rationale: ${s.rationale}`,
     ``,
-    `— ANTS // DOMAIN`,
+    `— TradeVantage`,
   ];
   return lines.join("\n");
 }
@@ -71,7 +71,7 @@ export function planToMarkdown(plan: TradingPlan): string {
   }
 
   lines.push(`---`);
-  lines.push(`*Generated from ANTS // DOMAIN · ${plan.id}*`);
+  lines.push(`*Generated from TradeVantage · ${plan.id}*`);
 
   return lines.join("\n");
 }

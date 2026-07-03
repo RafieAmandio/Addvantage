@@ -10,7 +10,7 @@ export function MarketingFooter() {
           <Wordmark size={36} />
         </div>
         <p className="text-base font-light leading-[1.4] text-white">
-          +Vantage does not manage funds. ANTS accepts no liability for
+          +Vantage does not manage funds. TradeVantage accepts no liability for
           trading decisions made by recipients. Liability waiver enforced at
           signup.
         </p>

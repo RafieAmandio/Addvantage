@@ -12,7 +12,7 @@ export function ClassificationStripe({
           {label}
         </span>
         <span className="hidden text-white/40 sm:inline">
-          ANTS // DOMAIN // ACTIVE TRANSMISSION
+          TradeVantage // ACTIVE TRANSMISSION
         </span>
       </div>
     </div>

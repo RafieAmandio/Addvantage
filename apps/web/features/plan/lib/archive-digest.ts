@@ -41,7 +41,7 @@ export function archiveDigestMarkdown(
       : "—";
 
   const header = [
-    `# ANTS // DOMAIN — Plan Archive Digest`,
+    `# TradeVantage — Plan Archive Digest`,
     ``,
     `**Plans:** ${closed.length} closed · ${plans.length - closed.length} live`,
     `**Range:** ${dateRange}`,

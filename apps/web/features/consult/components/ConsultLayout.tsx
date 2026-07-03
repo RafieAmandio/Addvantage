@@ -305,7 +305,7 @@ export function ConsultLayout({
             </button>
           </div>
           <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-            <span>● Encrypted · ANTS-internal · Session-only</span>
+            <span>● Encrypted · TradeVantage-internal · Session-only</span>
             <span>Enter to send · Shift+Enter for newline</span>
           </div>
         </div>

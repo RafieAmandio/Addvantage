@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export function DocumentTitle() {
   useEffect(() => {
-    const base = "ANTS · DOMAIN";
+    const base = "TradeVantage";
     const prev = document.title;
     document.title = base;
     return () => {
