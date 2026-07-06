@@ -123,26 +123,31 @@ All services deploy to a Hostinger VPS (4GB RAM, Ubuntu 24.04) via Dokploy (Dock
 
 **SSH:** `ssh tradevantage` (key: `~/.ssh/id_ed25519_tradevantage`, IP: `76.13.198.76`).
 
-**Deploying via Dokploy API (preferred):**
+**Deploying (local build → GHCR → Dokploy pull, since 2026-07-06):**
+
+Images are built locally and pushed to GHCR; the Dokploy apps use the
+Docker-image source (`ghcr.io/rafieamandio/tradevantage-{web,api,worker}:latest`)
+and only pull + swap containers — no builds on the 4GB VPS.
 
 ```bash
-# 1. Push to main
-git push origin main
-
-# 2. Authenticate with Dokploy
-ssh tradevantage "curl -s -X POST 'http://localhost:3000/api/auth/sign-in/email' \
-  -H 'Content-Type: application/json' \
-  -c /tmp/dk \
-  -d '{\"email\":\"tradevantage.gg@gmail.com\",\"password\":\"Bitcoinmaxi88\"}'"
-
-# 3. Trigger deploy (replace APP_ID with the Dokploy App ID from the table above)
-ssh tradevantage "curl -s -X POST 'http://localhost:3000/api/trpc/application.deploy' \
-  -H 'Content-Type: application/json' \
-  -b /tmp/dk \
-  -d '{\"json\":{\"applicationId\":\"APP_ID\"}}'"
+# Build linux/amd64 images, push :latest + :<sha>, trigger Dokploy redeploys
+scripts/deploy-local.sh              # all three services
+scripts/deploy-local.sh web          # one service
+SKIP_DEPLOY=1 scripts/deploy-local.sh  # build+push only
 ```
 
-Dokploy handles git pull, docker build (with env/build-args), and service update automatically. Do NOT manually `docker build` or `docker service update` — let Dokploy manage the full lifecycle.
+One-time machine setup: `gh auth refresh -h github.com -s write:packages,read:packages`,
+then `gh auth token | docker login ghcr.io -u RafieAmandio --password-stdin`.
+The web image bakes `NEXT_PUBLIC_*` at build time — values live in the script.
+Dokploy's registry pull credential is a GitHub token saved per-app
+(application.saveDockerProvider); if GH auth is regenerated, update it there.
+
+The Dokploy dashboard API (auth + `application.deploy`) can also be called
+directly at `https://dashboard.tradevantage.gg` with the panel login
+(`tradevantage.gg@gmail.com` / `Bitcoinmaxi88`). `application.deploy` on a
+docker-source app pulls the image and redeploys. Do NOT manually
+`docker build` or `docker service update` on the VPS — let Dokploy manage
+the service lifecycle.
 
 **Key production env vars** (set in Dokploy, NOT in .env files):
 - Web: `HOSTNAME=0.0.0.0` (critical — Swarm overrides HOSTNAME), `NEXT_PUBLIC_API_URL=https://api.tradevantage.gg`, `JWT_SECRET`
