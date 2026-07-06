@@ -6,7 +6,8 @@ const MEMBER_SELECT = {
   title: true,
   description: true,
   category: true,
-  youtubeId: true,
+  provider: true,
+  videoId: true,
   duration: true,
   sortOrder: true,
 } as const;

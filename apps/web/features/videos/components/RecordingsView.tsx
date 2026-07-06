@@ -85,7 +85,7 @@ function VideoRow({
       <div className="relative hidden aspect-video overflow-hidden border border-white/[0.06] sm:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={thumbnailUrl(video.youtubeId)}
+          src={thumbnailUrl(video.provider, video.videoId)}
           alt=""
           loading="lazy"
           className="h-full w-full object-cover saturate-50 transition-[filter] duration-200 group-hover:saturate-100"

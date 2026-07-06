@@ -46,7 +46,7 @@ export default async function AdminVideosPage() {
               <div className="aspect-video overflow-hidden border border-white/[0.06]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={thumbnailUrl(v.youtubeId)}
+                  src={thumbnailUrl(v.provider, v.videoId)}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover"

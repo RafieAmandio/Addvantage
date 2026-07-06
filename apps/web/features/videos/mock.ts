@@ -9,7 +9,8 @@ export const videoModules: VideoModule[] = [
     description:
       "How the desk maps structure before London open: liquidity pools, prior-day extremes, and the levels that actually matter.",
     category: "analysis",
-    youtubeId: "jNQXAC9IVRw",
+    provider: "youtube",
+    videoId: "jNQXAC9IVRw",
     duration: "42:10",
     sortOrder: 10,
   },
@@ -19,7 +20,8 @@ export const videoModules: VideoModule[] = [
     description:
       "Full macro sweep for the week: DXY posture, index rotation, and the three setups the desk is stalking.",
     category: "analysis",
-    youtubeId: "dQw4w9WgXcQ",
+    provider: "youtube",
+    videoId: "dQw4w9WgXcQ",
     duration: "38:55",
     sortOrder: 20,
   },
@@ -29,7 +31,8 @@ export const videoModules: VideoModule[] = [
     description:
       "Unedited session replay. Watch the desk work a sweep-and-reclaim on GBPUSD in real time, including the losing first attempt.",
     category: "session",
-    youtubeId: "9bZkp7q19f0",
+    provider: "youtube",
+    videoId: "9bZkp7q19f0",
     duration: "1:02:33",
     sortOrder: 30,
   },
@@ -39,7 +42,8 @@ export const videoModules: VideoModule[] = [
     description:
       "NY open playbook applied live: news filter, first-hour range, and trade management through a CPI print.",
     category: "session",
-    youtubeId: "kJQP7kiw5Fk",
+    provider: "youtube",
+    videoId: "kJQP7kiw5Fk",
     duration: "55:20",
     sortOrder: 40,
   },

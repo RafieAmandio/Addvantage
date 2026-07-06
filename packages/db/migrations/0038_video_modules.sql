@@ -1,10 +1,11 @@
 -- 0038_video_modules.sql
 -- Video Modules — curated VIP-only recordings (market analysis + live
 -- sessions) surfaced as a tab inside /app/education. One row = one module
--- video, hosted as an unlisted YouTube embed (we store only the 11-char ID).
+-- video, hosted externally as a link-shared embed (YouTube unlisted or
+-- Google Drive); we store only the provider + its video ID.
 --
 -- Access control differs from education_primers: the API gates reads to
--- vip/admin so youtube_id never reaches free-tier clients. RLS mirrors the
+-- vip/admin so video_id never reaches free-tier clients. RLS mirrors the
 -- 0020 convention (published-or-admin read, admin-only writes) as
 -- defense-in-depth for direct PostgREST access.
 
@@ -14,7 +15,8 @@ create table public.video_modules (
   title text not null,
   description text not null default '',
   category text not null default 'analysis' check (category in ('analysis', 'session')),
-  youtube_id text not null,
+  provider text not null default 'youtube' check (provider in ('youtube', 'drive')),
+  video_id text not null,
   duration text not null default '',
   sort_order int not null default 0,
   published boolean not null default false,

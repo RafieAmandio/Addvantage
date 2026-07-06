@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/session";
 import { apiPost, apiPut, apiDelete } from "@/lib/api/client-server";
-import { extractYoutubeId } from "@/features/videos/lib/youtube";
+import { parseVideoRef } from "@/features/videos/lib/youtube";
 
 export type VideoActionState = {
   ok: boolean;
@@ -21,19 +21,11 @@ const videoFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(160),
   description: z.string().max(4000).default(""),
   category: z.enum(["analysis", "session"]),
-  youtube: z
+  video: z
     .string()
-    .min(1, "YouTube URL or ID is required")
-    .transform((val, ctx) => {
-      const id = extractYoutubeId(val);
-      if (!id) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Not a valid YouTube URL or video ID",
-        });
-        return z.NEVER;
-      }
-      return id;
+    .min(1, "Video URL or ID is required")
+    .refine((v) => parseVideoRef(v) !== null, {
+      message: "Not a valid YouTube / Google Drive URL or video ID",
     }),
   duration: z.string().max(16).default(""),
   sortOrder: z.coerce.number().int().min(0).default(0),
@@ -45,18 +37,16 @@ function parseForm(formData: FormData) {
     title: formData.get("title"),
     description: formData.get("description") ?? "",
     category: formData.get("category"),
-    youtube: formData.get("youtube"),
+    video: formData.get("video"),
     duration: formData.get("duration") ?? "",
     sortOrder: formData.get("sortOrder") ?? 0,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" } as const;
   }
-  const { youtube, ...rest } = parsed.data;
   return {
     data: {
-      ...rest,
-      youtubeId: youtube,
+      ...parsed.data,
       published: formData.get("published") === "on",
     },
   } as const;

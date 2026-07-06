@@ -10,7 +10,7 @@ import {
   type VideoActionState,
 } from "@/features/videos/admin/actions";
 import type { VideoModuleAdmin } from "@/features/videos/admin/queries";
-import { extractYoutubeId } from "@/features/videos/lib/youtube";
+import { parseVideoRef } from "@/features/videos/lib/youtube";
 import { thumbnailUrl } from "@/features/videos/types";
 import { cn } from "@/lib/cn";
 
@@ -45,11 +45,11 @@ function slugify(value: string): string {
 export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
   const action = video ? updateVideo.bind(null, video.id) : createVideo;
   const [state, formAction] = useFormState(action, INITIAL);
-  const [youtube, setYoutube] = useState(video?.youtubeId ?? "");
+  const [videoInput, setVideoInput] = useState(video?.videoId ?? "");
   const [slug, setSlug] = useState(video?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(!!video);
 
-  const previewId = extractYoutubeId(youtube);
+  const previewRef = parseVideoRef(videoInput);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -107,15 +107,15 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="v-youtube" className={labelCls}>
-              YouTube URL or ID
+            <label htmlFor="v-video" className={labelCls}>
+              YouTube / Drive URL or ID
             </label>
             <input
-              id="v-youtube"
-              name="youtube"
+              id="v-video"
+              name="video"
               required
-              value={youtube}
-              onChange={(e) => setYoutube(e.target.value)}
+              value={videoInput}
+              onChange={(e) => setVideoInput(e.target.value)}
               className={cn(inputCls, "font-mono")}
               placeholder="https://youtu.be/dQw4w9WgXcQ"
             />
@@ -200,22 +200,22 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
       <div>
         <div className={labelCls}>Thumbnail preview</div>
         <div className="aspect-video border border-white/[0.06] bg-black-2">
-          {previewId ? (
+          {previewRef ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={thumbnailUrl(previewId)}
-              alt="YouTube thumbnail preview"
+              src={thumbnailUrl(previewRef.provider, previewRef.videoId)}
+              alt="Video thumbnail preview"
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-widest2 text-white/20">
-              {youtube ? "Invalid YouTube link" : "Paste a link to preview"}
+              {videoInput ? "Invalid video link" : "Paste a link to preview"}
             </div>
           )}
         </div>
-        {previewId && (
+        {previewRef && (
           <div className="mt-2 font-mono text-[10px] text-white/40">
-            ID: {previewId}
+            {previewRef.provider}: {previewRef.videoId}
           </div>
         )}
 

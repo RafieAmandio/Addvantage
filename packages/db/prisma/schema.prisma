@@ -254,7 +254,8 @@ model VideoModule {
   title       String
   description String   @default("")
   category    String   @default("analysis")
-  youtubeId   String   @map("youtube_id")
+  provider    String   @default("youtube")
+  videoId     String   @map("video_id")
   duration    String   @default("")
   sortOrder   Int      @default(0) @map("sort_order")
   published   Boolean  @default(false)

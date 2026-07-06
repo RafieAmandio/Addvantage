@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useWatchedVideos } from "@/features/videos/hooks/useWatchedVideos";
 import {
   categoryLabel,
+  embedUrl,
   moduleLabel,
   type VideoModule,
 } from "@/features/videos/types";
@@ -67,7 +68,7 @@ export function VideoWatchView({
 
       <div className="mt-6 aspect-video w-full border border-white/[0.06] bg-black">
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
+          src={embedUrl(video.provider, video.videoId)}
           title={video.title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
