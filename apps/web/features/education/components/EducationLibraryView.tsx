@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { PrimerCard } from "@/features/education/components/PrimerCard";
+import { EducationTabs } from "@/features/videos/components/EducationTabs";
 import type { Primer } from "@/features/education/types";
 
 function primerMatchesQuery(p: Primer, q: string): boolean {
@@ -101,6 +102,7 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
             oil. Each primer is anchored to a real framework and tagged into
             the hashtag system.
           </p>
+          <EducationTabs current="primers" />
         </div>
       </div>
 
