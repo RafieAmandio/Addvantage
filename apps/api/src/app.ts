@@ -1,4 +1,8 @@
 import express from "express";
+// Express 4 drops async middleware rejections (requireAuth/requireAdmin/rate
+// limiters all async-throw), which crashed the process as an unhandled
+// rejection. This patches the router so they reach errorHandler instead.
+import "express-async-errors";
 import cors from "cors";
 import helmet from "helmet";
 import { env } from "./config/env.js";
