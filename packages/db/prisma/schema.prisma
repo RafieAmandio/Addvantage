@@ -248,6 +248,23 @@ model EducationPrimer {
   @@map("education_primers")
 }
 
+model VideoModule {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String   @unique
+  title       String
+  description String   @default("")
+  category    String   @default("analysis")
+  youtubeId   String   @map("youtube_id")
+  duration    String   @default("")
+  sortOrder   Int      @default(0) @map("sort_order")
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([published, sortOrder], map: "video_modules_published_sort_idx")
+  @@map("video_modules")
+}
+
 model Payment {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId   String    @map("profile_id") @db.Uuid

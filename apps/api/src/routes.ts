@@ -12,6 +12,7 @@ import { timelineRoutes } from "./features/timeline/timeline.routes.js";
 import { userRoutes } from "./features/user/user.routes.js";
 import { authRoutes } from "./features/auth/auth.routes.js";
 import { educationRoutes } from "./features/education/education.routes.js";
+import { videosRoutes } from "./features/videos/videos.routes.js";
 import { subscriptionRoutes } from "./features/subscription/subscription.routes.js";
 import { ingestionRoutes } from "./features/ingestion/ingestion.routes.js";
 import { channelRoutes } from "./features/channel/channel.routes.js";
@@ -36,6 +37,7 @@ export function mountRoutes(app: Express) {
   app.use("/users", userRoutes);
   app.use("/auth", authRoutes);
   app.use("/education", educationRoutes);
+  app.use("/videos", videosRoutes);
   app.use("/subscription", subscriptionRoutes);
   app.use("/ingestion", ingestionRoutes);
   app.use("/channel", channelRoutes);

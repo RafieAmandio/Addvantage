@@ -14,6 +14,7 @@ const ROUTES: Array<{ keys: string; label: string; href: string }> = [
   { keys: "g x", label: "Plan Compare", href: "/app/plan/compare" },
   { keys: "g k", label: "Consultation", href: "/app/consult" },
   { keys: "g e", label: "Education", href: "/app/education" },
+  { keys: "g v", label: "Video Modules", href: "/app/education/videos" },
   { keys: "g t", label: "Hashtags", href: "/app/tags" },
   { keys: "g w", label: "Watchlist", href: "/app/watchlist" },
   { keys: "g s", label: "Subscription", href: "/app/subscription" },
