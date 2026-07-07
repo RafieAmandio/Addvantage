@@ -10,6 +10,7 @@ import { syncRsi } from "../rsi/sync-rsi";
 import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
 import { syncGaps } from "../gap-screener/sync-gaps";
+import { syncTokenUnlocks } from "../token-unlocks/sync-unlocks";
 
 // ---------------------------------------------------------------------------
 // Robust minute-aligned scheduler
@@ -45,6 +46,8 @@ const SCHEDULE = {
   polymarket: { minute: 15, divisorHour: 2 },
   /** Polymarket slug rotation — daily at 06:00 */
   polymarketRotate: { minute: 0, fixedHour: 6, divisorHour: 24 },
+  /** Token unlocks — every 12 hours at :20 (free DefiLlama + CoinGecko) */
+  unlocks: { minute: 20, divisorHour: 12 },
 } as const;
 
 type JobName = keyof typeof SCHEDULE;
@@ -59,6 +62,7 @@ const lastFiredAt: Record<JobName, number> = {
   gap: -1,
   polymarket: -1,
   polymarketRotate: -1,
+  unlocks: -1,
 };
 
 function shouldFire(
@@ -132,6 +136,11 @@ export function startScheduler(): void {
       logger.error({ err: String(err) }, "polymarket: boot sync failed");
     });
 
+  syncTokenUnlocks().catch((err) => {
+    Sentry.captureException(err, { tags: { scope: "unlocks-sync.boot" } });
+    logger.error({ err: String(err) }, "unlocks-sync: boot sync failed");
+  });
+
   // ---- recurring poll (every 30 s) ----
   pollTimer = setInterval(() => {
     try {
@@ -152,6 +161,7 @@ export function startScheduler(): void {
       renewal: config.EMAIL_PROVIDER ? "09:00 daily" : "disabled",
       polymarket: "m15 every 2h",
       polymarketRotate: "06:00 daily",
+      unlocks: "m20 every 12h",
     },
     "scheduler: started (setInterval 30s poll)",
   );
@@ -204,6 +214,16 @@ function pollJobs(): void {
     syncGaps().catch((err) => {
       Sentry.captureException(err, { tags: { scope: "gap-sync.cron" } });
       logger.error({ err: String(err) }, "gap-sync: scheduled sync failed");
+    });
+  }
+
+  // -- Token unlocks (every 12h at :20) --
+  if (shouldFire("unlocks", now)) {
+    markFired("unlocks", now);
+    logger.info("scheduler: firing token-unlocks sync");
+    syncTokenUnlocks().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "unlocks-sync.cron" } });
+      logger.error({ err: String(err) }, "unlocks-sync: scheduled sync failed");
     });
   }
 

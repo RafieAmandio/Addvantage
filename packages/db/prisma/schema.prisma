@@ -444,3 +444,31 @@ model GapSnapshot {
   @@id([symbol, weekStart])
   @@map("gap_snapshots")
 }
+
+model TokenUnlock {
+  geckoId    String   @map("gecko_id")
+  unlockAt   DateTime @map("unlock_at") @db.Timestamptz(6)
+  symbol     String
+  name       String
+  mcapRank   Int      @map("mcap_rank")
+  tokens     Decimal  @db.Decimal
+  pctSupply  Decimal  @map("pct_supply") @db.Decimal
+  usdValue   Decimal  @map("usd_value") @db.Decimal
+  price      Decimal  @db.Decimal
+  circSupply Decimal  @map("circ_supply") @db.Decimal
+  categories String[] @default([])
+  recipients Json     @default("[]")
+  fetchedAt  DateTime @default(now()) @map("fetched_at") @db.Timestamptz(6)
+
+  @@id([geckoId, unlockAt])
+  @@index([unlockAt], map: "token_unlocks_unlock_at_idx")
+  @@map("token_unlocks")
+}
+
+model TokenUnlocksMeta {
+  id            Int      @id @default(1)
+  trackedTop200 Int      @map("tracked_top200")
+  syncedAt      DateTime @map("synced_at") @db.Timestamptz(6)
+
+  @@map("token_unlocks_meta")
+}

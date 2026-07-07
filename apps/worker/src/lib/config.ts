@@ -51,6 +51,10 @@ const EnvSchema = z.object({
 
   FRED_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
+  // Optional CoinGecko demo key — the public endpoint works without it; the
+  // key just raises rate limits for the token-unlocks sync.
+  COINGECKO_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   KOBEISSI_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   /** Override for the Truth Social RSS mirror URL. Unset = use the adapter's
