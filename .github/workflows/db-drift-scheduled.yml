@@ -1,0 +1,79 @@
+name: DB drift (prod)
+
+# Weekly check that LIVE PROD still matches schema.prisma and has RLS everywhere.
+# This is the only guard that catches out-of-band SQL-editor/dashboard edits and a
+# table left without RLS — the PR-time `db-drift` gate only compares migrations to
+# the schema, and Prisma is blind to RLS. A failure here means prod drifted.
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Mondays 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  prod-drift:
+    name: prod matches schema + RLS everywhere
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Guard on DB secret
+        id: guard
+        env:
+          PROD_DIRECT_DB_URL: ${{ secrets.PROD_DIRECT_DB_URL }}
+        run: |
+          if [ -z "$PROD_DIRECT_DB_URL" ]; then
+            echo "::warning::Skipping — PROD_DIRECT_DB_URL secret not set (Supabase session-mode, port 5432)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.guard.outputs.skip != 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        if: steps.guard.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+
+      # 1. Structural drift: does live prod still match schema.prisma?
+      #    Non-empty diff (exit 2) => someone changed prod out-of-band.
+      - name: Prod schema matches schema.prisma
+        if: steps.guard.outputs.skip != 'true'
+        working-directory: packages/db
+        env:
+          PROD_DIRECT_DB_URL: ${{ secrets.PROD_DIRECT_DB_URL }}
+        run: >-
+          pnpm exec prisma migrate diff
+          --from-url "$PROD_DIRECT_DB_URL"
+          --to-schema-datamodel ./prisma/schema.prisma
+          --exit-code
+
+      # 2. RLS everywhere: fail if any public table has RLS disabled.
+      #    (Substitutes for get_advisors, which is MCP-only and unavailable in CI.)
+      - name: Every public table has RLS enabled
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          PROD_DIRECT_DB_URL: ${{ secrets.PROD_DIRECT_DB_URL }}
+        run: |
+          psql "$PROD_DIRECT_DB_URL" -v ON_ERROR_STOP=1 -c "
+            DO \$\$
+            DECLARE bad text;
+            BEGIN
+              SELECT string_agg(tablename, ', ') INTO bad
+              FROM pg_tables WHERE schemaname = 'public' AND NOT rowsecurity;
+              IF bad IS NOT NULL THEN
+                RAISE EXCEPTION 'Prod tables WITHOUT RLS: %', bad;
+              END IF;
+              RAISE NOTICE 'All public tables have RLS enabled.';
+            END \$\$;
+          "

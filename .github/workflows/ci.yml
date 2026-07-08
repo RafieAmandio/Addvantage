@@ -80,3 +80,14 @@ jobs:
           --to-schema-datamodel ./prisma/schema.prisma
           --shadow-database-url postgresql://postgres:pw@localhost:5432/postgres
           --exit-code
+
+  db-rls-guard:
+    name: db · every new table has RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      # Prisma can't model RLS, so db-drift is blind to it. This fails a PR whose
+      # migration adds a table without ENABLE ROW LEVEL SECURITY in the same file.
+      - name: RLS guard
+        run: bash scripts/check-migration-rls.sh

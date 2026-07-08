@@ -109,3 +109,52 @@ For local Supabase dev, `supabase db reset` wipes and re-applies every migration
 - `mcp__supabase__list_migrations` first — confirm the next number and that no out-of-band DDL was applied since the last commit.
 - Migrations affecting `news_items`, `timeline_events`, or `instrument_bars` should be applied during off-peak hours (the worker writes to all three).
 - After applying, `mcp__supabase__get_advisors` for both `security` and `performance`. Treat any HIGH-severity finding as a blocker, not an FYI.
+
+> The rollback/pre-flight prose above predates the Prisma Migrate switch and describes the
+> legacy `mcp__supabase__apply_migration` flow. It is kept for reference, but the **only**
+> supported path now is the Prisma workflow at the top of this file. `get_advisors` after a
+> change is still required.
+
+## Drift protection (CI)
+
+Three guards keep prod and the repo in sync (`.github/workflows/`):
+
+| Guard | When | Catches |
+|-------|------|---------|
+| `ci.yml` → `db-drift` | every PR | `prisma/migrations` no longer reproduce `schema.prisma` (shadow Postgres; no prod creds) |
+| `ci.yml` → `db-rls-guard` | every PR | a migration adds a `CREATE TABLE` without `ENABLE ROW LEVEL SECURITY` (`scripts/check-migration-rls.sh`) |
+| `db-drift-scheduled.yml` | weekly + manual | **live prod** drifted from `schema.prisma`, or any prod table has RLS disabled (catches out-of-band SQL-editor edits) |
+
+The first two need no secrets. The scheduled one and the deploy `migrate` job need
+`PROD_DIRECT_DB_URL` (below); until it's set they warn-and-skip.
+
+## One-time setup
+
+**GitHub secret `PROD_DIRECT_DB_URL`** — a **session-mode** Supabase connection (port
+**5432**), NOT the app's transaction pooler (6543). Prisma Migrate needs session mode.
+
+```
+postgresql://postgres.mlbcppehtoytqqbrkirn:<DB-PASSWORD>@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+```
+
+Get it from Supabase dashboard → Project → **Connect** → **Session pooler**. Add it under
+repo → Settings → Secrets and variables → Actions. This activates both the deploy-time
+`migrate` job and the weekly `db-drift-scheduled` check.
+
+## First migration (walkthrough)
+
+```bash
+cd packages/db
+# 1. edit prisma/schema.prisma (add a model / field)
+# 2. generate the migration SQL (does NOT apply it)
+pnpm exec prisma migrate dev --name add_widget --create-only
+# 3. open prisma/migrations/<ts>_add_widget/migration.sql and, IF you added a table,
+#    hand-append its RLS (copy the guarded pattern from 0_init/migration.sql):
+#      alter table public.widget enable row level security;
+#      create policy ... ;   -- or leave policy-less for a service-role-only table
+# 4. apply to prod (or let the deploy pipeline do it)
+DATABASE_URL="<session-mode url>" pnpm exec prisma migrate deploy
+# 5. refresh the client + verify
+pnpm exec prisma generate
+#    then get_advisors(security) — must be clean.
+```

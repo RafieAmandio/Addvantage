@@ -47,7 +47,7 @@ This is the core flow and spans five files. Read them together when touching any
 5. `apps/worker/src/pipeline/rephrase.ts` — calls OpenAI with `response_format: json_schema` (strict), validates with `RephraseOutputSchema`, returns `{ headline, rephrased, analysis, impact, bias, affects, tags }`. Rows are inserted `status='pending'`.
 6. `apps/worker/src/telegram/notify.ts` — DMs every whitelisted admin (env `TELEGRAM_ADMIN_CHAT_IDS` ∪ `public.telegram_admins` where `active=true`) a deeplink to `/admin/review/[id]`. `apps/worker/src/telegram/bot.ts` also serves `/start`, `/whoami`, `/status` commands.
 
-Admin approves/edits/rejects under `apps/web/app/admin/review/[id]`. Public reads on `/app/news` are gated by RLS to `status='approved'` only — there is no `.eq("status","approved")` safety net you can remove; the policy in `packages/db/migrations/0003_rls.sql` is the guarantee.
+Admin approves/edits/rejects under `apps/web/app/admin/review/[id]`. `/app/news` is served through the Express API, which filters to `status='approved'` in the news repository query — that query **is** the guarantee (do NOT remove it). `news_items` has RLS enabled with no policy (service-role backend only); the intended-but-never-applied `0003_rls.sql` "public read if approved" policy is not live, and the web app does not read the table directly, so RLS is not the news-visibility gate.
 
 **Adding a source.** Three edits, in this order:
 1. `packages/shared/src/constants/sources.ts` — add the row (new `code`).
@@ -68,10 +68,43 @@ Hashtags, impact, and bias are a **closed set**. When adding a value, update all
 
 ## Database & RLS
 
-- Migrations in `packages/db/migrations/` are **append-only and numbered**. Never edit a committed migration — add a new file. See `packages/db/README.md`.
-- Every new table must ship RLS in the same migration. `public.is_admin()` (SQL helper) is the canonical admin check; reuse it instead of inlining `select is_admin from profiles`.
-- After any schema change, run `pnpm --filter @tradevantage/db generate` (or `npx prisma generate` inside `packages/db`) to regenerate the Prisma client.
-- RLS summary: `profiles` self-read + admin override, `news_items` public read only if `status='approved'`, `ingestion_runs` admin-read, `telegram_admins` admin-only.
+**Migrations use Prisma Migrate** (adopted 2026-07; `packages/db/prisma/schema.prisma` is
+the source of truth). The old numbered SQL in `packages/db/migrations/` is **frozen /
+historical — do not apply it**. **NEVER apply DDL via the Supabase SQL editor or the MCP
+`apply_migration` tool** — out-of-band edits are exactly what caused a silent prod↔repo
+drift (15 tables shipped with RLS disabled, incl. `payments`). Schema changes go through
+one path only:
+
+1. Edit `prisma/schema.prisma`.
+2. `pnpm --filter @tradevantage/db exec prisma migrate dev --name <change> --create-only`
+   → generates `prisma/migrations/<timestamp>_<change>/migration.sql`.
+3. **Hand-append the RLS to that `migration.sql`.** Prisma cannot model RLS, policies,
+   `SECURITY DEFINER` functions, grants, or storage — if the migration adds a table you
+   MUST add its `ENABLE ROW LEVEL SECURITY` + policies in the same file, guarded so it also
+   applies on a vanilla Postgres shadow DB (copy the role/`auth.uid()`/`check_function_bodies`/
+   `storage` guards from `0_init/migration.sql`). **A table shipped without RLS is a
+   CRITICAL bug — the CI `db-drift` gate is blind to RLS; only `db-rls-guard` + `get_advisors`
+   catch it.**
+4. Apply: `prisma migrate deploy` (CI runs this on deploy once the `PROD_DIRECT_DB_URL`
+   secret is set — session-mode connection, port 5432, NOT the 6543 pooler). Then
+   `prisma generate` to refresh the client.
+5. After any change, run `get_advisors` (security) — treat any ERROR/WARN as a blocker.
+
+- `public.is_admin()` (SECURITY DEFINER, `search_path`-pinned) is the canonical admin check
+  inside policies — reuse it, don't inline `select is_admin from profiles`. It is **not**
+  RPC-callable by anon/authenticated (execute revoked); only policies + the service-role
+  backend use it.
+- **Actual RLS posture:** backend-only tables (`profiles`, `news_items`, `payments`,
+  `consult_*`, `trading_plans`, `education_primers`, …) have RLS **enabled with NO policy** —
+  the Express API reaches them over the service-role Postgres connection (bypasses RLS) and
+  the web app never queries them directly. A handful of reference/market tables
+  (`*_snapshots`, `token_unlocks*`, `channel_threads`, `video_modules`, `timeline_events`)
+  have explicit public-read policies. **Access control for `/app/*` is enforced by the API
+  (JWT + subscription tier), NOT by table RLS.**
+- CI guards: `db-drift` (PR) fails if `prisma/migrations` no longer reproduce
+  `schema.prisma`; `db-rls-guard` (PR) fails if a migration adds a table with no RLS; a
+  weekly `db-drift-scheduled` job diffs **live prod** vs the schema + runs the advisor to
+  catch any out-of-band edits. **Prod project ref: `mlbcppehtoytqqbrkirn`.**
 
 ## Supabase clients (web)
 
