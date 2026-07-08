@@ -345,7 +345,7 @@ export function PositioningSection() {
             <RevealItem delay={500} trigger={inView}>
               <p className="font-mono text-base font-light leading-[1.4] text-black">
                 A market radar powered by AI and professionals, created for
-                traders and investors who already know what they&apos;re doing.
+                experienced traders and investors.
               </p>
             </RevealItem>
             <div className="pointer-events-none absolute left-1/2 top-[193px] h-[364px] w-[364px] -translate-x-1/2">

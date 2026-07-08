@@ -134,8 +134,8 @@ export function HeroSection() {
             )}
           >
             Directional Outlook &amp; Macro Alpha Intelligence — a market
-            radar powered by AI and professionals, built for traders who
-            already know what they&apos;re doing.
+            radar powered by AI and professionals, built for experienced
+            traders.
           </p>
           <div
             className={cn(
