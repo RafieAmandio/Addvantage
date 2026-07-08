@@ -2,18 +2,26 @@
 
 Single source of truth for the Supabase schema.
 
+> **Migration system: Prisma Migrate (as of 2026-07).** `prisma/schema.prisma` is
+> the source of truth; migrations live in `prisma/migrations/` and are applied with
+> `prisma migrate deploy`. The old hand-written `migrations/*.sql` files are **frozen
+> as historical record only** — see "Legacy migrations" below. This switch fixed a
+> drift where SQL files were applied ad-hoc via the SQL editor and never recorded, so
+> prod silently diverged from the repo.
+
 ## Layout
 
 ```
 packages/db/
-├── migrations/       # Numbered SQL files — apply via Supabase MCP / psql
-│   ├── 0001_init.sql
-│   ├── 0002_news_items.sql
-│   ├── 0003_rls.sql
-│   └── 0004_seed_sources.sql
+├── prisma/
+│   ├── schema.prisma          # SOURCE OF TRUTH (models = tables)
+│   └── migrations/            # applied via `prisma migrate deploy`
+│       ├── migration_lock.toml
+│       └── 0_init/migration.sql   # squashed baseline of live prod (DDL + RLS)
+├── migrations/                # FROZEN legacy SQL — historical record, do not apply
 ├── src/
-│   ├── index.ts      # re-exports Database type
-│   └── types.ts      # generated via `supabase gen types typescript`
+│   ├── index.ts               # re-exports Prisma client
+│   └── types.ts               # generated via `supabase gen types typescript`
 └── package.json
 ```
 
@@ -22,18 +30,54 @@ packages/db/
 After any migration:
 
 ```bash
-# via Supabase CLI
-supabase gen types typescript --project-id qawrdgttfpslyelocfmx \
+# via Supabase CLI (prod project ref: mlbcppehtoytqqbrkirn)
+supabase gen types typescript --project-id mlbcppehtoytqqbrkirn \
   > packages/db/src/types.ts
 ```
 
 Or via the MCP `generate_typescript_types` tool, piped to `src/types.ts`.
 
-## Migration rules
+## Migration workflow (Prisma Migrate)
 
-1. **Never edit a committed migration.** Add a new numbered file instead.
-2. **DDL only in migrations.** Seed data goes in `migrations/` too if it's canonical (source registry), but per-row user data never belongs here.
-3. **RLS first.** Every new table must ship with its RLS policy in the same migration.
+Create a migration after editing `schema.prisma`:
+
+```bash
+# from packages/db — generates prisma/migrations/<timestamp>_<name>/migration.sql
+pnpm exec prisma migrate dev --name <change_name> --create-only
+```
+
+Then apply:
+
+```bash
+pnpm exec prisma migrate deploy   # forward-only, idempotent; CI does this on deploy
+```
+
+`DATABASE_URL` for migrations must be a **session-mode** connection (Supabase pooler
+port **5432**), not the transaction pooler (6543) the app uses.
+
+### Rules
+
+1. **Never edit an applied migration.** Create a new one. CI (`db-drift` job) fails if
+   `prisma/migrations/` no longer reproduces `schema.prisma`.
+2. **RLS is NOT in `schema.prisma` — hand-add it.** Prisma cannot model RLS, policies,
+   `SECURITY DEFINER` functions, grants, or storage. After `migrate dev --create-only`
+   generates the DDL, **append the `ENABLE ROW LEVEL SECURITY` + `CREATE POLICY` SQL to
+   the same `migration.sql`** before `migrate deploy`. A table shipped without its RLS
+   is the exact bug this system was adopted to prevent — check `get_advisors` after.
+3. **Guard Supabase-isms so the CI shadow DB (vanilla Postgres) can replay them.**
+   Follow the pattern in `0_init/migration.sql`: create `anon`/`authenticated`/
+   `service_role` roles if missing, stub `auth.uid()` if absent, `SET
+   check_function_bodies = off`, and wrap `storage.*` statements in an
+   `IF EXISTS (… table_schema='storage' …)` guard. Otherwise the `db-drift` CI job fails
+   to apply the migration.
+4. **After applying, run `get_advisors`** (security + performance). Any HIGH finding is a
+   blocker, not an FYI.
+
+## Legacy migrations (`migrations/*.sql`)
+
+Frozen historical record of the pre-Prisma hand-written SQL (`0001`–`0042`). **Do not
+apply these** — `0_init/migration.sql` already squashes their cumulative effect, and it
+is what prod is baselined against. They remain in the repo to document intent/history.
 
 ## Rollback strategy
 
