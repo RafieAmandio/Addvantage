@@ -15,7 +15,8 @@ import { earlyAccessRepository } from "./early-access.repository.js";
 // Founding early-access offer surfaced in the welcome email.
 const CONFIRMATION = {
   bonusMonths: 2,
-  subscriptionStart: "30 September 2026",
+  coveredFrom: "Monday, 13 July 2026",
+  coveredThrough: "30 September 2027",
   accessEmailDate: "Monday, 13 July 2026",
 };
 

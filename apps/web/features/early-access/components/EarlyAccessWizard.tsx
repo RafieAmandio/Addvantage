@@ -854,8 +854,8 @@ function ConfirmationPanel() {
           <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months access</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-black/60">Subscription starts</span>
-          <span className="font-bold text-black">{CONFIRMATION.subscriptionStart}</span>
+          <span className="text-black/60">Covered through</span>
+          <span className="font-bold text-black">{CONFIRMATION.coveredThrough}</span>
         </div>
       </div>
       <p className="mx-auto mt-6 max-w-sm font-mono text-sm leading-[1.6] text-black/60">

@@ -99,6 +99,7 @@ export const PAYMENT_DESTINATIONS = {
 // Success screen + confirmation email share this framing.
 export const CONFIRMATION = {
   bonusMonths: 2,
-  subscriptionStart: "30 September 2026",
+  coveredFrom: "Monday, 13 July 2026",
+  coveredThrough: "30 September 2027",
   accessEmailDate: "Monday, 13 July 2026",
 } as const;
