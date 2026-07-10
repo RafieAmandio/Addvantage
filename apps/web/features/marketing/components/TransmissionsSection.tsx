@@ -186,7 +186,7 @@ export function TransmissionsSection() {
   return (
     <section
       ref={sectionRef as React.RefObject<HTMLElement>}
-      className="relative mt-[80px] md:mt-[140px]"
+      className="relative mt-[80px] font-mono md:mt-[140px]"
     >
       {/* Cursor-reveal texture */}
       <div

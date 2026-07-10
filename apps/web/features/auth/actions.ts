@@ -63,6 +63,9 @@ export async function loginAction(
   }
 
   if (isMockMode()) {
+    // Simulate auth latency so the button's loading state is visible in mock
+    // mode. No-op in production (mock mode is a local/prototype flag only).
+    await new Promise((resolve) => setTimeout(resolve, 900));
     redirect("/app");
   }
 

@@ -111,6 +111,11 @@ html, body {
   50% { transform: scaleY(1.1); opacity: 1; }
 }
 
+/* Pixel spinner — square ring that ticks in 8 mechanical steps (button loading) */
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}
+
 /* Toast progress bar */
 @keyframes toastBar {
   from { width: 100%; }
