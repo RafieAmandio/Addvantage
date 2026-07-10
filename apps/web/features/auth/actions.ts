@@ -113,6 +113,12 @@ export async function signupAction(
   _prev: SignupActionState,
   formData: FormData,
 ): Promise<SignupActionState> {
+  // Public registration is invite-only for now (early access is the way in).
+  // Defense-in-depth: the /signup UI is gated, this closes the action path too.
+  if (process.env.NEXT_PUBLIC_REGISTRATION_OPEN !== "1") {
+    return { ok: false, error: "registration_closed" };
+  }
+
   const raw = {
     email: formData.get("email"),
     password: formData.get("password"),

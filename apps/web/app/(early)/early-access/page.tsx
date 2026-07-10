@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Hard gate: the intake flow only renders when enrollment is explicitly opened
-// (NEXT_PUBLIC_EARLY_ACCESS_OPEN=1, baked at build time). Otherwise nobody can
-// register — they get the standby screen.
-const EARLY_ACCESS_OPEN = process.env.NEXT_PUBLIC_EARLY_ACCESS_OPEN === "1";
+// Early access is the primary way in, so it's open by default. Set
+// NEXT_PUBLIC_EARLY_ACCESS_OPEN=0 at build time to fall back to the standby
+// screen (e.g. to pause intake).
+const EARLY_ACCESS_OPEN = process.env.NEXT_PUBLIC_EARLY_ACCESS_OPEN !== "0";
 
 export default function EarlyAccessPage() {
   return EARLY_ACCESS_OPEN ? <EarlyAccessWizard /> : <EarlyAccessClosed />;
