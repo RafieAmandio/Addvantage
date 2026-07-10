@@ -153,7 +153,7 @@ export function EarlyAccessWizard() {
   }
 
   return (
-    <main className="grid min-h-screen grid-cols-1 md:grid-cols-[1fr_2fr]">
+    <main className="grid min-h-screen grid-cols-1 md:h-screen md:grid-cols-[1fr_2fr] md:overflow-hidden">
       {/* Left — dark branding panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0">
@@ -239,12 +239,13 @@ export function EarlyAccessWizard() {
         </div>
       </div>
 
-      {/* Right — white form panel */}
-      <div className="flex flex-col items-center justify-center bg-white px-6 py-16 md:px-12">
+      {/* Right — white form panel (scrolls independently when content is tall) */}
+      <div className="flex flex-col bg-white px-6 md:h-screen md:overflow-y-auto md:px-12">
+        <div className="m-auto w-full max-w-md py-16">
         {done ? (
           <ConfirmationPanel />
         ) : (
-          <div key={stepKey} className="w-full max-w-md">
+          <div key={stepKey} className="w-full">
             {step === 0 && (
               <StepShell n="01" label="Identity" title="Request access">
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
@@ -525,6 +526,7 @@ export function EarlyAccessWizard() {
             </p>
           </div>
         )}
+        </div>
       </div>
     </main>
   );
