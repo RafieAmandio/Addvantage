@@ -190,14 +190,14 @@ export function EarlyAccessWizard() {
             {["This is", "early access,", "not a waitlist."].map((line, i) => (
               <span
                 key={line}
-                className={cn("block transition-all duration-700", i === 1 && "text-brand")}
+                className="block transition-all duration-700"
                 style={{
                   opacity: mounted ? 1 : 0,
                   transform: mounted ? "translateY(0)" : "translateY(30px)",
                   transitionDelay: `${300 + i * 150}ms`,
                 }}
               >
-                {line}
+                {i === 1 ? <Redact>{line}</Redact> : line}
               </span>
             ))}
           </h1>
@@ -529,6 +529,26 @@ export function EarlyAccessWizard() {
         </div>
       </div>
     </main>
+  );
+}
+
+// The headline accent, "declassified": white text sits under a solid black
+// redaction bar that holds, gets scanned, then wipes off to the right on load.
+function Redact({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="relative inline-block text-white">
+      {children}
+      <span
+        aria-hidden
+        className="absolute inset-x-[-0.1em] top-[0.08em] bottom-[0.14em] origin-right overflow-hidden bg-black"
+        style={{ animation: "declassify 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s both" }}
+      >
+        <span
+          className="absolute inset-y-0 -left-8 w-8 bg-white/60 blur-md"
+          style={{ animation: "redactScan 1.2s ease-out 0.5s both" }}
+        />
+      </span>
+    </span>
   );
 }
 
