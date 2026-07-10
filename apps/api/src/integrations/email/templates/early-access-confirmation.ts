@@ -14,6 +14,9 @@ const MONO = "'Courier New', Courier, monospace";
 const SITE = "https://tradevantage.gg";
 const TELEGRAM_INVITE = "https://t.me/+CooIVleIU7w3MTll";
 const TELEGRAM_NAME = "TradeVantage";
+const SUPPORT_EMAIL = "tradevantage.gg@gmail.com";
+const EXNESS_REF = "https://one.exnessonelink.com/a/ln6atwo69p";
+const BITGET_REF = "https://partner.bitget.com/bg/TVantage";
 
 // Self-contained, table-based, inline-styled email so it renders across clients.
 // Tactical/intel brand: earth hero, yellow logo mark, yellow info band, dark
@@ -82,6 +85,29 @@ export function earlyAccessConfirmationEmail(
               </table>
               <p style="font-family:${MONO};font-size:12px;line-height:1.6;color:#3a3300;margin:16px 0 0;">
                 We're verifying your payment and broker details now. Nothing else is needed from you until then.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Cashback referrals (light) -->
+          <tr>
+            <td style="background:${PAPER};padding:26px 32px;border-top:2px solid ${INK};">
+              <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK};font-weight:bold;">Cashback guarantee // Partner brokers</div>
+              <p style="font-family:${MONO};font-size:13px;line-height:1.6;color:#333;margin:12px 0 16px;">
+                Want the 100% cashback guarantee? Make sure your broker account is opened through one of these referral links, otherwise the cashback can't be tracked to you.
+              </p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:0 10px 0 0;">
+                    <a href="${EXNESS_REF}" style="display:inline-block;background:${INK};color:${PAPER};font-family:${MONO};font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;">Open Exness &rarr;</a>
+                  </td>
+                  <td>
+                    <a href="${BITGET_REF}" style="display:inline-block;background:${INK};color:${PAPER};font-family:${MONO};font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;">Open Bitget &rarr;</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="font-family:${MONO};font-size:12px;line-height:1.6;color:#444;margin:16px 0 0;">
+                Already have an account with one of them? Email us at <a href="mailto:${SUPPORT_EMAIL}" style="color:${INK};font-weight:bold;">${SUPPORT_EMAIL}</a> and we'll get your referral switched over. We have the connection to change it.
               </p>
             </td>
           </tr>
