@@ -338,7 +338,7 @@ export function EarlyAccessWizard() {
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
                   <label htmlFor="ea-telegram" className={labelClass}>Telegram handle</label>
                   <div className="relative mt-2">
-                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-black/40">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-black/60">
                       @
                     </span>
                     <input
@@ -360,7 +360,7 @@ export function EarlyAccessWizard() {
             {step === 1 && (
               <StepShell n="02" label="Cashback" title="The cashback program">
                 <p
-                  className="font-mono text-sm text-black/50"
+                  className="font-mono text-sm text-black/60"
                   style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
                 >
                   Opt into the 100% money-back guarantee, or take early access on its own. Either way, the next steps are the same.
@@ -391,7 +391,9 @@ export function EarlyAccessWizard() {
                       <ol className="space-y-2">
                         {CASHBACK.qualify.map((q, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
+                            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center bg-brand text-[11px] font-bold text-black">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
                             <span>{q}</span>
                           </li>
                         ))}
@@ -404,7 +406,7 @@ export function EarlyAccessWizard() {
                 {form.wantsCashback !== null && (
                   <div className="space-y-4" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
                     <div>
-                      <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">
+                      <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/60">
                         Partner brokers
                       </p>
                       <p className="mt-2 font-mono text-sm leading-[1.5] text-black/60">{BROKER_COPY}</p>
@@ -421,7 +423,7 @@ export function EarlyAccessWizard() {
                           <BrokerLogo name={b.name} logoUrl={b.logoUrl} />
                           <span className="min-w-0 flex-1">
                             <span className="block font-mono text-sm font-bold text-black">{b.name}</span>
-                            <span className="block font-mono text-xs text-black/45">{b.kind}</span>
+                            <span className="block font-mono text-xs text-black/60">{b.kind}</span>
                           </span>
                           <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest2 text-black/60 transition-colors group-hover:text-black">
                             Register
@@ -438,7 +440,7 @@ export function EarlyAccessWizard() {
             {step === 2 && (
               <StepShell n="03" label="Waiver" title="Liability waiver">
                 <p
-                  className="font-mono text-sm text-black/50"
+                  className="font-mono text-sm text-black/60"
                   style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
                 >
                   Read every line. This is binding. Tick all four, then sign with your full legal name.
@@ -499,7 +501,7 @@ export function EarlyAccessWizard() {
             {step === 3 && (
               <StepShell n="04" label="Payment" title="Payment">
                 <p
-                  className="font-mono text-sm text-black/50"
+                  className="font-mono text-sm text-black/60"
                   style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
                 >
                   One upfront payment secures your place. USDT is the cheaper option. Transfer, then upload your receipt.
@@ -558,7 +560,7 @@ export function EarlyAccessWizard() {
                 type="button"
                 onClick={() => step > 0 && advanceStep(step - 1)}
                 disabled={step === 0}
-                className="font-mono text-sm text-black/40 transition-all duration-200 hover:text-black disabled:opacity-0"
+                className="font-mono text-sm text-black/60 transition-all duration-200 hover:text-black disabled:opacity-0"
               >
                 &larr; Back
               </button>
@@ -617,7 +619,7 @@ export function EarlyAccessWizard() {
                 />
               ))}
             </div>
-            <p className="mt-2 text-center font-mono text-xs text-black/40">
+            <p className="mt-2 text-center font-mono text-xs text-black/60">
               ({step + 1}/{STEPS.length}) {STEPS[step]?.label}
             </p>
           </div>
@@ -685,7 +687,7 @@ function StepShell({
 }) {
   return (
     <div className="space-y-6">
-      <p className="font-mono text-sm text-black/50" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+      <p className="font-mono text-sm text-black/60" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
         Step {n} / {label}
       </p>
       <h2 className="font-mono text-xl font-bold text-black" style={{ animation: "fadeSlideUp 0.4s ease-out 0.1s both" }}>
@@ -720,7 +722,7 @@ function Choice({
         <span className={cn("led", !active && "opacity-30")} aria-hidden />
         {title}
       </span>
-      <span className="pl-4 font-mono text-xs text-black/50">{sub}</span>
+      <span className="pl-4 font-mono text-xs text-black/60">{sub}</span>
     </button>
   );
 }
@@ -742,13 +744,13 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
   return (
     <div className="rounded-lg border border-gray-3 bg-white-2 p-5">
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">{dest.method}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest2 text-black/60">{dest.method}</span>
         <span className="font-mono text-lg font-bold text-black">{dest.amountLabel}</span>
       </div>
       <dl className="mt-4 space-y-2">
         {dest.rows.map((row) => (
           <div key={row.label} className="flex items-center justify-between gap-4">
-            <dt className="font-mono text-xs text-black/40">{row.label}</dt>
+            <dt className="font-mono text-xs text-black/60">{row.label}</dt>
             <dd className="flex items-center gap-2 font-mono text-sm text-black">
               <span className="break-all text-right">{row.value}</span>
               {"copyable" in row && row.copyable && (
@@ -764,7 +766,7 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
           </div>
         ))}
       </dl>
-      <p className="mt-4 font-mono text-xs leading-[1.5] text-black/40">{dest.note}</p>
+      <p className="mt-4 font-mono text-xs leading-[1.5] text-black/60">{dest.note}</p>
     </div>
   );
 }
@@ -806,7 +808,7 @@ function ProofUpload({
         ) : (
           <span className="font-mono text-2xl text-black/30">↑</span>
         )}
-        <span className="font-mono text-xs text-black/50">
+        <span className="font-mono text-xs text-black/60">
           {uploading
             ? "Uploading your receipt..."
             : uploaded
@@ -835,11 +837,11 @@ function ConfirmationPanel() {
       </p>
       <div className="mt-8 space-y-2 rounded-lg border border-gray-3 bg-white-2 p-5 text-left font-mono text-sm">
         <div className="flex items-center justify-between">
-          <span className="text-black/40">Bonus</span>
+          <span className="text-black/60">Bonus</span>
           <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months access</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-black/40">Subscription starts</span>
+          <span className="text-black/60">Subscription starts</span>
           <span className="font-bold text-black">{CONFIRMATION.subscriptionStart}</span>
         </div>
       </div>
@@ -847,7 +849,7 @@ function ConfirmationPanel() {
         We&apos;re verifying your payment and broker details now. Your access instructions land in your inbox by{" "}
         <span className="font-bold text-black">{CONFIRMATION.accessEmailDate}</span>. Nothing else needed until then.
       </p>
-      <Link href="/" className="mt-8 inline-block font-mono text-sm text-black/50 transition-colors hover:text-brand">
+      <Link href="/" className="mt-8 inline-block font-mono text-sm text-black/60 transition-colors hover:text-brand">
         &larr; Back to TradeVantage
       </Link>
     </div>
