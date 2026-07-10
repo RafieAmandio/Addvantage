@@ -380,29 +380,6 @@ export function EarlyAccessWizard() {
                   />
                 </div>
 
-                {form.wantsCashback === true && (
-                  <div
-                    className="space-y-4 rounded-lg border border-gray-3 bg-white-2 p-5 font-mono text-sm leading-[1.6] text-black/60"
-                    style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
-                  >
-                    <p className="text-base font-bold text-black">{CASHBACK.headline}</p>
-                    <div>
-                      <p className="mb-2 font-bold text-black">How to qualify</p>
-                      <ol className="space-y-2">
-                        {CASHBACK.qualify.map((q, i) => (
-                          <li key={i} className="flex gap-3">
-                            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center bg-brand text-[11px] font-bold text-black">
-                              {String(i + 1).padStart(2, "0")}
-                            </span>
-                            <span>{q}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                    <p>{CASHBACK.close}</p>
-                  </div>
-                )}
-
                 {form.wantsCashback !== null && (
                   <div className="space-y-4" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
                     <div>
@@ -432,6 +409,29 @@ export function EarlyAccessWizard() {
                         </a>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {form.wantsCashback === true && (
+                  <div
+                    className="space-y-4 rounded-lg border border-gray-3 bg-white-2 p-5 font-mono text-sm leading-[1.6] text-black/60"
+                    style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
+                  >
+                    <p className="text-base font-bold text-black">{CASHBACK.headline}</p>
+                    <div>
+                      <p className="mb-2 font-bold text-black">How to qualify</p>
+                      <ol className="space-y-2">
+                        {CASHBACK.qualify.map((q, i) => (
+                          <li key={i} className="flex gap-3">
+                            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center bg-brand text-[11px] font-bold text-black">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                            <span>{q}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <p>{CASHBACK.close}</p>
                   </div>
                 )}
               </StepShell>
