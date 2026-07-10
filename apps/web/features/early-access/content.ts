@@ -34,21 +34,30 @@ export const ACK_ITEMS: { key: AckKey; label: string }[] = [
 
 // Fixed partner brokers (affiliate links from referral_partners). Register now
 // or later; cashback participants are verified after one week.
-export const PARTNER_BROKERS = [
+export interface PartnerBroker {
+  name: string;
+  kind: string;
+  url: string;
+  logoUrl?: string;
+}
+
+export const PARTNER_BROKERS: PartnerBroker[] = [
   {
     name: "Exness",
-    kind: "Forex / CFD broker",
+    kind: "Forex and CFD broker",
     url: "https://one.exnessonelink.com/a/ln6atwo69p",
+    logoUrl:
+      "https://mlbcppehtoytqqbrkirn.supabase.co/storage/v1/object/public/uploads/referral/314d500c-6821-44a7-8b24-5936266116cd.webp",
   },
   {
     name: "Bitget",
     kind: "Crypto exchange",
     url: "https://partner.bitget.com/bg/TVantage",
   },
-] as const;
+];
 
 export const BROKER_COPY =
-  "Register with one of our two partner brokers now, or later. If you're on the cashback program, we verify your account after one week.";
+  "Register with a partner broker now or later. If you take the cashback program, we verify your account after one week.";
 
 // The cashback briefing, shown when the applicant opts in. De-em-dashed.
 export const CASHBACK = {

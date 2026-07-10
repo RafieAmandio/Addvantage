@@ -127,7 +127,7 @@ export function EarlyAccessWizard() {
         set("proofImageUrl", json.data.imageUrl);
       }
     } catch {
-      setUploadError("Upload failed. Check the file and try again.");
+      setUploadError("We couldn't upload that file. Use a PNG, JPG or WEBP under 5 MB.");
     } finally {
       setUploading(false);
     }
@@ -150,7 +150,7 @@ export function EarlyAccessWizard() {
     });
     setSubmitting(false);
     if (res.ok) setDone(true);
-    else setSubmitError("Something went wrong. Please try again.");
+    else setSubmitError("We couldn't submit your application. Please try again.");
   }
 
   return (
@@ -324,25 +324,28 @@ export function EarlyAccessWizard() {
                 )}
 
                 {form.wantsCashback !== null && (
-                  <div className="space-y-3" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
-                    <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">
-                      Partner brokers
-                    </p>
-                    <p className="font-mono text-sm leading-[1.5] text-black/60">{BROKER_COPY}</p>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="space-y-4" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">
+                        Partner brokers
+                      </p>
+                      <p className="mt-2 font-mono text-sm leading-[1.5] text-black/60">{BROKER_COPY}</p>
+                    </div>
+                    <div className="divide-y divide-gray-3 overflow-hidden rounded-lg border border-gray-3">
                       {PARTNER_BROKERS.map((b) => (
                         <a
                           key={b.name}
                           href={b.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex items-center justify-between rounded-lg border border-gray-3 p-4 transition-all duration-200 hover:border-black/40 hover:bg-black/[0.02] active:scale-[0.98]"
+                          className="group flex items-center gap-4 p-4 transition-colors duration-200 hover:bg-black/[0.03]"
                         >
-                          <span>
+                          <BrokerLogo name={b.name} logoUrl={b.logoUrl} />
+                          <span className="min-w-0 flex-1">
                             <span className="block font-mono text-sm font-bold text-black">{b.name}</span>
-                            <span className="block font-mono text-xs text-black/50">{b.kind}</span>
+                            <span className="block font-mono text-xs text-black/45">{b.kind}</span>
                           </span>
-                          <span className="flex items-center gap-1 font-mono text-xs font-bold text-black">
+                          <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest2 text-black/60 transition-colors group-hover:text-black">
                             Register
                             <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
                           </span>
@@ -382,7 +385,7 @@ export function EarlyAccessWizard() {
                   ))}
                 </div>
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
-                  <label className={labelClass}>Signature, type your full legal name</label>
+                  <label className={labelClass}>Sign by typing your full legal name</label>
                   <input
                     type="text"
                     value={form.signedName}
@@ -498,7 +501,7 @@ export function EarlyAccessWizard() {
                       Submitting
                     </>
                   ) : (
-                    "Submit"
+                    "Submit application"
                   )}
                 </button>
               )}
@@ -543,6 +546,30 @@ function Redact({ children }: { children: React.ReactNode }) {
           style={{ animation: "redactScan 1.2s ease-out 0.5s both" }}
         />
       </span>
+    </span>
+  );
+}
+
+// Real broker logo when we have one (Supabase-stored), else a clean monogram.
+function BrokerLogo({ name, logoUrl }: { name: string; logoUrl?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (logoUrl && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={logoUrl}
+        alt={`${name} logo`}
+        width={40}
+        height={40}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        className="h-10 w-10 shrink-0 rounded-lg border border-gray-3 bg-white object-contain p-1.5"
+      />
+    );
+  }
+  return (
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-3 bg-black/[0.04] font-mono text-base font-bold text-black">
+      {name.charAt(0)}
     </span>
   );
 }
@@ -683,10 +710,10 @@ function ProofUpload({
         )}
         <span className="font-mono text-xs text-black/50">
           {uploading
-            ? "Uploading..."
+            ? "Uploading your receipt..."
             : uploaded
-              ? "Receipt attached, tap to replace"
-              : "Tap to upload your transfer receipt (PNG, JPG, WEBP)"}
+              ? "Receipt attached. Click to replace."
+              : "Upload a screenshot of your transfer. PNG, JPG or WEBP, max 5 MB."}
         </span>
       </label>
       {error && <p className="mt-2 font-mono text-xs text-blood-bright">{error}</p>}
