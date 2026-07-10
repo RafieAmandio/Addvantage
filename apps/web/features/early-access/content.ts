@@ -53,6 +53,8 @@ export const PARTNER_BROKERS: PartnerBroker[] = [
     name: "Bitget",
     kind: "Crypto exchange",
     url: "https://partner.bitget.com/bg/TVantage",
+    logoUrl:
+      "https://mlbcppehtoytqqbrkirn.supabase.co/storage/v1/object/public/uploads/referral/399281be-842e-40de-929a-49dd65fc873c.png",
   },
 ];
 
