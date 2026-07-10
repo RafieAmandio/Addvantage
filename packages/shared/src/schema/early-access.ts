@@ -79,7 +79,15 @@ export const EarlyAccessApplicationSchema = z.object({
   signedName: fullName,
   acknowledgements,
   paymentMethod: z.enum(PAYMENT_METHODS),
-  proofImageUrl: z.string().url("Upload your payment proof"),
+  // Proof lives in the private `payment-proofs` bucket, so the upload endpoint
+  // hands back an object key (e.g. "payment-proof/<uuid>.png"), not a public
+  // URL. Accept any non-empty reference; the value is server-derived from our
+  // own upload endpoint, never free user input.
+  proofImageUrl: z
+    .string()
+    .trim()
+    .min(1, "Upload your payment proof")
+    .max(500),
   // Honeypot: real users never fill this; bots do. Must be empty/absent.
   website: z.string().max(0).optional(),
 });
