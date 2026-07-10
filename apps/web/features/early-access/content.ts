@@ -32,8 +32,23 @@ export const ACK_ITEMS: { key: AckKey; label: string }[] = [
   },
 ];
 
-// Optional broker attribution (supports the manual affiliate check).
-export const BROKER_OPTIONS = ["Exness", "Bitget", "Bybit", "Other", "None yet"] as const;
+// Fixed partner brokers (affiliate links from referral_partners). Register now
+// or later; cashback participants are verified after one week.
+export const PARTNER_BROKERS = [
+  {
+    name: "Exness",
+    kind: "Forex / CFD broker",
+    url: "https://one.exnessonelink.com/a/ln6atwo69p",
+  },
+  {
+    name: "Bitget",
+    kind: "Crypto exchange",
+    url: "https://partner.bitget.com/bg/TVantage",
+  },
+] as const;
+
+export const BROKER_COPY =
+  "Register with one of our two partner brokers now, or later. If you're on the cashback program, we verify your account after one week.";
 
 // The cashback briefing, shown when the applicant opts in. De-em-dashed.
 export const CASHBACK = {
@@ -53,18 +68,18 @@ export const PAYMENT_DESTINATIONS = {
     method: "USDT",
     amountLabel: "$850 USDT",
     rows: [
-      { label: "Network", value: "TRC20 (to be confirmed)" },
-      { label: "Wallet address", value: "PROVIDED_ON_LAUNCH", copyable: true },
+      { label: "Network", value: "TRC20 (Tron)" },
+      { label: "Wallet address", value: "TL2sphSJFtRkS1CHbRhBRLBL7utxHkKo7T", copyable: true },
     ],
-    note: "Cheapest option. Send the exact amount, then upload your transfer receipt below.",
+    note: "Cheapest option. Send the exact amount on the TRC20 network, then upload your transfer receipt below.",
   },
   bca: {
     method: "Bank transfer (BCA)",
     amountLabel: "IDR 18,000,000",
     rows: [
       { label: "Bank", value: "BCA" },
-      { label: "Account name", value: "TradeVantage" },
-      { label: "Account number", value: "PROVIDED_ON_LAUNCH", copyable: true },
+      { label: "Account name", value: "VANTAGE ALGORITMA INDONESIA" },
+      { label: "Account number", value: "7350368021", copyable: true },
     ],
     note: "Transfer the exact amount, then upload your transfer receipt below.",
   },

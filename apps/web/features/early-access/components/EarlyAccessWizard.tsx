@@ -9,7 +9,8 @@ import { submitEarlyAccessApplication } from "@/features/early-access/actions";
 import {
   STEPS,
   ACK_ITEMS,
-  BROKER_OPTIONS,
+  PARTNER_BROKERS,
+  BROKER_COPY,
   CASHBACK,
   PAYMENT_DESTINATIONS,
   CONFIRMATION,
@@ -325,34 +326,28 @@ export function EarlyAccessWizard() {
                 {form.wantsCashback !== null && (
                   <div className="space-y-3" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
                     <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">
-                      Partner broker (optional)
+                      Partner brokers
                     </p>
+                    <p className="font-mono text-sm leading-[1.5] text-black/60">{BROKER_COPY}</p>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div>
-                        <label className={labelClass}>Broker</label>
-                        <select
-                          value={form.broker}
-                          onChange={(e) => set("broker", e.target.value)}
-                          className={cn(inputClass, "appearance-none")}
+                      {PARTNER_BROKERS.map((b) => (
+                        <a
+                          key={b.name}
+                          href={b.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center justify-between rounded-lg border border-gray-3 p-4 transition-all duration-200 hover:border-black/40 hover:bg-black/[0.02] active:scale-[0.98]"
                         >
-                          <option value="">Select (optional)</option>
-                          {BROKER_OPTIONS.map((b) => (
-                            <option key={b} value={b}>
-                              {b}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className={labelClass}>Account / ID</label>
-                        <input
-                          type="text"
-                          value={form.brokerAccountRef}
-                          onChange={(e) => set("brokerAccountRef", e.target.value)}
-                          placeholder="optional"
-                          className={inputClass}
-                        />
-                      </div>
+                          <span>
+                            <span className="block font-mono text-sm font-bold text-black">{b.name}</span>
+                            <span className="block font-mono text-xs text-black/50">{b.kind}</span>
+                          </span>
+                          <span className="flex items-center gap-1 font-mono text-xs font-bold text-black">
+                            Register
+                            <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
+                          </span>
+                        </a>
+                      ))}
                     </div>
                   </div>
                 )}
