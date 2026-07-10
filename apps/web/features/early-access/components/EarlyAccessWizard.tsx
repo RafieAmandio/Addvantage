@@ -851,11 +851,19 @@ function ConfirmationPanel() {
       <div className="mt-8 space-y-2 rounded-lg border border-gray-3 bg-white-2 p-5 text-left font-mono text-sm">
         <div className="flex items-center justify-between">
           <span className="text-black/60">Bonus</span>
-          <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months access</span>
+          <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months free</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-black/60">Covered through</span>
-          <span className="font-bold text-black">{CONFIRMATION.coveredThrough}</span>
+          <span className="text-black/60">Subscription starts</span>
+          <span className="font-bold text-black">{CONFIRMATION.subscriptionStart}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Free through</span>
+          <span className="font-bold text-black">{CONFIRMATION.freeThrough}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Subscription until</span>
+          <span className="font-bold text-black">{CONFIRMATION.subscriptionThrough}</span>
         </div>
       </div>
       <p className="mx-auto mt-6 max-w-sm font-mono text-sm leading-[1.6] text-black/60">

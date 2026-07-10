@@ -1,7 +1,8 @@
 export interface EarlyAccessConfirmationParams {
   bonusMonths: number;
-  coveredFrom: string;
-  coveredThrough: string;
+  subscriptionStart: string;
+  freeThrough: string;
+  subscriptionThrough: string;
   accessEmailDate: string;
 }
 
@@ -74,10 +75,13 @@ export function earlyAccessConfirmationEmail(
               <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK};font-weight:bold;">What happens next</div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
                 <tr>
-                  <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;"><strong>+${params.bonusMonths} bonus months</strong> on the house, founding member.</td>
+                  <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;"><strong>+${params.bonusMonths} bonus months</strong> free, on the house as a founding early user.</td>
                 </tr>
                 <tr>
-                  <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;border-top:1px solid rgba(17,17,17,0.15);">You're covered free from <strong>${params.coveredFrom}</strong> through <strong>${params.coveredThrough}</strong>.</td>
+                  <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;border-top:1px solid rgba(17,17,17,0.15);">Your subscription starts <strong>${params.subscriptionStart}</strong>, and from then through <strong>${params.freeThrough}</strong> is free.</td>
+                </tr>
+                <tr>
+                  <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;border-top:1px solid rgba(17,17,17,0.15);">Your subscription then runs through <strong>${params.subscriptionThrough}</strong>.</td>
                 </tr>
                 <tr>
                   <td style="font-family:${MONO};font-size:14px;color:${INK};padding:6px 0;border-top:1px solid rgba(17,17,17,0.15);">On <strong>${params.accessEmailDate}</strong> we'll email your access, with a link to set your password.</td>
