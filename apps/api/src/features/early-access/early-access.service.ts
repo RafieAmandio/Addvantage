@@ -5,6 +5,7 @@ import {
 } from "@/integrations/email/index.js";
 import {
   EARLY_ACCESS_PRICE,
+  type EarlyAccessLeadInput,
   type EarlyAccessApplicationInput,
 } from "@tradevantage/shared/schema";
 import { earlyAccessRepository } from "./early-access.repository.js";
@@ -17,11 +18,29 @@ const CONFIRMATION = {
 };
 
 export const earlyAccessService = {
+  // Persist the lead from the identity step and hand back enough of the row to
+  // restore a returning visitor's draft (or tell them they already applied).
+  async startLead(input: EarlyAccessLeadInput) {
+    const row = await earlyAccessRepository.upsertLead(input);
+    return {
+      status: row.status,
+      application: {
+        wantsCashback: row.wantsCashback,
+        broker: row.broker,
+        brokerAccountRef: row.brokerAccountRef,
+        signedName: row.signedName,
+        acknowledgements: row.acknowledgements,
+        paymentMethod: row.paymentMethod,
+        proofImageUrl: row.proofImageUrl,
+      },
+    };
+  },
+
   async submit(input: EarlyAccessApplicationInput) {
     // Amount is server-authoritative — never trust the client for pricing.
     const price = EARLY_ACCESS_PRICE[input.paymentMethod];
 
-    const application = await earlyAccessRepository.create({
+    const application = await earlyAccessRepository.finalize({
       email: input.email,
       telegramHandle: input.telegramHandle,
       wantsCashback: input.wantsCashback,
@@ -36,7 +55,10 @@ export const earlyAccessService = {
       proofImageUrl: input.proofImageUrl,
     });
 
-    await sendConfirmationEmail(application.id, input.email);
+    // Only email on the first finalize (idempotent on resubmit).
+    if (!application.confirmationEmailSentAt) {
+      await sendConfirmationEmail(application.id, input.email);
+    }
 
     return { id: application.id };
   },

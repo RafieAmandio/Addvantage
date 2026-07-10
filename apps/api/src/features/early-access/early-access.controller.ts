@@ -6,6 +6,11 @@ import { earlyAccessService } from "./early-access.service.js";
 
 export const earlyAccessController = {
   // Body is already validated + parsed by the `validate` middleware.
+  lead: asyncHandler(async (req: Request, res: Response) => {
+    const result = await earlyAccessService.startLead(req.body);
+    sendSuccess(res, result, "Lead saved");
+  }),
+
   submit: asyncHandler(async (req: Request, res: Response) => {
     const result = await earlyAccessService.submit(req.body);
     sendSuccess(res, result, "Application received", 201);

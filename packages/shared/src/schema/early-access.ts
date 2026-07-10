@@ -59,8 +59,19 @@ const acknowledgements = z.object({
   terms: z.literal(true),
 });
 
+const email = z.string().trim().toLowerCase().email("Enter a valid email");
+
+// Captured the moment the identity step is completed, persisted as a draft so
+// the team has a follow-up record even if the flow is abandoned.
+export const EarlyAccessLeadSchema = z.object({
+  email,
+  telegramHandle,
+});
+
+export type EarlyAccessLeadInput = z.infer<typeof EarlyAccessLeadSchema>;
+
 export const EarlyAccessApplicationSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email"),
+  email,
   telegramHandle,
   wantsCashback: z.boolean(),
   broker: optionalText(80),

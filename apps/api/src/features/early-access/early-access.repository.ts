@@ -1,8 +1,11 @@
 import { prisma } from "@/config/database.js";
 
-export interface CreateApplicationData {
+export interface LeadData {
   email: string;
   telegramHandle: string;
+}
+
+export interface ApplicationData extends LeadData {
   wantsCashback: boolean;
   broker: string | null;
   brokerAccountRef: string | null;
@@ -16,8 +19,38 @@ export interface CreateApplicationData {
 }
 
 export const earlyAccessRepository = {
-  create: (data: CreateApplicationData) =>
-    prisma.earlyAccessApplication.create({ data }),
+  // Identity step: create the draft or update the handle. Keyed by email so a
+  // returning visitor resumes their row instead of duplicating it.
+  upsertLead: (data: LeadData) =>
+    prisma.earlyAccessApplication.upsert({
+      where: { email: data.email },
+      update: { telegramHandle: data.telegramHandle },
+      create: { email: data.email, telegramHandle: data.telegramHandle },
+    }),
+
+  // Final submit: fill the remaining fields and flip the draft to 'pending'.
+  // Upsert so it also works if the lead step was skipped.
+  finalize: (data: ApplicationData) => {
+    const fields = {
+      telegramHandle: data.telegramHandle,
+      wantsCashback: data.wantsCashback,
+      broker: data.broker,
+      brokerAccountRef: data.brokerAccountRef,
+      signedName: data.signedName,
+      signedAt: data.signedAt,
+      acknowledgements: data.acknowledgements,
+      paymentMethod: data.paymentMethod,
+      paymentAmount: data.paymentAmount,
+      paymentCurrency: data.paymentCurrency,
+      proofImageUrl: data.proofImageUrl,
+      status: "pending",
+    };
+    return prisma.earlyAccessApplication.upsert({
+      where: { email: data.email },
+      update: fields,
+      create: { email: data.email, ...fields },
+    });
+  },
 
   markConfirmationSent: (id: string) =>
     prisma.earlyAccessApplication.update({

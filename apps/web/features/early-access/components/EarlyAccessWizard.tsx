@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { API_BASE } from "@/lib/api/client";
 import { isMockMode } from "@/lib/config/public";
-import { submitEarlyAccessApplication } from "@/features/early-access/actions";
+import {
+  submitEarlyAccessApplication,
+  startEarlyAccessLead,
+} from "@/features/early-access/actions";
 import {
   STEPS,
   ACK_ITEMS,
@@ -64,6 +67,8 @@ export function EarlyAccessWizard() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [leadPending, setLeadPending] = useState(false);
+  const [returning, setReturning] = useState<"draft" | "submitted" | null>(null);
   const [done, setDone] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -151,6 +156,42 @@ export function EarlyAccessWizard() {
     setSubmitting(false);
     if (res.ok) setDone(true);
     else setSubmitError("We couldn't submit your application. Please try again.");
+  }
+
+  async function handleContinue() {
+    if (!canContinue) return;
+
+    // Identity step: persist the lead and restore any existing draft.
+    if (step === 0) {
+      setLeadPending(true);
+      const res = await startEarlyAccessLead({
+        email: form.email,
+        telegramHandle: form.telegramHandle,
+      });
+      setLeadPending(false);
+
+      const a = res.application;
+      if (res.ok && a) {
+        setForm((f) => ({
+          ...f,
+          wantsCashback: a.wantsCashback ?? f.wantsCashback,
+          broker: a.broker ?? f.broker,
+          brokerAccountRef: a.brokerAccountRef ?? f.brokerAccountRef,
+          signedName: a.signedName ?? f.signedName,
+          acks: a.acknowledgements ?? f.acks,
+          paymentMethod: (a.paymentMethod as PaymentMethod | null) ?? f.paymentMethod,
+          proofImageUrl: a.proofImageUrl ?? f.proofImageUrl,
+        }));
+        if (a.proofImageUrl) setProofPreview(a.proofImageUrl);
+        const hasProgress =
+          a.wantsCashback !== null || !!a.signedName || !!a.paymentMethod || !!a.proofImageUrl;
+        setReturning(res.status === "pending" ? "submitted" : hasProgress ? "draft" : null);
+      }
+      advanceStep(1);
+      return;
+    }
+
+    advanceStep(step + 1);
   }
 
   return (
@@ -247,6 +288,20 @@ export function EarlyAccessWizard() {
           <ConfirmationPanel />
         ) : (
           <div key={stepKey} className="w-full">
+            {returning && (
+              <p
+                className={cn(
+                  "mb-6 rounded-lg border px-4 py-3 font-mono text-xs leading-[1.5]",
+                  returning === "submitted"
+                    ? "border-brand/50 bg-brand/5 text-black"
+                    : "border-gray-3 bg-white-2 text-black/60",
+                )}
+              >
+                {returning === "submitted"
+                  ? "You've already applied with this email. Finishing again updates your submission."
+                  : "Welcome back. We restored what you filled in before."}
+              </p>
+            )}
             {step === 0 && (
               <StepShell n="01" label="Identity" title="Request access">
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
@@ -478,11 +533,22 @@ export function EarlyAccessWizard() {
               {step < lastStep ? (
                 <button
                   type="button"
-                  onClick={() => canContinue && advanceStep(step + 1)}
-                  disabled={!canContinue}
-                  className="btn-pixel rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
+                  onClick={handleContinue}
+                  disabled={!canContinue || leadPending}
+                  className="btn-pixel flex items-center gap-2.5 rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
                 >
-                  Continue
+                  {leadPending ? (
+                    <>
+                      <span
+                        aria-hidden
+                        className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
+                        style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
+                      />
+                      Saving
+                    </>
+                  ) : (
+                    "Continue"
+                  )}
                 </button>
               ) : (
                 <button

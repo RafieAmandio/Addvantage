@@ -297,21 +297,22 @@ model Payment {
 /// service-role API connection (same posture as payments/profiles).
 model EarlyAccessApplication {
   id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email                   String
+  email                   String    @unique
   telegramHandle          String    @map("telegram_handle")
-  wantsCashback           Boolean   @map("wants_cashback")
+  wantsCashback           Boolean?  @map("wants_cashback")
   broker                  String?
   brokerAccountRef        String?   @map("broker_account_ref")
-  signedName              String    @map("signed_name")
-  signedAt                DateTime  @map("signed_at") @db.Timestamptz(6)
-  acknowledgements        Json
-  paymentMethod           String    @map("payment_method")
-  paymentAmount           Decimal   @map("payment_amount") @db.Decimal
-  paymentCurrency         String    @map("payment_currency")
-  proofImageUrl           String    @map("proof_image_url")
-  status                  String    @default("pending")
+  signedName              String?   @map("signed_name")
+  signedAt                DateTime? @map("signed_at") @db.Timestamptz(6)
+  acknowledgements        Json?
+  paymentMethod           String?   @map("payment_method")
+  paymentAmount           Decimal?  @map("payment_amount") @db.Decimal
+  paymentCurrency         String?   @map("payment_currency")
+  proofImageUrl           String?   @map("proof_image_url")
+  status                  String    @default("draft")
   confirmationEmailSentAt DateTime? @map("confirmation_email_sent_at") @db.Timestamptz(6)
   createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([createdAt(sort: Desc)])
   @@map("early_access_applications")
