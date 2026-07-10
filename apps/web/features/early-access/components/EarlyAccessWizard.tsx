@@ -153,7 +153,7 @@ export function EarlyAccessWizard() {
   }
 
   return (
-    <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
+    <main className="grid min-h-screen grid-cols-1 md:grid-cols-[1fr_2fr]">
       {/* Left — dark branding panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0">
@@ -173,12 +173,6 @@ export function EarlyAccessWizard() {
         >
           <Link href="/" className="font-mono text-base font-bold text-white">
             +vantage
-          </Link>
-          <Link
-            href="/"
-            className="btn-pixel rounded-lg border border-white/20 bg-black/40 px-4 py-2 font-mono text-sm font-bold text-white backdrop-blur-sm transition-colors hover:border-brand hover:text-brand"
-          >
-            &larr; Return To Brief
           </Link>
         </div>
 
@@ -312,8 +306,6 @@ export function EarlyAccessWizard() {
                     style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
                   >
                     <p className="text-base font-bold text-black">{CASHBACK.headline}</p>
-                    <p>{CASHBACK.why}</p>
-                    <p>{CASHBACK.brokersNote}</p>
                     <div>
                       <p className="mb-2 font-bold text-black">How to qualify</p>
                       <ol className="space-y-2">

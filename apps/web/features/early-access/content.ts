@@ -38,14 +38,10 @@ export const BROKER_OPTIONS = ["Exness", "Bitget", "Bybit", "Other", "None yet"]
 // The cashback briefing, shown when the applicant opts in. De-em-dashed.
 export const CASHBACK = {
   headline: "100% money-back guarantee, in USDT, after one year.",
-  why: "Our founder would rather take money from big corporations than from fellow investors. The guarantee is how we put that on the record.",
-  brokersNote:
-    "We are finalizing deals with a few partner brokers, carefully selected and used by the founder himself. Do your own research to confirm they meet your standards.",
   qualify: [
     "Sign up and trade with one of our selected partner brokers (to be confirmed).",
     "Post every trade in the private chat on our website before you execute it. This is your journal and your accountability.",
     "Your posted trades do not have to be profitable. You only have to never miss posting one.",
-    "After 12 months, our team plus AI review your journal and equity curve. We never need to see dollar amounts, only that the outcomes line up.",
   ],
   close:
     "Stay disciplined and act like a professional, and we reward it, with proof we can double-check against our partner brokers. Already have an account with one of them? We can help switch your partner code.",
