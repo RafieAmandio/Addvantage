@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { formatIDR, cn } from "@/lib/cn";
 import type { SubscriptionStatus } from "../queries/status";
 import type { PaymentRecord } from "../queries/history";
-import { createSubscriptionInvoice, requestDowngrade } from "../actions";
+import { requestDowngrade } from "../actions";
 
 interface SubscriptionPlan {
   id: string;
@@ -60,45 +60,25 @@ export function SubscriptionPageClient({ status, history }: Props) {
   const liabilitySigned = status?.signedLiability ?? false;
   const renewsAt = status?.renewsAt;
 
-  const [confirming, setConfirming] = useState(false);
+  // Self-serve payment is temporarily disabled — VIP+ access is granted
+  // manually on request. The upgrade CTA is a disabled notice for now.
+  const PAYMENTS_ENABLED = false;
+
   const [confirmingDown, setConfirmingDown] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const confirmRef = useRef<HTMLButtonElement>(null);
   const confirmDownRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (!confirming && !confirmingDown) return;
+    if (!confirmingDown) return;
     function handleClick(e: MouseEvent) {
-      if (confirming && confirmRef.current && !confirmRef.current.contains(e.target as Node)) {
-        setConfirming(false);
-      }
       if (confirmingDown && confirmDownRef.current && !confirmDownRef.current.contains(e.target as Node)) {
         setConfirmingDown(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [confirming, confirmingDown]);
-
-  const upgrade = () => {
-    if (!confirming) {
-      setConfirming(true);
-      return;
-    }
-    setError(null);
-    startTransition(async () => {
-      const result = await createSubscriptionInvoice();
-      if (result.ok && result.invoiceUrl) {
-        window.location.href = result.invoiceUrl;
-      } else {
-        setError(result.error === "invoice_failed"
-          ? "Payment provider not available. Try again later."
-          : result.error ?? "Something went wrong");
-        setConfirming(false);
-      }
-    });
-  };
+  }, [confirmingDown]);
 
   const downgrade = () => {
     if (!confirmingDown) {
@@ -189,6 +169,16 @@ export function SubscriptionPageClient({ status, history }: Props) {
           </div>
         )}
 
+        {!PAYMENTS_ENABLED && !paid && (
+          <div className="mt-4 border border-brand/40 bg-brand/[0.06] px-4 py-3 text-sm text-brand sm:px-6">
+            <span className="font-mono text-[10px] uppercase tracking-widest2">● Access by request</span>
+            <p className="mt-1 text-white/70">
+              Self-serve payment is temporarily disabled. To get VIP+ Trader access, please
+              contact us and we&apos;ll set you up.
+            </p>
+          </div>
+        )}
+
         <section className="mt-12">
           <SectionNumber n="01 /" label="AVAILABLE TIERS" />
           <div className="mt-6 grid grid-cols-12 gap-6">
@@ -260,17 +250,11 @@ export function SubscriptionPageClient({ status, history }: Props) {
                       </Button>
                     ) : (
                       <Button
-                        ref={confirmRef}
-                        onClick={upgrade}
                         size="md"
-                        disabled={paid || isPending}
+                        disabled
                         className="w-full"
                       >
-                        {paid
-                          ? "Active until renewal"
-                          : confirming
-                            ? "CONFIRM UPGRADE →"
-                            : "Upgrade access →"}
+                        {paid ? "Active until renewal" : "Contact to get access"}
                       </Button>
                     )}
                   </div>
