@@ -291,6 +291,32 @@ model Payment {
   @@map("payments")
 }
 
+/// Early-access / cashback intake. Standalone application (no account yet):
+/// the team verifies payment + affiliate manually and grants access out of band.
+/// Backend-only table — RLS enabled with NO policy; reached solely via the
+/// service-role API connection (same posture as payments/profiles).
+model EarlyAccessApplication {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                   String
+  telegramHandle          String    @map("telegram_handle")
+  wantsCashback           Boolean   @map("wants_cashback")
+  broker                  String?
+  brokerAccountRef        String?   @map("broker_account_ref")
+  signedName              String    @map("signed_name")
+  signedAt                DateTime  @map("signed_at") @db.Timestamptz(6)
+  acknowledgements        Json
+  paymentMethod           String    @map("payment_method")
+  paymentAmount           Decimal   @map("payment_amount") @db.Decimal
+  paymentCurrency         String    @map("payment_currency")
+  proofImageUrl           String    @map("proof_image_url")
+  status                  String    @default("pending")
+  confirmationEmailSentAt DateTime? @map("confirmation_email_sent_at") @db.Timestamptz(6)
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("early_access_applications")
+}
+
 model EmailLog {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId         String?   @map("profile_id") @db.Uuid
