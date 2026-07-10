@@ -3,6 +3,11 @@ export interface UploadOpts {
   originalName: string;
   contentType: string;
   folder?: string;
+  /** Override the default bucket (e.g. a private bucket for sensitive files). */
+  bucket?: string;
+  /** Default true. When false, the returned `url` is the object key (no public
+   *  URL), for objects in a non-public bucket. */
+  isPublic?: boolean;
 }
 
 export interface UploadResult {

@@ -194,7 +194,8 @@ export function EarlyAccessWizard() {
           paymentMethod: (a.paymentMethod as PaymentMethod | null) ?? f.paymentMethod,
           proofImageUrl: a.proofImageUrl ?? f.proofImageUrl,
         }));
-        if (a.proofImageUrl) setProofPreview(a.proofImageUrl);
+        // Proof lives in a private bucket, so there's no previewable URL to
+        // restore; the "receipt attached" state (proofImageUrl set) is enough.
         const hasProgress =
           a.wantsCashback !== null || !!a.signedName || !!a.paymentMethod || !!a.proofImageUrl;
         setReturning(res.status === "pending" ? "submitted" : hasProgress ? "draft" : null);
@@ -858,8 +859,9 @@ function ConfirmationPanel() {
         </div>
       </div>
       <p className="mx-auto mt-6 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
-        We&apos;re verifying your payment and broker details now. Your access instructions land in your inbox by{" "}
-        <span className="font-bold text-black">{CONFIRMATION.accessEmailDate}</span>. Nothing else needed until then.
+        We&apos;re verifying your payment and broker details now. On{" "}
+        <span className="font-bold text-black">{CONFIRMATION.accessEmailDate}</span> we&apos;ll email your access, with a
+        link to set your password. Nothing else needed until then.
       </p>
       <Link href="/" className="mt-8 inline-block font-mono text-sm text-black/60 transition-colors hover:text-brand">
         &larr; Back to TradeVantage

@@ -16,5 +16,10 @@ export const earlyAccessController = {
     sendSuccess(res, result, "Application received", 201);
   }),
 
-  uploadProof: asyncHandler(handleImageUpload("payment-proof")),
+  // Payment receipts contain PII, so they go to a PRIVATE bucket. The upload
+  // returns the object key (no public URL); reviewers resolve it via the service
+  // role / a signed URL.
+  uploadProof: asyncHandler(
+    handleImageUpload("payment-proof", { bucket: "payment-proofs", isPublic: false }),
+  ),
 };
