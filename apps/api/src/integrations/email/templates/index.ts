@@ -6,3 +6,7 @@ export {
   earlyAccessConfirmationEmail,
   type EarlyAccessConfirmationParams,
 } from "./early-access-confirmation.js";
+export {
+  earlyAccessInvoiceEmail,
+  type EarlyAccessInvoiceParams,
+} from "./early-access-invoice.js";

@@ -2,19 +2,31 @@ import { logger } from "@/config/logger.js";
 import {
   getEmailProvider,
   earlyAccessConfirmationEmail,
+  earlyAccessInvoiceEmail,
 } from "@/integrations/email/index.js";
 import {
   EARLY_ACCESS_PRICE,
+  type PaymentMethod,
   type EarlyAccessLeadInput,
   type EarlyAccessApplicationInput,
 } from "@tradevantage/shared/schema";
 import { earlyAccessRepository } from "./early-access.repository.js";
 
-// Founding early-access offer surfaced in the confirmation email.
+// Founding early-access offer surfaced in the welcome email.
 const CONFIRMATION = {
   bonusMonths: 2,
   subscriptionStart: "30 September 2026",
   accessEmailDate: "Monday, 13 July 2026",
+};
+
+const METHOD_LABELS: Record<PaymentMethod, string> = {
+  usdt: "USDT (TRC20 / Tron)",
+  bca: "Bank transfer (BCA)",
+};
+
+const AMOUNT_LABELS: Record<PaymentMethod, string> = {
+  usdt: "$850 USDT",
+  bca: "IDR 18,000,000",
 };
 
 export const earlyAccessService = {
@@ -57,27 +69,52 @@ export const earlyAccessService = {
 
     // Only email on the first finalize (idempotent on resubmit).
     if (!application.confirmationEmailSentAt) {
-      await sendConfirmationEmail(application.id, input.email);
+      await sendOnboardingEmails(application.id, input.email, input.paymentMethod);
     }
 
     return { id: application.id };
   },
 };
 
-// Best-effort: a mail failure must never fail the application submit.
-async function sendConfirmationEmail(id: string, email: string): Promise<void> {
+// Sends two emails on payment: the invoice/receipt, then the welcome email.
+// Best-effort — a mail failure must never fail the application submit.
+async function sendOnboardingEmails(
+  id: string,
+  email: string,
+  method: PaymentMethod,
+): Promise<void> {
   const provider = getEmailProvider();
   if (!provider) {
-    logger.warn({ id }, "early-access: no email provider; skipping confirmation");
+    logger.warn({ id }, "early-access: no email provider; skipping onboarding emails");
     return;
   }
 
-  const { subject, html } = earlyAccessConfirmationEmail(CONFIRMATION);
+  const to = { email };
+
   try {
-    await provider.sendHtml({ to: { email }, subject, html });
-    await earlyAccessRepository.markConfirmationSent(id);
-    logger.info({ id }, "early-access: confirmation email sent");
+    const invoice = earlyAccessInvoiceEmail({
+      reference: id.slice(0, 8).toUpperCase(),
+      date: new Date().toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }),
+      methodLabel: METHOD_LABELS[method],
+      amountLabel: AMOUNT_LABELS[method],
+    });
+    await provider.sendHtml({ to, subject: invoice.subject, html: invoice.html });
   } catch (err) {
-    logger.error({ err: String(err), id }, "early-access: confirmation email failed");
+    logger.error({ err: String(err), id }, "early-access: invoice email failed");
   }
+
+  try {
+    const welcome = earlyAccessConfirmationEmail(CONFIRMATION);
+    await provider.sendHtml({ to, subject: welcome.subject, html: welcome.html });
+  } catch (err) {
+    logger.error({ err: String(err), id }, "early-access: welcome email failed");
+  }
+
+  await earlyAccessRepository.markConfirmationSent(id);
+  logger.info({ id }, "early-access: onboarding emails sent (invoice + welcome)");
 }

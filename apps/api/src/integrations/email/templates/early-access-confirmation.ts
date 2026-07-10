@@ -11,6 +11,8 @@ const DARK = "#1A1A1A";
 const MUTED = "#9A9A9A";
 const MONO = "'Courier New', Courier, monospace";
 const SITE = "https://tradevantage.gg";
+const TELEGRAM_INVITE = "https://t.me/+CooIVleIU7w3MTll";
+const TELEGRAM_NAME = "TradeVantage";
 
 // Self-contained, table-based, inline-styled email so it renders across clients.
 // Tactical/intel brand: earth hero, yellow logo mark, yellow info band, dark
@@ -54,8 +56,11 @@ export function earlyAccessConfirmationEmail(
             </td>
           </tr>
           <tr>
-            <td style="background:${PAPER};padding:20px 32px 28px;" align="center">
-              <a href="${SITE}" style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:14px;text-decoration:none;padding:14px 30px;box-shadow:4px 4px 0 ${INK};">Go to TradeVantage</a>
+            <td style="background:${PAPER};padding:16px 32px 26px;" align="center">
+              <a href="${TELEGRAM_INVITE}" style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:14px;text-decoration:none;padding:14px 30px;box-shadow:4px 4px 0 ${INK};">Join the Telegram channel</a>
+              <p style="font-family:${MONO};font-size:12px;line-height:1.6;color:#444;margin:16px 0 0;">
+                If you&apos;re not in <strong>${TELEGRAM_NAME}</strong> yet, that&apos;s where the signal lives. Already in? Ignore this. Or visit <a href="${SITE}" style="color:${INK};font-weight:bold;">tradevantage.gg</a>.
+              </p>
             </td>
           </tr>
 
