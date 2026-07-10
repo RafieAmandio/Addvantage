@@ -560,7 +560,7 @@ export function EarlyAccessWizard() {
                 type="button"
                 onClick={() => step > 0 && advanceStep(step - 1)}
                 disabled={step === 0}
-                className="font-mono text-sm text-black/60 transition-all duration-200 hover:text-black disabled:opacity-0"
+                className="-ml-2 min-h-[44px] px-2 py-3 font-mono text-sm text-black/60 transition-all duration-200 hover:text-black disabled:opacity-0"
               >
                 &larr; Back
               </button>
@@ -747,25 +747,37 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
         <span className="font-mono text-[11px] uppercase tracking-widest2 text-black/60">{dest.method}</span>
         <span className="font-mono text-lg font-bold text-black">{dest.amountLabel}</span>
       </div>
-      <dl className="mt-4 space-y-2">
-        {dest.rows.map((row) => (
-          <div key={row.label} className="flex items-center justify-between gap-4">
-            <dt className="font-mono text-xs text-black/60">{row.label}</dt>
-            <dd className="flex items-center gap-2 font-mono text-sm text-black">
-              <span className="break-all text-right">{row.value}</span>
-              {"copyable" in row && row.copyable && (
-                <button
-                  type="button"
-                  onClick={() => copy(row.value)}
-                  className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-black/60 transition-colors hover:border-brand hover:text-black"
-                >
-                  {copied === row.value ? "Copied" : "Copy"}
-                </button>
-              )}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      <div className="mt-4 space-y-1">
+        {dest.rows.map((row) => {
+          const copyable = "copyable" in row && row.copyable;
+          if (copyable) {
+            // Full-row tap target (>=44px) so the wallet / account number is easy
+            // to copy on touch, where a tiny button would be fiddly and risky.
+            return (
+              <button
+                key={row.label}
+                type="button"
+                onClick={() => copy(row.value)}
+                className="group -mx-2 flex min-h-[44px] w-full items-start justify-between gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-black/[0.05]"
+              >
+                <span className="mt-0.5 shrink-0 font-mono text-xs text-black/60">{row.label}</span>
+                <span className="flex items-start gap-2">
+                  <span className="break-all text-right font-mono text-sm text-black">{row.value}</span>
+                  <span className="mt-px shrink-0 font-mono text-[10px] uppercase tracking-widest2 text-black/60 transition-colors group-hover:text-black">
+                    {copied === row.value ? "Copied" : "Copy"}
+                  </span>
+                </span>
+              </button>
+            );
+          }
+          return (
+            <div key={row.label} className="flex items-center justify-between gap-4 px-0 py-2">
+              <span className="font-mono text-xs text-black/60">{row.label}</span>
+              <span className="break-all text-right font-mono text-sm text-black">{row.value}</span>
+            </div>
+          );
+        })}
+      </div>
       <p className="mt-4 font-mono text-xs leading-[1.5] text-black/60">{dest.note}</p>
     </div>
   );
