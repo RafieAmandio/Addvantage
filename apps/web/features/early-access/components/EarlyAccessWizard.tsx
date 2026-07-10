@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { API_BASE } from "@/lib/api/client";
 import { isMockMode } from "@/lib/config/public";
-import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
 import { submitEarlyAccessApplication } from "@/features/early-access/actions";
 import {
   STEPS,
@@ -43,7 +42,8 @@ const INITIAL: FormState = {
 };
 
 const inputClass =
-  "mt-2 w-full rounded-lg border border-wire bg-black-2 px-4 py-3 font-mono text-base text-white outline-none transition-colors placeholder:text-white/25 focus-visible:border-brand";
+  "mt-2 w-full rounded-lg border border-gray-3 bg-white-2 px-4 py-3 font-mono text-base text-black shadow-none outline-none transition-all duration-300 placeholder:text-black/30 focus-visible:border-brand focus-visible:shadow-[0_0_0_3px_rgba(255,212,0,0.15)]";
+const labelClass = "block font-mono text-sm font-bold text-black";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,6 +54,8 @@ function looksLikeFullName(v: string) {
 
 export function EarlyAccessWizard() {
   const [step, setStep] = useState(0);
+  const [stepKey, setStepKey] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState<FormState>(INITIAL);
   const [website, setWebsite] = useState(""); // honeypot
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -62,12 +64,38 @@ export function EarlyAccessWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => setMounted(true), []);
+
+  // Slow background drift on the left panel (parity with the signup flow).
+  useEffect(() => {
+    let frame: number;
+    let t = 0;
+    const drift = () => {
+      t += 0.001;
+      if (imgRef.current) {
+        const x = Math.sin(t) * 8;
+        const y = Math.cos(t * 0.7) * 5;
+        imgRef.current.style.transform = `translate(${x}px, ${y}px) scale(1.05)`;
+      }
+      frame = requestAnimationFrame(drift);
+    };
+    frame = requestAnimationFrame(drift);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
+  const advanceStep = (next: number) => {
+    setStep(next);
+    setStepKey((k) => k + 1);
+  };
+
   const nameOk = looksLikeFullName(form.signedName);
   const allAcked = ACK_ITEMS.every((a) => form.acks[a.key]);
+  const lastStep = STEPS.length - 1;
 
   const canContinue = [
     EMAIL_RE.test(form.email.trim()) && form.telegramHandle.trim().length >= 3,
@@ -124,342 +152,413 @@ export function EarlyAccessWizard() {
     else setSubmitError("Something went wrong. Please try again.");
   }
 
-  if (done) return <Confirmation />;
-
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-8 md:py-12">
-        {/* Nav */}
-        <div className="flex items-center justify-between">
+    <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
+      {/* Left — dark branding panel */}
+      <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
+        <div className="absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={imgRef}
+            src="/figma/login-bg.png"
+            alt=""
+            className="h-full w-full object-cover opacity-20 mix-blend-lighten will-change-transform"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+        </div>
+
+        <div
+          className="relative z-10 flex items-center justify-between transition-all duration-700"
+          style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(-12px)" }}
+        >
           <Link href="/" className="font-mono text-base font-bold text-white">
             +vantage
           </Link>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            Early Access // Classified
-          </span>
+          <Link
+            href="/"
+            className="btn-pixel rounded-lg border border-white/20 bg-black/40 px-4 py-2 font-mono text-sm font-bold text-white backdrop-blur-sm transition-colors hover:border-brand hover:text-brand"
+          >
+            &larr; Return To Brief
+          </Link>
         </div>
 
-        {/* Stepper */}
-        <div className="mt-10 flex items-center gap-2">
-          {STEPS.map((s, i) => (
-            <div key={s.n} className="flex flex-1 items-center gap-2">
+        <div
+          className="relative z-10 mt-4 flex items-baseline gap-3 font-mono text-sm transition-all duration-700"
+          style={{ opacity: mounted ? 1 : 0, transitionDelay: "200ms" }}
+        >
+          <span className="font-bold text-brand">00 /</span>
+          <span className="h-px flex-1 bg-brand/40" />
+          <span className="font-bold text-white">Early Access</span>
+        </div>
+
+        <div className="relative z-10 mt-auto">
+          <h1 className="font-sans text-[clamp(2.5rem,7vw,72px)] font-bold leading-[0.95] text-white">
+            {["This is", "early access,", "not a waitlist."].map((line, i) => (
               <span
-                className={cn(
-                  "font-mono text-[10px] font-bold tabular-nums",
-                  i === step
-                    ? "text-brand"
-                    : i < step
-                      ? "text-white/50"
-                      : "text-white/20",
-                )}
+                key={line}
+                className={cn("block transition-all duration-700", i === 1 && "text-brand")}
+                style={{
+                  opacity: mounted ? 1 : 0,
+                  transform: mounted ? "translateY(0)" : "translateY(30px)",
+                  transitionDelay: `${300 + i * 150}ms`,
+                }}
               >
-                {s.n}
+                {line}
               </span>
+            ))}
+          </h1>
+          <p
+            className="mt-6 max-w-sm font-mono text-sm font-light leading-[1.5] text-white/60 transition-all duration-700"
+            style={{ opacity: mounted ? 1 : 0, transitionDelay: "800ms" }}
+          >
+            Your details, the cashback offer, the waiver, then payment. Access is issued by hand, not automated.
+          </p>
+        </div>
+
+        <div className="relative z-10 mt-12 space-y-2">
+          {STEPS.map((s, i) => (
+            <div
+              key={s.n}
+              className={cn(
+                "flex items-center gap-3 font-mono text-xs transition-all duration-300",
+                done || i < step ? "text-white/50" : i === step ? "text-brand" : "text-white/20",
+              )}
+              style={{
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? "translateX(0)" : "translateX(-16px)",
+                transitionDelay: `${900 + i * 80}ms`,
+              }}
+            >
+              <span className="font-bold">{s.n}</span>
               <span
-                className={cn(
-                  "h-px flex-1 transition-colors",
-                  i < step ? "bg-brand/60" : i === step ? "bg-brand/40" : "bg-white/10",
-                )}
+                className="h-px flex-1 bg-current transition-all duration-500"
+                style={{
+                  opacity: done || i <= step ? 0.6 : 0.15,
+                  transform: done || i <= step ? "scaleX(1)" : "scaleX(0.4)",
+                  transformOrigin: "left",
+                }}
               />
+              <span>{s.label}</span>
+              {!done && i === step && <span className="led animate-pulse" aria-hidden />}
             </div>
           ))}
         </div>
-        <div className="mt-3 flex items-center gap-2 font-mono text-xs">
-          <span className="led" aria-hidden />
-          <span className="text-white/50">
-            Step {step + 1} of {STEPS.length}
-          </span>
-          <span className="text-white/30">/</span>
-          <span className="font-bold text-white">{STEPS[step]?.label}</span>
-        </div>
+      </div>
 
-        {/* Step body */}
-        <div key={step} className="mt-8 flex-1 animate-revealUp">
-          {step === 0 && (
-            <StepShell
-              title="Request access"
-              blurb="Two lines and you're moving. This is where your access is issued."
-            >
-              <Field label="Email you'll use for access">
-                <input
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={(e) => set("email", e.target.value)}
-                  placeholder="you@domain.com"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Telegram handle">
-                <div className="relative mt-2">
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-white/40">
-                    @
-                  </span>
+      {/* Right — white form panel */}
+      <div className="flex flex-col items-center justify-center bg-white px-6 py-16 md:px-12">
+        {done ? (
+          <ConfirmationPanel />
+        ) : (
+          <div key={stepKey} className="w-full max-w-md">
+            {step === 0 && (
+              <StepShell n="01" label="Identity" title="Request access">
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
+                  <label className={labelClass}>Email you&apos;ll use for access</label>
+                  <input
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    value={form.email}
+                    onChange={(e) => set("email", e.target.value)}
+                    placeholder="you@domain.com"
+                    className={inputClass}
+                  />
+                </div>
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
+                  <label className={labelClass}>Telegram handle</label>
+                  <div className="relative mt-2">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-black/40">
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      value={form.telegramHandle}
+                      onChange={(e) => set("telegramHandle", e.target.value.replace(/^@+/, ""))}
+                      placeholder="handle"
+                      className={cn(inputClass, "mt-0 pl-9")}
+                    />
+                  </div>
+                </div>
+              </StepShell>
+            )}
+
+            {step === 1 && (
+              <StepShell n="02" label="Cashback" title="The cashback program">
+                <p
+                  className="font-mono text-sm text-black/50"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
+                  Opt into the 100% money-back guarantee, or take early access on its own. Either way, the next steps are the same.
+                </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
+                  <Choice
+                    active={form.wantsCashback === true}
+                    onClick={() => set("wantsCashback", true)}
+                    title="Yes, the guarantee"
+                    sub="100% back in USDT after 1 year"
+                  />
+                  <Choice
+                    active={form.wantsCashback === false}
+                    onClick={() => set("wantsCashback", false)}
+                    title="No, just access"
+                    sub="Skip the commitment"
+                  />
+                </div>
+
+                {form.wantsCashback === true && (
+                  <div
+                    className="space-y-4 rounded-lg border border-gray-3 bg-white-2 p-5 font-mono text-sm leading-[1.6] text-black/60"
+                    style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
+                  >
+                    <p className="text-base font-bold text-black">{CASHBACK.headline}</p>
+                    <p>{CASHBACK.why}</p>
+                    <p>{CASHBACK.brokersNote}</p>
+                    <div>
+                      <p className="mb-2 font-bold text-black">How to qualify</p>
+                      <ol className="space-y-2">
+                        {CASHBACK.qualify.map((q, i) => (
+                          <li key={i} className="flex gap-3">
+                            <span className="font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
+                            <span>{q}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <p>{CASHBACK.close}</p>
+                  </div>
+                )}
+
+                {form.wantsCashback !== null && (
+                  <div className="space-y-3" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+                    <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">
+                      Partner broker (optional)
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className={labelClass}>Broker</label>
+                        <select
+                          value={form.broker}
+                          onChange={(e) => set("broker", e.target.value)}
+                          className={cn(inputClass, "appearance-none")}
+                        >
+                          <option value="">Select (optional)</option>
+                          {BROKER_OPTIONS.map((b) => (
+                            <option key={b} value={b}>
+                              {b}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Account / ID</label>
+                        <input
+                          type="text"
+                          value={form.brokerAccountRef}
+                          onChange={(e) => set("brokerAccountRef", e.target.value)}
+                          placeholder="optional"
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </StepShell>
+            )}
+
+            {step === 2 && (
+              <StepShell n="03" label="Waiver" title="Liability waiver">
+                <p
+                  className="font-mono text-sm text-black/50"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
+                  Read every line. This is binding. Tick all four, then sign with your full legal name.
+                </p>
+                <div className="space-y-3" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
+                  {ACK_ITEMS.map((a) => (
+                    <label
+                      key={a.key}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors",
+                        form.acks[a.key] ? "border-brand bg-brand/5" : "border-gray-3 hover:border-black/30",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.acks[a.key]}
+                        onChange={(e) => set("acks", { ...form.acks, [a.key]: e.target.checked })}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+                      />
+                      <span className="font-mono text-sm leading-[1.5] text-black/70">{a.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
+                  <label className={labelClass}>Signature, type your full legal name</label>
                   <input
                     type="text"
-                    value={form.telegramHandle}
-                    onChange={(e) => set("telegramHandle", e.target.value.replace(/^@+/, ""))}
-                    placeholder="handle"
-                    className={cn(inputClass, "mt-0 pl-9")}
+                    value={form.signedName}
+                    onChange={(e) => set("signedName", e.target.value)}
+                    placeholder="Your full legal name"
+                    className={cn(
+                      "mt-2 w-full rounded-lg border px-4 py-3 font-serif text-2xl italic outline-none transition-colors",
+                      form.signedName.length > 0 && !nameOk
+                        ? "border-blood-bright bg-blood/5 text-blood-bright"
+                        : nameOk
+                          ? "border-moss bg-moss/5 text-black"
+                          : "border-gray-3 bg-white-2 text-black placeholder:text-black/30 focus-visible:border-brand",
+                    )}
+                  />
+                  {form.signedName.length > 0 && !nameOk && (
+                    <p className="mt-2 font-mono text-xs text-blood-bright">
+                      Type your full legal name, first and last.
+                    </p>
+                  )}
+                </div>
+              </StepShell>
+            )}
+
+            {step === 3 && (
+              <StepShell n="04" label="Payment" title="Payment">
+                <p
+                  className="font-mono text-sm text-black/50"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
+                  One upfront payment secures your place. USDT is the cheaper option. Transfer, then upload your receipt.
+                </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
+                  <Choice
+                    active={form.paymentMethod === "usdt"}
+                    onClick={() => set("paymentMethod", "usdt")}
+                    title={PAYMENT_DESTINATIONS.usdt.amountLabel}
+                    sub="USDT, cheapest"
+                  />
+                  <Choice
+                    active={form.paymentMethod === "bca"}
+                    onClick={() => set("paymentMethod", "bca")}
+                    title={PAYMENT_DESTINATIONS.bca.amountLabel}
+                    sub="Bank transfer, BCA"
                   />
                 </div>
-              </Field>
-            </StepShell>
-          )}
 
-          {step === 1 && (
-            <StepShell
-              title="Cashback program"
-              blurb="Opt into the 100% money-back guarantee, or take early access on its own. Either way, the next steps are the same."
-            >
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Choice
-                  active={form.wantsCashback === true}
-                  onClick={() => set("wantsCashback", true)}
-                  title="Yes, I want the guarantee"
-                  sub="100% money back in USDT after 1 year"
-                />
-                <Choice
-                  active={form.wantsCashback === false}
-                  onClick={() => set("wantsCashback", false)}
-                  title="No, just early access"
-                  sub="Skip the guarantee commitment"
-                />
-              </div>
-
-              {form.wantsCashback === true && (
-                <div className="mt-6 animate-revealUp space-y-5 border border-wire bg-gray/40 p-5 font-mono text-sm leading-[1.6] text-white/70">
-                  <p className="text-base font-bold text-white">{CASHBACK.headline}</p>
-                  <p>{CASHBACK.why}</p>
-                  <p>{CASHBACK.brokersNote}</p>
-                  <div>
-                    <p className="mb-2 font-bold text-brand">How to qualify</p>
-                    <ol className="space-y-2">
-                      {CASHBACK.qualify.map((q, i) => (
-                        <li key={i} className="flex gap-3">
-                          <span className="font-bold text-brand">{String(i + 1).padStart(2, "0")}</span>
-                          <span>{q}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                  <p>{CASHBACK.close}</p>
-                </div>
-              )}
-
-              {form.wantsCashback !== null && (
-                <div className="mt-6 space-y-4 animate-revealUp">
-                  <p className="font-mono text-[11px] uppercase tracking-widest2 text-white/40">
-                    Partner broker (optional)
-                  </p>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <Field label="Broker you trade with">
-                      <select
-                        value={form.broker}
-                        onChange={(e) => set("broker", e.target.value)}
-                        className={cn(inputClass, "appearance-none")}
-                      >
-                        <option value="">Select (optional)</option>
-                        {BROKER_OPTIONS.map((b) => (
-                          <option key={b} value={b}>
-                            {b}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
-                    <Field label="Account / ID reference">
-                      <input
-                        type="text"
-                        value={form.brokerAccountRef}
-                        onChange={(e) => set("brokerAccountRef", e.target.value)}
-                        placeholder="optional"
-                        className={inputClass}
-                      />
-                    </Field>
-                  </div>
-                </div>
-              )}
-            </StepShell>
-          )}
-
-          {step === 2 && (
-            <StepShell
-              title="Liability waiver"
-              blurb="Read every line. This is binding. Tick all four, then sign with your full legal name."
-            >
-              <div className="space-y-3">
-                {ACK_ITEMS.map((a) => (
-                  <label
-                    key={a.key}
-                    className={cn(
-                      "flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors",
-                      form.acks[a.key]
-                        ? "border-brand bg-brand/5"
-                        : "border-wire hover:border-white/30",
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={form.acks[a.key]}
-                      onChange={(e) => set("acks", { ...form.acks, [a.key]: e.target.checked })}
-                      className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+                {form.paymentMethod && (
+                  <div className="space-y-5" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+                    <PaymentDetails method={form.paymentMethod} />
+                    <ProofUpload
+                      preview={proofPreview}
+                      uploading={uploading}
+                      uploaded={form.proofImageUrl !== ""}
+                      error={uploadError}
+                      onSelect={onProofSelected}
                     />
-                    <span className="font-mono text-sm leading-[1.5] text-white/70">{a.label}</span>
-                  </label>
-                ))}
-              </div>
+                  </div>
+                )}
+              </StepShell>
+            )}
 
-              <div className="mt-6">
-                <p className="font-mono text-sm font-bold text-white">Signature, type your full legal name</p>
-                <input
-                  type="text"
-                  value={form.signedName}
-                  onChange={(e) => set("signedName", e.target.value)}
-                  placeholder="Your full legal name"
+            {submitError && (
+              <p className="mt-6 animate-[shake_0.3s_ease-out] font-mono text-sm text-blood-bright">
+                ● {submitError}
+              </p>
+            )}
+
+            {/* Honeypot */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
+
+            {/* Nav */}
+            <div className="mt-10 flex items-center justify-between" style={{ animation: "fadeSlideUp 0.4s ease-out 0.4s both" }}>
+              <button
+                type="button"
+                onClick={() => step > 0 && advanceStep(step - 1)}
+                disabled={step === 0}
+                className="font-mono text-sm text-black/40 transition-all duration-200 hover:text-black disabled:opacity-0"
+              >
+                &larr; Back
+              </button>
+              {step < lastStep ? (
+                <button
+                  type="button"
+                  onClick={() => canContinue && advanceStep(step + 1)}
+                  disabled={!canContinue}
+                  className="btn-pixel rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
+                >
+                  Continue
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!canContinue || submitting}
+                  className="btn-pixel flex items-center gap-2.5 rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
+                >
+                  {submitting ? (
+                    <>
+                      <span
+                        aria-hidden
+                        className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
+                        style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
+                      />
+                      Submitting
+                    </>
+                  ) : (
+                    "Submit"
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Step dots */}
+            <div className="mt-8 flex items-center justify-center gap-2">
+              {STEPS.map((s, i) => (
+                <div
+                  key={s.n}
                   className={cn(
-                    "mt-2 w-full rounded-lg border bg-black-2 px-4 py-3 font-serif text-2xl italic outline-none transition-colors",
-                    form.signedName.length > 0 && !nameOk
-                      ? "border-blood-bright text-blood-bright"
-                      : nameOk
-                        ? "border-moss text-white"
-                        : "border-wire text-white placeholder:text-white/25 focus-visible:border-brand",
+                    "h-2 rounded-full transition-all duration-300",
+                    i === step ? "w-6 bg-black" : i < step ? "w-2 bg-brand" : "w-2 bg-black/20",
                   )}
                 />
-                {form.signedName.length > 0 && !nameOk && (
-                  <p className="mt-2 font-mono text-xs text-blood-bright">
-                    Type your full legal name, first and last.
-                  </p>
-                )}
-              </div>
-            </StepShell>
-          )}
-
-          {step === 3 && (
-            <StepShell
-              title="Payment"
-              blurb="One upfront payment secures your place. USDT is the cheaper option. Transfer, then upload your receipt."
-            >
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Choice
-                  active={form.paymentMethod === "usdt"}
-                  onClick={() => set("paymentMethod", "usdt")}
-                  title={PAYMENT_DESTINATIONS.usdt.amountLabel}
-                  sub="USDT, cheapest"
-                />
-                <Choice
-                  active={form.paymentMethod === "bca"}
-                  onClick={() => set("paymentMethod", "bca")}
-                  title={PAYMENT_DESTINATIONS.bca.amountLabel}
-                  sub="Bank transfer, BCA"
-                />
-              </div>
-
-              {form.paymentMethod && (
-                <div className="mt-6 animate-revealUp space-y-5">
-                  <PaymentDetails method={form.paymentMethod} />
-                  <ProofUpload
-                    preview={proofPreview}
-                    uploading={uploading}
-                    uploaded={form.proofImageUrl !== ""}
-                    error={uploadError}
-                    onSelect={onProofSelected}
-                  />
-                </div>
-              )}
-            </StepShell>
-          )}
-        </div>
-
-        {submitError && (
-          <p className="mt-4 font-mono text-sm text-blood-bright">● {submitError}</p>
+              ))}
+            </div>
+            <p className="mt-2 text-center font-mono text-xs text-black/40">
+              ({step + 1}/{STEPS.length}) {STEPS[step]?.label}
+            </p>
+          </div>
         )}
-
-        {/* Honeypot: hidden from users, tempting to bots. */}
-        <input
-          type="text"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          aria-hidden
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-          className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
-        />
-
-        {/* Nav */}
-        <div className="mt-10 flex items-center justify-between gap-4">
-          <button
-            type="button"
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
-            disabled={step === 0}
-            className="font-mono text-sm text-white/50 transition-colors hover:text-white disabled:invisible"
-          >
-            ← Back
-          </button>
-
-          {step < STEPS.length - 1 ? (
-            <button
-              type="button"
-              onClick={() => canContinue && setStep((s) => s + 1)}
-              disabled={!canContinue}
-              className="btn-pixel rounded-lg bg-brand px-8 py-3 font-mono text-sm font-bold text-black transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Continue →
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canContinue || submitting}
-              className="btn-pixel flex items-center gap-2.5 rounded-lg bg-brand px-8 py-3 font-mono text-sm font-bold text-black transition-colors hover:bg-brand-dim disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {submitting ? (
-                <>
-                  <span
-                    aria-hidden
-                    className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
-                    style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
-                  />
-                  Submitting
-                </>
-              ) : (
-                "Submit application"
-              )}
-            </button>
-          )}
-        </div>
       </div>
     </main>
   );
 }
 
 function StepShell({
+  n,
+  label,
   title,
-  blurb,
   children,
 }: {
+  n: string;
+  label: string;
   title: string;
-  blurb: string;
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <h1 className="font-sans text-[clamp(1.75rem,5vw,40px)] font-bold leading-[1.05] text-white">
-        <ScrambleReveal text={title} duration={700} />
-      </h1>
-      <p className="mt-3 max-w-xl font-mono text-sm leading-[1.5] text-white/50">{blurb}</p>
-      <div className="mt-8">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="mt-5 block first:mt-0">
-      <span className="block font-mono text-sm font-bold text-white">{label}</span>
+    <div className="space-y-6">
+      <p className="font-mono text-sm text-black/50" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+        Step {n} / {label}
+      </p>
+      <h2 className="font-mono text-xl font-bold text-black" style={{ animation: "fadeSlideUp 0.4s ease-out 0.1s both" }}>
+        {title}
+      </h2>
       {children}
-    </label>
+    </div>
   );
 }
 
@@ -479,15 +578,15 @@ function Choice({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col gap-1 rounded-lg border p-4 text-left transition-colors",
-        active ? "border-brand bg-brand/5" : "border-wire hover:border-white/30",
+        "flex flex-col gap-1 rounded-lg border p-4 text-left transition-all duration-200 active:scale-[0.98]",
+        active ? "border-brand bg-brand/5 shadow-[0_0_0_3px_rgba(255,212,0,0.15)]" : "border-gray-3 hover:border-black/40 hover:bg-black/[0.02]",
       )}
     >
-      <span className="flex items-center gap-2 font-mono text-base font-bold text-white">
+      <span className="flex items-center gap-2 font-mono text-sm font-bold text-black">
         <span className={cn("led", !active && "opacity-30")} aria-hidden />
         {title}
       </span>
-      <span className="pl-4 font-mono text-xs text-white/50">{sub}</span>
+      <span className="pl-4 font-mono text-xs text-black/50">{sub}</span>
     </button>
   );
 }
@@ -507,24 +606,22 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
   };
 
   return (
-    <div className="border border-wire bg-gray/40 p-5">
+    <div className="rounded-lg border border-gray-3 bg-white-2 p-5">
       <div className="flex items-baseline justify-between">
-        <span className="font-mono text-[11px] uppercase tracking-widest2 text-white/40">
-          {dest.method}
-        </span>
-        <span className="font-mono text-lg font-bold text-brand">{dest.amountLabel}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest2 text-black/40">{dest.method}</span>
+        <span className="font-mono text-lg font-bold text-black">{dest.amountLabel}</span>
       </div>
       <dl className="mt-4 space-y-2">
         {dest.rows.map((row) => (
           <div key={row.label} className="flex items-center justify-between gap-4">
-            <dt className="font-mono text-xs text-white/40">{row.label}</dt>
-            <dd className="flex items-center gap-2 font-mono text-sm text-white">
+            <dt className="font-mono text-xs text-black/40">{row.label}</dt>
+            <dd className="flex items-center gap-2 font-mono text-sm text-black">
               <span className="break-all text-right">{row.value}</span>
               {"copyable" in row && row.copyable && (
                 <button
                   type="button"
                   onClick={() => copy(row.value)}
-                  className="shrink-0 border border-wire px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand"
+                  className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-black/60 transition-colors hover:border-brand hover:text-black"
                 >
                   {copied === row.value ? "Copied" : "Copy"}
                 </button>
@@ -533,7 +630,7 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
           </div>
         ))}
       </dl>
-      <p className="mt-4 font-mono text-xs leading-[1.5] text-white/40">{dest.note}</p>
+      <p className="mt-4 font-mono text-xs leading-[1.5] text-black/40">{dest.note}</p>
     </div>
   );
 }
@@ -553,11 +650,11 @@ function ProofUpload({
 }) {
   return (
     <div>
-      <p className="font-mono text-sm font-bold text-white">Proof of payment</p>
+      <p className={labelClass}>Proof of payment</p>
       <label
         className={cn(
           "mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors",
-          uploaded ? "border-moss bg-moss/5" : "border-wire hover:border-brand",
+          uploaded ? "border-moss bg-moss/5" : "border-gray-3 hover:border-brand hover:bg-black/[0.02]",
         )}
       >
         <input
@@ -571,11 +668,11 @@ function ProofUpload({
         />
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Payment proof preview" className="max-h-40 rounded border border-wire object-contain" />
+          <img src={preview} alt="Payment proof preview" className="max-h-40 rounded border border-gray-3 object-contain" />
         ) : (
-          <span className="font-mono text-2xl text-white/30">↑</span>
+          <span className="font-mono text-2xl text-black/30">↑</span>
         )}
-        <span className="font-mono text-xs text-white/50">
+        <span className="font-mono text-xs text-black/50">
           {uploading
             ? "Uploading..."
             : uploaded
@@ -588,41 +685,33 @@ function ProofUpload({
   );
 }
 
-function Confirmation() {
+function ConfirmationPanel() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
-      <div className="w-full max-w-lg animate-revealUp text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          ● Application received
+    <div className="w-full max-w-md text-center" style={{ animation: "fadeSlideUp 0.5s ease-out both" }}>
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">● Application received</div>
+      <h2 className="mt-5 font-sans text-[clamp(2rem,6vw,44px)] font-bold leading-[1.02] text-black">
+        You&apos;re in.
+      </h2>
+      <p className="mx-auto mt-4 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
+        Welcome aboard, operator. You&apos;re locked in as a founding early-access member.
+      </p>
+      <div className="mt-8 space-y-2 rounded-lg border border-gray-3 bg-white-2 p-5 text-left font-mono text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-black/40">Bonus</span>
+          <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months access</span>
         </div>
-        <h1 className="mt-5 font-sans text-[clamp(2rem,7vw,52px)] font-bold leading-[1.02] text-white">
-          <ScrambleReveal text="You're in." duration={800} />
-        </h1>
-        <p className="mx-auto mt-5 max-w-md font-mono text-sm leading-[1.6] text-white/60">
-          Welcome aboard, operator. You're locked in as a founding early-access member.
-        </p>
-        <div className="mt-8 space-y-2 border border-wire bg-gray/40 p-5 text-left font-mono text-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-white/40">Bonus</span>
-            <span className="font-bold text-brand">+{CONFIRMATION.bonusMonths} months access</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-white/40">Subscription starts</span>
-            <span className="font-bold text-white">{CONFIRMATION.subscriptionStart}</span>
-          </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/40">Subscription starts</span>
+          <span className="font-bold text-black">{CONFIRMATION.subscriptionStart}</span>
         </div>
-        <p className="mx-auto mt-6 max-w-md font-mono text-sm leading-[1.6] text-white/60">
-          We're verifying your payment and broker details now. Your access instructions land in your
-          inbox by <span className="font-bold text-white">{CONFIRMATION.accessEmailDate}</span>. Nothing
-          else needed from you until then.
-        </p>
-        <Link
-          href="/"
-          className="mt-8 inline-block font-mono text-sm text-white/50 transition-colors hover:text-brand"
-        >
-          ← Back to TradeVantage
-        </Link>
       </div>
-    </main>
+      <p className="mx-auto mt-6 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
+        We&apos;re verifying your payment and broker details now. Your access instructions land in your inbox by{" "}
+        <span className="font-bold text-black">{CONFIRMATION.accessEmailDate}</span>. Nothing else needed until then.
+      </p>
+      <Link href="/" className="mt-8 inline-block font-mono text-sm text-black/50 transition-colors hover:text-brand">
+        &larr; Back to TradeVantage
+      </Link>
+    </div>
   );
 }
