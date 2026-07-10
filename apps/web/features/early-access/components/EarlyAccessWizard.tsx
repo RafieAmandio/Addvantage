@@ -75,10 +75,22 @@ export function EarlyAccessWizard() {
   useEffect(() => setMounted(true), []);
 
   // Slow background drift on the left panel (parity with the signup flow).
+  // Skipped entirely when the user prefers reduced motion, and paused while the
+  // tab is hidden so it never burns cycles in the background.
   useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     let frame: number;
     let t = 0;
     const drift = () => {
+      if (document.hidden) {
+        frame = requestAnimationFrame(drift);
+        return;
+      }
       t += 0.001;
       if (imgRef.current) {
         const x = Math.sin(t) * 8;
@@ -290,6 +302,7 @@ export function EarlyAccessWizard() {
           <div key={stepKey} className="w-full">
             {returning && (
               <p
+                role="status"
                 className={cn(
                   "mb-6 rounded-lg border px-4 py-3 font-mono text-xs leading-[1.5]",
                   returning === "submitted"
@@ -305,11 +318,17 @@ export function EarlyAccessWizard() {
             {step === 0 && (
               <StepShell n="01" label="Identity" title="Request access">
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
-                  <label className={labelClass}>Email you&apos;ll use for access</label>
+                  <label htmlFor="ea-email" className={labelClass}>
+                    Email you&apos;ll use for access
+                  </label>
                   <input
+                    id="ea-email"
                     type="email"
                     inputMode="email"
                     autoComplete="email"
+                    required
+                    aria-required
+                    aria-invalid={form.email.length > 0 && !EMAIL_RE.test(form.email.trim())}
                     value={form.email}
                     onChange={(e) => set("email", e.target.value)}
                     placeholder="you@domain.com"
@@ -317,13 +336,17 @@ export function EarlyAccessWizard() {
                   />
                 </div>
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
-                  <label className={labelClass}>Telegram handle</label>
+                  <label htmlFor="ea-telegram" className={labelClass}>Telegram handle</label>
                   <div className="relative mt-2">
                     <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-black/40">
                       @
                     </span>
                     <input
+                      id="ea-telegram"
                       type="text"
+                      autoComplete="off"
+                      required
+                      aria-required
                       value={form.telegramHandle}
                       onChange={(e) => set("telegramHandle", e.target.value.replace(/^@+/, ""))}
                       placeholder="handle"
@@ -440,9 +463,18 @@ export function EarlyAccessWizard() {
                   ))}
                 </div>
                 <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
-                  <label className={labelClass}>Sign by typing your full legal name</label>
+                  <label htmlFor="ea-signature" className={labelClass}>
+                    Sign by typing your full legal name
+                  </label>
                   <input
+                    id="ea-signature"
                     type="text"
+                    required
+                    aria-required
+                    aria-invalid={form.signedName.length > 0 && !nameOk}
+                    aria-describedby={
+                      form.signedName.length > 0 && !nameOk ? "ea-signature-error" : undefined
+                    }
                     value={form.signedName}
                     onChange={(e) => set("signedName", e.target.value)}
                     placeholder="Your full legal name"
@@ -456,7 +488,7 @@ export function EarlyAccessWizard() {
                     )}
                   />
                   {form.signedName.length > 0 && !nameOk && (
-                    <p className="mt-2 font-mono text-xs text-blood-bright">
+                    <p id="ea-signature-error" className="mt-2 font-mono text-xs text-blood-bright">
                       Type your full legal name, first and last.
                     </p>
                   )}
@@ -503,7 +535,7 @@ export function EarlyAccessWizard() {
             )}
 
             {submitError && (
-              <p className="mt-6 animate-[shake_0.3s_ease-out] font-mono text-sm text-blood-bright">
+              <p role="alert" className="mt-6 animate-[shake_0.3s_ease-out] font-mono text-sm text-blood-bright">
                 ● {submitError}
               </p>
             )}
@@ -782,7 +814,11 @@ function ProofUpload({
               : "Upload a screenshot of your transfer. PNG, JPG or WEBP, max 5 MB."}
         </span>
       </label>
-      {error && <p className="mt-2 font-mono text-xs text-blood-bright">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-2 font-mono text-xs text-blood-bright">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
