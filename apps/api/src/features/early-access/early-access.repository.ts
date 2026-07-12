@@ -57,4 +57,36 @@ export const earlyAccessRepository = {
       where: { id },
       data: { confirmationEmailSentAt: new Date() },
     }),
+
+  // Admin: list every application, newest first. Proof key is returned so the
+  // admin UI can request a signed URL for it.
+  listAll: () =>
+    prisma.earlyAccessApplication.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        telegramHandle: true,
+        wantsCashback: true,
+        broker: true,
+        brokerAccountRef: true,
+        paymentMethod: true,
+        paymentAmount: true,
+        paymentCurrency: true,
+        proofImageUrl: true,
+        status: true,
+        createdAt: true,
+        provisionedAt: true,
+        accountId: true,
+      },
+    }),
+
+  findById: (id: string) =>
+    prisma.earlyAccessApplication.findUnique({ where: { id } }),
+
+  markProvisioned: (id: string, accountId: string) =>
+    prisma.earlyAccessApplication.update({
+      where: { id },
+      data: { status: "provisioned", provisionedAt: new Date(), accountId },
+    }),
 };

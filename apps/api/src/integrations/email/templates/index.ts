@@ -10,3 +10,7 @@ export {
   earlyAccessInvoiceEmail,
   type EarlyAccessInvoiceParams,
 } from "./early-access-invoice.js";
+export {
+  earlyAccessCredentialsEmail,
+  type EarlyAccessCredentialsParams,
+} from "./early-access-credentials.js";

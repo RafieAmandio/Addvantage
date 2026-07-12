@@ -62,6 +62,31 @@ export class SupabaseStorageProvider implements StorageProvider {
     return `${this.baseUrl}/storage/v1/object/public/${this.bucket}/${key}`;
   }
 
+  // Signed URL for a private object. Supabase returns a relative signedURL
+  // ("/object/sign/<bucket>/<key>?token=..."); prefix it with the storage base.
+  async getSignedUrl(key: string, expiresInSec: number, bucket?: string): Promise<string> {
+    const b = bucket ?? this.bucket;
+    const res = await fetch(
+      `${this.baseUrl}/storage/v1/object/sign/${b}/${key}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.serviceKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expiresIn: expiresInSec }),
+      },
+    );
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Supabase storage sign failed (${res.status}): ${body}`);
+    }
+
+    const json = (await res.json()) as { signedURL: string };
+    return `${this.baseUrl}/storage/v1${json.signedURL}`;
+  }
+
   async delete(key: string): Promise<void> {
     const res = await fetch(
       `${this.baseUrl}/storage/v1/object/${this.bucket}/${key}`,

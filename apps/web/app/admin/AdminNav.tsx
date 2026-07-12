@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/admin/consult", label: "Consult", code: "08" },
   { href: "/admin/referral", label: "Referral", code: "09" },
   { href: "/admin/videos", label: "Videos", code: "10" },
+  { href: "/admin/early-access", label: "Early Access", code: "11" },
 ] as const;
 
 export function AdminNav() {

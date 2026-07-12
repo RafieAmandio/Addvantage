@@ -3,7 +3,7 @@ import { requireAuth } from "@/core/middleware/auth.middleware.js";
 import { validate } from "@/core/middleware/validate.middleware.js";
 import { ipRateLimit } from "@/core/middleware/rate-limit.middleware.js";
 import { authController } from "./auth.controller.js";
-import { registerSchema, loginSchema } from "./auth.validation.js";
+import { registerSchema, loginSchema, changePasswordSchema } from "./auth.validation.js";
 
 const router = Router();
 
@@ -28,6 +28,14 @@ router.post(
   requireAuth,
   ipRateLimit({ limit: 3, windowSec: 60, action: "auth:resend-verification" }),
   authController.resendVerification,
+);
+
+router.post(
+  "/change-password",
+  requireAuth,
+  ipRateLimit({ limit: 5, windowSec: 60, action: "auth:change-password" }),
+  validate({ body: changePasswordSchema }),
+  authController.changePassword,
 );
 
 router.post("/service-token", authController.serviceToken);

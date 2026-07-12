@@ -22,6 +22,9 @@ export interface StorageProvider {
   upload(opts: UploadOpts): Promise<UploadResult>;
   getPublicUrl(key: string): string;
   delete(key: string): Promise<void>;
+  /** Short-lived signed URL for an object in a private bucket. Optional: not
+   *  every provider implements it. */
+  getSignedUrl?(key: string, expiresInSec: number, bucket?: string): Promise<string>;
 }
 
 const ALLOWED_MIME_TYPES = new Set([

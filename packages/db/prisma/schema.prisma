@@ -311,6 +311,8 @@ model EarlyAccessApplication {
   proofImageUrl           String?   @map("proof_image_url")
   status                  String    @default("draft")
   confirmationEmailSentAt DateTime? @map("confirmation_email_sent_at") @db.Timestamptz(6)
+  provisionedAt           DateTime? @map("provisioned_at") @db.Timestamptz(6)
+  accountId               String?   @map("account_id") @db.Uuid
   createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt               DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 

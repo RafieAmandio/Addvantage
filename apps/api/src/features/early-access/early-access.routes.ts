@@ -4,8 +4,11 @@ import {
   EarlyAccessLeadSchema,
 } from "@tradevantage/shared/schema";
 import { ipRateLimit } from "@/core/middleware/rate-limit.middleware.js";
+import { requireAuth } from "@/core/middleware/auth.middleware.js";
+import { requireAdmin } from "@/core/middleware/admin.middleware.js";
 import { upload } from "@/core/middleware/upload.middleware.js";
 import { validate } from "@/core/middleware/validate.middleware.js";
+import { asyncHandler } from "@/core/utils/async-handler.js";
 import { earlyAccessController } from "./early-access.controller.js";
 
 const router = Router();
@@ -34,5 +37,11 @@ router.post(
   validate({ body: EarlyAccessApplicationSchema }),
   earlyAccessController.submit,
 );
+
+// Admin: review paid applications and provision accounts. Admin-only.
+const admin = [requireAuth, asyncHandler(requireAdmin)] as const;
+router.get("/admin/applications", ...admin, earlyAccessController.adminList);
+router.get("/admin/:id/proof-url", ...admin, earlyAccessController.adminProofUrl);
+router.post("/admin/:id/provision", ...admin, earlyAccessController.adminProvision);
 
 export { router as earlyAccessRoutes };

@@ -187,6 +187,71 @@ export async function resendVerificationAction(): Promise<{ ok: boolean; error?:
   }
 }
 
+// ─── Change password ────────────────────────────────────────────────
+
+const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8).max(128),
+    confirmPassword: z.string().min(1),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "passwords_dont_match",
+  });
+
+export interface ChangePasswordState {
+  ok: boolean;
+  error?: string;
+}
+
+export async function changePasswordAction(
+  _prev: ChangePasswordState,
+  formData: FormData,
+): Promise<ChangePasswordState> {
+  const user = await getSession();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  const parsed = ChangePasswordSchema.safeParse({
+    currentPassword: formData.get("currentPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    if (issue?.message === "passwords_dont_match") {
+      return { ok: false, error: "passwords_dont_match" };
+    }
+    if (issue?.path[0] === "newPassword") {
+      return { ok: false, error: "password_too_short" };
+    }
+    return { ok: false, error: "invalid_input" };
+  }
+
+  if (isMockMode()) {
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    return { ok: true };
+  }
+
+  try {
+    await apiPost("/auth/change-password", {
+      currentPassword: parsed.data.currentPassword,
+      newPassword: parsed.data.newPassword,
+    });
+    return { ok: true };
+  } catch (err) {
+    // apiPost throws `API <status>: <path>`; 401 = wrong current password.
+    const msg = err instanceof Error ? err.message : "";
+    if (msg.includes("401")) return { ok: false, error: "wrong_password" };
+    Sentry.captureException(err, {
+      tags: { scope: "auth.changePassword" },
+      extra: { userId: user.id },
+    });
+    logger.error("changePassword failed", { error: err, userId: user.id, scope: "auth.changePassword" });
+    return { ok: false, error: "change_failed" };
+  }
+}
+
 // ─── Trader profile ─────────────────────────────────────────────────
 
 const MARKET_VALUES = ["indo", "crypto", "forex", "us"] as const;

@@ -5,7 +5,7 @@ import { AppError } from "@/core/errors/index.js";
 import type { AuthRequest } from "@/core/types/request.js";
 import { logger } from "@/config/logger.js";
 import { authService } from "./auth.service.js";
-import type { RegisterInput, LoginInput } from "./auth.validation.js";
+import type { RegisterInput, LoginInput, ChangePasswordInput } from "./auth.validation.js";
 
 export const authController = {
   register: asyncHandler(async (req: Request, res: Response) => {
@@ -36,6 +36,17 @@ export const authController = {
     const authReq = req as AuthRequest;
     const result = await authService.resendVerification(authReq.user.id);
     sendSuccess(res, result, "Verification email sent");
+  }),
+
+  changePassword: asyncHandler(async (req, res: Response) => {
+    const authReq = req as AuthRequest;
+    const { currentPassword, newPassword } = req.body as ChangePasswordInput;
+    const result = await authService.changePassword({
+      userId: authReq.user.id,
+      currentPassword,
+      newPassword,
+    });
+    sendSuccess(res, result, "Password changed");
   }),
 
   serviceToken: asyncHandler(async (req: Request, res: Response) => {
