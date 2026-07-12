@@ -13,6 +13,7 @@ const DARK = "#1A1A1A";
 const MUTED = "#9A9A9A";
 const MONO = "'Courier New', Courier, monospace";
 const SITE = "https://tradevantage.gg";
+const LOGO = "https://tradevantage.gg/figma/logo-mark.png";
 const TELEGRAM_INVITE = "https://t.me/+CooIVleIU7w3MTll";
 const TELEGRAM_NAME = "TradeVantage";
 const SUPPORT_EMAIL = "tradevantage.gg@gmail.com";
@@ -47,7 +48,7 @@ export function earlyAccessConfirmationEmail(
           </tr>
           <tr>
             <td style="background:${PAPER};padding:8px 32px 4px;" align="center">
-              <span style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:15px;padding:3px 8px;">V</span>
+              <img src="${LOGO}" width="30" height="30" alt="+vantage" style="display:inline-block;vertical-align:middle;border:0;border-radius:6px;" />
               <span style="font-family:${MONO};font-weight:bold;font-size:18px;color:${INK};vertical-align:middle;">&nbsp;+vantage</span>
             </td>
           </tr>
@@ -123,7 +124,7 @@ export function earlyAccessConfirmationEmail(
                 <tr>
                   <td valign="top" style="width:58%;">
                     <div>
-                      <span style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:14px;padding:2px 7px;">V</span>
+                      <img src="${LOGO}" width="24" height="24" alt="+vantage" style="display:inline-block;vertical-align:middle;border:0;border-radius:5px;" />
                       <span style="font-family:${MONO};font-weight:bold;font-size:16px;color:${PAPER};vertical-align:middle;">&nbsp;+vantage</span>
                     </div>
                     <p style="font-family:${MONO};font-size:11px;line-height:1.6;color:${MUTED};margin:12px 0 0;">

@@ -12,6 +12,7 @@ const DARK = "#1A1A1A";
 const MUTED = "#9A9A9A";
 const MONO = "'Courier New', Courier, monospace";
 const SITE = "https://tradevantage.gg";
+const LOGO = "https://tradevantage.gg/figma/logo-mark.png";
 
 // Invoice / receipt for the manual early-access payment. Sent alongside the
 // welcome email. Table-based + inline styles so it renders across clients.
@@ -43,7 +44,7 @@ export function earlyAccessInvoiceEmail(
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td>
-                    <span style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:15px;padding:3px 8px;">V</span>
+                    <img src="${LOGO}" width="30" height="30" alt="+vantage" style="display:inline-block;vertical-align:middle;border:0;border-radius:6px;" />
                     <span style="font-family:${MONO};font-weight:bold;font-size:18px;color:${INK};vertical-align:middle;">&nbsp;+vantage</span>
                   </td>
                   <td align="right" style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#111;font-weight:bold;">Invoice</td>
@@ -98,7 +99,7 @@ export function earlyAccessInvoiceEmail(
           <tr>
             <td style="background:${DARK};padding:24px 32px;">
               <div>
-                <span style="display:inline-block;background:${BRAND};color:${INK};font-family:${MONO};font-weight:bold;font-size:13px;padding:2px 6px;">V</span>
+                <img src="${LOGO}" width="22" height="22" alt="+vantage" style="display:inline-block;vertical-align:middle;border:0;border-radius:5px;" />
                 <span style="font-family:${MONO};font-weight:bold;font-size:15px;color:${PAPER};vertical-align:middle;">&nbsp;+vantage</span>
               </div>
               <p style="font-family:${MONO};font-size:11px;line-height:1.6;color:${MUTED};margin:12px 0 0;">
