@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { ForexTier } from "@tradevantage/shared";
 
 const TIER_TABS: { value: ForexTier | "all"; label: string }[] = [
@@ -77,7 +77,7 @@ export function GapToolbar({
         </span>
         {updatedAt && (
           <span title={updatedAt}>
-            Updated {new Date(updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            Updated {formatWibTime(updatedAt)} WIB
           </span>
         )}
       </div>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { SectionHeader } from "@/features/dashboard/components/SectionHeader";
-import { formatTime, cn } from "@/lib/cn";
+import { formatWibTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TradingPlan } from "@/features/plan/types";
 
@@ -70,7 +70,7 @@ export function FeaturedRow({
                           </span>
                         )}
                         <span className="ml-auto hidden text-xs text-white/30 sm:inline">
-                          {formatTime(ts)}
+                          {formatWibTime(ts)} WIB
                         </span>
                       </div>
                       <h3

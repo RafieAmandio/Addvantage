@@ -7,7 +7,6 @@ import {
   type LocalSession,
   type PersistedConsult,
 } from "@/features/consult/types";
-import { useToast } from "@/lib/toast";
 
 export interface InitialConsultData {
   sessions: LocalSession[];
@@ -19,7 +18,6 @@ const EMPTY_INITIAL: InitialConsultData = { sessions: [], extras: {} };
 export function useConsultPersistence(
   initial: InitialConsultData = EMPTY_INITIAL
 ) {
-  const toast = useToast();
   const [localSessions, setLocalSessions] = useState<LocalSession[]>(
     initial.sessions
   );
@@ -31,61 +29,12 @@ export function useConsultPersistence(
   );
   const [hydrated, setHydrated] = useState(false);
 
+  // One session per account: never resurface older/extra sessions from
+  // localStorage. Always resolve to the single latest server session
+  // provided in `initial`. localStorage is still written below purely as a
+  // cache of the active session, but it is never merged back onto the list.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(CONSULT_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as PersistedConsult;
-
-        if (Array.isArray(parsed.sessions)) {
-          setLocalSessions((prev) => {
-            const seen = new Set(prev.map((s) => s.id));
-            const tail = parsed.sessions.filter((s) => !seen.has(s.id));
-            return [...prev, ...tail];
-          });
-        }
-        if (parsed.extras && typeof parsed.extras === "object") {
-          setExtrasBySession((prev) => ({ ...parsed.extras, ...prev }));
-        }
-        if (parsed.lastActiveId) {
-          const fromLocal = parsed.sessions?.find(
-            (s) => s.id === parsed.lastActiveId
-          );
-          const fromServer = initial.sessions.find(
-            (s) => s.id === parsed.lastActiveId
-          );
-          const resumed = fromServer ?? fromLocal;
-          if (resumed) {
-            setActiveId(parsed.lastActiveId);
-            const RESTORE_SHOWN_KEY = "ants-domain-consult-restore-shown";
-            let alreadyShown = false;
-            try {
-              alreadyShown =
-                sessionStorage.getItem(RESTORE_SHOWN_KEY) === "1";
-            } catch {}
-            if (!alreadyShown) {
-              try {
-                sessionStorage.setItem(RESTORE_SHOWN_KEY, "1");
-              } catch {}
-              const defaultId = "";
-              toast.push({
-                tone: "info",
-                title: "Resumed last session",
-                description: `${resumed.id} · ${resumed.title}`,
-                duration: 3500,
-                action: {
-                  label: "↶ START FRESH",
-                  onClick: () => setActiveId(defaultId),
-                },
-              });
-            }
-          }
-        }
-      }
-    } catch {}
     setHydrated(true);
-    // toast is stable (noop when unmounted); intentional omit from deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

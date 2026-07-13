@@ -1,110 +1,116 @@
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
 
 export const hashtagMeta: Record<Hashtag, { label: string; description: string }> = {
-  "losing-streak": {
-    label: "Losing Streak",
-    description: "Process for surviving and exiting drawdown without doing more damage.",
+  "monetary-policy": {
+    label: "Monetary Policy",
+    description: "Central-bank rate decisions, forward guidance, and QT/QE balance-sheet moves.",
   },
-  unprofitability: {
-    label: "Unprofitability",
-    description: "Diagnosing why an edge isn't there yet — sample size, filter, execution.",
+  "interest-rates": {
+    label: "Interest Rates",
+    description: "Policy and market rate moves, curve shape, and rate-cut/hike repricing.",
   },
-  "developing-edge": {
-    label: "Developing Edge",
-    description: "Building, testing, and trusting a new system.",
+  inflation: {
+    label: "Inflation",
+    description: "CPI, PCE, PPI prints, wage growth, and inflation-expectation shifts.",
   },
-  "loss-aversion": {
-    label: "Loss Aversion",
-    description: "Asymmetric pain from losses vs. pleasure from gains. The root of disposition effect.",
+  "economic-data": {
+    label: "Economic Data",
+    description: "Growth, labor, and activity releases — NFP, GDP, PMIs, retail sales.",
   },
-  "recency-bias": {
-    label: "Recency Bias",
-    description: "Weighting the last few trades more than the previous many.",
+  "central-banks": {
+    label: "Central Banks",
+    description: "Fed, ECB, BoE, BoJ and peers — speeches, minutes, and personnel.",
   },
-  "sunk-cost": {
-    label: "Sunk Cost",
-    description: "Refusing to close a trade because of money already lost on it.",
+  "fiscal-policy": {
+    label: "Fiscal Policy",
+    description: "Government spending, taxation, deficits, debt issuance, and stimulus.",
   },
-  "risk-management": {
-    label: "Risk Management",
-    description: "Position sizing, invalidation, drawdown protocol.",
+  geopolitics: {
+    label: "Geopolitics",
+    description: "Conflict, sanctions, trade tension, and elections that move risk pricing.",
   },
-  "mean-reversion": {
-    label: "Mean Reversion",
-    description: "Setups built on extension and snap-back.",
+  "risk-off": {
+    label: "Risk-Off",
+    description: "Flight to safety — equities down, credit wider, defensive flows dominate.",
   },
-  "trend-following": {
-    label: "Trend Following",
-    description: "Setups built on continuation and breakout.",
+  "risk-on": {
+    label: "Risk-On",
+    description: "Risk appetite building — equities bid, spreads tighten, carry rewarded.",
   },
-  fomo: {
-    label: "FOMO",
-    description: "Chasing a move already underway for fear of missing out, not on a planned signal.",
+  "safe-haven": {
+    label: "Safe Haven",
+    description: "Demand for gold, USD, JPY, CHF, and Treasuries in stress.",
   },
-  overtrading: {
-    label: "Overtrading",
-    description: "Taking too many trades relative to real edge — boredom, noise, or forcing setups.",
+  energy: {
+    label: "Energy",
+    description: "Crude, natural gas, and refined products — supply, OPEC, and demand.",
   },
-  "revenge-trading": {
-    label: "Revenge Trading",
-    description: "Trading to win back a recent loss rather than following the plan.",
+  commodities: {
+    label: "Commodities",
+    description: "Broad raw-materials complex — industrial metals, ags, and softs.",
   },
-  patience: {
-    label: "Patience",
-    description: "Waiting for the setup to come to you instead of manufacturing one.",
+  "precious-metals": {
+    label: "Precious Metals",
+    description: "Gold, silver, platinum, palladium — haven bid and real-rate sensitivity.",
   },
-  discipline: {
-    label: "Discipline",
-    description: "Executing the plan consistently regardless of how you feel in the moment.",
+  equities: {
+    label: "Equities",
+    description: "Stock indices and single names — positioning, breadth, and rotation.",
   },
-  breakout: {
-    label: "Breakout",
-    description: "Entries on price clearing a defined level or range with momentum.",
+  crypto: {
+    label: "Crypto",
+    description: "Bitcoin, Ether, and digital assets — flows, ETFs, and on-chain moves.",
   },
-  liquidity: {
-    label: "Liquidity",
-    description: "Reading where resting orders and stops sit, and how price hunts them.",
+  forex: {
+    label: "Forex",
+    description: "Currency-pair moves, rate differentials, and cross-border capital flows.",
   },
-  "support-resistance": {
-    label: "Support / Resistance",
-    description: "Trading reactions at horizontal levels where price has previously turned.",
+  bonds: {
+    label: "Bonds",
+    description: "Sovereign and credit markets — yields, auctions, and spread moves.",
+  },
+  "tech-sector": {
+    label: "Tech Sector",
+    description: "AI, semiconductors, and megacap tech driving index leadership.",
+  },
+  earnings: {
+    label: "Earnings",
+    description: "Corporate results, guidance, and margins as market catalysts.",
+  },
+  regulation: {
+    label: "Regulation",
+    description: "Antitrust, financial rules, and policy actions reshaping sectors.",
+  },
+  "us-politics": {
+    label: "US Politics",
+    description: "Elections, Congress, shutdowns, and administration policy shifts.",
   },
   volatility: {
     label: "Volatility",
-    description: "Sizing and setups adapted to how much the instrument is currently moving.",
+    description: "VIX regime, realized vs. implied swings, and volatility spikes.",
   },
-  "position-sizing": {
-    label: "Position Sizing",
-    description: "Choosing trade size from risk-per-trade and stop distance, not gut feel.",
-  },
-  confluence: {
-    label: "Confluence",
-    description: "Stacking multiple independent signals that agree before entering.",
-  },
-  fakeout: {
-    label: "Fakeout",
-    description: "A false break that traps traders on the wrong side before reversing.",
+  liquidity: {
+    label: "Liquidity",
+    description: "Market depth, funding conditions, and central-bank plumbing.",
   },
   momentum: {
     label: "Momentum",
-    description: "Trading in the direction of strong, sustained order flow.",
-  },
-  "range-bound": {
-    label: "Range Bound",
-    description: "Fading the edges of a market with no clear directional trend.",
-  },
-  "news-driven": {
-    label: "News Driven",
-    description: "Moves caused by scheduled data or headlines rather than pure price action.",
-  },
-  overconfidence: {
-    label: "Overconfidence",
-    description: "Oversizing or skipping rules after a run of wins.",
-  },
-  "analysis-paralysis": {
-    label: "Analysis Paralysis",
-    description: "Over-researching to the point of missing or avoiding execution.",
+    description: "Trend persistence and flow-driven continuation across assets.",
   },
 };
 
 export const allHashtags: Hashtag[] = [...HASHTAGS];
+
+/**
+ * Safe accessor for hashtag metadata. Returns the meta entry when present,
+ * otherwise a derived fallback so the Explorer never crashes on a tag that
+ * isn't in the current taxonomy (e.g. legacy tags on older news rows).
+ */
+export function getHashtagMeta(tag: string): { label: string; description: string } {
+  const meta = (hashtagMeta as Record<string, { label: string; description: string }>)[tag];
+  if (meta) return meta;
+  return {
+    label: tag.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    description: "",
+  };
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
-import { formatDate, formatTime } from "@/lib/cn";
+import { formatDate, formatWibTime } from "@/lib/cn";
 import { apiGet } from "@/lib/api/client-server";
 import Link from "next/link";
 import { ChannelThreadNav } from "./ChannelThreadNav";
@@ -112,7 +112,7 @@ export default async function ChannelPage({
               <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-brand" />
               <div className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2">
                 <span className="text-white/60">
-                  {formatDate(p.createdAt)} · {formatTime(p.createdAt)}Z
+                  {formatDate(p.createdAt)} · {formatWibTime(p.createdAt)} WIB
                 </span>
                 <span className="text-white/40">·</span>
                 <span className="text-brand">BY {p.author.toUpperCase()}</span>

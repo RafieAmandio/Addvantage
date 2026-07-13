@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatWibDateTime } from "@/lib/cn";
 import type { GraphNode } from "../queries/graph";
 
 const TYPE_COLORS: Record<string, string> = {
@@ -65,7 +66,7 @@ export function IntelDetailPanel({
         {/* content */}
         <div className="flex-1 px-4 py-4">
           <div className="font-mono text-[9px] text-white/30">
-            {new Date(node.timestamp).toLocaleString()}
+            {formatWibDateTime(node.timestamp)}
           </div>
           <h3 className="mt-1 font-display text-lg leading-snug text-white">
             {node.title}

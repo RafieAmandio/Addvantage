@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
-import { hashtagMeta } from "@/features/tags/constants";
+import { getHashtagMeta } from "@/features/tags/constants";
 import { listNewsByTag, listPrimersByTag } from "@/features/tags/queries";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
@@ -21,7 +21,7 @@ export default async function TagPage({
   const { tag: rawTag } = params;
   if (!isHashtag(rawTag)) return notFound();
   const tag = rawTag;
-  const meta = hashtagMeta[tag];
+  const meta = getHashtagMeta(tag);
 
   const [matchedNews, matchedPrimers] = await Promise.all([
     listNewsByTag(tag),

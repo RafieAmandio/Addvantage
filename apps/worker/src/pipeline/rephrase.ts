@@ -25,7 +25,7 @@ RULES:
 - No "analysts say", no "experts believe", no hedging filler. No rhetorical questions.
 - Tone: tactical, dense, slightly antagonistic — you're briefing experienced traders, not writing a blog post.
 - "affects" = list only tickers/instruments that are materially moved (e.g. ["SPX","DXY"]). Max 6.
-- "tags" must come from the closed taxonomy. Empty array is fine.
+- "tags": classify what the item is ABOUT — the macro driver (monetary-policy, inflation, geopolitics, ...), the asset class (equities, crypto, forex, commodities, bonds, energy, precious-metals), or the catalyst (earnings, regulation, us-politics). Pick 1–4 that genuinely apply; empty array if none fit. Do not force-fit, and only use tags from the VALID TAGS list below.
 - Do NOT fabricate data. If the raw content is thin, keep output proportionally brief — but still hit all 3 paragraphs.`;
 
 const TAGS_LIST = HASHTAGS.join(", ");

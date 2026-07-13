@@ -35,53 +35,47 @@ export function useConsultActions({
     title: string;
   } | null>(null);
 
-  const startNewSession = async () => {
-    const now = new Date();
-    const hhmm =
-      String(now.getHours()).padStart(2, "0") +
-      String(now.getMinutes()).padStart(2, "0");
-    const title = `New session · ${hhmm}`;
+  const send = async () => {
+    if (!draft.trim()) return;
+    const userBody = draft;
 
-    const res = await createConsultSession(title);
-    if (!res.ok || !res.sessionId) {
-      toast.push({
-        tone: "error",
-        title: "Could not open session",
-        description:
-          res.error === "rate_limited"
-            ? "Too many new sessions — slow down."
-            : "Failed to reach the desk. Try again.",
-      });
-      return;
+    // One session per account. If no session exists yet, open the single
+    // session for this account on the first transmission (the only entry
+    // point for session creation — no parallel sessions can be spawned).
+    let sessionId = active.id;
+    if (!sessionId) {
+      const res = await createConsultSession("Consultation");
+      if (!res.ok || !res.sessionId) {
+        toast.push({
+          tone: "error",
+          title: "Could not open session",
+          description:
+            res.error === "rate_limited"
+              ? "Too many new sessions — slow down."
+              : "Failed to reach the desk. Try again.",
+        });
+        return;
+      }
+      sessionId = res.sessionId;
+      const openedAt = new Date().toISOString();
+      const session: LocalSession = {
+        id: sessionId,
+        title: "Consultation",
+        startedAt: openedAt,
+        lastAt: openedAt,
+        tags: [],
+        messages: [],
+      };
+      setLocalSessions([session]);
+      setActiveId(sessionId);
     }
 
-    const session: LocalSession = {
-      id: res.sessionId,
-      title,
-      startedAt: now.toISOString(),
-      lastAt: now.toISOString(),
-      tags: [],
-      messages: [],
-    };
-    setLocalSessions((prev) => [session, ...prev]);
-    setActiveId(res.sessionId);
-    setDraft("");
-    toast.push({
-      tone: "success",
-      title: "Session opened",
-      description: `Session logged — rename via the ✎ icon.`,
-    });
-  };
-
-  const send = () => {
-    if (!draft.trim()) return;
-    const sessionId = active.id;
     const nowIso = new Date().toISOString();
     const userMsg: ConsultMessage = {
       id: `M-x${Date.now()}`,
       role: "user",
       ts: nowIso,
-      body: draft,
+      body: userBody,
       tags: [],
     };
 
@@ -93,7 +87,6 @@ export function useConsultActions({
       prev.map((s) => (s.id === sessionId ? { ...s, lastAt: nowIso, status: "awaiting_reply" } : s))
     );
 
-    const userBody = draft;
     setDraft("");
 
     appendConsultMessage({
@@ -190,7 +183,6 @@ export function useConsultActions({
     setDraft,
     pendingDelete,
     setPendingDelete,
-    startNewSession,
     send,
     renameSession,
     requestDeleteSession,

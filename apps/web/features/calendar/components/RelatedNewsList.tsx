@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { formatTime } from "@/lib/cn";
+import { formatWibTime } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
@@ -32,7 +32,7 @@ export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
                 [{n.sourceCode}]
               </div>
               <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                {formatTime(ts)}Z
+                {formatWibTime(ts)} WIB
               </div>
               <div className="mt-3 space-y-1.5">
                 <ImpactPill level={n.impact} />

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn, formatDate, formatTime } from "@/lib/cn";
+import { cn, formatDate, formatWibTime } from "@/lib/cn";
 import { getNewsForPlan } from "@/features/plan/queries/news";
 
 interface Props {
@@ -31,7 +31,7 @@ export async function NewsMentioningPlan({ planId, className }: Props) {
                   <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
                     <span className="text-brand">[{n.sourceCode}]</span>
                     <span>
-                      · {formatDate(ts)} · {formatTime(ts)}Z
+                      · {formatDate(ts)} · {formatWibTime(ts)} WIB
                     </span>
                   </div>
                   <div className="mt-1 text-sm text-white transition-colors group-hover:text-brand">

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/cn";
+import { cn, formatDate } from "@/lib/cn";
 import {
   categoryLabel,
   daysUntil,
@@ -72,12 +72,7 @@ function ImpactBadge({ impact }: { impact: string | null }) {
 function secondaryDate(e: UpgradeEvent): string {
   const d = (e.displayDate || "").trim();
   if (d && !/^(in\b|ongoing)/i.test(d)) return d;
-  const formatted = new Date(e.dateStart).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  const formatted = formatDate(e.dateStart);
   return e.dateApprox ? `~${formatted}` : formatted;
 }
 
