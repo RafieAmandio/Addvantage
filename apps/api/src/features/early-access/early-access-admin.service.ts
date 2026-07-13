@@ -1,4 +1,3 @@
-import { env } from "@/config/env.js";
 import { logger } from "@/config/logger.js";
 import { AppError } from "@/core/errors/index.js";
 import { getEmailProvider, earlyAccessCredentialsEmail } from "@/integrations/email/index.js";
@@ -54,7 +53,10 @@ export const earlyAccessAdminService = {
         const { subject, html } = earlyAccessCredentialsEmail({
           email: app.email,
           tempPassword,
-          loginUrl: `${env.SITE_URL}/login`,
+          // Hardcoded to the production domain: the credentials email is only
+          // ever sent from prod, and env.SITE_URL isn't set there (falls back to
+          // localhost:3000).
+          loginUrl: `https://tradevantage.gg/login`,
         });
         await provider.sendHtml({ to: { email: app.email }, subject, html });
         emailSent = true;
