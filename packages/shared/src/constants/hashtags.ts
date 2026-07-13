@@ -12,6 +12,23 @@ export const HASHTAGS = [
   "risk-management",
   "mean-reversion",
   "trend-following",
+  "fomo",
+  "overtrading",
+  "revenge-trading",
+  "patience",
+  "discipline",
+  "breakout",
+  "liquidity",
+  "support-resistance",
+  "volatility",
+  "position-sizing",
+  "confluence",
+  "fakeout",
+  "momentum",
+  "range-bound",
+  "news-driven",
+  "overconfidence",
+  "analysis-paralysis",
 ] as const;
 
 export type Hashtag = (typeof HASHTAGS)[number];

@@ -13,6 +13,20 @@ export function formatTime(iso: string, opts: Intl.DateTimeFormatOptions = {}) {
   });
 }
 
+export function formatWibTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-GB", {
+    timeZone: "Asia/Jakarta",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+export function formatWibDateTime(iso: string) {
+  return `${formatDate(iso)} · ${formatWibTime(iso)} WIB`;
+}
+
 export function formatDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleDateString("en-GB", {

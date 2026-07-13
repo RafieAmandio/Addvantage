@@ -50,7 +50,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   );
 
   useUrlSyncedState({
-    view: view !== "week" ? view : null,
+    view: view !== "day" ? view : null,
     d: anchor !== TODAY_YMD ? anchor : null,
     impact: impactFilter !== "all" ? impactFilter : null,
     region: regionFilter !== "all" ? regionFilter : null,

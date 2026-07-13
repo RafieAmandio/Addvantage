@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SectionNumber, DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { formatTime } from "@/lib/cn";
+import { formatWibTime } from "@/lib/cn";
 import type { TimelineEvent } from "@/features/timeline/types";
 import type { NewsListItem } from "@/features/news/queries/news";
 import { RelatedNewsList } from "@/features/calendar/components/RelatedNewsList";
@@ -28,7 +28,7 @@ export function EventDetailView({
               /
             </span>
             <DataLabel>
-              {event.kind.toUpperCase()} · {formatTime(event.occurredAt)}Z
+              {event.kind.toUpperCase()} · {formatWibTime(event.occurredAt)} WIB
             </DataLabel>
           </div>
           <h1 className="mt-3 font-display text-4xl leading-tight text-white">

@@ -35,7 +35,7 @@ const PLANS: SubscriptionPlan[] = [
   {
     id: "vip-trader",
     name: "VIP+ Trader",
-    priceIDR: 17_500_000,
+    priceIDR: 18_000_000,
     cadence: "1-year",
     highlight: true,
     features: [
