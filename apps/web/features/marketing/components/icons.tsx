@@ -1,26 +1,16 @@
 import { FUTURA } from "@/features/marketing/lib/data";
 
 export function LogoMark({ size = 30 }: { size?: number }) {
-  const iconSize = Math.round(size * 0.53);
   return (
-    <div
-      style={{ width: size, height: size, borderRadius: Math.round(size * 0.17) }}
-      className="relative flex shrink-0 items-center justify-center bg-brand"
-    >
-      <svg
-        width={iconSize}
-        height={iconSize}
-        viewBox="0 0 15.3079 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M5.30986 0L10.463 11.2513L12.8758 5.99305H15.3079L10.4438 16L2.88743 0H5.30986Z"
-          fill="#111111"
-        />
-        <path d="M0.787 2.494H11.287L10.5 4.594H0L0.787 2.494Z" fill="#111111" />
-      </svg>
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/figma/logo-mark.png"
+      alt="+vantage"
+      width={size}
+      height={size}
+      className="shrink-0"
+      style={{ width: size, height: size }}
+    />
   );
 }
 

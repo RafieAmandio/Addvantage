@@ -23,9 +23,13 @@ DOKPLOY_URL="https://dashboard.tradevantage.gg"
 # Dokploy application IDs (see CLAUDE.md deployment table)
 app_id() {
   case "$1" in
-    web)    echo "g-kctMkTjn_hr_n9I_GAD" ;;
-    api)    echo "llgO8uAqXsHJYILDxDorp" ;;
-    worker) echo "5Az6Gqlcv7l2yH6PfAvAB" ;;
+    web)             echo "g-kctMkTjn_hr_n9I_GAD" ;;
+    api)             echo "llgO8uAqXsHJYILDxDorp" ;;
+    worker)          echo "5Az6Gqlcv7l2yH6PfAvAB" ;;
+    # Upgrade Radar scraper — its own container (headed CloakBrowser under xvfb,
+    # HEADED=1 baked into the image). Fill in the Dokploy application id after
+    # creating the app (Docker image source: ghcr.io/rafieamandio/tradevantage-upgrade-scraper:latest).
+    upgrade-scraper) echo "" ;;
   esac
 }
 

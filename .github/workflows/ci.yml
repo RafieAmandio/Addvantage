@@ -37,3 +37,57 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  db-drift:
+    name: db · migrations match schema
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      # Vanilla Postgres shadow DB. The baseline migration is written to apply
+      # cleanly here (Supabase roles / auth.uid() / storage are guarded), so the
+      # drift check needs no Supabase and no production credentials.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: pw
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # Fails (exit 2) if prisma/migrations do not reproduce schema.prisma —
+      # i.e. someone changed the schema without committing a matching migration.
+      - name: Migrations must reproduce schema.prisma
+        working-directory: packages/db
+        run: >-
+          pnpm exec prisma migrate diff
+          --from-migrations ./prisma/migrations
+          --to-schema-datamodel ./prisma/schema.prisma
+          --shadow-database-url postgresql://postgres:pw@localhost:5432/postgres
+          --exit-code
+
+  db-rls-guard:
+    name: db · every new table has RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      # Prisma can't model RLS, so db-drift is blind to it. This fails a PR whose
+      # migration adds a table without ENABLE ROW LEVEL SECURITY in the same file.
+      - name: RLS guard
+        run: bash scripts/check-migration-rls.sh

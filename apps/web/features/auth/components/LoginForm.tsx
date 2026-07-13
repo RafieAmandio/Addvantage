@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { loginAction, type LoginActionState } from "@/features/auth/actions";
 
@@ -58,35 +58,26 @@ function useScrambleReveal(text: string, delay = 0) {
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-  const [scramble, setScramble] = useState("Authenticate");
-  const interval = useRef<ReturnType<typeof setInterval>>();
-
-  useEffect(() => {
-    if (pending) {
-      const words = [
-        "Verifying...",
-        "Signing in...",
-        "Almost there...",
-      ];
-      let i = 0;
-      interval.current = setInterval(() => {
-        i = (i + 1) % words.length;
-        setScramble(words[i]!);
-      }, 400);
-    } else {
-      clearInterval(interval.current);
-      setScramble("Sign In");
-    }
-    return () => clearInterval(interval.current);
-  }, [pending]);
 
   return (
     <button
       type="submit"
       disabled={pending}
-      className="btn-pixel group mt-10 w-full rounded-lg bg-brand py-4 font-mono text-base font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.98] disabled:animate-pulse"
+      aria-busy={pending}
+      className="btn-pixel group mt-10 flex w-full items-center justify-center gap-2.5 rounded-lg bg-brand py-4 font-mono text-base font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.98] disabled:cursor-wait"
     >
-      {scramble}
+      {pending ? (
+        <>
+          <span
+            aria-hidden
+            className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
+            style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
+          />
+          Signing in
+        </>
+      ) : (
+        "Sign In"
+      )}
     </button>
   );
 }

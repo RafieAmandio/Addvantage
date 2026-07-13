@@ -16,6 +16,7 @@ const ROUTES: Array<{ keys: string; label: string; href: string }> = [
   { keys: "g e", label: "Education", href: "/app/education" },
   { keys: "g v", label: "Video Modules", href: "/app/education/videos" },
   { keys: "g o", label: "Token Unlocks", href: "/app/unlocks" },
+  { keys: "g r", label: "Upgrade Radar", href: "/app/upgrades" },
   { keys: "g t", label: "Hashtags", href: "/app/tags" },
   { keys: "g w", label: "Watchlist", href: "/app/watchlist" },
   { keys: "g s", label: "Subscription", href: "/app/subscription" },

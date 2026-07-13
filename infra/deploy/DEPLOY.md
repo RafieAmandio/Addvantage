@@ -44,7 +44,7 @@ cp apps/worker/.env.example apps/worker/.env
 
 Fill in:
 
-- `NEXT_PUBLIC_SUPABASE_URL` — `https://qawrdgttfpslyelocfmx.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_URL` — `https://mlbcppehtoytqqbrkirn.supabase.co`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from Supabase dashboard → Project Settings → API
 - `SUPABASE_SERVICE_ROLE_KEY` — same page, **server-only**
 - `OPENAI_API_KEY` — from https://platform.openai.com/api-keys
@@ -182,7 +182,7 @@ dump via `pg_dump` from a cron on the VPS.
 
 ```bash
 # crontab -e
-0 3 * * * PGPASSWORD=... pg_dump -h db.qawrdgttfpslyelocfmx.supabase.co -U postgres -Fc postgres > /srv/backups/tv-$(date +\%F).dump
+0 3 * * * PGPASSWORD=... pg_dump -h db.mlbcppehtoytqqbrkirn.supabase.co -U postgres -Fc postgres > /srv/backups/tv-$(date +\%F).dump
 ```
 
 ## 9. Domain + DNS

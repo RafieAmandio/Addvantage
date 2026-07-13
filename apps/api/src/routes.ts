@@ -23,6 +23,8 @@ import { referralRoutes } from "./features/referral/referral.routes.js";
 import { predictionRoutes } from "./features/prediction/prediction.routes.js";
 import { graphRoutes } from "./features/graph/graph.routes.js";
 import { gapScreenerRoutes } from "./features/gap-screener/gap-screener.routes.js";
+import { upgradeRadarRoutes } from "./features/upgrade-radar/upgrade-radar.routes.js";
+import { earlyAccessRoutes } from "./features/early-access/early-access.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -49,4 +51,6 @@ export function mountRoutes(app: Express) {
   app.use("/predictions", predictionRoutes);
   app.use("/graph", graphRoutes);
   app.use("/gap-screener", gapScreenerRoutes);
+  app.use("/upgrade-radar", upgradeRadarRoutes);
+  app.use("/early-access", earlyAccessRoutes);
 }

@@ -32,9 +32,11 @@ const nav = [
   { label: "ATR Levels", href: "/app/atr", group: "tools", icon: "atr" },
   { label: "Gap Scanner", href: "/app/gap-screener", group: "tools", icon: "gap" },
   { label: "Token Unlocks", href: "/app/unlocks", group: "tools", locked: true, icon: "unlocks" },
+  { label: "Upgrade Radar", href: "/app/upgrades", group: "tools", locked: true, icon: "radar" },
   { label: "Intel Map", href: "/app/intel", group: "tools", icon: "intel" },
   { label: "Watchlist", href: "/app/watchlist", group: "tools", icon: "watchlist" },
   { label: "Subscription", href: "/app/subscription", group: "account", icon: "subscription" },
+  { label: "Settings", href: "/app/settings", group: "account", icon: "settings" },
   { label: "Admin", href: "/admin/review", group: "admin", icon: "admin" },
 ];
 
@@ -54,10 +56,12 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
     case "atr": return <svg {...props}><path d="M2 4h12M2 8h8M2 12h10" strokeWidth="2" strokeLinecap="round" /></svg>;
     case "gap": return <svg {...props}><path d="M2 5h12M2 11h12" /><path d="M8 5V2M8 14v-3" strokeWidth="2" /><path d="M5 8h6" strokeDasharray="2 2" /></svg>;
     case "unlocks": return <svg {...props}><rect x="3" y="7" width="10" height="7" rx="1" /><path d="M6 7V5a2 2 0 013.4-1.4" /><path d="M8 10v1.5" /></svg>;
+    case "radar": return <svg {...props}><circle cx="8" cy="8" r="6" /><circle cx="8" cy="8" r="2.5" /><path d="M8 8l4-2.5" /></svg>;
     case "intel": return <svg {...props}><circle cx="8" cy="8" r="2" /><circle cx="4" cy="4" r="1.5" /><circle cx="12" cy="4" r="1.5" /><circle cx="4" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><path d="M6 6.5L5 5M10 6.5l1-1.5M6 9.5L5 11M10 9.5l1 1.5" /></svg>;
     case "watchlist": return <svg {...props}><path d="M8 2l1.8 3.6L14 6.2l-3 2.9.7 4.1L8 11.4l-3.7 1.8.7-4.1-3-2.9 4.2-.6L8 2z" /></svg>;
     case "subscription": return <svg {...props}><rect x="2" y="4" width="12" height="8" rx="1" /><path d="M2 7h12" /></svg>;
     case "admin": return <svg {...props}><path d="M8 1L2 4v4c0 4 2.5 6.5 6 8 3.5-1.5 6-4 6-8V4L8 1z" /><path d="M6 8l2 2 3-4" /></svg>;
+    case "settings": return <svg {...props}><circle cx="8" cy="8" r="2.25" /><path d="M8 1.5v2M8 12.5v2M14.5 8h-2M3.5 8h-2M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4M12.6 12.6l-1.4-1.4M4.8 4.8L3.4 3.4" /></svg>;
     default: return null;
   }
 }

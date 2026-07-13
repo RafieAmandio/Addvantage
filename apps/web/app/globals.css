@@ -111,6 +111,25 @@ html, body {
   50% { transform: scaleY(1.1); opacity: 1; }
 }
 
+/* Pixel spinner — square ring that ticks in 8 mechanical steps (button loading) */
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Declassify — a black redaction bar wipes off to the right, revealing text */
+@keyframes declassify {
+  0%   { transform: scaleX(1); }
+  55%  { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+/* Faint scan sheen that crosses the redaction bar just before it lifts */
+@keyframes redactScan {
+  0%, 45% { opacity: 0; transform: translateX(-120%); }
+  60%     { opacity: 1; }
+  100%    { opacity: 0; transform: translateX(120%); }
+}
+
 /* Toast progress bar */
 @keyframes toastBar {
   from { width: 100%; }

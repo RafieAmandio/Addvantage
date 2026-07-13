@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import bcrypt from "bcrypt";
 import { SignJWT, jwtVerify } from "jose";
 import { env } from "@/config/env.js";
@@ -155,6 +156,49 @@ export const authService = {
       .sign(secret);
 
     return { accessToken };
+  },
+
+  // Creates a real account for a customer who already paid (early access).
+  // Generates a temporary password, returned in plaintext ONCE so it can be
+  // emailed (and shown to the admin as a fallback). Never logs the password.
+  provisionPaidAccount: async (input: {
+    email: string;
+    handle?: string;
+    renewsAt: Date;
+  }) => {
+    const existing = await authRepository.findByEmail(input.email);
+    if (existing) {
+      throw new AppError("An account with this email already exists", 409);
+    }
+
+    const tempPassword = crypto.randomBytes(9).toString("base64url");
+    const passwordHash = await bcrypt.hash(tempPassword, SALT_ROUNDS);
+    const profile = await authRepository.createProvisioned({
+      email: input.email,
+      passwordHash,
+      handle: input.handle,
+      renewsAt: input.renewsAt,
+    });
+
+    return { profile, tempPassword };
+  },
+
+  changePassword: async (input: {
+    userId: string;
+    currentPassword: string;
+    newPassword: string;
+  }) => {
+    const profile = await authRepository.findPasswordHashById(input.userId);
+    if (!profile || !profile.passwordHash) {
+      throw new AppError("User not found", 404);
+    }
+
+    const valid = await bcrypt.compare(input.currentPassword, profile.passwordHash);
+    if (!valid) throw new AppError("Current password is incorrect", 401);
+
+    const passwordHash = await bcrypt.hash(input.newPassword, SALT_ROUNDS);
+    await authRepository.updatePassword(input.userId, passwordHash);
+    return { changed: true };
   },
 
   resendVerification: async (userId: string) => {

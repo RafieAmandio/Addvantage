@@ -152,3 +152,12 @@ feat|fix|chore|refactor: short summary
 | Black | `#111111` | Page backgrounds, dark surfaces |
 | Gray | `#1F1F1F` | Elevated surfaces, cards, inputs |
 | White | `#EEEEEE` | Primary text |
+
+## Deploying
+
+- **Never build images on the VPS** and **never assume `git push` deploys anything** (no GitHub→Dokploy webhook).
+- Deploys are **local buildx → GHCR → Dokploy pull**. From the Addvantage repo root:
+  - `scripts/deploy-local.sh` — build+push web/api/worker images and trigger Dokploy redeploys
+  - `scripts/deploy-local.sh web` — single service
+  - `SKIP_DEPLOY=1 scripts/deploy-local.sh` — build+push only
+- One-time GHCR setup, Dokploy app IDs, and details: `CLAUDE.md` → "Deployment (Dokploy on VPS)".

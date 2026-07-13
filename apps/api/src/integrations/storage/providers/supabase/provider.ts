@@ -25,16 +25,17 @@ export class SupabaseStorageProvider implements StorageProvider {
 
     const ext = path.extname(opts.originalName) || mimeToExt(opts.contentType);
     const folder = opts.folder ?? "uploads";
+    const bucket = opts.bucket ?? this.bucket;
     const key = `${folder}/${randomUUID()}${ext}`;
 
     const res = await fetch(
-      `${this.baseUrl}/storage/v1/object/${this.bucket}/${key}`,
+      `${this.baseUrl}/storage/v1/object/${bucket}/${key}`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.serviceKey}`,
           "Content-Type": opts.contentType,
-          "Cache-Control": "public, max-age=31536000, immutable",
+          "Cache-Control": "private, max-age=31536000, immutable",
           "x-upsert": "false",
         },
         body: opts.buffer,
@@ -46,7 +47,12 @@ export class SupabaseStorageProvider implements StorageProvider {
       throw new Error(`Supabase storage upload failed (${res.status}): ${body}`);
     }
 
-    const url = this.getPublicUrl(key);
+    // Private objects have no public URL — hand back the object key so callers
+    // store a reference the service role (or a signed URL) can resolve later.
+    const url =
+      opts.isPublic === false
+        ? key
+        : `${this.baseUrl}/storage/v1/object/public/${bucket}/${key}`;
     logger.info({ key, contentType: opts.contentType, size: opts.buffer.length }, "storage: uploaded (supabase)");
 
     return { key, url, contentType: opts.contentType, size: opts.buffer.length };
@@ -54,6 +60,31 @@ export class SupabaseStorageProvider implements StorageProvider {
 
   getPublicUrl(key: string): string {
     return `${this.baseUrl}/storage/v1/object/public/${this.bucket}/${key}`;
+  }
+
+  // Signed URL for a private object. Supabase returns a relative signedURL
+  // ("/object/sign/<bucket>/<key>?token=..."); prefix it with the storage base.
+  async getSignedUrl(key: string, expiresInSec: number, bucket?: string): Promise<string> {
+    const b = bucket ?? this.bucket;
+    const res = await fetch(
+      `${this.baseUrl}/storage/v1/object/sign/${b}/${key}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.serviceKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expiresIn: expiresInSec }),
+      },
+    );
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Supabase storage sign failed (${res.status}): ${body}`);
+    }
+
+    const json = (await res.json()) as { signedURL: string };
+    return `${this.baseUrl}/storage/v1${json.signedURL}`;
   }
 
   async delete(key: string): Promise<void> {
