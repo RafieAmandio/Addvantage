@@ -3,10 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
-import {
-  LogoMark,
-  Wordmark,
-} from "@/features/marketing/components/icons";
 import { heroTicker } from "@/features/marketing/lib/data";
 import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
 import { TickerItem } from "@/features/marketing/components/TickerItem";
@@ -56,6 +52,10 @@ function Flicker({
   );
 }
 
+// The globe in hero.png sits 3.92% left of the image's horizontal center
+// (measured from its apex). Nudge it right so it reads as centered.
+const EARTH_X = "3.92%";
+
 export function HeroSection() {
   const earthRef = useRef<HTMLImageElement>(null);
   const [entered, setEntered] = useState(false);
@@ -75,7 +75,7 @@ export function HeroSection() {
         const scrolled = window.scrollY;
         if (earthRef.current) {
           const zoom = 1 + Math.min(1, scrolled / window.innerHeight) * 0.4;
-          earthRef.current.style.transform = `translate(-50%, ${scrolled * 0.08}px) scale(${zoom})`;
+          earthRef.current.style.transform = `translate(${EARTH_X}, ${scrolled * 0.08}px) scale(${zoom})`;
         }
         ticking = false;
       });
@@ -89,11 +89,15 @@ export function HeroSection() {
     <>
       {/* Navbar — always on top */}
       <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-8 md:px-[140px] md:py-10">
-        <Link href="/" className="group flex items-center gap-[7.78px]">
-          <span className="transition-transform duration-300 ease-out group-hover:scale-110">
-            <LogoMark size={30} />
-          </span>
-          <Wordmark size={24} />
+        <Link href="/" className="group flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-vantage.png"
+            alt="+vantage"
+            width={319}
+            height={73}
+            className="h-8 w-auto transition-transform duration-300 ease-out group-hover:scale-110"
+          />
         </Link>
         <Link
           href="/signup"
@@ -162,9 +166,10 @@ export function HeroSection() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={earthRef}
-            src="/figma/earth-1.png"
+            src="/figma/hero.png"
             alt=""
-            className="absolute left-1/2 top-[2%] w-[5000px] max-w-none -translate-x-1/2 select-none will-change-transform"
+            style={{ transform: `translateX(${EARTH_X})` }}
+            className="absolute inset-x-0 bottom-[-48px] w-full max-w-none origin-bottom select-none will-change-transform"
           />
           <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-gray via-gray/60 to-transparent" />
         </div>

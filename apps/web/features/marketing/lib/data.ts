@@ -1,12 +1,14 @@
 export const FUTURA = "'Futura', 'Inter', system-ui, sans-serif";
 
 export const heroTicker = [
-  { sym: "BBNI", val: "4.320", chg: "-4.2%", dir: "down" as const },
-  { sym: "BBCA", val: "6.500", chg: "-4.2%", dir: "down" as const },
-  { sym: "BBRI", val: "3.110", chg: "-1.2%", dir: "down" as const },
-  { sym: "WBSA", val: "456", chg: "+24.2%", dir: "up" as const },
-  { sym: "TPIA", val: "2.123", chg: "-1.2%", dir: "down" as const },
-  { sym: "DGWA", val: "806", chg: "-0.1%", dir: "down" as const },
+  { sym: "EURUSD", val: "1.0847", chg: "+0.31%", dir: "up" as const },
+  { sym: "BTCUSD", val: "68,240", chg: "+2.14%", dir: "up" as const },
+  { sym: "GBPUSD", val: "1.2718", chg: "-0.42%", dir: "down" as const },
+  { sym: "XAUUSD", val: "2,381.40", chg: "+0.83%", dir: "up" as const },
+  { sym: "USDJPY", val: "157.22", chg: "+0.48%", dir: "up" as const },
+  { sym: "ETHUSD", val: "3,542", chg: "-1.27%", dir: "down" as const },
+  { sym: "SOLUSD", val: "168.90", chg: "+4.61%", dir: "up" as const },
+  { sym: "AUDUSD", val: "0.6648", chg: "-0.19%", dir: "down" as const },
 ];
 
 export const pillars = [

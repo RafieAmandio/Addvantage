@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { ModelViewer } from "@/features/marketing/components/ModelViewer";
 import {
   IconCheckBox,
   IconCloseSquare,
@@ -348,18 +349,27 @@ export function PositioningSection() {
                 experienced traders and investors.
               </p>
             </RevealItem>
-            <div className="pointer-events-none absolute left-1/2 top-[193px] h-[364px] w-[364px] -translate-x-1/2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/figma/what-this-is.png"
-                alt=""
-                className="h-full w-full object-cover transition-all duration-1000"
+            {/* Oversized, bottom-cropped 3D model — bleeds past the card's
+                bottom edge (clipped by the card's overflow-hidden). */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
+              <div
+                className="aspect-square w-[96%] transition-all duration-1000"
                 style={{
                   opacity: inView ? 1 : 0,
-                  transform: inView ? "scale(1) rotate(0deg)" : "scale(0.8) rotate(-3deg)",
+                  transform: inView ? "translateY(20%) scale(1)" : "translateY(20%) scale(0.85)",
                   transitionDelay: "600ms",
                 }}
-              />
+              >
+                <ModelViewer
+                  src="/models/what-this-is.glb"
+                  poster="/figma/what-this-is.png"
+                  radius="82%"
+                  idleSpeed={8}
+                  scrollSpin={110}
+                  pointerTrack={7}
+                  basePhi={80}
+                />
+              </div>
             </div>
           </div>
 

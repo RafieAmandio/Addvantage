@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { faq } from "@/features/marketing/lib/data";
 import { cn } from "@/lib/cn";
+import { ModelViewer } from "@/features/marketing/components/ModelViewer";
 
 function useInView(threshold = 0.2) {
   const ref = useRef<HTMLElement>(null);
@@ -232,18 +233,24 @@ export function FaqSection() {
               transitionDelay: "300ms",
             }}
           >
-            <div className="pointer-events-none absolute left-[-256px] top-[224px] h-[1073px] w-[1073px] blur-[2.5px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/figma/discord.png"
-                alt=""
-                className="h-full w-full object-cover transition-all duration-1000"
+            <div className="pointer-events-none absolute left-[-256px] top-[224px] h-[1073px] w-[1073px]">
+              <div
+                className="h-full w-full transition-all duration-1000"
                 style={{
                   opacity: inView ? 1 : 0,
                   transform: inView ? "scale(1)" : "scale(0.9)",
                   transitionDelay: "500ms",
                 }}
-              />
+              >
+                <ModelViewer
+                  src="/models/discord.glb"
+                  poster="/figma/discord.png"
+                  idleSpeed={4}
+                  scrollSpin={60}
+                  pointerTrack={3}
+                  basePhi={84}
+                />
+              </div>
             </div>
             <div className="relative flex flex-col gap-2 text-white">
               <ScrambleH2
