@@ -69,7 +69,7 @@ export function TickerItem({ sym, val, chg, dir }: Props) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        "flex w-[220px] shrink-0 items-center justify-center gap-[11px] rounded-[10px] bg-white/10 p-4 backdrop-blur-[8.65px] transition-shadow duration-300",
+        "flex min-w-[220px] shrink-0 items-center justify-center gap-[11px] whitespace-nowrap rounded-[10px] bg-white/10 px-5 py-4 backdrop-blur-[8.65px] transition-shadow duration-300",
         hovered && "shadow-[0_0_12px_rgba(255,212,0,0.15)]"
       )}
     >
