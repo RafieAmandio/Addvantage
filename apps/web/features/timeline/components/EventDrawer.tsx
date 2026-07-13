@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { cn } from "@/lib/cn";
+import { cn, formatWibDateTime } from "@/lib/cn";
 import { kindBadge } from "@/features/timeline/types";
 import type { TimelineEvent } from "@/features/timeline/types";
 
@@ -34,10 +34,6 @@ function impactColor(impact: TimelineEvent["impact"]): string {
     default:
       return "bg-white/10 text-white/50";
   }
-}
-
-function formatOccurredAt(iso: string): string {
-  return iso.slice(0, 16).replace("T", " ") + " UTC";
 }
 
 export function EventDrawer({ event, onClose }: EventDrawerProps) {
@@ -84,7 +80,7 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
                 </span>
               )}
               <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {formatOccurredAt(event.occurredAt)}
+                {formatWibDateTime(event.occurredAt)}
               </span>
             </div>
           </div>

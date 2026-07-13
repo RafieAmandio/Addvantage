@@ -10,7 +10,7 @@ import {
   ImpactPill,
   BiasBadge,
 } from "@/components/ui/Marker";
-import { cn, formatTime, formatDate } from "@/lib/cn";
+import { cn, formatWibTime, formatDate } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TradingPlan } from "@/features/plan/types";
 
@@ -113,7 +113,7 @@ export function BriefClient({ news, plan }: Props) {
                         </span>
                       )}
                       <span className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:inline">
-                        {formatTime(ts)}Z · BY {n.author.toUpperCase()}
+                        {formatWibTime(ts)} WIB · BY {n.author.toUpperCase()}
                       </span>
                     </div>
                     <h3

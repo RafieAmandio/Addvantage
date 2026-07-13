@@ -1,4 +1,4 @@
-import { cn, formatTime } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { ConsultMessage } from "@/features/consult/types";
 
 export function Bubble({ msg }: { msg: ConsultMessage }) {
@@ -18,7 +18,7 @@ export function Bubble({ msg }: { msg: ConsultMessage }) {
           ● {isUser ? "OPERATOR" : `DESK · ${msg.author ?? "TEAM"}`}
         </span>
         <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-          {formatTime(msg.ts)}Z
+          {formatWibTime(msg.ts)} WIB
         </span>
       </div>
       <div

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { cn } from "@/lib/cn";
+import { cn, formatWibDateTime } from "@/lib/cn";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
 
 interface ChannelThread {
@@ -543,7 +543,7 @@ export default function AdminChannelPage() {
                     )}
                   </div>
                   <div className="mt-0.5 font-mono text-[9px] text-white/30">
-                    {new Date(post.createdAt).toLocaleString()}
+                    {formatWibDateTime(post.createdAt)}
                   </div>
                 </div>
               </div>

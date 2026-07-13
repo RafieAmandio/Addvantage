@@ -1,4 +1,4 @@
-import { allHashtags, hashtagMeta } from "@/features/tags/constants";
+import { allHashtags, getHashtagMeta } from "@/features/tags/constants";
 import type { ConsultMessage } from "@/features/consult/types";
 import { logger } from "@/lib/logger";
 
@@ -87,7 +87,7 @@ function getLocalConsultResults(tokens: string[]): SearchResult[] {
 function getHashtagResults(tokens: string[]): SearchResult[] {
   const results: SearchResult[] = [];
   for (const t of allHashtags) {
-    const m = hashtagMeta[t];
+    const m = getHashtagMeta(t);
     const haystack = [t, m.label, m.description].join(" ").toLowerCase();
     const sc = scoreHaystack(`#${t}`.toLowerCase(), [], haystack, tokens);
     if (sc > 0) {

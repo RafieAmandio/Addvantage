@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { sessionMatchesQuery } from "@/features/consult/lib/search";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { ConsultLayout } from "@/features/consult/components/ConsultLayout";
 import { ConsultHeroHeader } from "@/features/consult/components/ConsultHeroHeader";
 import { ConsultModeHint } from "@/features/consult/components/ConsultModeHint";
@@ -10,12 +9,10 @@ import {
   type InitialConsultData,
 } from "@/features/consult/hooks/useConsultPersistence";
 import { useConsultKeyboard } from "@/features/consult/hooks/useConsultKeyboard";
-import { useSessionQueryParam } from "@/features/consult/hooks/useSessionQueryParam";
 import { useConsultActions } from "@/features/consult/hooks/useConsultActions";
 import { useConsultPolling } from "@/features/consult/hooks/useConsultPolling";
 import { useAppState, isPaid } from "@/lib/state";
 import { PaywallOverlay } from "@/components/ui/Paywall";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import type { ConsultSession } from "@/features/consult/types";
 
 const EMPTY_SESSION: ConsultSession = {
@@ -44,18 +41,10 @@ export function ConsultPageView({
     setActiveId,
   } = useConsultPersistence(initialData);
 
-  const [sessionQuery, setSessionQuery] = useSessionQueryParam();
   const modeHint = useConsultKeyboard();
   const endRef = useRef<HTMLDivElement>(null);
 
-  const visibleSessions = useMemo(
-    () =>
-      localSessions.filter((s) =>
-        sessionMatchesQuery(s, extrasBySession[s.id] ?? [], sessionQuery)
-      ),
-    [localSessions, extrasBySession, sessionQuery]
-  );
-
+  // One session per account: always resolve to the single latest session.
   const active =
     localSessions.find((s) => s.id === activeId) ??
     localSessions[0] ??
@@ -63,19 +52,7 @@ export function ConsultPageView({
   const extras = extrasBySession[active.id] ?? [];
   const messages = [...active.messages, ...extras];
 
-  const {
-    draft,
-    setDraft,
-    pendingDelete,
-    setPendingDelete,
-    startNewSession,
-    send,
-    renameSession,
-    requestDeleteSession,
-    confirmDeleteSession,
-    exportActiveSession,
-    isUserSession,
-  } = useConsultActions({
+  const { draft, setDraft, send, exportActiveSession } = useConsultActions({
     active,
     activeId,
     setActiveId,
@@ -101,39 +78,18 @@ export function ConsultPageView({
   }, [extras]);
 
   const layoutProps = {
-    sessions: visibleSessions,
-    totalSessions: localSessions.length,
-    sessionQuery,
-    setSessionQuery,
-    extrasBySession,
     messages,
     active,
-    activeId,
-    setActiveId,
     draft,
     setDraft,
     send,
     endRef,
-    onNewSession: startNewSession,
-    onRenameSession: renameSession,
-    onDeleteSession: requestDeleteSession,
     onExportSession: exportActiveSession,
-    isLocalSession: isUserSession,
   };
 
   return (
     <div className="stagger relative">
       <ConsultModeHint modeHint={modeHint} />
-      <ConfirmDialog
-        open={pendingDelete !== null}
-        title={`Delete "${pendingDelete?.title ?? ""}"?`}
-        description="This session and all its messages will be permanently removed. This cannot be undone."
-        confirmLabel="Delete session"
-        cancelLabel="Keep"
-        destructive
-        onConfirm={confirmDeleteSession}
-        onCancel={() => setPendingDelete(null)}
-      />
       <ConsultHeroHeader paid={paid} />
 
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6">

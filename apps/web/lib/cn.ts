@@ -8,7 +8,7 @@ export function formatTime(iso: string, opts: Intl.DateTimeFormatOptions = {}) {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-    timeZone: "UTC",
+    timeZone: "Asia/Jakarta",
     ...opts,
   });
 }
@@ -30,6 +30,7 @@ export function formatWibDateTime(iso: string) {
 export function formatDate(iso: string) {
   const d = new Date(iso);
   return d.toLocaleDateString("en-GB", {
+    timeZone: "Asia/Jakarta",
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -37,7 +38,7 @@ export function formatDate(iso: string) {
 }
 
 export function formatDateTime(iso: string) {
-  return `${formatDate(iso)} · ${formatTime(iso)}Z`;
+  return `${formatDate(iso)} · ${formatWibTime(iso)} WIB`;
 }
 
 export function formatIDR(n: number) {

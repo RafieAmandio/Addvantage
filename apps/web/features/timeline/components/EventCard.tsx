@@ -1,12 +1,8 @@
 import { memo } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/cn";
+import { cn, formatWibDateTime } from "@/lib/cn";
 import { kindBadge } from "@/features/timeline/types";
 import type { TimelineEvent } from "@/features/timeline/queries/timeline";
-
-function formatTime(iso: string): string {
-  return iso.slice(0, 16).replace("T", " ");
-}
 
 function eventHref(e: TimelineEvent): string | null {
   if (e.newsItemId) return `/app/news/${e.newsItemId}`;
@@ -38,7 +34,7 @@ function EventCardInner({
           </span>
         )}
         <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          {formatTime(event.occurredAt)}
+          {formatWibDateTime(event.occurredAt)}
         </span>
       </div>
       <div className="mt-1.5 text-sm leading-snug text-white">{event.title}</div>

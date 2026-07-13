@@ -52,13 +52,26 @@ export const graphService = {
       }
     }
 
-    const perType = Math.ceil(limit / types.length);
+    // Weight the node budget toward recent, high-signal sources. News + macro
+    // events are the live pulse; published plans and channel posts are authored
+    // occasionally and otherwise dilute the graph with stale anchors. Allocate
+    // by weight across whichever types were requested (renormalized).
+    const TYPE_WEIGHT: Record<string, number> = {
+      news: 0.55,
+      event: 0.3,
+      plan: 0.1,
+      channel: 0.05,
+    };
+    const activeWeight =
+      types.reduce((sum, t) => sum + (TYPE_WEIGHT[t] ?? 0), 0) || 1;
+    const perTypeFor = (t: string) =>
+      Math.max(1, Math.ceil((limit * (TYPE_WEIGHT[t] ?? 0)) / activeWeight));
 
     const fetchers: Promise<GraphNode[]>[] = [];
 
     if (types.includes("news")) {
       fetchers.push(
-        graphRepository.fetchNews(q, perType).then((rows) =>
+        graphRepository.fetchNews(q, perTypeFor("news")).then((rows) =>
           rows.map((r) => ({
             id: r.id,
             type: "news" as const,
@@ -75,7 +88,7 @@ export const graphService = {
 
     if (types.includes("plan")) {
       fetchers.push(
-        graphRepository.fetchPlans(q, perType).then((rows) =>
+        graphRepository.fetchPlans(q, perTypeFor("plan")).then((rows) =>
           rows.map((r) => ({
             id: r.id,
             type: "plan" as const,
@@ -92,7 +105,7 @@ export const graphService = {
 
     if (types.includes("channel")) {
       fetchers.push(
-        graphRepository.fetchChannel(q, perType).then((rows) =>
+        graphRepository.fetchChannel(q, perTypeFor("channel")).then((rows) =>
           rows.map((r) => ({
             id: r.id,
             type: "channel" as const,
@@ -109,7 +122,7 @@ export const graphService = {
 
     if (types.includes("event")) {
       fetchers.push(
-        graphRepository.fetchEvents(q, perType).then((rows) =>
+        graphRepository.fetchEvents(q, perTypeFor("event")).then((rows) =>
           rows.map((r) => ({
             id: r.id,
             type: "event" as const,
@@ -125,7 +138,12 @@ export const graphService = {
     }
 
     const nodeGroups = await Promise.all(fetchers);
-    const nodes = nodeGroups.flat().slice(0, limit);
+    // Newest first, so the freshest intelligence is what survives the cap and
+    // leads the node list the client renders.
+    const nodes = nodeGroups
+      .flat()
+      .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+      .slice(0, limit);
 
     const edges = computeEdges(nodes);
 

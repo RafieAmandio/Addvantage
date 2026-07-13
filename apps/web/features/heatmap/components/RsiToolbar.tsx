@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { RsiZoneId } from "../types";
 import type { ForexGroup } from "@tradevantage/shared";
 import { ZONE_CONFIG, ZONES_ORDERED, GROUP_LABELS, GROUPS_ORDERED, GROUP_COLORS } from "../lib/zones";
@@ -103,7 +103,7 @@ export function RsiToolbar({
         </span>
         {updatedAt && (
           <span title={updatedAt}>
-            Updated {new Date(updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            Updated {formatWibTime(updatedAt)} WIB
           </span>
         )}
       </div>

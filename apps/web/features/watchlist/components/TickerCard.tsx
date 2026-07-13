@@ -2,7 +2,7 @@ import { memo } from "react";
 import Link from "next/link";
 import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
-import { formatDate, formatTime, cn } from "@/lib/cn";
+import { formatDate, formatWibTime, cn } from "@/lib/cn";
 import type { TickerRollup } from "@/features/watchlist/types";
 
 interface Props {
@@ -88,7 +88,7 @@ function TickerCardImpl({ rollup, onUnpin }: Props) {
                       <ImpactPill level={n.impact} />
                       <BiasBadge bias={n.bias} />
                       <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                        {formatDate(ts)} · {formatTime(ts)}Z
+                        {formatDate(ts)} · {formatWibTime(ts)} WIB
                       </span>
                     </div>
                     <div className="mt-1 font-display text-base leading-snug text-white transition-colors group-hover:text-brand">

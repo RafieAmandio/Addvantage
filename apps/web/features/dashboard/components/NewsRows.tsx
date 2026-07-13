@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { formatTime, cn } from "@/lib/cn";
+import { formatWibTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 export function NewsRows({
@@ -75,7 +75,7 @@ export function NewsRows({
                 </span>
                 <BiasBadge bias={n.bias} />
                 <span className="hidden w-16 shrink-0 text-right text-[11px] text-white/40 sm:block">
-                  {formatTime(ts)}
+                  {formatWibTime(ts)} WIB
                 </span>
               </Link>
             );

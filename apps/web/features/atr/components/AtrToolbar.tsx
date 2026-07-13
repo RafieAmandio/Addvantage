@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { AtrZoneId } from "../types";
 import { ATR_ZONE_CONFIG, ATR_ZONES_ORDERED, GROUP_LABELS } from "../lib/zones";
 import type { ForexGroup, ForexTier } from "@tradevantage/shared";
@@ -119,7 +119,7 @@ export function AtrToolbar({
         </span>
         {updatedAt && (
           <span title={updatedAt}>
-            Updated {new Date(updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            Updated {formatWibTime(updatedAt)} WIB
           </span>
         )}
       </div>

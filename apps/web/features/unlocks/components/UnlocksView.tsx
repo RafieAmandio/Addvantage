@@ -1,4 +1,4 @@
-import { cn } from "@/lib/cn";
+import { cn, formatDate } from "@/lib/cn";
 import {
   compactUsd,
   daysUntil,
@@ -69,12 +69,7 @@ function CategoryTags({ categories }: { categories: string[] }) {
 }
 
 function dateLabel(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  return formatDate(iso);
 }
 
 function DesktopTable({ events }: { events: UnlockEvent[] }) {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
-import { allHashtags, hashtagMeta } from "@/features/tags/constants";
+import { allHashtags, getHashtagMeta } from "@/features/tags/constants";
 import { DataLabel, SectionNumber } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
@@ -125,7 +125,7 @@ function TagsView() {
     if (!query) return counts;
     const q = query.toLowerCase();
     return counts.filter(({ tag }) => {
-      const meta = hashtagMeta[tag];
+      const meta = getHashtagMeta(tag);
       const haystack = `${tag} ${meta.label} ${meta.description}`.toLowerCase();
       return haystack.includes(q);
     });
@@ -219,7 +219,7 @@ function TagsView() {
 
         <div className="mt-6 grid grid-cols-12 gap-px bg-gray-3">
           {visibleCounts.map(({ tag, c }, i) => {
-            const meta = hashtagMeta[tag];
+            const meta = getHashtagMeta(tag);
             const density = c / maxCount;
             const isHot = i < 3 && c > 0 && !query && sortMode === "density";
             return (

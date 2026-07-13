@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { cn, formatDate, formatTime } from "@/lib/cn";
+import { cn, formatDate, formatWibTime } from "@/lib/cn";
 import type { Notification } from "@/features/notifications/types";
 import {
   KIND_COLOR,
@@ -93,7 +93,7 @@ export function NotificationItem({
                 </span>
               )}
               <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                · {n.id} · {formatDate(n.ts)} · {formatTime(n.ts)}Z
+                · {n.id} · {formatDate(n.ts)} · {formatWibTime(n.ts)} WIB
               </span>
             </div>
             <div
