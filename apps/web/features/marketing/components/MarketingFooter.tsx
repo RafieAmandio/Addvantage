@@ -1,19 +1,12 @@
 import Link from "next/link";
-import { Wordmark } from "@/features/marketing/components/icons";
+import { LogoMark, Wordmark } from "@/features/marketing/components/icons";
 
 export function MarketingFooter() {
   return (
     <footer className="mt-[80px] flex flex-wrap items-start justify-between gap-10 bg-white/[0.03] p-6 md:mt-[140px] md:p-[140px]">
       <div className="flex w-full flex-col gap-[42px] md:max-w-[310px]">
         <div className="flex items-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/figma/logo-mark.png"
-            alt="+vantage"
-            width={45}
-            height={45}
-            className="h-[45px] w-[45px] shrink-0"
-          />
+          <LogoMark size={45} />
           <Wordmark size={36} />
         </div>
         <p className="text-base font-light leading-[1.4] text-white">
