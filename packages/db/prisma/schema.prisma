@@ -266,6 +266,16 @@ model VideoModule {
   @@map("video_modules")
 }
 
+model ShortLink {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug      String   @unique
+  targetUrl String   @map("target_url")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("short_links")
+}
+
 model Payment {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId   String    @map("profile_id") @db.Uuid
