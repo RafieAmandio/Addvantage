@@ -69,13 +69,19 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
 
-  // Sync tier from backend so localStorage reflects the real DB value.
+  // Sync tier + display name from backend so localStorage reflects real values.
   useEffect(() => {
     if (!hydrated) return;
-    apiGet<{ tier: string }>("/users/me")
+    apiGet<{ tier: string; email?: string; handle?: string }>("/users/me")
       .then((data) => {
         const backendTier: Tier = data?.tier === "vip" ? "vip" : "free";
         setTierState(backendTier);
+        // Display name in the sidebar/topbar = the email's local part (drop the
+        // "@domain"), e.g. "jane.doe@gmail.com" → "jane.doe". Fall back to the
+        // chosen handle, then leave the existing value if neither is available.
+        const emailLocal = data?.email ? data.email.split("@")[0] : "";
+        const name = emailLocal || data?.handle || "";
+        if (name) setOperatorName(name);
       })
       .catch(() => {});
   }, [hydrated]);
