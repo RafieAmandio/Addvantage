@@ -11,7 +11,7 @@ export function isPaidTier(t: string): t is PaidTier {
 
 // Indonesian Rupiah (IDR) checkout amount per paid tier (annual).
 export const TIER_PRICE_IDR: Record<PaidTier, number> = {
-  vip: 17_500_000,
+  vip: 18_000_000,
 };
 
 // Hourly request budget per tier for tier-gated APIs (consult LLM, etc.).

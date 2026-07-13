@@ -306,7 +306,7 @@ export function AccessSection() {
               </span>
             </div>
             <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4]">
-              <ScramblePrice text="IDR 17.5M" trigger={inView} delay={500} />
+              <ScramblePrice text="IDR 18.000.000" trigger={inView} delay={500} />
             </p>
             <p
               className="font-mono text-base font-light leading-[1.4] transition-all duration-500"

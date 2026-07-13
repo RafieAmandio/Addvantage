@@ -30,6 +30,9 @@ const GammaEventSchema = z.object({
   slug: z.string(),
   volume: z.number().optional(),
   liquidity: z.number().optional(),
+  endDate: z.string().optional().nullable(),
+  closed: z.boolean().optional().nullable(),
+  active: z.boolean().optional().nullable(),
   markets: z.array(GammaMarketSchema).default([]),
 });
 
@@ -154,6 +157,11 @@ export async function syncPolymarketSnapshots(): Promise<void> {
         continue;
       }
 
+      if (event.closed === true) {
+        logger.debug({ label: t.label, eventId: t.eventId }, "polymarket-sync: event closed, skipping");
+        continue;
+      }
+
       const outcomes = parseOutcomes(event.markets);
 
       if (outcomes.length === 0) {
@@ -213,10 +221,25 @@ export async function rotatePolymarketSlugs(): Promise<void> {
         continue;
       }
 
+      const now = Date.now();
+
       const candidates = events.filter((e) => {
+        // Base filters: enough markets, meaningful volume, at least 2 live outcomes.
         if (e.markets.length < 3 || (e.volume ?? 0) < 10_000) return false;
         const active = parseOutcomes(e.markets);
-        return active.length >= 2;
+        if (active.length < 2) return false;
+
+        // Exclude explicitly closed / inactive events (resolved monthly markets).
+        if (e.closed === true || e.active === false) return false;
+
+        // Exclude events whose resolution date is already in the past.
+        // Missing endDate is allowed but will be ranked last below.
+        if (e.endDate) {
+          const end = new Date(e.endDate).getTime();
+          if (!Number.isNaN(end) && end <= now) return false;
+        }
+
+        return true;
       });
 
       if (candidates.length === 0) {
@@ -224,9 +247,43 @@ export async function rotatePolymarketSlugs(): Promise<void> {
         continue;
       }
 
-      const best = candidates.reduce((a, b) =>
-        (b.volume ?? 0) > (a.volume ?? 0) ? b : a,
-      );
+      // Prefer the current OPEN market that resolves SOONEST (nearest future
+      // endDate = the live monthly market). Tie-break by higher volume.
+      // Candidates without a valid future endDate rank after those that have one.
+      const endMs = (e: (typeof candidates)[number]): number | null => {
+        if (!e.endDate) return null;
+        const ms = new Date(e.endDate).getTime();
+        return Number.isNaN(ms) ? null : ms;
+      };
+
+      // Skip ultra-short-dated markets (daily/weekly) so we track the monthly
+      // consensus market rather than churning on markets that resolve in days.
+      // If every candidate is short-dated (some symbols only have weeklies),
+      // fall back to the full candidate set so rotation never gets stuck.
+      const MIN_HORIZON_MS = 10 * 24 * 60 * 60 * 1000;
+      const monthly = candidates.filter((e) => {
+        const end = endMs(e);
+        return end !== null && end > now + MIN_HORIZON_MS;
+      });
+      const pool = monthly.length > 0 ? monthly : candidates;
+
+      const best = pool.reduce((a, b) => {
+        const aEnd = endMs(a);
+        const bEnd = endMs(b);
+
+        // Both have a future endDate → nearest resolution wins.
+        if (aEnd !== null && bEnd !== null) {
+          if (aEnd !== bEnd) return aEnd < bEnd ? a : b;
+          return (b.volume ?? 0) > (a.volume ?? 0) ? b : a;
+        }
+
+        // Exactly one has an endDate → that one is preferred.
+        if (aEnd !== null) return a;
+        if (bEnd !== null) return b;
+
+        // Neither has an endDate → fall back to higher volume.
+        return (b.volume ?? 0) > (a.volume ?? 0) ? b : a;
+      });
 
       if (best.id !== t.eventId) {
         await prisma.polymarketTracked.update({

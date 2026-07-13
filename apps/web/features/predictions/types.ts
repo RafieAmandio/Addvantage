@@ -35,6 +35,7 @@ export const PredictionCardData = z.object({
       max: z.number(),
     })
     .nullable(),
+  stale: z.boolean(),
 });
 
 export type PredictionCardData = z.infer<typeof PredictionCardData>;

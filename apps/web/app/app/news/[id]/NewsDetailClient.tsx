@@ -13,7 +13,7 @@ import {
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { RelatedPlansChips } from "@/features/news/components/RelatedPlansChips";
-import { formatDate, formatTime, cn } from "@/lib/cn";
+import { formatDate, formatWibTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 interface Props {
@@ -99,7 +99,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             <ImpactPill level={item.impact} />
             <BiasBadge bias={item.bias} />
             <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              {formatDate(ts)} · {formatTime(ts)}Z
+              {formatDate(ts)} · {formatWibTime(ts)} WIB
             </span>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -145,7 +145,7 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
             <dl className="mt-4 space-y-2 border border-gray-3 bg-gray-2/30 p-4 font-mono text-xs">
               <Row label="Source" value={`[${item.sourceCode}]`} />
               <Row label="Author" value={item.author} />
-              <Row label="Captured" value={`${formatTime(ts)}Z`} />
+              <Row label="Captured" value={`${formatWibTime(ts)} WIB`} />
               <Row label="Impact" value={item.impact.toUpperCase()} />
               <Row label="Bias" value={item.bias.toUpperCase()} />
             </dl>

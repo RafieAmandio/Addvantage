@@ -54,7 +54,7 @@ function parseForm(formData: FormData) {
 
 function revalidateVideos() {
   revalidatePath("/admin/videos");
-  revalidatePath("/app/education/videos");
+  revalidatePath("/app/education");
 }
 
 export async function createVideo(

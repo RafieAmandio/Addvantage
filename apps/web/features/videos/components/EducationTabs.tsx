@@ -9,8 +9,8 @@ const LABELS: Record<Tab, string> = {
 };
 
 const HREFS: Record<Tab, string> = {
-  primers: "/app/education",
-  videos: "/app/education/videos",
+  primers: "/app/education/primers",
+  videos: "/app/education",
 };
 
 export function EducationTabs({ current }: { current: Tab }) {

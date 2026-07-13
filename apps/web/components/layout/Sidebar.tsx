@@ -28,11 +28,11 @@ const nav = [
   { label: "Consultation", href: "/app/consult", group: "tools", locked: true, icon: "consult" },
   { label: "Education", href: "/app/education", group: "tools", icon: "education" },
   { label: "Hashtags", href: "/app/tags", group: "tools", icon: "tags" },
-  { label: "RSI Heatmap", href: "/app/heatmap", group: "tools", icon: "heatmap" },
-  { label: "ATR Levels", href: "/app/atr", group: "tools", icon: "atr" },
-  { label: "Gap Scanner", href: "/app/gap-screener", group: "tools", icon: "gap" },
-  { label: "Token Unlocks", href: "/app/unlocks", group: "tools", locked: true, icon: "unlocks" },
-  { label: "Upgrade Radar", href: "/app/upgrades", group: "tools", locked: true, icon: "radar" },
+  { label: "RSI Heatmap", href: "/app/heatmap", group: "tools-forex", icon: "heatmap" },
+  { label: "ATR Levels", href: "/app/atr", group: "tools-forex", icon: "atr" },
+  { label: "Gap Scanner", href: "/app/gap-screener", group: "tools-forex", icon: "gap" },
+  { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", locked: true, icon: "unlocks" },
+  { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", locked: true, icon: "radar" },
   { label: "Intel Map", href: "/app/intel", group: "tools", icon: "intel" },
   { label: "Watchlist", href: "/app/watchlist", group: "tools", icon: "watchlist" },
   { label: "Subscription", href: "/app/subscription", group: "account", icon: "subscription" },
@@ -176,6 +176,16 @@ export function Sidebar() {
         </NavGroup>
         <NavGroup label="Tools">
           {nav.filter((n) => n.group === "tools").map((n) => (
+            <NavItem key={n.href} {...n} active={pathname.startsWith(n.href)} paid={paid} />
+          ))}
+        </NavGroup>
+        <NavGroup label="Forex Tools">
+          {nav.filter((n) => n.group === "tools-forex").map((n) => (
+            <NavItem key={n.href} {...n} active={pathname.startsWith(n.href)} paid={paid} />
+          ))}
+        </NavGroup>
+        <NavGroup label="Crypto Tools">
+          {nav.filter((n) => n.group === "tools-crypto").map((n) => (
             <NavItem key={n.href} {...n} active={pathname.startsWith(n.href)} paid={paid} />
           ))}
         </NavGroup>

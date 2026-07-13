@@ -62,6 +62,9 @@ export const predictionService = {
         ? { min: Math.round(raw.min * 10) / 10, max: Math.round(raw.max * 10) / 10 }
         : null;
 
+      const stale =
+        Date.now() - latest.fetchedAt.getTime() > 7 * 24 * 60 * 60 * 1000;
+
       results.push({
         tracked: {
           id: t.id,
@@ -78,6 +81,7 @@ export const predictionService = {
         marketCount: latest.marketCount,
         fetchedAt: latest.fetchedAt.toISOString(),
         weekRange,
+        stale,
       });
     }
 

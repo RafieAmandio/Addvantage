@@ -37,7 +37,7 @@ export function PrimerDetailView({
           <Breadcrumbs
             items={[
               { label: "Home", href: "/app" },
-              { label: "Education", href: "/app/education" },
+              { label: "Education", href: "/app/education/primers" },
               { label: primer.id },
             ]}
           />
@@ -143,7 +143,7 @@ export function PrimerDetailView({
 
         <nav className="mt-16 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
           <Link
-            href={prev ? `/app/education/${prev.id}` : "/app/education"}
+            href={prev ? `/app/education/${prev.id}` : "/app/education/primers"}
             className={cn(
               "block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               !prev && "pointer-events-none opacity-30"
@@ -157,7 +157,7 @@ export function PrimerDetailView({
             </div>
           </Link>
           <Link
-            href={next ? `/app/education/${next.id}` : "/app/education"}
+            href={next ? `/app/education/${next.id}` : "/app/education/primers"}
             className={cn(
               "block bg-black p-4 text-right transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
               !next && "pointer-events-none opacity-30"

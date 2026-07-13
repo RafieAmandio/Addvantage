@@ -64,7 +64,7 @@ export function rangeLabel(view: ViewMode, anchorYmd: string): string {
 }
 
 export function parseViewMode(v: string | null): ViewMode {
-  return v === "day" || v === "month" ? v : "week";
+  return v === "week" || v === "month" ? v : "day";
 }
 
 export function parseImpact(v: string | null): ImpactFilter {

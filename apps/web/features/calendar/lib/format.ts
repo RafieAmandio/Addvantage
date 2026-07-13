@@ -2,21 +2,16 @@ import { ymdToDate } from "./date";
 
 export function formatCalendarTime(
   iso: string,
-  anchorLocalYmd: string,
-  showOffset = true
+  _anchorLocalYmd: string,
+  showOffset = false
 ): string {
+  void showOffset;
   const d = new Date(iso);
   const wibMs = d.getTime() + 7 * 60 * 60 * 1000;
   const wib = new Date(wibMs);
   const hh = String(wib.getUTCHours()).padStart(2, "0");
   const mm = String(wib.getUTCMinutes()).padStart(2, "0");
-  if (!showOffset) return `${hh}${mm}`;
-  const eventYmd = wib.toISOString().slice(0, 10);
-  const anchor = ymdToDate(anchorLocalYmd).getTime();
-  const eventMid = ymdToDate(eventYmd).getTime();
-  const dayOffset = Math.round((eventMid - anchor) / (1000 * 60 * 60 * 24));
-  const sign = dayOffset >= 0 ? "+" : "";
-  return `${hh}${mm}${sign}${dayOffset}`;
+  return `${hh}:${mm} WIB`;
 }
 
 export function formatDayHeader(ymd: string): string {

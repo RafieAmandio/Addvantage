@@ -8,7 +8,7 @@ import {
   BiasBadge,
 } from "@/components/ui/Marker";
 import { Highlight } from "@/components/ui/Highlight";
-import { formatTime, cn } from "@/lib/cn";
+import { formatWibTime, cn } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 interface NewsListRowProps {
@@ -39,7 +39,7 @@ function NewsListRowImpl({ item, query, isSeen }: NewsListRowProps) {
           )}
         </div>
         <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          {formatTime(ts)}Z
+          {formatWibTime(ts)} WIB
         </div>
         <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-brand">
           BY <Highlight text={item.author.toUpperCase()} query={query.toUpperCase()} />
