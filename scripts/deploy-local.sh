@@ -33,6 +33,17 @@ app_id() {
   esac
 }
 
+# Dokploy per-app deploy webhooks. The token in the path is the auth — hitting
+# the URL makes Dokploy pull :latest and redeploy that app. No login needed.
+deploy_hook() {
+  case "$1" in
+    web)             echo "$DOKPLOY_URL/api/deploy/P6IVJy3zKjFYXUOyITLHv" ;;
+    api)             echo "$DOKPLOY_URL/api/deploy/wXO5zIQKu-MVyO5dvn1To" ;;
+    worker)          echo "$DOKPLOY_URL/api/deploy/meoxrO6zJCqXDPNtTxrbx" ;;
+    upgrade-scraper) echo "" ;;
+  esac
+}
+
 # NEXT_PUBLIC_* are inlined into the client bundle at build time — they are
 # public by design (the anon key ships in every page load already).
 WEB_BUILD_ARGS=(
@@ -65,18 +76,13 @@ if [ "${SKIP_DEPLOY:-0}" = "1" ]; then
 fi
 
 echo "==> triggering Dokploy redeploys"
-read -r -s -p "Dokploy password for tradevantage.gg@gmail.com: " DK_PASS; echo
-COOKIES=$(mktemp)
-trap 'rm -f "$COOKIES"' EXIT
-curl -sf -X POST "$DOKPLOY_URL/api/auth/sign-in/email" \
-  -H 'Content-Type: application/json' -c "$COOKIES" \
-  -d "{\"email\":\"tradevantage.gg@gmail.com\",\"password\":\"$DK_PASS\"}" > /dev/null
-
 for svc in "${SERVICES[@]}"; do
-  id=$(app_id "$svc")
-  curl -sf -X POST "$DOKPLOY_URL/api/trpc/application.deploy" \
-    -H 'Content-Type: application/json' -b "$COOKIES" \
-    -d "{\"json\":{\"applicationId\":\"$id\"}}" > /dev/null
+  hook=$(deploy_hook "$svc")
+  if [ -z "$hook" ]; then
+    echo "    $svc: no deploy webhook configured, skipping"
+    continue
+  fi
+  curl -sf -X POST "$hook" > /dev/null
   echo "    $svc deploy triggered"
 done
 echo "==> done — watch progress at $DOKPLOY_URL"
