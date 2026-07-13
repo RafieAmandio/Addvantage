@@ -27,7 +27,21 @@ const ServerEnvSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 });
 
-const parsed = ServerEnvSchema.safeParse(process.env);
+// During `next build` (page-data collection) the server-only secrets are not
+// present — they are injected by Dokploy at runtime, and the build only gets
+// NEXT_PUBLIC_* args (see CLAUDE.md "Deployment"). Next sets NEXT_PHASE to
+// `phase-production-build` for the whole build process, so we relax the strict
+// required-secret check for that phase only; runtime boot still validates for
+// real. SKIP_ENV_VALIDATION=1 is an explicit escape hatch for the same purpose.
+const isBuildPhase =
+  process.env.NEXT_PHASE === "phase-production-build" ||
+  process.env.SKIP_ENV_VALIDATION === "1";
+
+const envSource = isBuildPhase
+  ? { ...process.env, JWT_SECRET: process.env.JWT_SECRET ?? "build-time-placeholder" }
+  : process.env;
+
+const parsed = ServerEnvSchema.safeParse(envSource);
 
 if (!parsed.success) {
   console.error(
