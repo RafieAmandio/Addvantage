@@ -276,6 +276,23 @@ model ShortLink {
   @@map("short_links")
 }
 
+model ClassReport {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String    @unique
+  title       String
+  summary     String    @default("")
+  author      String    @default("Anthony")
+  driveId     String    @map("drive_id")
+  publishedAt DateTime? @map("published_at") @db.Timestamptz(6)
+  sortOrder   Int       @default(0) @map("sort_order")
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([published, sortOrder], map: "class_reports_pub_idx")
+  @@map("class_reports")
+}
+
 model Payment {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId   String    @map("profile_id") @db.Uuid

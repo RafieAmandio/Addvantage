@@ -26,6 +26,7 @@ import { gapScreenerRoutes } from "./features/gap-screener/gap-screener.routes.j
 import { upgradeRadarRoutes } from "./features/upgrade-radar/upgrade-radar.routes.js";
 import { earlyAccessRoutes } from "./features/early-access/early-access.routes.js";
 import { shortLinksRoutes } from "./features/short-links/short-links.routes.js";
+import { reportsRoutes } from "./features/reports/reports.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -55,4 +56,5 @@ export function mountRoutes(app: Express) {
   app.use("/upgrade-radar", upgradeRadarRoutes);
   app.use("/early-access", earlyAccessRoutes);
   app.use("/short-links", shortLinksRoutes);
+  app.use("/reports", reportsRoutes);
 }
