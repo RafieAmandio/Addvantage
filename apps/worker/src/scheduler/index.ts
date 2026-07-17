@@ -28,14 +28,25 @@ import { syncTokenUnlocks } from "../token-unlocks/sync-unlocks";
 let pollTimer: NodeJS.Timeout | null = null;
 let inFlightTick: Promise<void> | null = null;
 
+type ScheduleSpec = {
+  minute: number;
+  divisorHour: number;
+  fixedHour?: number;
+  fixedHours?: readonly number[];
+  timezone?: string;
+};
+
+const WIB_TIMEZONE = "Asia/Jakarta";
+const WIB_RSI_HOURS = [0, 4, 8, 12, 16, 20] as const;
+
 /** Minute of hour when each job should fire. */
 const SCHEDULE = {
   /** Main source ingestion — every hour at :03 */
   sources: { minute: 3, divisorHour: 1 },
   /** TradingEconomics calendar — every 6 hours at :07 */
   calendar: { minute: 7, divisorHour: 6 },
-  /** RSI sync — every 4 hours at :10 (requires MARKET_DATA_PROVIDER) */
-  rsi: { minute: 10, divisorHour: 4 },
+  /** RSI sync — every 4 hours from 08:05 WIB (requires MARKET_DATA_PROVIDER) */
+  rsi: { minute: 5, fixedHours: WIB_RSI_HOURS, divisorHour: 4, timezone: WIB_TIMEZONE },
   /** ATR daily levels — every 4 hours at :12 (requires MARKET_DATA_PROVIDER) */
   atr: { minute: 12, divisorHour: 4 },
   /** Renewal reminders — daily at 09:00 (requires EMAIL_PROVIDER) */
@@ -48,7 +59,7 @@ const SCHEDULE = {
   polymarketRotate: { minute: 0, fixedHour: 6, divisorHour: 24 },
   /** Token unlocks — every 12 hours at :20 (free DefiLlama + CoinGecko) */
   unlocks: { minute: 20, divisorHour: 12 },
-} as const;
+} satisfies Record<string, ScheduleSpec>;
 
 type JobName = keyof typeof SCHEDULE;
 
@@ -65,21 +76,40 @@ const lastFiredAt: Record<JobName, number> = {
   unlocks: -1,
 };
 
+function getJobTimeParts(now: Date, timezone?: string): { hour: number; minute: number } {
+  if (!timezone) {
+    return { hour: now.getHours(), minute: now.getMinutes() };
+  }
+
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(now);
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? Number.NaN);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? Number.NaN);
+
+  return { hour, minute };
+}
+
 function shouldFire(
   job: JobName,
   now: Date,
 ): boolean {
-  const spec = SCHEDULE[job];
-  const minute = now.getMinutes();
-  const hour = now.getHours();
+  const spec: ScheduleSpec = SCHEDULE[job];
+  const { hour, minute } = getJobTimeParts(now, spec.timezone);
   const nowMinuteEpoch = Math.floor(now.getTime() / 60_000);
 
   // Already fired this exact minute?
   if (lastFiredAt[job] === nowMinuteEpoch) return false;
 
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return false;
   if (minute !== spec.minute) return false;
-  if ("fixedHour" in spec && hour !== spec.fixedHour) return false;
-  if (hour % spec.divisorHour !== 0 && !("fixedHour" in spec)) return false;
+  if (spec.fixedHours && !spec.fixedHours.includes(hour)) return false;
+  if (typeof spec.fixedHour === "number" && hour !== spec.fixedHour) return false;
+  if (!spec.fixedHours && typeof spec.fixedHour !== "number" && hour % spec.divisorHour !== 0) return false;
 
   return true;
 }
@@ -155,7 +185,7 @@ export function startScheduler(): void {
     {
       sources: "m3 every 1h",
       calendar: "m7 every 6h",
-      rsi: config.MARKET_DATA_PROVIDER ? "m10 every 4h" : "disabled",
+      rsi: config.MARKET_DATA_PROVIDER ? "08:05/12:05/16:05/20:05/00:05/04:05 WIB" : "disabled",
       atr: config.MARKET_DATA_PROVIDER ? "m12 every 4h" : "disabled",
       gap: config.MARKET_DATA_PROVIDER ? "m16 every 4h" : "disabled",
       renewal: config.EMAIL_PROVIDER ? "09:00 daily" : "disabled",
@@ -187,7 +217,7 @@ function pollJobs(): void {
     });
   }
 
-  // -- RSI (every 4h at :10, requires market data) --
+  // -- RSI (every 4h from 08:05 WIB, requires market data) --
   if (config.MARKET_DATA_PROVIDER && shouldFire("rsi", now)) {
     markFired("rsi", now);
     logger.info("scheduler: firing rsi sync");
