@@ -2,13 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
-import { apiPost, apiPut, apiDelete } from "@/lib/api/client-server";
+import { apiPost, apiPostForm, apiPut, apiDelete } from "@/lib/api/client-server";
 
 interface ActionState {
   ok: boolean;
   error?: string;
   sessionId?: string;
   messageId?: string;
+  imageUrl?: string;
 }
 
 export async function createConsultSession(
@@ -49,6 +50,24 @@ export async function appendConsultMessage(input: {
     return { ok: true, messageId: data.id };
   } catch {
     return { ok: false, error: "insert_failed" };
+  }
+}
+
+export async function uploadConsultImage(
+  sessionId: string,
+  formData: FormData,
+): Promise<ActionState> {
+  const user = await getSession();
+  if (!user) return { ok: false, error: "unauthorized" };
+
+  try {
+    const data = await apiPostForm<{ id: string; imageUrl: string }>(
+      `/consult/sessions/${sessionId}/upload`,
+      formData,
+    );
+    return { ok: true, messageId: data.id, imageUrl: data.imageUrl };
+  } catch {
+    return { ok: false, error: "upload_failed" };
   }
 }
 

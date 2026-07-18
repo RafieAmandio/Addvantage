@@ -56,6 +56,31 @@ export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: 
   return json.data;
 }
 
+export async function apiPostForm<T>(
+  path: string,
+  formData: FormData,
+  opts?: { token?: string },
+): Promise<T> {
+  const token = opts?.token ?? getAccessToken();
+  // No Content-Type header — fetch sets the multipart boundary from the FormData body.
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers,
+    body: formData,
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`API ${res.status}: ${path}`);
+  }
+
+  const json = (await res.json()) as ApiResponse<T>;
+  return json.data;
+}
+
 export async function apiPut<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };

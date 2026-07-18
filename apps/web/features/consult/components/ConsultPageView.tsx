@@ -52,7 +52,7 @@ export function ConsultPageView({
   const extras = extrasBySession[active.id] ?? [];
   const messages = [...active.messages, ...extras];
 
-  const { draft, setDraft, send, exportActiveSession } = useConsultActions({
+  const { draft, setDraft, send, sendImage, uploadingImage, exportActiveSession } = useConsultActions({
     active,
     activeId,
     setActiveId,
@@ -83,6 +83,8 @@ export function ConsultPageView({
     draft,
     setDraft,
     send,
+    sendImage,
+    uploadingImage,
     endRef,
     onExportSession: exportActiveSession,
   };

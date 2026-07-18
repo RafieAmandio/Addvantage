@@ -1,3 +1,4 @@
+import type { Prisma } from "@tradevantage/db";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
 import { consultRepository } from "./consult.repository.js";
 import { notifyAdminsConsult } from "@/integrations/telegram/notify.js";
@@ -50,6 +51,7 @@ export const consultService = {
       userId,
       role: data.role,
       content: data.content,
+      ...(data.metadata ? { metadata: data.metadata as Prisma.InputJsonValue } : {}),
     });
     await consultRepository.updateSessionFlags(sessionId, {
       unreadAdmin: true,

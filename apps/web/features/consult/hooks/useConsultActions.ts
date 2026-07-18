@@ -7,6 +7,7 @@ import {
   renameConsultSession,
   deleteConsultSession,
   appendConsultMessage,
+  uploadConsultImage,
 } from "@/features/consult/actions";
 import type { ConsultMessage, ConsultSession, LocalSession } from "@/features/consult/types";
 import { useToast } from "@/lib/toast";
@@ -30,45 +31,53 @@ export function useConsultActions({
 }) {
   const toast = useToast();
   const [draft, setDraft] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<{
     id: string;
     title: string;
   } | null>(null);
 
+  // One session per account. If no session exists yet, open the single session
+  // for this account (the only entry point for session creation — no parallel
+  // sessions can be spawned). Returns the session id, or null on failure
+  // (a toast is surfaced here so callers can just bail).
+  const ensureSession = async (): Promise<string | null> => {
+    if (active.id) return active.id;
+
+    const res = await createConsultSession("Consultation");
+    if (!res.ok || !res.sessionId) {
+      toast.push({
+        tone: "error",
+        title: "Could not open session",
+        description:
+          res.error === "rate_limited"
+            ? "Too many new sessions — slow down."
+            : "Failed to reach the desk. Try again.",
+      });
+      return null;
+    }
+
+    const sessionId = res.sessionId;
+    const openedAt = new Date().toISOString();
+    const session: LocalSession = {
+      id: sessionId,
+      title: "Consultation",
+      startedAt: openedAt,
+      lastAt: openedAt,
+      tags: [],
+      messages: [],
+    };
+    setLocalSessions([session]);
+    setActiveId(sessionId);
+    return sessionId;
+  };
+
   const send = async () => {
     if (!draft.trim()) return;
     const userBody = draft;
 
-    // One session per account. If no session exists yet, open the single
-    // session for this account on the first transmission (the only entry
-    // point for session creation — no parallel sessions can be spawned).
-    let sessionId = active.id;
-    if (!sessionId) {
-      const res = await createConsultSession("Consultation");
-      if (!res.ok || !res.sessionId) {
-        toast.push({
-          tone: "error",
-          title: "Could not open session",
-          description:
-            res.error === "rate_limited"
-              ? "Too many new sessions — slow down."
-              : "Failed to reach the desk. Try again.",
-        });
-        return;
-      }
-      sessionId = res.sessionId;
-      const openedAt = new Date().toISOString();
-      const session: LocalSession = {
-        id: sessionId,
-        title: "Consultation",
-        startedAt: openedAt,
-        lastAt: openedAt,
-        tags: [],
-        messages: [],
-      };
-      setLocalSessions([session]);
-      setActiveId(sessionId);
-    }
+    const sessionId = await ensureSession();
+    if (!sessionId) return;
 
     const nowIso = new Date().toISOString();
     const userMsg: ConsultMessage = {
@@ -110,6 +119,79 @@ export function useConsultActions({
         duration: 3500,
       });
     });
+  };
+
+  const sendImage = async (file: File) => {
+    if (uploadingImage) return;
+
+    // Mirror the API's storage allowlist + 5 MB cap (integrations/storage).
+    const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+    const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.push({
+        tone: "error",
+        title: "Unsupported file",
+        description: "Attach a PNG, JPEG, WebP, or GIF image.",
+      });
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      toast.push({
+        tone: "error",
+        title: "Image too large",
+        description: "Max 5 MB per image.",
+      });
+      return;
+    }
+
+    const sessionId = await ensureSession();
+    if (!sessionId) return;
+
+    setUploadingImage(true);
+    const nowIso = new Date().toISOString();
+    const previewUrl = URL.createObjectURL(file);
+    const userMsg: ConsultMessage = {
+      id: `M-x${Date.now()}`,
+      role: "user",
+      ts: nowIso,
+      body: `[image: ${file.name}]`,
+      tags: [],
+      image: { url: previewUrl, name: file.name, contentType: file.type },
+    };
+
+    setExtrasBySession((prev) => ({
+      ...prev,
+      [sessionId]: [...(prev[sessionId] ?? []), userMsg],
+    }));
+    setLocalSessions((prev) =>
+      prev.map((s) => (s.id === sessionId ? { ...s, lastAt: nowIso, status: "awaiting_reply" } : s))
+    );
+
+    const fd = new FormData();
+    fd.append("image", file);
+
+    try {
+      const res = await uploadConsultImage(sessionId, fd);
+      if (!res.ok) {
+        toast.push({
+          tone: "error",
+          title: "Image not sent",
+          description: "Failed to reach the desk. Try again.",
+          duration: 3500,
+        });
+      }
+    } catch {
+      toast.push({
+        tone: "error",
+        title: "Image not sent",
+        description: "Network error reaching the desk. Try again.",
+        duration: 3500,
+      });
+    } finally {
+      // Poll replaces `extras` with the authoritative server copy (real URL)
+      // within ~10s, so the optimistic blob preview is transient.
+      setUploadingImage(false);
+    }
   };
 
   const renameSession = (id: string, newTitle: string) => {
@@ -181,9 +263,11 @@ export function useConsultActions({
   return {
     draft,
     setDraft,
+    uploadingImage,
     pendingDelete,
     setPendingDelete,
     send,
+    sendImage,
     renameSession,
     requestDeleteSession,
     confirmDeleteSession,
