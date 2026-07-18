@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export interface ConsultAttachment {
+  url: string;
+  name?: string;
+  contentType?: string;
+}
+
 export interface ConsultMessage {
   id: string;
   role: "user" | "admin";
@@ -7,6 +13,7 @@ export interface ConsultMessage {
   ts: string;
   body: string;
   tags: string[];
+  image?: ConsultAttachment;
 }
 
 export interface ConsultSession {
@@ -53,6 +60,7 @@ export const ConsultMessageRowSchema = z.object({
   sessionId: z.string().uuid(),
   role: z.enum(CONSULT_MESSAGE_ROLES),
   content: z.string(),
+  metadata: z.record(z.unknown()).nullish(),
   createdAt: z.string(),
 });
 export type ConsultMessageRow = z.infer<typeof ConsultMessageRowSchema>;

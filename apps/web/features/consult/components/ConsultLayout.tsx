@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type { ConsultMessage, ConsultSession } from "@/features/consult/types";
 import { Bubble } from "@/features/consult/components/Bubble";
 import { ScrollableConversation } from "@/features/consult/components/ScrollableConversation";
@@ -15,6 +16,8 @@ export function ConsultLayout({
   draft,
   setDraft,
   send,
+  sendImage,
+  uploadingImage,
   endRef,
   onExportSession,
 }: {
@@ -23,11 +26,14 @@ export function ConsultLayout({
   draft: string;
   setDraft: (s: string) => void;
   send: () => void;
+  sendImage: (file: File) => void;
+  uploadingImage: boolean;
   endRef: React.RefObject<HTMLDivElement>;
   onExportSession: () => void;
 }) {
   const awaitingReply = active.status === "awaiting_reply";
   const hasSession = active.id !== "";
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <section className="mx-auto flex h-[75vh] w-full flex-col border border-gray-3">
@@ -95,10 +101,40 @@ export function ConsultLayout({
 
       <div className="border-t border-gray-3 bg-gray-2/40 p-4">
         <div className="flex items-end gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) sendImage(file);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingImage}
+            title="Attach an image"
+            aria-label="Attach an image"
+            className="border border-gray-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {uploadingImage ? "···" : "＋ IMG"}
+          </button>
           <textarea
             data-consult-input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            onPaste={(e) => {
+              const file = Array.from(e.clipboardData.items)
+                .find((it) => it.type.startsWith("image/"))
+                ?.getAsFile();
+              if (file) {
+                e.preventDefault();
+                sendImage(file);
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -124,7 +160,7 @@ export function ConsultLayout({
         </div>
         <div className="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/30">
           <span>● Encrypted · TradeVantage-internal · Session-only</span>
-          <span>Enter to send · Shift+Enter for newline</span>
+          <span>{uploadingImage ? "Uploading image…" : "Enter to send · ＋ IMG or paste to attach"}</span>
         </div>
       </div>
     </section>
