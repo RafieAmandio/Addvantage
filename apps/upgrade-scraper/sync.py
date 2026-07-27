@@ -5,6 +5,7 @@ then delete-and-replaces the upgrade_events table in one transaction.
 """
 import os
 import re
+import sys
 import json
 import urllib.request
 import datetime as dt
@@ -63,6 +64,19 @@ def write_events(catalysts):
             c["title"], c["category"], c["cmc_category"], c.get("impact"), c.get("impact_score"),
             c["date_start"], c["date_approx"], c["display_date"], c["source"], c.get("coin_icon"),
         ))
+
+    # A scrape that yields nothing is almost always a failure (Cloudflare block,
+    # markup change, CoinGecko hiccup) rather than "there are genuinely no
+    # upcoming upgrades". Replacing the table with an empty set in that case
+    # silently blanks the Upgrade Radar until the next good run, so bail out and
+    # leave the last known-good rows in place.
+    if not rows:
+        print(
+            "refusing to publish an empty result set — keeping existing rows",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 0
 
     conn = psycopg2.connect(_db_url())
     try:

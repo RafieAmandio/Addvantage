@@ -9,6 +9,7 @@ import { groupByMonth } from "@/features/plan/lib/archive-filters";
 import { PlanStatsBadges } from "@/features/plan/components/PlanStatsBadges";
 import { PlanArchiveMonthGroup } from "@/features/plan/components/PlanArchiveMonthGroup";
 import { SectionNumber, DataLabel } from "@/components/ui/Marker";
+import { flattenText } from "@/components/ui/ProseText";
 import { cn, formatDate } from "@/lib/cn";
 
 export default async function PlanPage() {
@@ -123,7 +124,7 @@ export default async function PlanPage() {
 
               <div className="col-span-12 lg:col-span-9">
                 <p className="line-clamp-3 font-display text-xl leading-relaxed text-white/90 transition-colors group-hover:text-white">
-                  {latest.thesis}
+                  {flattenText(latest.thesis)}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {latest.setups.map((s) => (

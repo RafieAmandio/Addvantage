@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { TradingPlan } from "@/features/plan/types";
+import { flattenText } from "@/components/ui/ProseText";
 
 export function ActivePlanSection({
   plan,
@@ -47,8 +48,10 @@ export function ActivePlanSection({
           </Link>
         </div>
 
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/60">
-          {paid ? plan.thesis : "Upgrade to VIP+ to view the current thesis and setups."}
+        <p className="mt-4 line-clamp-3 max-w-3xl text-sm leading-relaxed text-white/60">
+          {paid
+            ? flattenText(plan.thesis)
+            : "Upgrade to VIP+ to view the current thesis and setups."}
         </p>
 
         {paid && plan.setups.length > 0 && (

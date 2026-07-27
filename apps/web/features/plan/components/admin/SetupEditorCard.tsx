@@ -198,9 +198,9 @@ export function SetupEditorCard({
         <textarea
           value={setup.invalidation}
           onChange={(e) => update("invalidation", e.target.value)}
-          rows={2}
+          rows={3}
           placeholder="What kills this setup"
-          className={cn(INPUT, "leading-relaxed")}
+          className={cn(INPUT, PROSE, "leading-relaxed")}
         />
       </Label>
 
@@ -208,9 +208,9 @@ export function SetupEditorCard({
         <textarea
           value={setup.rationale}
           onChange={(e) => update("rationale", e.target.value)}
-          rows={3}
+          rows={4}
           placeholder="Why this trade"
-          className={cn(INPUT, "leading-relaxed")}
+          className={cn(INPUT, PROSE, "leading-relaxed")}
         />
       </Label>
 
@@ -356,6 +356,10 @@ function SetupImageUpload({
 
 const INPUT =
   "w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none";
+
+// Prose fields (invalidation, rationale) are sentences, not tickers — undo the
+// terminal-style uppercase/tracking so what you type is what you read back.
+const PROSE = "normal-case tracking-normal text-sm resize-y";
 
 function Label({
   text,

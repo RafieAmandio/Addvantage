@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DataLabel, BiasBadge } from "@/components/ui/Marker";
+import { ProseText } from "@/components/ui/ProseText";
 import { cn, formatDate } from "@/lib/cn";
 import type { TradingPlan, TradingSetup } from "@/features/plan/types";
 import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
@@ -136,9 +137,11 @@ export function PlanCompareColumn({
 
       <div className="border-b border-gray-3 p-5">
         <DataLabel>Thesis</DataLabel>
-        <p className="mt-2 font-display text-base leading-relaxed text-white/90">
-          {plan.thesis}
-        </p>
+        <ProseText
+          text={plan.thesis}
+          className="mt-2 space-y-3"
+          paragraphClassName="font-display text-base leading-relaxed text-white/90"
+        />
       </div>
 
       <div className="p-5">
