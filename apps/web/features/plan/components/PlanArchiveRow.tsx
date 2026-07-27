@@ -4,6 +4,7 @@ import { cn, formatDate } from "@/lib/cn";
 import type { TradingPlan } from "@/features/plan/types";
 import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import { Highlight } from "@/components/ui/Highlight";
+import { flattenText } from "@/components/ui/ProseText";
 
 type Props = {
   plan: TradingPlan;
@@ -76,7 +77,7 @@ function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
           className="line-clamp-3 font-display text-lg leading-relaxed text-white/85 transition-colors group-hover:text-white"
           title={plan.thesis}
         >
-          <Highlight text={plan.thesis} query={query} />
+          <Highlight text={flattenText(plan.thesis)} query={query} />
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {plan.setups.map((s) => (

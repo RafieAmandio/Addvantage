@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { Plan, PlanStatus } from "@/features/plan/types";
+import { flattenText } from "@/components/ui/ProseText";
 
 const STATUS_CHIP: Record<PlanStatus, string> = {
   draft: "bg-gray-2 border-gray-3 text-white/60",
@@ -48,8 +49,8 @@ export function PlanAdminListTable({ plans }: { plans: Plan[] }) {
             </div>
           </div>
           <div className="col-span-12 lg:col-span-8">
-            <div className="font-display text-xl text-white transition-colors group-hover:text-brand">
-              {p.thesis || "(no thesis)"}
+            <div className="line-clamp-2 font-display text-xl text-white transition-colors group-hover:text-brand">
+              {p.thesis ? flattenText(p.thesis) : "(no thesis)"}
             </div>
             <div className="mt-2 flex flex-wrap gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/60">
               {p.tags.map((t) => (
