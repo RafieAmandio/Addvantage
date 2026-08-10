@@ -36,6 +36,12 @@ jobs:
         run: pnpm lint
 
       - name: Build
+        # Public env is required by the web build's page-data collection. Mock
+        # mode is the schema's documented zero-setup path — this job only checks
+        # that everything compiles; the real NEXT_PUBLIC_* values are baked at
+        # deploy time (scripts/deploy-local.sh).
+        env:
+          NEXT_PUBLIC_MOCK_MODE: "1"
         run: pnpm build
 
   db-drift:
