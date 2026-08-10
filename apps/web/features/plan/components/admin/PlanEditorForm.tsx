@@ -288,12 +288,17 @@ export function PlanEditorForm({ plan }: { plan: Plan | null }) {
         <Field label="Thesis">
           <textarea
             name="thesis"
-            rows={4}
+            rows={16}
             required
             defaultValue={plan?.thesis ?? ""}
-            placeholder="Market outlook — why this bias, what breaks it"
-            className="mt-4 w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+            placeholder={
+              "Market outlook — why this bias, what breaks it.\n\nLeave a blank line between sections; they render as separate paragraphs. Single line breaks and indentation are kept as typed."
+            }
+            className="mt-4 w-full resize-y border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
           />
+          <span className="mt-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/40">
+            Blank line = new paragraph · line breaks preserved
+          </span>
         </Field>
 
         <Field label="Tags (comma-separated)">

@@ -154,14 +154,14 @@ export function PlanDetailSetupCard({
 
       <div className="mt-4 border-t border-gray-3 pt-3">
         <DataLabel>Rationale</DataLabel>
-        <p className="mt-1 text-sm text-white/70">{s.rationale}</p>
+        <p className="mt-1 whitespace-pre-wrap text-sm text-white/70">{s.rationale}</p>
       </div>
 
       <div className="mt-4 border-t border-blood/40 pt-3">
         <div className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
           Invalidation
         </div>
-        <p className="mt-1 text-sm text-white/80">{s.invalidation}</p>
+        <p className="mt-1 whitespace-pre-wrap text-sm text-white/80">{s.invalidation}</p>
       </div>
 
       <div className="mt-4 flex items-center justify-between">

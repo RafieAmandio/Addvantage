@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAppState, isPaid } from "@/lib/state";
 import { SectionNumber } from "@/components/ui/Marker";
 import { PaywallOverlay } from "@/components/ui/Paywall";
+import { ProseText } from "@/components/ui/ProseText";
 import { formatDate } from "@/lib/cn";
 import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
 import type { TradingPlan } from "@/features/plan/types";
@@ -84,9 +85,10 @@ export function PlanDetail({
           <section>
             <SectionNumber n="01 /" label="MARKET THESIS" />
             <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
-              <p className="font-display text-xl leading-relaxed text-white">
-                {plan.thesis}
-              </p>
+              <ProseText
+                text={plan.thesis}
+                paragraphClassName="font-display text-xl leading-relaxed text-white"
+              />
             </div>
             {plan.imageUrl && (
               <a
