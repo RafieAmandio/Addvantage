@@ -5,7 +5,7 @@ import type { AtrZoneId } from "../types";
 import { ATR_ZONE_CONFIG, ATR_ZONES_ORDERED, GROUP_LABELS } from "../lib/zones";
 import type { ForexGroup, ForexTier } from "@tradevantage/shared";
 
-const GROUPS: ForexGroup[] = ["major", "cross", "commodity", "exotic", "index"];
+const GROUPS: ForexGroup[] = ["major", "cross", "commodity", "index"];
 
 const TIER_TABS: { value: ForexTier | "all"; label: string }[] = [
   { value: "all", label: "All" },

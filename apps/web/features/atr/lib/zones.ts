@@ -4,7 +4,6 @@ export const GROUP_LABELS: Record<string, string> = {
   major: "Major",
   cross: "Cross",
   commodity: "Commodity",
-  exotic: "Exotic",
   index: "Index",
 };
 

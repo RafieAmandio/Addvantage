@@ -10,7 +10,7 @@ import { AtrBarChart } from "@/features/atr/components/AtrBarChart";
 import { AtrList } from "@/features/atr/components/AtrList";
 import { AtrTable } from "@/features/atr/components/AtrTable";
 
-const ALL_GROUPS = new Set(["major", "cross", "commodity", "exotic", "index"]);
+const ALL_GROUPS = new Set(["major", "cross", "commodity", "index"]);
 
 export default function AtrClient() {
   const [activeTier, setActiveTier] = useState<ForexTier | "all">("all");
