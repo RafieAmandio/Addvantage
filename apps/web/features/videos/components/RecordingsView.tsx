@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { DataLabel } from "@/components/ui/Marker";
@@ -103,14 +104,43 @@ function VideoRow({
   );
 }
 
+const CATEGORY_TABS = [
+  { key: "analysis", label: "Modules" },
+  { key: "session", label: "Live Sessions" },
+] as const;
+
 export function RecordingsView({ videos }: { videos: VideoModule[] }) {
   const { slugs: watchedSlugs, hydrated } = useWatchedVideos();
+  const [tab, setTab] = useState<VideoModule["category"]>("analysis");
+  const shown = videos.filter((v) => v.category === tab);
 
   return (
     <div className="stagger">
       <VideoModulesHeader />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {videos.length === 0 ? (
+        <div
+          className="mb-6 flex gap-px bg-gray-3"
+          role="tablist"
+          aria-label="Video category"
+        >
+          {CATEGORY_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              role="tab"
+              aria-selected={tab === t.key}
+              className={cn(
+                "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                tab === t.key
+                  ? "bg-brand text-black"
+                  : "bg-gray-2 text-white/60 hover:text-white",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {shown.length === 0 ? (
           <div className="flex min-h-[30vh] flex-col items-center justify-center gap-2 border border-gray-3 bg-black">
             <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
               No recordings on file
@@ -121,7 +151,7 @@ export function RecordingsView({ videos }: { videos: VideoModule[] }) {
           </div>
         ) : (
           <div className="border-t border-gray-3">
-            {videos.map((v, i) => (
+            {shown.map((v, i) => (
               <VideoRow
                 key={v.slug}
                 video={v}

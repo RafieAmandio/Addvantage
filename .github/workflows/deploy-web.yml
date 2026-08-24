@@ -1,0 +1,71 @@
+name: Deploy web
+
+# Native-amd64 build on GitHub's runners (no QEMU, no laptop). Mirrors
+# scripts/deploy-local.sh web: build apps/web/Dockerfile, push to the same GHCR
+# tag Dokploy pulls, then hit the web deploy webhook. NEXT_PUBLIC_* are public
+# (baked into the client bundle) so they live here as build-args, same as the
+# local script. Worker has its own workflow (deploy-worker.yml).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/shared/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build + push image
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - name: Build + push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=https://mlbcppehtoytqqbrkirn.supabase.co
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sYmNwcGVodG95dHFxYnJraXJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjgxNzMsImV4cCI6MjA5MjcwNDE3M30.P0bQzXApvPxMgM4nQ4yp_hUmEz-idkwfKMEkTh-L304
+            NEXT_PUBLIC_SITE_URL=https://tradevantage.gg
+            NEXT_PUBLIC_API_URL=https://api.tradevantage.gg
+            NEXT_PUBLIC_MOCK_MODE=0
+          tags: |
+            ghcr.io/rafieamandio/tradevantage-web:latest
+            ghcr.io/rafieamandio/tradevantage-web:${{ steps.meta.outputs.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Trigger Dokploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The token in the path is the auth — same webhook scripts/deploy-local.sh
+      # calls. Makes Dokploy pull :latest and redeploy the web app.
+      - name: Trigger Dokploy redeploy
+        run: curl -sf -X POST https://dashboard.tradevantage.gg/api/deploy/P6IVJy3zKjFYXUOyITLHv

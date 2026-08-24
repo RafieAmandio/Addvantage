@@ -8,7 +8,6 @@ const GROUP_COLORS: Record<string, string> = {
   major: "text-brand",
   cross: "text-white/50",
   commodity: "text-yellow-400",
-  exotic: "text-purple-400",
   index: "text-blue-400",
 };
 
@@ -16,7 +15,6 @@ const GROUP_LABELS: Record<string, string> = {
   major: "Major",
   cross: "Cross",
   commodity: "Commodity",
-  exotic: "Exotic",
   index: "Index",
 };
 

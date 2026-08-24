@@ -1,4 +1,4 @@
-export type ForexGroup = "major" | "cross" | "commodity" | "exotic" | "index";
+export type ForexGroup = "major" | "cross" | "commodity" | "index";
 export type ForexTier = "primary" | "secondary" | "thirdliner";
 
 export interface ForexPair {
@@ -53,14 +53,6 @@ export const FOREX_PAIRS: ForexPair[] = [
   { symbol: "CHF/JPY", label: "Swiss Franc / Yen", group: "cross", tier: "thirdliner" },
   // Remaining commodities
   { symbol: "XAU/EUR", label: "Gold / Euro", group: "commodity", tier: "thirdliner" },
-  // Exotics
-  { symbol: "USD/SGD", label: "US Dollar / Singapore", group: "exotic", tier: "thirdliner" },
-  { symbol: "USD/MXN", label: "US Dollar / Mexican Peso", group: "exotic", tier: "thirdliner" },
-  { symbol: "USD/ZAR", label: "US Dollar / South African Rand", group: "exotic", tier: "thirdliner" },
-  { symbol: "USD/TRY", label: "US Dollar / Turkish Lira", group: "exotic", tier: "thirdliner" },
-  { symbol: "USD/THB", label: "US Dollar / Thai Baht", group: "exotic", tier: "thirdliner" },
-  { symbol: "EUR/PLN", label: "Euro / Polish Zloty", group: "exotic", tier: "thirdliner" },
-  { symbol: "USD/HKD", label: "US Dollar / Hong Kong Dollar", group: "exotic", tier: "thirdliner" },
   // Remaining indices
   { symbol: "DJI", label: "Dow Jones", group: "index", tier: "thirdliner" },
   { symbol: "DXY", label: "US Dollar Index", group: "index", tier: "thirdliner" },

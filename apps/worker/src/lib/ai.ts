@@ -180,7 +180,9 @@ class OpenLimitsProvider extends AIProvider {
           if (evt.type === "content_block_delta" && evt.delta?.type === "text_delta") {
             chunks.push(evt.delta.text);
           }
-        } catch {}
+        } catch {
+          // skip malformed SSE line
+        }
       }
       text = chunks.join("").trim();
     }
