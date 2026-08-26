@@ -48,6 +48,16 @@ const EnvSchema = z.object({
 
   TELEGRAM_BOT_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
+  // WhatsApp bridge (Jeff/Hermes Baileys bridge) — consult notifications to the
+  // TradeVantage group. All optional: notify is a no-op unless URL + group are set.
+  WHATSAPP_BRIDGE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  WHATSAPP_BRIDGE_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  WHATSAPP_CONSULT_GROUP_JID: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  // Comma-separated JIDs to @-mention (e.g. Anthony's 97925355024479@lid).
+  WHATSAPP_CONSULT_MENTION_JIDS: z.preprocess(emptyToUndef, z.string().optional()),
+  // Visible mention token that pairs with the JIDs above (e.g. "@Anthony").
+  WHATSAPP_CONSULT_MENTION_TEXT: z.preprocess(emptyToUndef, z.string().optional()),
+
   STORAGE_PROVIDER: z.preprocess(emptyToUndef, z.enum(["supabase", "s3"]).optional()),
   STORAGE_BUCKET: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 

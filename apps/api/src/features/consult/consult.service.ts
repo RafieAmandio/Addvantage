@@ -2,6 +2,7 @@ import type { Prisma } from "@tradevantage/db";
 import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
 import { consultRepository } from "./consult.repository.js";
 import { notifyAdminsConsult } from "@/integrations/telegram/notify.js";
+import { notifyConsultWhatsApp } from "@/integrations/whatsapp/notify.js";
 
 export const consultService = {
   async verifySessionOwnership(userId: string, sessionId: string) {
@@ -65,6 +66,17 @@ export const consultService = {
       userEmail: userEmail ?? "",
       messagePreview: data.content,
     }).catch(() => {});
+
+    // Member messages (text + images) also ping the WhatsApp group / tag Anthony.
+    if (data.role === "user") {
+      const imageUrl = (data.metadata as { imageUrl?: string } | undefined)?.imageUrl;
+      notifyConsultWhatsApp({
+        sessionId,
+        userEmail: userEmail ?? "",
+        messagePreview: data.content,
+        ...(imageUrl ? { imageUrl } : {}),
+      }).catch(() => {});
+    }
 
     return result;
   },
