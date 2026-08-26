@@ -15,6 +15,7 @@ model Profile {
   emailVerified     Boolean          @default(false) @map("email_verified")
   tier              String           @default("free")
   isAdmin           Boolean          @default(false) @map("is_admin")
+  allowMention      Boolean          @default(true) @map("allow_mention")
   signedLiability   Boolean          @default(false) @map("signed_liability")
   joinedAt          DateTime         @default(now()) @map("joined_at") @db.Timestamptz(6)
   renewsAt          DateTime?        @map("renews_at") @db.Timestamptz(6)

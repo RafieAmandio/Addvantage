@@ -6,6 +6,8 @@ interface ConsultWhatsAppNotification {
   userEmail: string;
   messagePreview: string;
   imageUrl?: string;
+  // Member opted out of being named — hide identity and flag it for Anthony.
+  private?: boolean;
 }
 
 // Posts a new-consult ping to the TradeVantage WhatsApp group via Jeff's Baileys
@@ -35,17 +37,20 @@ export async function notifyConsultWhatsApp(
     n.messagePreview.length > 300
       ? n.messagePreview.slice(0, 297) + "…"
       : n.messagePreview;
-  // WhatsApp linkifies a bare domain, so drop the scheme for a cleaner tap target.
-  const link = `${env.SITE_URL}/admin/consult?sq=${n.sessionId}`.replace(/^https?:\/\//, "");
+  // Keep the full https:// so WhatsApp renders it as a proper tappable link.
+  const link = `${env.SITE_URL}/admin/consult?sq=${n.sessionId}`;
   const body = isImage ? "📷 _sent an image_" : `_"${preview}"_`;
 
   const message = [
     "🔔 *New consult message*",
-    `From: ${n.userEmail || "a member"}`,
+    "",
+    n.private ? "From: 🔒 *Private member*" : `From: ${n.userEmail || "a member"}`,
+    n.private ? "🚫 _Asked not to be named, please don't mention them in the group_" : "",
     "",
     body,
     "",
-    `${mentionText} 👉 ${link}`.trim(),
+    mentionText.trim(),
+    `👉 ${link}`,
   ]
     .filter(Boolean)
     .join("\n");

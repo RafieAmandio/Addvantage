@@ -24,6 +24,7 @@ const ME_SELECT = {
   tier: true,
   isAdmin: true,
   signedLiability: true,
+  allowMention: true,
 } as const;
 
 export const userRepository = {
@@ -65,6 +66,7 @@ export const userRepository = {
       markets?: string[];
       yearlyGoal?: string;
       faultAttribution?: string;
+      allowMention?: boolean;
     },
   ) =>
     prisma.profile.update({
