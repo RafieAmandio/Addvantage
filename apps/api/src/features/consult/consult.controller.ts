@@ -84,7 +84,7 @@ export const consultController = {
         size: result.size,
         originalName: file.originalname,
       },
-    });
+    }, authReq.user.email);
 
     sendSuccess(res, { ...message, imageUrl: result.url }, "Image uploaded", 201);
   }),
