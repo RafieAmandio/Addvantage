@@ -70,12 +70,19 @@ export const consultService = {
     // Member messages (text + images) also ping the WhatsApp group / tag Anthony.
     if (data.role === "user") {
       const imageUrl = (data.metadata as { imageUrl?: string } | undefined)?.imageUrl;
-      notifyConsultWhatsApp({
-        sessionId,
-        userEmail: userEmail ?? "",
-        messagePreview: data.content,
-        ...(imageUrl ? { imageUrl } : {}),
-      }).catch(() => {});
+      // Members can opt out of being named; flag it so Anthony keeps them private.
+      consultRepository
+        .getAllowMention(userId)
+        .then((allowMention) =>
+          notifyConsultWhatsApp({
+            sessionId,
+            userEmail: userEmail ?? "",
+            messagePreview: data.content,
+            private: !allowMention,
+            ...(imageUrl ? { imageUrl } : {}),
+          }),
+        )
+        .catch(() => {});
     }
 
     return result;

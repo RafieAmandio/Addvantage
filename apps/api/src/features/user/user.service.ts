@@ -21,6 +21,7 @@ export const userService = {
       markets?: string[];
       yearlyGoal?: string;
       faultAttribution?: string;
+      allowMention?: boolean;
     },
   ) {
     const profile = await userRepository.findById(userId);

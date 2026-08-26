@@ -15,4 +15,5 @@ export const updateProfileSchema = z.object({
   markets: z.array(z.enum(MARKET_VALUES)).optional(),
   yearlyGoal: z.string().trim().max(500).optional(),
   faultAttribution: z.enum(["vantage", "me", "market"]).optional(),
+  allowMention: z.boolean().optional(),
 });

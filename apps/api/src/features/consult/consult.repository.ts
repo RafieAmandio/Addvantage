@@ -22,6 +22,11 @@ const MESSAGE_SELECT = {
 } as const;
 
 export const consultRepository = {
+  getAllowMention: (userId: string) =>
+    prisma.profile
+      .findUnique({ where: { id: userId }, select: { allowMention: true } })
+      .then((p) => p?.allowMention ?? true),
+
   listSessions: (userId: string, limit: number) =>
     prisma.consultSession.findMany({
       where: { userId },

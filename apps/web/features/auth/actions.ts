@@ -327,6 +327,32 @@ export async function saveTraderProfile(
   }
 }
 
+// ─── Mention preference ─────────────────────────────────────────────
+
+export async function saveMentionPreference(
+  allowMention: boolean,
+): Promise<{ ok: boolean }> {
+  const user = await getSession();
+  if (!user) return { ok: false };
+  if (isMockMode()) return { ok: true };
+
+  try {
+    await apiPut("/users/profile", { allowMention });
+    return { ok: true };
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { scope: "auth.saveMentionPreference" },
+      extra: { userId: user.id },
+    });
+    logger.error("saveMentionPreference failed", {
+      error: err,
+      userId: user.id,
+      scope: "auth.saveMentionPreference",
+    });
+    return { ok: false };
+  }
+}
+
 // ─── Logout ─────────────────────────────────────────────────────────
 
 export async function logoutAction(): Promise<void> {
