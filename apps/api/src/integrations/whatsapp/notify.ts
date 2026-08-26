@@ -30,18 +30,22 @@ export async function notifyConsultWhatsApp(
     .filter(Boolean);
   const mentionText = env.WHATSAPP_CONSULT_MENTION_TEXT ?? "";
 
+  const isImage = Boolean(n.imageUrl);
   const preview =
-    n.messagePreview.length > 200
-      ? n.messagePreview.slice(0, 197) + "..."
+    n.messagePreview.length > 300
+      ? n.messagePreview.slice(0, 297) + "…"
       : n.messagePreview;
+  // WhatsApp linkifies a bare domain, so drop the scheme for a cleaner tap target.
+  const link = `${env.SITE_URL}/admin/consult?sq=${n.sessionId}`.replace(/^https?:\/\//, "");
+  const body = isImage ? "📷 _sent an image_" : `_"${preview}"_`;
 
   const message = [
-    "🔔 New TradeVantage consult",
-    n.userEmail ? `From: ${n.userEmail}` : "",
+    "🔔 *New consult message*",
+    `From: ${n.userEmail || "a member"}`,
     "",
-    `"${preview}"`,
+    body,
     "",
-    `${mentionText} ${env.SITE_URL}/admin/consult?sq=${n.sessionId}`.trim(),
+    `${mentionText} 👉 ${link}`.trim(),
   ]
     .filter(Boolean)
     .join("\n");
@@ -73,7 +77,6 @@ export async function notifyConsultWhatsApp(
           chatId,
           fileUrl: n.imageUrl,
           mediaType: "image",
-          caption: mentionText || undefined,
         }),
       });
       if (!res.ok) {
