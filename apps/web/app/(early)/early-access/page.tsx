@@ -3,9 +3,9 @@ import { EarlyAccessWizard } from "@/features/early-access/components/EarlyAcces
 import { EarlyAccessClosed } from "@/features/early-access/components/EarlyAccessClosed";
 
 export const metadata: Metadata = {
-  title: "Early Access",
+  title: "Apply",
   description:
-    "Founding early-access intake for TradeVantage. Reserve your place, opt into the 100% cashback program, and secure your subscription.",
+    "Apply to join TradeVantage. Reserve your place, opt into the 100% cashback program, and secure your subscription.",
   robots: { index: false, follow: false },
 };
 

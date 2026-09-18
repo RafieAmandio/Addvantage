@@ -10,6 +10,7 @@ import {
   type EarlyAccessLeadInput,
   type EarlyAccessApplicationInput,
 } from "@tradevantage/shared/schema";
+import { notifyApplicationWhatsApp } from "@/integrations/whatsapp/notify.js";
 import { earlyAccessRepository } from "./early-access.repository.js";
 
 // Founding early-access offer surfaced in the welcome email.
@@ -69,8 +70,14 @@ export const earlyAccessService = {
       proofImageUrl: input.proofImageUrl,
     });
 
-    // Only email on the first finalize (idempotent on resubmit).
+    // Only email + ping the group on the first finalize (idempotent on resubmit).
     if (!application.confirmationEmailSentAt) {
+      notifyApplicationWhatsApp({
+        email: input.email,
+        telegramHandle: input.telegramHandle,
+        planLabel: `${METHOD_LABELS[input.paymentMethod]} · ${AMOUNT_LABELS[input.paymentMethod]}`,
+        cashback: input.wantsCashback,
+      }).catch(() => {});
       await sendOnboardingEmails(application.id, input.email, input.paymentMethod);
     }
 
