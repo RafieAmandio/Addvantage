@@ -12,7 +12,7 @@ export function EarlyAccessClosed() {
 
         <div className="mt-12 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-brand">
           <span className="led animate-pulse" aria-hidden />
-          Early Access // Standby
+          Applications // Standby
         </div>
 
         <h1 className="mt-6 font-sans text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.0] text-white">
@@ -26,7 +26,7 @@ export function EarlyAccessClosed() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-md font-mono text-sm leading-[1.6] text-white/60">
-          Enrollment is sealed. Founding early access opens shortly. If you were sent here, hold tight; your window is coming.
+          Applications are sealed. They open shortly. If you were sent here, hold tight; your window is coming.
         </p>
 
         <Link

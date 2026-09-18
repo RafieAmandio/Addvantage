@@ -237,12 +237,12 @@ export function EarlyAccessWizard() {
         >
           <span className="font-bold text-brand">00 /</span>
           <span className="h-px flex-1 bg-brand/40" />
-          <span className="font-bold text-white">Early Access</span>
+          <span className="font-bold text-white">Apply</span>
         </div>
 
         <div className="relative z-10 mt-auto">
           <h1 className="font-sans text-[clamp(2.5rem,7vw,72px)] font-bold leading-[0.95] text-white">
-            {["This is", "early access,", "not a waitlist."].map((line, i) => (
+            {["This is an", "application,", "not a waitlist."].map((line, i) => (
               <span
                 key={line}
                 className="block transition-all duration-700"
@@ -846,7 +846,7 @@ function ConfirmationPanel() {
         You&apos;re in.
       </h2>
       <p className="mx-auto mt-4 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
-        Welcome aboard, operator. You&apos;re locked in as a founding early-access member.
+        Welcome aboard, operator. You&apos;re locked in as a founding member.
       </p>
       <div className="mt-8 space-y-2 rounded-lg border border-gray-3 bg-white-2 p-5 text-left font-mono text-sm">
         <div className="flex items-center justify-between">
