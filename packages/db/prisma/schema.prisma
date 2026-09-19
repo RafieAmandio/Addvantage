@@ -416,6 +416,47 @@ model ChannelPost {
   @@map("channel_posts")
 }
 
+// ─── bulletin_instruments ────────────────────────────────────────────
+// Admin-curated (and Jeff-ingestable) per-instrument board shown on the home
+// page: what the desk is watching, the entry/exit plan, and a market-structure
+// table across timeframes (the levels relation). One row per symbol.
+model BulletinInstrument {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  symbol      String          @unique
+  status      String          @default("active") // "active" (looked at) | "watching"
+  bias        String          @default("neutral") // bullish | bearish | neutral
+  whatToWatch String?         @map("what_to_watch")
+  entry       String?
+  exit        String?
+  note        String?
+  sortOrder   Int             @default(0) @map("sort_order")
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime        @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  levels      BulletinLevel[]
+
+  @@index([status])
+  @@index([updatedAt(sort: Desc)], map: "bulletin_instruments_updated_idx")
+  @@map("bulletin_instruments")
+}
+
+// ─── bulletin_levels ─────────────────────────────────────────────────
+// One market-structure row per timeframe for a bulletin instrument.
+model BulletinLevel {
+  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bulletinId      String             @map("bulletin_id") @db.Uuid
+  timeframe       String // "1H" | "4H" | "12H" | "1D" | "3D" | "1W"
+  marketStructure String             @default("neutral") @map("market_structure") // bullish | bearish | neutral
+  bosLevel        String?            @map("bos_level")
+  comment         String?
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  bulletin        BulletinInstrument @relation(fields: [bulletinId], references: [id], onDelete: Cascade)
+
+  @@unique([bulletinId, timeframe])
+  @@index([bulletinId])
+  @@map("bulletin_levels")
+}
+
 model ReferralPartner {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
