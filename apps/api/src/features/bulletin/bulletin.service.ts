@@ -1,4 +1,4 @@
-import { NotFoundError } from "@/core/errors/index.js";
+import { NotFoundError, ForbiddenError } from "@/core/errors/index.js";
 import {
   BULLETIN_TIMEFRAMES,
   type BulletinCreateInput,
@@ -6,7 +6,7 @@ import {
   type BulletinLevelInput,
   type BulletinIngestInput,
 } from "@tradevantage/shared/schema";
-import { bulletinRepository } from "./bulletin.repository.js";
+import { bulletinRepository, bulletinAccess } from "./bulletin.repository.js";
 
 const TF_ORDER = new Map<string, number>(BULLETIN_TIMEFRAMES.map((t, i) => [t, i]));
 
@@ -19,7 +19,12 @@ function ordered<T extends { levels: { timeframe: string }[] }>(b: T): T {
 }
 
 export const bulletinService = {
-  async list() {
+  // Members: VIP or admin only.
+  async list(userId: string) {
+    const profile = await bulletinAccess.getProfile(userId);
+    if (!profile || (profile.tier !== "vip" && !profile.isAdmin)) {
+      throw new ForbiddenError("VIP access required");
+    }
     const rows = await bulletinRepository.list();
     return rows.map(ordered);
   },

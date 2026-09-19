@@ -1,12 +1,13 @@
 import type { Request, Response } from "express";
 import { asyncHandler } from "@/core/utils/async-handler.js";
 import { sendSuccess } from "@/core/utils/response.js";
+import type { AuthRequest } from "@/core/types/request.js";
 import { bulletinService } from "./bulletin.service.js";
 
 export const bulletinController = {
-  // ─── read (members) ──────────────────────────────────────────────────
-  list: asyncHandler(async (_req: Request, res: Response) => {
-    const bulletins = await bulletinService.list();
+  // ─── read (VIP / admin members) ──────────────────────────────────────
+  list: asyncHandler(async (req: Request, res: Response) => {
+    const bulletins = await bulletinService.list((req as AuthRequest).user.id);
     sendSuccess(res, bulletins);
   }),
 
