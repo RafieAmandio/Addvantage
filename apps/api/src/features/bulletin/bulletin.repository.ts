@@ -6,6 +6,12 @@ import type {
 
 const withLevels = { levels: true } as const;
 
+// Access check source: the bulletin board is VIP/admin-only.
+export const bulletinAccess = {
+  getProfile: (userId: string) =>
+    prisma.profile.findUnique({ where: { id: userId }, select: { tier: true, isAdmin: true } }),
+};
+
 // Fields on the instrument itself (everything except symbol + levels).
 interface InstrumentFields {
   status?: string;
