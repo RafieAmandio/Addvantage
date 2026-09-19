@@ -17,17 +17,20 @@ import { CalendarStrip } from "@/features/dashboard/components/CalendarStrip";
 import { ActivePlanSection } from "@/features/dashboard/components/ActivePlanSection";
 import { WatchlistSection } from "@/features/dashboard/components/WatchlistSection";
 import { NewsRows } from "@/features/dashboard/components/NewsRows";
+import { BulletinSection } from "@/features/bulletin/components/BulletinSection";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan } from "@/features/plan/types";
 import type { PredictionCardData } from "@/features/predictions/types";
+import type { Bulletin } from "@/features/bulletin/types";
 
 interface Props {
   news: NewsListItem[];
   plans: Plan[];
   predictions: PredictionCardData[];
+  bulletins: Bulletin[];
 }
 
-export function DashboardClient({ news, plans, predictions }: Props) {
+export function DashboardClient({ news, plans, predictions, bulletins }: Props) {
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
   const { ids: seenNewsIds, hydrated: seenHydrated } = useSeenNews();
@@ -92,6 +95,8 @@ export function DashboardClient({ news, plans, predictions }: Props) {
       />
 
       <CalendarStrip />
+
+      <BulletinSection bulletins={bulletins} />
 
       <ActivePlanSection plan={plan} paid={paid} />
 

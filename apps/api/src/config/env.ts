@@ -46,6 +46,10 @@ const EnvSchema = z.object({
 
   SERVICE_TOKEN_SECRET: z.preprocess(emptyToUndef, z.string().min(32).optional()),
 
+  // Shared secret Jeff (or any trusted server-side caller) sends as a Bearer
+  // token to POST /bulletin/ingest. Unset = the ingest endpoint is disabled.
+  BULLETIN_INGEST_TOKEN: z.preprocess(emptyToUndef, z.string().min(16).optional()),
+
   TELEGRAM_BOT_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   // WhatsApp bridge (Jeff/Hermes Baileys bridge) — consult notifications to the
