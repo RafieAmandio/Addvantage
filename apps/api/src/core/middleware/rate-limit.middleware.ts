@@ -33,6 +33,11 @@ async function enforce(key: string, limit: number, windowSec: number): Promise<b
 }
 
 function getIp(req: Request): string {
+  // Behind Cloudflare the origin's X-Forwarded-For starts with Cloudflare's
+  // edge IP (shared by many visitors), so key on the real client IP that
+  // Cloudflare puts in CF-Connecting-IP. Fall back to XFF, then the socket IP.
+  const cf = (req.headers["cf-connecting-ip"] as string | undefined)?.trim();
+  if (cf) return cf;
   return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.ip ?? "unknown";
 }
 
