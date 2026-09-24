@@ -18,6 +18,7 @@ const LINKS = [
   { href: "/admin/early-access", label: "Early Access", code: "11" },
   { href: "/admin/meet", label: "Meet", code: "12" },
   { href: "/admin/bulletin", label: "Bulletin", code: "13" },
+  { href: "/admin/giveaway", label: "Giveaway", code: "14" },
 ] as const;
 
 export function AdminNav() {

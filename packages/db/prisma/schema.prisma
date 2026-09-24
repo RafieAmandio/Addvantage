@@ -457,6 +457,23 @@ model BulletinLevel {
   @@map("bulletin_levels")
 }
 
+// ─── giveaway_entries ────────────────────────────────────────────────
+// Public giveaway sign-ups (giveaway.tradevantage.gg): a BingX UID plus contact
+// details, deduped by UID. `won_at` marks a drawn winner.
+model GiveawayEntry {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bingxUid  String    @unique @map("bingx_uid")
+  email     String
+  telegram  String
+  name      String?
+  wonAt     DateTime? @map("won_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("giveaway_entries")
+}
+
 model ReferralPartner {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
