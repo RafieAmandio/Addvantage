@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GiveawayForm } from "@/features/giveaway/components/GiveawayForm";
-import { BINGX_REF_URL, REWARDS, STEPS } from "@/features/giveaway/content";
+import {
+  BINGX_KYC_TRANSFER_URL,
+  BINGX_REF_URL,
+  REWARDS,
+  STEPS,
+  SUPPORT_TELEGRAM,
+  SUPPORT_TELEGRAM_URL,
+} from "@/features/giveaway/content";
 
 export const metadata: Metadata = {
   title: "TradeVantage Giveaway — Trade & Win",
@@ -25,14 +32,14 @@ export default function GiveawayPage() {
             Giveaway · Open to all new users
           </span>
           <h1 className="mt-4 font-display text-[clamp(2.5rem,8vw,72px)] font-bold leading-[0.98] text-white">
-            Trade 2 days,
+            Get <span className="text-brand">28 USDT</span>
             <br />
-            get <span className="text-brand">8 USDT cash</span>
+            and a chance to win <span className="text-brand">$100</span>
           </h1>
           <p className="mt-5 max-w-xl font-mono text-sm leading-[1.6] text-white/60">
-            Plus a 20 USDT position voucher on register, and a shot at the{" "}
-            <span className="text-white">$100 weekly giveaway</span> drawn every Saturday. Submit your
-            BingX User ID below to enter.
+            Register and trade on BingX for a 20 USDT voucher plus 8 USDT cash, then get a shot at the{" "}
+            <span className="text-white">$100 giveaway</span> drawn every Saturday. Submit your BingX
+            User ID below to enter.
           </p>
         </div>
 
@@ -84,6 +91,41 @@ export default function GiveawayPage() {
               <GiveawayForm />
             </div>
           </div>
+        </div>
+
+        {/* Already have a BingX account */}
+        <div className="mt-14 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
+          <h2 className="font-display text-2xl text-white">Already have a BingX account?</h2>
+          <p className="mt-1 font-mono text-sm text-white/50">Two ways to qualify under the TradeVantage referral:</p>
+          <ol className="mt-5 space-y-4">
+            <li className="flex gap-4">
+              <span className="font-mono text-sm font-bold text-brand">1</span>
+              <p className="font-mono text-sm leading-[1.6] text-white/70">
+                Create a new account with our{" "}
+                <a href={BINGX_REF_URL} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-2 hover:text-brand-dim">
+                  referral link
+                </a>
+                .
+              </p>
+            </li>
+            <li className="flex gap-4">
+              <span className="font-mono text-sm font-bold text-brand">2</span>
+              <p className="font-mono text-sm leading-[1.6] text-white/70">
+                Transfer your KYC from your old account to a new one under the referral,{" "}
+                <a href={BINGX_KYC_TRANSFER_URL} target="_blank" rel="noopener noreferrer" className="text-brand underline underline-offset-2 hover:text-brand-dim">
+                  following this guide
+                </a>
+                .
+              </p>
+            </li>
+          </ol>
+          <p className="mt-6 border-t border-white/[0.08] pt-5 font-mono text-sm leading-[1.6] text-white/50">
+            Questions? Reach us on WhatsApp or Telegram{" "}
+            <a href={SUPPORT_TELEGRAM_URL} target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-2 hover:text-brand">
+              {SUPPORT_TELEGRAM}
+            </a>
+            .
+          </p>
         </div>
 
         <p className="mt-16 font-mono text-[11px] leading-[1.6] text-white/25">

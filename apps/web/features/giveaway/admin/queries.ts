@@ -3,9 +3,7 @@ import { apiGet } from "@/lib/api/client-server";
 export interface GiveawayEntry {
   id: string;
   bingxUid: string;
-  email: string;
-  telegram: string;
-  name: string | null;
+  contact: string;
   wonAt: string | null;
   createdAt: string;
   updatedAt: string;

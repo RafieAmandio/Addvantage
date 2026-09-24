@@ -65,28 +65,16 @@ export function GiveawayForm() {
           />
         </div>
         <div>
-          <label htmlFor="email" className={labelClass}>
-            Email
-          </label>
-          <input id="email" name="email" type="email" required placeholder="you@email.com" className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="telegram" className={labelClass}>
-            Telegram or WhatsApp
+          <label htmlFor="contact" className={labelClass}>
+            Email or Telegram
           </label>
           <input
-            id="telegram"
-            name="telegram"
+            id="contact"
+            name="contact"
             required
-            placeholder="@handle or +62…"
+            placeholder="you@email.com or @handle"
             className={inputClass}
           />
-        </div>
-        <div>
-          <label htmlFor="name" className={labelClass}>
-            Name <span className="font-normal text-white/40">(optional)</span>
-          </label>
-          <input id="name" name="name" placeholder="Your name" className={inputClass} />
         </div>
       </div>
 

@@ -15,9 +15,7 @@ export async function submitGiveawayEntry(
 ): Promise<GiveawayState> {
   const parsed = GiveawayEntrySchema.safeParse({
     bingxUid: formData.get("bingxUid"),
-    email: formData.get("email"),
-    telegram: formData.get("telegram"),
-    name: formData.get("name") ?? "",
+    contact: formData.get("contact"),
     website: formData.get("website") ?? "", // honeypot
   });
   if (!parsed.success) {

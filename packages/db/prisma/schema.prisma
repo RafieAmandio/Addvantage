@@ -463,9 +463,9 @@ model BulletinLevel {
 model GiveawayEntry {
   id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   bingxUid  String    @unique @map("bingx_uid")
-  email     String
-  telegram  String
-  name      String?
+  contact   String    @map("telegram") // email or Telegram handle — how we reach the winner
+  email     String    // legacy column (NOT NULL in DB); written as "" now
+  name      String?   // legacy column, no longer collected
   wonAt     DateTime? @map("won_at") @db.Timestamptz(6)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

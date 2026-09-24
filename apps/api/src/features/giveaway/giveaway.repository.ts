@@ -2,24 +2,18 @@ import { prisma } from "@/config/database.js";
 
 export interface EntryData {
   bingxUid: string;
-  email: string;
-  telegram: string;
-  name?: string;
+  contact: string;
 }
 
 export const giveawayRepository = {
-  // Dedupe by UID: re-submitting the same BingX UID updates the contact details
+  // Dedupe by UID: re-submitting the same BingX UID updates the contact
   // rather than creating a duplicate entry.
   upsert: (d: EntryData) =>
     prisma.giveawayEntry.upsert({
       where: { bingxUid: d.bingxUid },
-      update: { email: d.email, telegram: d.telegram, name: d.name ?? null },
-      create: {
-        bingxUid: d.bingxUid,
-        email: d.email,
-        telegram: d.telegram,
-        name: d.name ?? null,
-      },
+      update: { contact: d.contact },
+      // `email` is a legacy NOT NULL column we no longer collect — write "".
+      create: { bingxUid: d.bingxUid, contact: d.contact, email: "" },
     }),
 
   list: () => prisma.giveawayEntry.findMany({ orderBy: { createdAt: "desc" } }),

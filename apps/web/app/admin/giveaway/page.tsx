@@ -10,13 +10,9 @@ export const revalidate = 0;
 
 function Row({ e }: { e: GiveawayEntry }) {
   return (
-    <div className="grid grid-cols-[7rem_1fr_1fr_auto] items-center gap-4 border-b border-gray-3 bg-black px-4 py-3 sm:gap-6 sm:px-6">
+    <div className="grid grid-cols-[7rem_1fr_auto] items-center gap-4 border-b border-gray-3 bg-black px-4 py-3 sm:gap-6 sm:px-6">
       <span className="font-mono text-sm font-bold text-white">{e.bingxUid}</span>
-      <span className="min-w-0 truncate font-mono text-xs text-white/60">
-        {e.email}
-        {e.name ? <span className="text-white/30"> · {e.name}</span> : null}
-      </span>
-      <span className="min-w-0 truncate font-mono text-xs text-white/50">{e.telegram}</span>
+      <span className="min-w-0 truncate font-mono text-xs text-white/60">{e.contact}</span>
       <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
         {e.wonAt ? (
           <span className="text-brand">★ Winner</span>
