@@ -27,6 +27,7 @@ import { upgradeRadarRoutes } from "./features/upgrade-radar/upgrade-radar.route
 import { earlyAccessRoutes } from "./features/early-access/early-access.routes.js";
 import { shortLinksRoutes } from "./features/short-links/short-links.routes.js";
 import { bulletinRoutes } from "./features/bulletin/bulletin.routes.js";
+import { giveawayRoutes } from "./features/giveaway/giveaway.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -57,4 +58,5 @@ export function mountRoutes(app: Express) {
   app.use("/early-access", earlyAccessRoutes);
   app.use("/short-links", shortLinksRoutes);
   app.use("/bulletin", bulletinRoutes);
+  app.use("/giveaway", giveawayRoutes);
 }

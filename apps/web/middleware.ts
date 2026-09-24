@@ -6,13 +6,22 @@ import { updateSession } from "@/lib/auth/middleware";
 // /early-access route; everything else on that host still resolves normally.
 // early.tradevantage.gg stays as an alias so older links keep working.
 const APPLY_HOSTS = new Set(["apply.tradevantage.gg", "early.tradevantage.gg"]);
+// giveaway.tradevantage.gg/ rewrites to the internal /giveaway route.
+const GIVEAWAY_HOST = "giveaway.tradevantage.gg";
 
 export async function middleware(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0];
-  if (APPLY_HOSTS.has(host) && request.nextUrl.pathname === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/early-access";
-    return NextResponse.rewrite(url);
+  if (request.nextUrl.pathname === "/") {
+    if (APPLY_HOSTS.has(host)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/early-access";
+      return NextResponse.rewrite(url);
+    }
+    if (host === GIVEAWAY_HOST) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/giveaway";
+      return NextResponse.rewrite(url);
+    }
   }
   return updateSession(request);
 }
