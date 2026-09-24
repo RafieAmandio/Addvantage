@@ -25,14 +25,14 @@ export default function GiveawayPage() {
             Giveaway · Open to all new users
           </span>
           <h1 className="mt-4 font-display text-[clamp(2.5rem,8vw,72px)] font-bold leading-[0.98] text-white">
-            Trade 2 days,
+            Get <span className="text-brand">28 USDT</span>
             <br />
-            get <span className="text-brand">8 USDT cash</span>
+            and a chance to win <span className="text-brand">$100</span>
           </h1>
           <p className="mt-5 max-w-xl font-mono text-sm leading-[1.6] text-white/60">
-            Plus a 20 USDT position voucher on register, and a shot at the{" "}
-            <span className="text-white">$100 weekly giveaway</span> drawn every Saturday. Submit your
-            BingX User ID below to enter.
+            Register and trade on BingX for a 20 USDT voucher plus 8 USDT cash, then get a shot at the{" "}
+            <span className="text-white">$100 giveaway</span> drawn every Saturday. Submit your BingX
+            User ID below to enter.
           </p>
         </div>
 

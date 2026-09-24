@@ -16,8 +16,8 @@ export const STEPS = [
   },
   {
     n: "02",
-    title: "KYC + deposit, trade 500 USDT",
-    body: "Complete KYC, deposit, and trade 500 USDT to earn 3 USDT cash.",
+    title: "KYC + deposit, then trade",
+    body: "Complete KYC, deposit, and trade for 2 days to earn 8 USDT cash.",
   },
   {
     n: "03",

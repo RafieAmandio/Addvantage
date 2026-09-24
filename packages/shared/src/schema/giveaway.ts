@@ -13,15 +13,8 @@ const bingxUid = z
 
 export const GiveawayEntrySchema = z.object({
   bingxUid,
-  email: z.string().trim().toLowerCase().email("Enter a valid email").max(200),
-  // Telegram @handle or a WhatsApp number — how we reach the winner.
-  telegram: z.string().trim().min(2, "Enter your Telegram or WhatsApp").max(64),
-  name: z
-    .string()
-    .trim()
-    .max(80)
-    .optional()
-    .transform((v) => (v === "" ? undefined : v)),
+  // Email or Telegram handle — how we reach the winner.
+  contact: z.string().trim().min(3, "Enter your email or Telegram").max(200),
   // Honeypot: real users leave this empty; bots fill it → rejected.
   website: z.string().max(0).optional(),
 });

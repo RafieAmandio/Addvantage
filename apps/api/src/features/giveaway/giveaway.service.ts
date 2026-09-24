@@ -5,9 +5,7 @@ export const giveawayService = {
   async submit(input: GiveawayEntryInput) {
     const entry = await giveawayRepository.upsert({
       bingxUid: input.bingxUid,
-      email: input.email,
-      telegram: input.telegram,
-      ...(input.name ? { name: input.name } : {}),
+      contact: input.contact,
     });
     return { id: entry.id };
   },
