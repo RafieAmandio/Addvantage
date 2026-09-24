@@ -31,8 +31,7 @@ export function GiveawayForm() {
       <div className="rounded-xl border border-moss/30 bg-moss/[0.06] p-6 text-center">
         <p className="font-display text-2xl text-white">You&apos;re in! 🎉</p>
         <p className="mt-2 font-mono text-sm text-white/60">
-          Your entry is recorded. Winners are drawn every <span className="text-brand">Saturday</span> —
-          we&apos;ll reach you on the contact you provided.
+          Your entry is recorded. We&apos;ll reach you on the contact you provided when the <span className="text-brand">$100 giveaway</span> is drawn.
         </p>
       </div>
     );
