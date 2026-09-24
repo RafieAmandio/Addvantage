@@ -2,6 +2,14 @@
 export const BINGX_REF_URL =
   "https://bingx.com/id/activity/general/3013891856?ch=bd&ref=TradeVantage";
 
+// Guide: move KYC identity from an old BingX account to a new one (under the referral).
+export const BINGX_KYC_TRANSFER_URL =
+  "https://bingx.com/id/support/articles/20877072634265-caramentransferidentitasandakeakunlain";
+
+// Support contact for member questions.
+export const SUPPORT_TELEGRAM = "@p4thfinder11";
+export const SUPPORT_TELEGRAM_URL = "https://t.me/p4thfinder11";
+
 export const REWARDS = [
   { value: "20 USDT", label: "Position voucher on register" },
   { value: "8 USDT", label: "Cash for trading 2 days" },
