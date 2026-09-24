@@ -13,7 +13,7 @@ export const SUPPORT_TELEGRAM_URL = "https://t.me/p4thfinder11";
 export const REWARDS = [
   { value: "20 USDT", label: "Position voucher on register" },
   { value: "8 USDT", label: "Cash for trading 2 days" },
-  { value: "$100", label: "Weekly giveaway, drawn Saturday" },
+  { value: "$100", label: "Giveaway prize" },
 ] as const;
 
 export const STEPS = [
@@ -30,6 +30,6 @@ export const STEPS = [
   {
     n: "03",
     title: "Submit your BingX User ID",
-    body: "Enter your UID below to join the $100 weekly giveaway. Winners are drawn every Saturday.",
+    body: "Enter your UID below to join the $100 giveaway.",
   },
 ] as const;

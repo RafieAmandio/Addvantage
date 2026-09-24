@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: "TradeVantage Giveaway — Trade & Win",
   description:
-    "Register on BingX, trade, and submit your User ID to join the TradeVantage $100 weekly giveaway. Open to all new users.",
+    "Register on BingX, trade, and submit your User ID to join the TradeVantage $100 giveaway. Open to all new users.",
   robots: { index: false, follow: false },
 };
 
@@ -38,8 +38,8 @@ export default function GiveawayPage() {
           </h1>
           <p className="mt-5 max-w-xl font-mono text-sm leading-[1.6] text-white/60">
             Register and trade on BingX for a 20 USDT voucher plus 8 USDT cash, then get a shot at the{" "}
-            <span className="text-white">$100 giveaway</span> drawn every Saturday. Submit your BingX
-            User ID below to enter.
+            <span className="text-white">$100 giveaway</span>. Submit your BingX User ID
+            below to enter.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ export default function GiveawayPage() {
           <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 sm:p-7">
             <h2 className="font-display text-2xl text-white">Enter the giveaway</h2>
             <p className="mt-1 font-mono text-xs text-white/40">
-              One entry per BingX UID. Winners announced Saturday.
+              One entry per BingX UID.
             </p>
             <div className="mt-6">
               <GiveawayForm />
@@ -129,7 +129,7 @@ export default function GiveawayPage() {
         </div>
 
         <p className="mt-16 font-mono text-[11px] leading-[1.6] text-white/25">
-          Rewards are provided by BingX under their promotion terms. TradeVantage runs the weekly $100
+          Rewards are provided by BingX under their promotion terms. TradeVantage runs the $100
           giveaway among verified entries. Trading involves substantial risk of loss.
         </p>
       </div>
