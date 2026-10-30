@@ -10,6 +10,7 @@ interface PersistResult {
   rephrased: number;
   errors: number;
   insertedIds: string[];
+  lastError?: string;
 }
 
 // Sources where each item has a unique source_url (safe for URL-based dedup).
@@ -68,6 +69,7 @@ export async function persistCandidates(
     } catch (err) {
       logger.error({ err: String(err), externalId: c.externalId }, "rephrase failed");
       result.errors++;
+      result.lastError = String(err);
       continue;
     }
 
@@ -105,6 +107,7 @@ export async function persistCandidates(
     } catch (err) {
       logger.error({ err: String(err), externalId: c.externalId }, "insert failed");
       result.errors++;
+      result.lastError = String(err);
     }
   }
 

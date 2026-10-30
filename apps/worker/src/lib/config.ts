@@ -57,6 +57,12 @@ const EnvSchema = z.object({
 
   KOBEISSI_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
+  /** Jeff's Baileys bridge — same vars as the api. Used only for the
+   *  "news pipeline is down" ops alert. Unset = no alert. */
+  WHATSAPP_BRIDGE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  WHATSAPP_BRIDGE_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  WHATSAPP_CONSULT_GROUP_JID: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+
   /** Override for the Truth Social RSS mirror URL. Unset = use the adapter's
    *  hardcoded default (`https://trumpstruth.org/feed`). Useful if the mirror
    *  rotates hosts or we point at a self-hosted cache. */
