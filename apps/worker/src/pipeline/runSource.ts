@@ -4,6 +4,7 @@ import { logger } from "../lib/logger";
 import { getAdapter } from "../adapters";
 import { loadExistingHashes, loadExistingSourceUrls, persistCandidates } from "./persist";
 import { notifyPending } from "../telegram/notify";
+import { alertPipelineDown } from "./alert";
 
 /**
  * One end-to-end run for a single source:
@@ -33,6 +34,12 @@ export async function runSource(sourceCode: string): Promise<void> {
     const result = await persistCandidates(sourceCode, candidates, existingHashes, existingUrls);
     logger.info({ sourceCode, ...result }, "persisted");
 
+    // Every new item failed (e.g. LLM key out of balance). Without this the run
+    // is recorded "ok" and the outage is invisible on /admin/logs.
+    if (result.errors > 0 && result.inserted === 0) {
+      throw new Error(`all ${result.errors} new items failed: ${result.lastError}`);
+    }
+
     if (result.insertedIds.length > 0) {
       await notifyPending(sourceCode, result.insertedIds);
     }
@@ -61,6 +68,7 @@ export async function runSource(sourceCode: string): Promise<void> {
       tags: { scope: "runSource", sourceCode },
     });
     logger.error({ err: String(err), sourceCode }, "runSource failed");
+    await alertPipelineDown(sourceCode, String(err));
     await prisma.ingestionRun.update({
       where: { id: runRow.id },
       data: {
