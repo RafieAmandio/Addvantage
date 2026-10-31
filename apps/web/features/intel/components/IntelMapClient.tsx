@@ -14,6 +14,9 @@ import {
 import { zoom, zoomIdentity, type D3ZoomEvent } from "d3-zoom";
 import { select } from "d3-selection";
 import { cn } from "@/lib/cn";
+import { TextTabs } from "@/components/ui/TextTabs";
+import { PageSearchInput } from "@/components/ui/PageSearchInput";
+import { ChipToggles } from "@/features/atr/components/FilterControls";
 import { fetchGraph, type GraphNode, type GraphEdge, type GraphFilters } from "../queries/graph";
 import { IntelDetailPanel } from "./IntelDetailPanel";
 
@@ -35,7 +38,7 @@ const NODE_R = 6;
 
 const TYPE_COLORS: Record<string, string> = {
   news: "#FFD400",
-  plan: "#65A30D",
+  plan: "#00DD94",
   channel: "#9CA3AF",
   event: "#6B7280",
 };
@@ -44,7 +47,7 @@ const TIME_RANGES = [
   { label: "1W", days: 7 },
   { label: "1M", days: 30 },
   { label: "3M", days: 90 },
-  { label: "ALL", days: 0 },
+  { label: "All", days: 0 },
 ] as const;
 
 const CONTENT_TYPES = ["news", "plan", "channel", "event"] as const;
@@ -73,7 +76,7 @@ function nodeColor(node: GraphNode): string {
   }
   if (node.type === "plan") {
     const dir = node.meta.direction as string;
-    return dir === "long" || dir === "bullish" ? "#65A30D" : "#DC2626";
+    return dir === "long" || dir === "bullish" ? "#00DD94" : "#FF454D";
   }
   return TYPE_COLORS[node.type] ?? "#6B7280";
 }
@@ -297,85 +300,61 @@ export function IntelMapClient() {
     : [];
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col">
-      {/* ─── filter bar ──────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.06] bg-black px-4 py-3 sm:px-6">
-        <input
-          type="text"
-          value={symbolSearch}
-          onChange={(e) => setSymbolSearch(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && loadGraph()}
-          placeholder="Filter symbols (e.g. XAUUSD, EURUSD)"
-          className="w-48 border border-gray-3 bg-gray-2 px-2 py-1.5 font-mono text-[10px] text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+    <div className="flex flex-col gap-4 px-4 pb-10 sm:px-6 lg:h-[calc(100vh-64px)]">
+      {/* filters */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <div className="w-full sm:w-72">
+          <PageSearchInput
+            value={symbolSearch}
+            onChange={setSymbolSearch}
+            placeholder="Symbols, e.g. XAUUSD, EURUSD"
+            ariaLabel="Filter symbols"
+          />
+        </div>
+        <ChipToggles
+          options={CONTENT_TYPES.map((t) => ({ id: t, label: t[0]!.toUpperCase() + t.slice(1) }))}
+          active={activeTypes as Set<(typeof CONTENT_TYPES)[number]>}
+          onToggle={toggleType}
+          label="Content types"
         />
-
-        <div className="flex gap-1">
-          {CONTENT_TYPES.map((t) => (
-            <button
-              key={t}
-              onClick={() => toggleType(t)}
-              className={cn(
-                "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
-                "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                activeTypes.has(t)
-                  ? "border-current text-white"
-                  : "border-gray-3 text-white/25"
-              )}
-              style={activeTypes.has(t) ? { color: TYPE_COLORS[t] } : undefined}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-1">
-          {TIME_RANGES.map((r) => (
-            <button
-              key={r.label}
-              onClick={() => setTimeRange(r)}
-              className={cn(
-                "border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
-                "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                timeRange.label === r.label
-                  ? "border-brand text-brand"
-                  : "border-gray-3 text-white/40 hover:text-white/60"
-              )}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-          {nodes.length} NODES · {links.length} EDGES
+        <TextTabs
+          options={TIME_RANGES.map((r) => r.label)}
+          value={timeRange.label}
+          onChange={(l) => setTimeRange(TIME_RANGES.find((r) => r.label === l)!)}
+          label="Time range"
+        />
+        <div className="text-[12px] text-white/40 sm:ml-auto">
+          {nodes.length} nodes · {links.length} edges
         </div>
       </div>
 
       {/* ─── main area ───────────────────────────────────────────────── */}
-      <div className="relative flex flex-1 overflow-hidden">
+      <div className="relative flex h-[60vh] min-h-[360px] gap-4 lg:h-auto lg:min-h-0 lg:flex-1">
         <div
           ref={containerRef}
           className={cn(
-            "relative flex-1 bg-grid cursor-grab active:cursor-grabbing",
-            selected && "lg:w-[60%]"
+            "relative min-w-0 flex-1 cursor-grab overflow-hidden rounded-2xl bg-panel active:cursor-grabbing",
           )}
         >
+          {/* legend */}
+          <div className="pointer-events-none absolute left-4 top-3 z-10 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-white/40">
+            <span><i className="mr-1.5 inline-block h-2 w-2 rotate-45 bg-brand align-middle" />High impact news</span>
+            <span><i className="mr-1.5 inline-block h-2 w-2 bg-up align-middle" />Long plan</span>
+            <span><i className="mr-1.5 inline-block h-2 w-2 bg-down align-middle" />Short plan</span>
+            <span><i className="mr-1.5 inline-block h-2 w-2 bg-white/40 align-middle" />Channel, event</span>
+          </div>
           {loading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand animate-pulse">
-                Computing connections...
-              </div>
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-panel/70">
+              <div className="text-[14px] text-white/55">Computing connections</div>
             </div>
           )}
 
           {error && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-black/80">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-                {error}
-              </div>
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-panel/90">
+              <div className="text-[14px] text-white/70">{error}</div>
               <button
                 onClick={loadGraph}
-                className="border border-brand px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black"
+                className="rounded-full bg-brand px-4 py-1.5 text-[13px] font-semibold text-black focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
               >
                 Retry
               </button>
@@ -385,12 +364,8 @@ export function IntelMapClient() {
           {!loading && !error && nodes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-                  No connections found
-                </div>
-                <div className="mt-2 font-display text-lg text-white/50">
-                  Adjust filters to expand the search
-                </div>
+                <div className="text-[15px] font-semibold text-white/70">No connections found</div>
+                <div className="mt-1 text-[14px] text-white/40">Widen the time range or clear the symbol filter.</div>
               </div>
             </div>
           )}
@@ -433,10 +408,10 @@ export function IntelMapClient() {
                     x={pos.x}
                     y={pos.y - 30}
                     textAnchor="middle"
-                    fill="rgba(255,255,255,0.2)"
-                    fontSize="9"
-                    fontFamily="monospace"
-                    letterSpacing="0.15em"
+                    fill="rgba(255,255,255,0.35)"
+                    fontSize="11"
+                    fontWeight="600"
+                    letterSpacing="0.08em"
                   >
                     {symbol}
                   </text>
@@ -494,7 +469,7 @@ export function IntelMapClient() {
           {/* tooltip */}
           {tooltip && (
             <div
-              className="pointer-events-none absolute z-20 border border-gray-3 bg-black/95 px-3 py-2"
+              className="pointer-events-none absolute z-20 rounded-lg bg-raised px-3 py-2 ring-1 ring-white/[0.08]"
               style={{ left: tooltip.x, top: tooltip.y }}
             >
               <div className="flex items-center gap-2">
@@ -502,19 +477,19 @@ export function IntelMapClient() {
                   className="inline-block h-2 w-2"
                   style={{ backgroundColor: TYPE_COLORS[tooltip.node.type] }}
                 />
-                <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+                <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
                   {tooltip.node.type}
                 </span>
                 {tooltip.node.symbols.length > 0 && (
-                  <span className="font-mono text-[9px] text-brand/60">
+                  <span className="text-[12px] text-white/55">
                     {tooltip.node.symbols.slice(0, 3).join(", ")}
                   </span>
                 )}
               </div>
-              <div className="mt-1 max-w-[240px] truncate font-mono text-[10px] text-white">
+              <div className="mt-1 max-w-[260px] truncate text-[13px] font-medium text-white">
                 {tooltip.node.title}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] text-white/30">
+              <div className="mt-0.5 text-[12px] text-white/30">
                 {new Date(tooltip.node.timestamp).toLocaleDateString()}
               </div>
             </div>
@@ -531,26 +506,20 @@ export function IntelMapClient() {
         )}
       </div>
 
-      {/* ─── mobile: list fallback ───────────────────────────────────── */}
-      <div className="block border-t border-white/[0.06] lg:hidden">
-        <div className="max-h-48 overflow-y-auto px-4 py-2">
+      {/* mobile: list fallback */}
+      <section className="rounded-2xl bg-panel p-5 lg:hidden">
+        <h2 className="mb-2 text-[15px] font-semibold text-white">Latest nodes</h2>
+        <ul className="divide-y divide-white/[0.07]">
           {nodes.slice(0, 20).map((n) => (
-            <button
-              key={n.data.id}
-              onClick={() => setSelected(n.data)}
-              className="flex w-full items-center gap-2 border-b border-white/[0.04] py-1.5 text-left"
-            >
-              <span
-                className="inline-block h-2 w-2 shrink-0"
-                style={{ backgroundColor: TYPE_COLORS[n.data.type] }}
-              />
-              <span className="truncate font-mono text-[10px] text-white/70">
-                {n.data.title}
-              </span>
-            </button>
+            <li key={n.data.id}>
+              <button onClick={() => setSelected(n.data)} className="flex w-full items-center gap-3 py-2.5 text-left">
+                <span className="inline-block h-2 w-2 shrink-0" style={{ backgroundColor: nodeColor(n.data) }} />
+                <span className="truncate text-[14px] text-white/80">{n.data.title}</span>
+              </button>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
     </div>
   );
 }

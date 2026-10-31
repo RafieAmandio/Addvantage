@@ -1,125 +1,88 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/cn";
-import type { RsiTableRow, RsiZoneId } from "../types";
+import { RsiMeter } from "@/features/instrument/components/DotMatrix";
+import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
+import { PairLink, SortTh, nextSort, sortRows } from "@/features/atr/components/FilterControls";
+import type { RsiPair, RsiTableRow, RsiZoneId } from "../types";
 import { ZONE_CONFIG, GROUP_LABELS } from "../lib/zones";
 
-interface RsiTableProps {
-  pairs: RsiTableRow[];
+const zoneColor = (zone: string | null) => (zone ? ZONE_CONFIG[zone as RsiZoneId]?.color : undefined) ?? "rgba(255,255,255,.55)";
+
+/** One timeframe, ranked: a dot meter per pair, most overbought first. */
+export function RsiRanked({ pairs }: { pairs: RsiPair[] }) {
+  const sorted = useMemo(() => [...pairs].sort((a, b) => b.rsi - a.rsi), [pairs]);
+  return (
+    <ul className="divide-y divide-white/[0.07]">
+      {sorted.map((p) => (
+        <li key={p.symbol} className="grid grid-cols-[88px_minmax(0,1fr)_48px] items-center gap-3 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)_56px_96px_96px]">
+          <PairLink symbol={p.symbol} sub={GROUP_LABELS[p.group] ?? p.group} />
+          <div className="max-w-[200px]">
+            <RsiMeter rsi={p.rsi} />
+          </div>
+          <span className="text-right font-num text-[20px] font-semibold leading-5" style={{ color: zoneColor(p.zone) }}>
+            {p.rsi.toFixed(1)}
+          </span>
+          <span className="hidden text-[13px] font-medium sm:block" style={{ color: zoneColor(p.zone) }}>
+            {ZONE_CONFIG[p.zone]?.label}
+          </span>
+          <span className="hidden text-right font-num text-[17px] font-medium text-white/55 sm:block">
+            {p.price !== null ? fmtPrice(p.price) : "n/a"}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 type SortKey = "symbol" | "price" | "rsi1h" | "rsi4h" | "rsi1d";
 
-const GROUP_COLORS: Record<string, string> = {
-  major: "text-brand",
-  cross: "text-white/50",
-  commodity: "text-yellow-400",
-  index: "text-blue-400",
-};
-
 function RsiCell({ rsi, zone }: { rsi: number | null; zone: string | null }) {
-  if (rsi === null) return (
-    <td className="px-3 py-3 text-center font-mono text-xs text-white/15" title="Data unavailable for this timeframe">
-      —
-    </td>
-  );
-  const cfg = zone ? ZONE_CONFIG[zone as RsiZoneId] : null;
-  const color = cfg?.color ?? "#6B7280";
   return (
-    <td className="px-3 py-3 text-center font-mono text-xs font-medium" style={{ color }}>
-      {rsi.toFixed(2)}
+    <td className="py-2.5 pr-3 text-right font-num text-[18px] font-semibold leading-5 last:pr-0" style={{ color: rsi === null ? "rgba(255,255,255,.2)" : zoneColor(zone) }}>
+      {rsi === null ? "n/a" : rsi.toFixed(1)}
     </td>
   );
 }
 
-export function RsiTable({ pairs }: RsiTableProps) {
-  const router = useRouter();
+/** Every pair across 1H, 4H and 1D, sortable. */
+export function RsiTable({ pairs }: { pairs: RsiTableRow[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("symbol");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir(key === "symbol" ? "asc" : "desc"); }
+  const sorted = useMemo(() => sortRows(pairs, sortKey, sortDir), [pairs, sortKey, sortDir]);
+  const sort = (k: SortKey) => {
+    const [key, dir] = nextSort(k, sortKey, sortDir, "symbol");
+    setSortKey(key);
+    setSortDir(dir);
   };
-
-  const sorted = useMemo(() => {
-    return [...pairs].sort((a, b) => {
-      const av = a[sortKey];
-      const bv = b[sortKey];
-      if (av === null && bv === null) return 0;
-      if (av === null) return 1;
-      if (bv === null) return -1;
-      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-  }, [pairs, sortKey, sortDir]);
-
-  const columns: { key: SortKey; label: string }[] = [
-    { key: "symbol", label: "Symbol" },
-    { key: "price", label: "Price" },
-    { key: "rsi1h", label: "RSI (1H)" },
-    { key: "rsi4h", label: "RSI (4H)" },
-    { key: "rsi1d", label: "RSI (1D)" },
-  ];
+  const th = { sortKey, dir: sortDir, onSort: sort };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px]">
-        <thead>
-          <tr className="border-b border-white/[0.06]">
-            <th className="w-10 px-3 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              #
-            </th>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                onClick={() => toggleSort(col.key)}
-                className={cn(
-                  "cursor-pointer px-3 py-3 font-mono text-[10px] font-medium uppercase tracking-wider transition-colors hover:text-white/60",
-                  col.key === "symbol" ? "text-left" : "text-center",
-                  sortKey === col.key ? "text-brand" : "text-white/25",
-                )}
-              >
-                {col.label}
-                {sortKey === col.key && (
-                  <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>
-                )}
-              </th>
-            ))}
+    <table className="w-full table-fixed text-left">
+      <thead className="border-b border-white/[0.07]">
+        <tr>
+          <SortTh k="symbol" {...th} className="w-[100px] sm:w-[140px]">Pair</SortTh>
+          <SortTh k="price" {...th} className="hidden text-right sm:table-cell">Price</SortTh>
+          <SortTh k="rsi1h" {...th} className="text-right">1H</SortTh>
+          <SortTh k="rsi4h" {...th} className="text-right">4H</SortTh>
+          <SortTh k="rsi1d" {...th} className="text-right">1D</SortTh>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-white/[0.07]">
+        {sorted.map((r) => (
+          <tr key={r.symbol} className="hover:bg-raised">
+            <td className="py-2.5 pr-3">
+              <PairLink symbol={r.symbol} sub={GROUP_LABELS[r.group] ?? r.group} />
+            </td>
+            <td className="hidden py-2.5 pr-3 text-right font-num text-[17px] font-medium text-white/55 sm:table-cell">
+              {r.price !== null ? fmtPrice(r.price) : "n/a"}
+            </td>
+            <RsiCell rsi={r.rsi1h} zone={r.zone1h} />
+            <RsiCell rsi={r.rsi4h} zone={r.zone4h} />
+            <RsiCell rsi={r.rsi1d} zone={r.zone1d} />
           </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row, idx) => (
-            <tr
-              key={row.symbol}
-              onClick={() => router.push(`/app/instrument/${encodeURIComponent(row.symbol)}`)}
-              className="cursor-pointer border-b border-white/[0.03] transition-colors hover:bg-white/[0.02]"
-            >
-              <td className="px-3 py-3 font-mono text-xs text-white/20">
-                {idx + 1}
-              </td>
-              <td className="px-3 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-sm font-bold text-white">
-                    {row.symbol}
-                  </span>
-                  <span className={cn("text-[9px] font-medium uppercase", GROUP_COLORS[row.group] ?? "text-white/30")}>
-                    {GROUP_LABELS[row.group] ?? row.group}
-                  </span>
-                </div>
-              </td>
-              <td className="px-3 py-3 text-center font-mono text-xs text-white/50">
-                {row.price !== null ? row.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 }) : "—"}
-              </td>
-              <RsiCell rsi={row.rsi1h} zone={row.zone1h} />
-              <RsiCell rsi={row.rsi4h} zone={row.zone4h} />
-              <RsiCell rsi={row.rsi1d} zone={row.zone1d} />
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 }

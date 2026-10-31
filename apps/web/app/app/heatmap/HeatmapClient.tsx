@@ -1,135 +1,106 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { RsiZoneId } from "@/features/heatmap/types";
 import type { ForexGroup } from "@tradevantage/shared";
-import { ZONES_ORDERED } from "@/features/heatmap/lib/zones";
-import { GROUPS_ORDERED } from "@/features/heatmap/lib/zones";
+import { formatWibTime } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
+import { GROUP_LABELS, GROUPS_ORDERED, ZONE_CONFIG, ZONES_ORDERED } from "@/features/heatmap/lib/zones";
 import { useRsiData, useRsiTableData } from "@/features/heatmap/hooks/useRsiData";
-import { RsiToolbar } from "@/features/heatmap/components/RsiToolbar";
-import { RsiHeatmap } from "@/features/heatmap/components/RsiHeatmap";
-import { RsiList } from "@/features/heatmap/components/RsiList";
-import { RsiTable } from "@/features/heatmap/components/RsiTable";
+import { RsiRanked, RsiTable } from "@/features/heatmap/components/RsiTable";
+import { ChipToggles, StateLine, ZoneToggles, flip } from "@/features/atr/components/FilterControls";
+
+const TIMEFRAMES = [
+  { id: "1h", label: "1H" },
+  { id: "4h", label: "4H" },
+  { id: "1d", label: "1D" },
+] as const;
 
 export default function HeatmapClient() {
-  const [interval, setChartInterval] = useState("4h");
-  const [activeZones, setActiveZones] = useState<Set<RsiZoneId>>(
-    () => new Set(ZONES_ORDERED),
-  );
-  const [activeGroups, setActiveGroups] = useState<Set<ForexGroup>>(
-    () => new Set(GROUPS_ORDERED),
-  );
+  const [interval, setChartInterval] = useState<"1h" | "4h" | "1d">("4h");
+  const [activeZones, setActiveZones] = useState<Set<RsiZoneId>>(() => new Set(ZONES_ORDERED));
+  const [activeGroups, setActiveGroups] = useState<Set<ForexGroup>>(() => new Set(GROUPS_ORDERED));
 
   const chartData = useRsiData(interval);
   const tableData = useRsiTableData();
 
-  const toggleZone = useCallback((z: RsiZoneId) => {
-    setActiveZones((prev) => {
-      const next = new Set(prev);
-      if (next.has(z)) next.delete(z);
-      else next.add(z);
-      return next;
-    });
-  }, []);
-
-  const toggleGroup = useCallback((g: ForexGroup) => {
-    setActiveGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(g)) next.delete(g);
-      else next.add(g);
-      return next;
-    });
-  }, []);
-
   const filteredPairs = useMemo(() => {
     if (!chartData.data) return [];
-    return chartData.data.pairs.filter(
-      (p) => activeZones.has(p.zone) && activeGroups.has(p.group as ForexGroup),
-    );
+    return chartData.data.pairs.filter((p) => activeZones.has(p.zone) && activeGroups.has(p.group as ForexGroup));
   }, [chartData.data, activeZones, activeGroups]);
 
-  const totalCount = chartData.data?.pairs.length ?? 0;
+  const all = chartData.data?.pairs ?? [];
+  const avg = all.length ? all.reduce((s, p) => s + p.rsi, 0) / all.length : null;
+  const zones = ZONES_ORDERED.map((z) => {
+    const c = ZONE_CONFIG[z];
+    return {
+      id: z,
+      label: c.label,
+      color: c.color,
+      range: `${c.min} to ${c.max}`,
+      count: all.filter((p) => p.zone === z).length,
+    };
+  });
+  const tf = TIMEFRAMES.find((t) => t.id === interval)!.label;
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-        <div className="flex items-center gap-3">
-          <h1 className="font-mono text-lg font-bold text-white">
-            Forex RSI Heatmap
-          </h1>
-          {!chartData.loading && !chartData.error && totalCount > 0 && (
-            <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
-              <span className="led" aria-hidden />
-              {totalCount} instruments
-            </span>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        <Panel
+          title={`RSI ${tf}`}
+          sub={
+            <>
+              14-period RSI, most overbought first.
+              {chartData.data?.updatedAt && <span className="text-white/30"> Updated {formatWibTime(chartData.data.updatedAt)} WIB</span>}
+            </>
+          }
+          action={<TextTabs options={TIMEFRAMES} value={interval} onChange={setChartInterval} label="Timeframe" />}
+        >
+          {chartData.loading ? (
+            <StateLine>Scanning {tf} RSI</StateLine>
+          ) : chartData.error ? (
+            <StateLine>{chartData.error}</StateLine>
+          ) : filteredPairs.length === 0 ? (
+            <StateLine>
+              {all.length === 0 ? "No RSI data yet. The worker syncs every 4 hours." : "No pairs match the selected filters."}
+            </StateLine>
+          ) : (
+            <>
+              <RsiRanked pairs={filteredPairs} />
+              <p className="mt-3 text-[12px] text-white/30">
+                {filteredPairs.length} of {all.length} pairs. Each dot is 5 RSI points, the tinted ends mark 30 and 70.
+              </p>
+            </>
           )}
-        </div>
-        <p className="mt-1 text-xs text-white/30">
-          14-period RSI across major pairs, crosses, commodities, and indices.
-          Refreshed every 4 hours.
-        </p>
+        </Panel>
+
+        {tableData.data && tableData.data.pairs.length > 0 && (
+          <Panel title="All timeframes" sub="1H, 4H and 1D side by side. Sort by any column.">
+            <RsiTable pairs={tableData.data.pairs} />
+          </Panel>
+        )}
       </div>
 
-      <RsiToolbar
-        interval={interval}
-        onIntervalChange={setChartInterval}
-        activeZones={activeZones}
-        onToggleZone={toggleZone}
-        activeGroups={activeGroups}
-        onToggleGroup={toggleGroup}
-        pairCount={filteredPairs.length}
-        totalCount={totalCount}
-        updatedAt={chartData.data?.updatedAt ?? null}
-      />
-
-      {/* Scatter chart */}
-      {chartData.loading && (
-        <div className="flex items-center justify-center py-32">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-brand">
-            <span className="led" aria-hidden />
-            Scanning {interval} frequency
-          </div>
-        </div>
-      )}
-
-      {chartData.error && (
-        <div className="px-4 py-12 text-center text-sm text-white/40 sm:px-6">
-          {chartData.error}
-        </div>
-      )}
-
-      {!chartData.loading && !chartData.error && filteredPairs.length === 0 && (
-        <div className="px-4 py-20 text-center sm:px-6">
-          <p className="text-sm text-white/30">
-            {chartData.data && chartData.data.pairs.length === 0
-              ? "No RSI data available yet. The worker syncs every 4 hours."
-              : "No pairs match the selected filters."}
-          </p>
-        </div>
-      )}
-
-      {!chartData.loading && !chartData.error && filteredPairs.length > 0 && (
-        <>
-          <div className="hidden md:block">
-            <RsiHeatmap pairs={filteredPairs} />
-          </div>
-          <div className="md:hidden">
-            <RsiList pairs={filteredPairs} />
-          </div>
-        </>
-      )}
-
-      {/* Table below chart */}
-      {!tableData.loading && !tableData.error && tableData.data && tableData.data.pairs.length > 0 && (
-        <div className="border-t border-white/[0.06]">
-          <div className="px-4 py-4 sm:px-6">
-            <h2 className="font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              All Instruments
-            </h2>
-          </div>
-          <RsiTable pairs={tableData.data.pairs} />
-        </div>
-      )}
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Zones" sub="Tap a zone to hide or show it">
+          {avg !== null && (
+            <div className="mb-3 flex items-baseline justify-between">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Average {tf}</span>
+              <span className="font-num text-[28px] font-semibold leading-7 text-white">{avg.toFixed(1)}</span>
+            </div>
+          )}
+          <ZoneToggles zones={zones} active={activeZones} onToggle={(z) => setActiveZones(flip(z))} label="RSI zones" />
+        </Panel>
+        <Panel title="Groups">
+          <ChipToggles
+            options={GROUPS_ORDERED.map((g) => ({ id: g, label: GROUP_LABELS[g] ?? g }))}
+            active={activeGroups}
+            onToggle={(g) => setActiveGroups(flip(g))}
+            label="Instrument groups"
+          />
+        </Panel>
+      </aside>
     </div>
   );
 }

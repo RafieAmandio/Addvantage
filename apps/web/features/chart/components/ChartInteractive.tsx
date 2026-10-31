@@ -17,6 +17,8 @@ interface ChartInteractiveProps {
   symbol: string;
   seriesType?: "candlestick" | "area";
   height?: number;
+  /** Controls shown left of the pin button, above the chart. */
+  toolbar?: React.ReactNode;
 }
 
 export function ChartInteractive({
@@ -26,6 +28,7 @@ export function ChartInteractive({
   symbol,
   seriesType = "candlestick",
   height = 520,
+  toolbar,
 }: ChartInteractiveProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -45,8 +48,9 @@ export function ChartInteractive({
 
   return (
     <>
-      <div className="border border-gray-3 bg-gray-2 p-3">
-        <div className="mb-3 flex items-center justify-end">
+      <div>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-2">{toolbar}</div>
           <AddPinButton symbol={symbol} />
         </div>
         <PriceChart

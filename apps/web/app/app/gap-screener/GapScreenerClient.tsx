@@ -2,10 +2,31 @@
 
 import { useMemo, useState } from "react";
 import type { ForexTier } from "@tradevantage/shared";
+import { formatWibTime } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
 import { useGapData } from "@/features/gap-screener/hooks/useGapData";
-import { GapToolbar } from "@/features/gap-screener/components/GapToolbar";
 import { GapTable } from "@/features/gap-screener/components/GapTable";
-import { GapList } from "@/features/gap-screener/components/GapList";
+import { StateLine } from "@/features/atr/components/FilterControls";
+
+const TIERS = [
+  { id: "all", label: "All tiers" },
+  { id: "primary", label: "Primary" },
+  { id: "secondary", label: "Secondary" },
+  { id: "thirdliner", label: "Thirdliner" },
+] as const;
+const STATUSES = [
+  { id: "active", label: "Active" },
+  { id: "filled", label: "Filled" },
+  { id: "all", label: "All" },
+] as const;
+
+const RULES: [string, string][] = [
+  ["Gap up", "Sell setup, target Friday close"],
+  ["Gap down", "Buy setup, target Friday close"],
+  ["Minimum gap", "0.3%"],
+  ["Stop loss", "1.5x the gap size"],
+];
 
 export default function GapScreenerClient() {
   const [activeTier, setActiveTier] = useState<ForexTier | "all">("all");
@@ -16,79 +37,71 @@ export default function GapScreenerClient() {
   const filteredPairs = useMemo(() => {
     if (!data) return [];
     return data.pairs.filter(
-      (p) =>
-        (activeTier === "all" || p.tier === activeTier) &&
-        (activeStatus === "all" || p.status === activeStatus),
+      (p) => (activeTier === "all" || p.tier === activeTier) && (activeStatus === "all" || p.status === activeStatus),
     );
   }, [data, activeTier, activeStatus]);
 
-  const totalCount = data?.pairs.length ?? 0;
+  const pairs = data?.pairs ?? [];
+  const totalCount = pairs.length;
+  const stats: [string, number][] = [
+    ["Active", pairs.filter((p) => p.status === "active").length],
+    ["Filled", pairs.filter((p) => p.status === "filled").length],
+    ["Total", totalCount],
+  ];
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-        <div className="flex items-center gap-3">
-          <h1 className="font-mono text-lg font-bold text-white">
-            Monday Gap Scanner
-          </h1>
-          {!loading && !error && totalCount > 0 && (
-            <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
-              <span className="led" aria-hidden />
-              {totalCount} gaps
-            </span>
-          )}
-        </div>
-        <p className="mt-1 text-xs text-white/30">
-          Weekend gaps tend to fill back to Friday&apos;s close. Gap UP = SELL setup. Gap DOWN = BUY setup.
-          Min gap 0.3%. SL at 1.5x gap size.
-        </p>
-      </div>
-
-      <GapToolbar
-        activeTier={activeTier}
-        onTierChange={setActiveTier}
-        activeStatus={activeStatus}
-        onStatusChange={setActiveStatus}
-        pairCount={filteredPairs.length}
-        totalCount={totalCount}
-        updatedAt={data?.updatedAt ?? null}
-      />
-
-      {loading && (
-        <div className="flex items-center justify-center py-32">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-brand">
-            <span className="led" aria-hidden />
-            Scanning weekend gaps
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="px-4 py-12 text-center text-sm text-white/40 sm:px-6">
-          {error}
-        </div>
-      )}
-
-      {!loading && !error && filteredPairs.length === 0 && (
-        <div className="px-4 py-20 text-center sm:px-6">
-          <p className="text-sm text-white/30">
-            {totalCount === 0
-              ? "No gaps detected this week. Check back next Monday."
-              : "No gaps match the selected filters."}
-          </p>
-        </div>
-      )}
-
-      {!loading && !error && filteredPairs.length > 0 && (
-        <>
-          <div className="hidden md:block">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <Panel
+        title="Weekend gaps"
+        sub={
+          <>
+            Gaps between Friday close and Monday open, largest first.
+            {data?.updatedAt && <span className="text-white/30"> Updated {formatWibTime(data.updatedAt)} WIB</span>}
+          </>
+        }
+        action={<TextTabs options={STATUSES} value={activeStatus} onChange={setActiveStatus} label="Status" />}
+      >
+        <TextTabs options={TIERS} value={activeTier} onChange={setActiveTier} label="Tier" className="mb-3" />
+        {loading ? (
+          <StateLine>Scanning weekend gaps</StateLine>
+        ) : error ? (
+          <StateLine>{error}</StateLine>
+        ) : filteredPairs.length === 0 ? (
+          <StateLine>{totalCount === 0 ? "No gaps detected this week. Check back next Monday." : "No gaps match the selected filters."}</StateLine>
+        ) : (
+          <>
             <GapTable pairs={filteredPairs} />
-          </div>
-          <div className="md:hidden">
-            <GapList pairs={filteredPairs} />
-          </div>
-        </>
-      )}
+            <p className="mt-3 text-[12px] text-white/30">
+              {filteredPairs.length} of {totalCount} gaps. Gap size in percent, fill is how much of the gap price has closed.
+            </p>
+          </>
+        )}
+      </Panel>
+
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="This week">
+          <dl className="grid grid-cols-3 gap-3">
+            {stats.map(([k, v]) => (
+              <div key={k}>
+                <dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">{k}</dt>
+                <dd className={k === "Active" && v > 0 ? "font-num text-[34px] font-semibold leading-9 text-brand" : "font-num text-[34px] font-semibold leading-9 text-white"}>
+                  {v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </Panel>
+        <Panel title="Rules" sub="Weekend gaps tend to fill back to Friday's close">
+          <dl className="-my-1 divide-y divide-white/[0.07]">
+            {RULES.map(([k, v]) => (
+              <div key={k} className="flex items-baseline justify-between gap-3 py-2.5">
+                <dt className="text-[14px] text-white/55">{k}</dt>
+                <dd className="text-right text-[14px] font-medium text-white">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </Panel>
+      </aside>
     </div>
   );
 }
