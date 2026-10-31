@@ -42,7 +42,7 @@ export interface MacroData {
   banks: Partial<Record<Ccy, { bank: string; rate: number; asOf: string; lastChange: number | null; lastChangeDate: string | null; odds?: RateOdds }>>;
   yields10y?: { months: string[]; series: Partial<Record<Ccy, (number | null)[]>> };
   usCurve?: { y2: number; y10: number; asOf: string };
-  risk: { vix?: Gauge; move?: Gauge; hy?: Gauge };
+  risk: { vix?: Gauge; move?: Gauge; ig?: Gauge; hy?: Gauge };
 }
 
 const round = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
@@ -169,12 +169,15 @@ export async function fetchMacro(last?: MacroData): Promise<{ data: MacroData; f
   await step("move", async () => {
     out.risk.move = await yahoo("^MOVE");
   });
-  await step("hy spread", async () => {
-    const rows = await fred("BAMLH0A0HYM2");
-    const last = rows.at(-1)!;
-    const monthAgo = [...rows].reverse().find((x) => Date.parse(x.date) <= Date.parse(last.date) - 30 * 86_400_000);
-    out.risk.hy = { v: last.v, change: monthAgo ? round(last.v - monthAgo.v, 2) : null, asOf: last.date, spark: rows.slice(-30).map((x) => x.v) };
-  });
+  // ICE BofA option-adjusted spreads, % points: investment grade and high yield, change over 1 month.
+  for (const [key, id] of [["ig", "BAMLC0A0CM"], ["hy", "BAMLH0A0HYM2"]] as const) {
+    await step(`${key} spread`, async () => {
+      const rows = await fred(id);
+      const last = rows.at(-1)!;
+      const monthAgo = [...rows].reverse().find((x) => Date.parse(x.date) <= Date.parse(last.date) - 30 * 86_400_000);
+      out.risk[key] = { v: last.v, change: monthAgo ? round(last.v - monthAgo.v, 2) : null, asOf: last.date, spark: rows.slice(-30).map((x) => x.v) };
+    });
+  }
 
   return { data: out, failures };
 }

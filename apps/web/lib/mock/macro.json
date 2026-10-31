@@ -20,7 +20,7 @@
           },
           {
             "label": "50+ bps increase",
-            "p": 0.0165
+            "p": 0.017
           },
           {
             "label": "25 bps decrease",
@@ -31,7 +31,7 @@
             "p": 0.004
           }
         ],
-        "volume": 10080060,
+        "volume": 10082960,
         "url": "https://polymarket.com/event/fed-decision-in-december-20260729232808632"
       }
     },
@@ -55,7 +55,7 @@
           },
           {
             "label": "50+ bps increase",
-            "p": 0.0155
+            "p": 0.0145
           },
           {
             "label": "50+ bps decrease",
@@ -82,7 +82,7 @@
         "outcomes": [
           {
             "label": "25 bps increase",
-            "p": 0.9855
+            "p": 0.9865
           },
           {
             "label": "No change",
@@ -101,7 +101,7 @@
             "p": 0.0005
           }
         ],
-        "volume": 446012,
+        "volume": 446083,
         "url": "https://polymarket.com/event/bank-of-england-decision-in-november-20260730150602252"
       }
     },
@@ -117,15 +117,15 @@
         "outcomes": [
           {
             "label": "25 bps increase",
-            "p": 0.785
+            "p": 0.8
           },
           {
             "label": "No change",
-            "p": 0.15
+            "p": 0.145
           },
           {
             "label": "50+ bps increase",
-            "p": 0.0325
+            "p": 0.0365
           },
           {
             "label": "50+ bps decrease",
@@ -136,7 +136,7 @@
             "p": 0.0155
           }
         ],
-        "volume": 30606,
+        "volume": 30713,
         "url": "https://polymarket.com/event/bank-of-japan-decision-in-december-20260918"
       }
     },
@@ -152,11 +152,11 @@
         "outcomes": [
           {
             "label": "25 bps increase",
-            "p": 0.909
+            "p": 0.908
           },
           {
             "label": "No change",
-            "p": 0.088
+            "p": 0.089
           },
           {
             "label": "50+ bps increase",
@@ -187,7 +187,7 @@
         "outcomes": [
           {
             "label": "25 bps increase",
-            "p": 0.7
+            "p": 0.705
           },
           {
             "label": "No change",
@@ -199,7 +199,7 @@
           },
           {
             "label": "25 bps decrease",
-            "p": 0.016
+            "p": 0.013
           },
           {
             "label": "50+ bps decrease",
@@ -222,11 +222,11 @@
         "outcomes": [
           {
             "label": "No Change",
-            "p": 0.61
+            "p": 0.615
           },
           {
             "label": "25 bps increase",
-            "p": 0.39
+            "p": 0.385
           },
           {
             "label": "25 bps decrease",
@@ -241,7 +241,7 @@
             "p": 0.0005
           }
         ],
-        "volume": 183008,
+        "volume": 183027,
         "url": "https://polymarket.com/event/bank-of-canada-decision-in-december-20260908230600011"
       }
     },
@@ -354,6 +354,43 @@
         94.55,
         93.54,
         100.2
+      ]
+    },
+    "ig": {
+      "v": 0.89,
+      "change": 0.05,
+      "asOf": "2026-10-29",
+      "spark": [
+        0.77,
+        0.77,
+        0.77,
+        0.77,
+        0.79,
+        0.81,
+        0.83,
+        0.84,
+        0.84,
+        0.86,
+        0.85,
+        0.84,
+        0.83,
+        0.82,
+        0.82,
+        0.83,
+        0.83,
+        0.83,
+        0.84,
+        0.84,
+        0.85,
+        0.87,
+        0.87,
+        0.88,
+        0.89,
+        0.91,
+        0.9,
+        0.88,
+        0.86,
+        0.89
       ]
     },
     "hy": {
@@ -538,5 +575,5 @@
     "y10": 4.98,
     "asOf": "2026-10-29"
   },
-  "syncedAt": "2026-10-31T14:03:45.957Z"
+  "syncedAt": "2026-10-31T15:24:39.872Z"
 }

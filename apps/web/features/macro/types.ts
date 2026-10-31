@@ -30,6 +30,6 @@ export interface MacroData {
   banks: Partial<Record<Ccy, Bank>>;
   yields10y?: { months: string[]; series: Partial<Record<Ccy, (number | null)[]>> };
   usCurve?: { y2: number; y10: number; asOf: string };
-  risk: { vix?: Gauge; move?: Gauge; hy?: Gauge };
+  risk: { vix?: Gauge; move?: Gauge; ig?: Gauge; hy?: Gauge };
   syncedAt: string | null;
 }
