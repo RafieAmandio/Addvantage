@@ -49,8 +49,8 @@ export function PageSearchInput({
   }, [focusKey, inputId]);
 
   return (
-    <div className="border border-gray-3 bg-gray-2/40 transition-colors focus-within:border-brand">
-      <div className="flex items-center gap-3 px-4 py-3">
+    <div>
+      <div className="flex h-11 items-center gap-3 rounded-full bg-panel px-4 ring-1 ring-white/[0.08] transition-shadow focus-within:ring-brand">
         <svg
           width="16"
           height="16"
@@ -58,7 +58,7 @@ export function PageSearchInput({
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          className="shrink-0 text-brand"
+          className="shrink-0 text-white/40"
           aria-hidden
         >
           <circle cx="9" cy="9" r="6" />
@@ -76,7 +76,7 @@ export function PageSearchInput({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 bg-transparent font-mono text-sm text-white placeholder:text-white/30 outline-none"
+          className="min-w-0 flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 outline-none"
           aria-label={ariaLabel}
         />
         {value && (
@@ -84,15 +84,15 @@ export function PageSearchInput({
             onClick={() => onChange("")}
             title="Clear search"
             aria-label="Clear search"
-            className="border border-gray-3 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="flex h-6 w-6 items-center justify-center rounded-full bg-raised text-[11px] text-white/60 transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
             ✕
           </button>
         )}
       </div>
       {matchLabel && value && (
-        <div className="border-t border-gray-3 bg-black/60 px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
-          ● {matchLabel}
+        <div className="px-4 pt-1.5 text-[12px] text-white/40">
+          {matchLabel}
         </div>
       )}
     </div>

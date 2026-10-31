@@ -9,7 +9,7 @@ import { CalendarPanel } from "@/features/dashboard/components/CalendarPanel";
 import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import { fmtPrice, dayChange } from "@/features/dashboard/components/PriceStrip";
 import { InstrumentChart, type ChartLevel, type ChartPin } from "@/features/instrument/components/InstrumentChart";
-import { AtrGauge, NewsPulse, RsiMeter, SessionRing } from "@/features/instrument/components/DotMatrix";
+import { AtrGauge, NewsPulse, RsiMeter, SessionRing, newsPulse } from "@/features/instrument/components/DotMatrix";
 import { StructureStrip } from "@/features/bulletin/components/StructureStrip";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import type { AtrPair } from "@/features/atr/types";
@@ -37,21 +37,6 @@ const num = (s: string | undefined) => {
 const Eyebrow = ({ children }: { children: React.ReactNode }) => (
   <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/40">{children}</p>
 );
-
-const PULSE_DAYS = 90;
-
-/** Last 90 UTC days of coverage for the pair: item count and net bias per day. */
-function pulse(news: NewsListItem[]) {
-  const today = Math.floor(Date.now() / 86_400_000);
-  const days = Array.from({ length: PULSE_DAYS }, () => ({ count: 0, net: 0 }));
-  for (const n of news) {
-    const i = PULSE_DAYS - 1 - (today - Math.floor(new Date(n.publishedAt ?? n.fetchedAt).getTime() / 86_400_000));
-    if (i < 0 || i >= PULSE_DAYS) continue;
-    days[i]!.count++;
-    days[i]!.net += n.bias === "bullish" ? 1 : n.bias === "bearish" ? -1 : 0;
-  }
-  return days;
-}
 
 export default function InstrumentClient({
   symbol,
@@ -112,7 +97,7 @@ export default function InstrumentClient({
     ].filter((p) => p.time <= end);
   }, [bars, news, calendar]);
 
-  const days = useMemo(() => pulse(news), [news]);
+  const days = useMemo(() => newsPulse(news), [news]);
 
   return (
     <div className="space-y-4 px-4 pb-10 sm:px-6">

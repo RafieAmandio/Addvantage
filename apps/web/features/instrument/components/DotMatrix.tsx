@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import type { NewsListItem } from "@/features/news/queries/news";
 
 /**
  * Square-dot terminal graphics. Every dot encodes a value; nothing here is
@@ -11,11 +12,15 @@ const BRAND = "#FFD400";
 const UP = "#00DD94";
 const DOWN = "#FF454D";
 
-function Dots({ cols, rows, fill, label }: { cols: number; rows: number; fill: (c: number, r: number) => string; label: string }) {
+function Dots({ cols, rows, fill, label, className = "block h-auto w-full", scale }: { cols: number; rows: number; fill: (c: number, r: number) => string; label: string; className?: string; scale?: number }) {
   const cells = [];
   for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) cells.push(<rect key={`${c}-${r}`} x={c * P} y={r * P} width={D} height={D} fill={fill(c, r)} />);
   return (
-    <svg viewBox={`0 0 ${cols * P - (P - D)} ${rows * P - (P - D)}`} className="block h-auto w-full" role="img" aria-label={label}>
+    <svg
+      viewBox={`0 0 ${cols * P - (P - D)} ${rows * P - (P - D)}`}
+      width={scale ? (cols * P - (P - D)) * scale : undefined}
+      height={scale ? (rows * P - (P - D)) * scale : undefined}
+      className={className} role="img" aria-label={label}>
       {cells}
     </svg>
   );
@@ -134,6 +139,44 @@ export function NewsPulse({ days }: { days: { count: number; net: number }[] }) 
         const d = days[c]!;
         if (4 - r >= Math.min(5, d.count)) return OFF;
         return d.net > 0 ? UP : d.net < 0 ? DOWN : "rgba(255,255,255,.6)";
+      }}
+    />
+  );
+}
+
+/** Per-UTC-day item count and net bias for the last `days` days, oldest first. */
+export function newsPulse(news: NewsListItem[], days = 90) {
+  const today = Math.floor(Date.now() / 86_400_000);
+  const out = Array.from({ length: days }, () => ({ count: 0, net: 0 }));
+  for (const n of news) {
+    const i = days - 1 - (today - Math.floor(new Date(n.publishedAt ?? n.fetchedAt).getTime() / 86_400_000));
+    if (i < 0 || i >= days) continue;
+    out[i]!.count++;
+    out[i]!.net += n.bias === "bullish" ? 1 : n.bias === "bearish" ? -1 : 0;
+  }
+  return out;
+}
+
+/** 13 weeks as a calendar: one column per week, Monday on top. Brightness = item count, colour = net bias. */
+export function NewsCalendar({ days }: { days: { count: number; net: number }[] }) {
+  // Pad the front so the last day (today) lands on its weekday row.
+  const todayRow = (new Date().getUTCDay() + 6) % 7;
+  const lead = (((todayRow - (days.length - 1)) % 7) + 7) % 7;
+  const grid: ({ count: number; net: number } | null)[] = [...Array<null>(lead).fill(null), ...days];
+  const cols = Math.ceil(grid.length / 7);
+  return (
+    <Dots
+      className="block max-w-full"
+      scale={2.3}
+      cols={cols}
+      rows={7}
+      label={`${days.reduce((n, d) => n + d.count, 0)} items in ${days.length} days`}
+      fill={(c, r) => {
+        const d = grid[c * 7 + r];
+        if (!d) return "transparent";
+        if (d.count === 0) return OFF;
+        const base = d.net > 0 ? "0,221,148" : d.net < 0 ? "255,69,77" : "255,255,255";
+        return `rgba(${base},${Math.min(1, 0.35 + d.count * 0.2)})`;
       }}
     />
   );

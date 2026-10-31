@@ -5,27 +5,24 @@ interface Props {
   className?: string;
 }
 
+// ponytail: shows the plan id only; join plan symbol/date server-side if ids prove unreadable.
 export function RelatedPlansChips({ planIds, className }: Props) {
   const ids = (planIds ?? []).filter((id) => id && id.length > 0);
   if (ids.length === 0) return null;
 
   return (
-    <div className={className}>
-      <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-        Related plans · {ids.length}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {ids.map((id) => (
+    <ul className={className ?? "-my-1 divide-y divide-white/[0.07]"}>
+      {ids.map((id) => (
+        <li key={id}>
           <Link
-            key={id}
             href={`/app/plan/${id}`}
-            className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            title={id}
+            className="flex items-center justify-between py-2 text-[14px] text-white/85 hover:text-brand focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
-            PLAN {id.slice(0, 8)}
+            {id}
+            <span className="text-white/30">→</span>
           </Link>
-        ))}
-      </div>
-    </div>
+        </li>
+      ))}
+    </ul>
   );
 }
