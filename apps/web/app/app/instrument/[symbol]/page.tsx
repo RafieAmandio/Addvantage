@@ -15,6 +15,9 @@ import type { NewsListItem } from "@/features/news/queries/news";
 import type { AtrPair } from "@/features/atr/types";
 import type { CalendarEvent } from "@/features/calendar/types";
 import type { Bar } from "@/features/chart/components/PriceChart";
+import { getMacro } from "@/features/macro/queries";
+import { pairLegs } from "@/features/macro/lib/macro";
+import type { Ccy } from "@/features/macro/types";
 import InstrumentClient, { type RsiDetail } from "./InstrumentClient";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +57,7 @@ export default async function InstrumentPage({ params }: { params: Promise<{ sym
   const profile = await getProfile();
   const canSeeBulletin = !!profile && (profile.tier === "vip" || profile.isAdmin);
 
-  const [rsi, atr, hourlyRows, dailyRows, news, plans, bulletins, macro] = await Promise.all([
+  const [rsi, atr, hourlyRows, dailyRows, news, plans, bulletins, macro, macroData] = await Promise.all([
     apiGet<RsiDetail>(`/rsi/detail/${enc}`).catch(() => null),
     apiGet<AtrPair & { label: string }>(`/atr/detail/${enc}`).catch(() => null),
     listBars({ symbol: canonical, interval: "1h", from: new Date(now - 14 * 86_400_000), to: new Date(now) }),
@@ -68,7 +71,10 @@ export default async function InstrumentPage({ params }: { params: Promise<{ sym
       to: new Date(now + 72 * 3600_000).toISOString(),
       limit: 200,
     }).catch(() => []),
+    getMacro(),
   ]);
+  // FX pairs show both legs; USD-quoted metals show the Fed.
+  const rateLegs: Ccy[] = pairLegs(sym) ?? (sym.endsWith("USD") ? ["USD"] : []);
 
   let hourly = toChartBars(hourlyRows);
   let daily = toChartBars(dailyRows);
@@ -102,6 +108,8 @@ export default async function InstrumentPage({ params }: { params: Promise<{ sym
       setups={setups}
       bulletin={bulletins.find((b) => same(b.symbol, canonical)) ?? null}
       calendar={calendar}
+      macro={macroData}
+      legs={rateLegs}
     />
   );
 }
