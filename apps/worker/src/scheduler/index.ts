@@ -11,6 +11,7 @@ import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
 import { syncGaps } from "../gap-screener/sync-gaps";
 import { syncTokenUnlocks } from "../token-unlocks/sync-unlocks";
+import { syncMacro } from "../macro/sync-macro";
 
 // ---------------------------------------------------------------------------
 // Robust minute-aligned scheduler
@@ -59,6 +60,8 @@ const SCHEDULE = {
   polymarketRotate: { minute: 0, fixedHour: 6, divisorHour: 24 },
   /** Token unlocks — every 12 hours at :20 (free DefiLlama + CoinGecko) */
   unlocks: { minute: 20, divisorHour: 12 },
+  /** Macro snapshot (BIS, FRED, Polymarket, Yahoo; keyless) — every 6 hours at :40 */
+  macro: { minute: 40, divisorHour: 6 },
 } satisfies Record<string, ScheduleSpec>;
 
 type JobName = keyof typeof SCHEDULE;
@@ -74,6 +77,7 @@ const lastFiredAt: Record<JobName, number> = {
   polymarket: -1,
   polymarketRotate: -1,
   unlocks: -1,
+  macro: -1,
 };
 
 function getJobTimeParts(now: Date, timezone?: string): { hour: number; minute: number } {
@@ -171,6 +175,11 @@ export function startScheduler(): void {
     logger.error({ err: String(err) }, "unlocks-sync: boot sync failed");
   });
 
+  syncMacro().catch((err) => {
+    Sentry.captureException(err, { tags: { scope: "macro-sync.boot" } });
+    logger.error({ err: String(err) }, "macro-sync: boot sync failed");
+  });
+
   // ---- recurring poll (every 30 s) ----
   pollTimer = setInterval(() => {
     try {
@@ -192,6 +201,7 @@ export function startScheduler(): void {
       polymarket: "m15 every 2h",
       polymarketRotate: "06:00 daily",
       unlocks: "m20 every 12h",
+      macro: "m40 every 6h",
     },
     "scheduler: started (setInterval 30s poll)",
   );
@@ -244,6 +254,16 @@ function pollJobs(): void {
     syncGaps().catch((err) => {
       Sentry.captureException(err, { tags: { scope: "gap-sync.cron" } });
       logger.error({ err: String(err) }, "gap-sync: scheduled sync failed");
+    });
+  }
+
+  // -- Macro snapshot (every 6h at :40) --
+  if (shouldFire("macro", now)) {
+    markFired("macro", now);
+    logger.info("scheduler: firing macro sync");
+    syncMacro().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "macro-sync.cron" } });
+      logger.error({ err: String(err) }, "macro-sync: scheduled sync failed");
     });
   }
 
