@@ -58,6 +58,8 @@ function isActive(pathname: string, href: string) {
 export function routeMeta(pathname: string): { title: string; tagline: string } {
   const sym = pathname.match(/^\/app\/instrument\/([^/]+)/)?.[1];
   if (sym) return { title: decodeURIComponent(sym).toUpperCase(), tagline: "Price, levels, plan and news for one instrument." };
+  const chart = pathname.match(/^\/app\/chart\/([^/]+)/)?.[1];
+  if (chart) return { title: `${decodeURIComponent(chart).toUpperCase()} chart`, tagline: "Price with the news and macro events that moved it." };
   const hit = [...nav].sort((a, b) => b.href.length - a.href.length).find((n) => isActive(pathname, n.href));
   return hit ? { title: hit.label, tagline: hit.tagline } : { title: "Home", tagline: nav[0].tagline };
 }
