@@ -11,6 +11,7 @@ import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
 import { syncGaps } from "../gap-screener/sync-gaps";
 import { syncTokenUnlocks } from "../token-unlocks/sync-unlocks";
+import { syncBars } from "../bars/sync-bars";
 
 // ---------------------------------------------------------------------------
 // Robust minute-aligned scheduler
@@ -59,6 +60,10 @@ const SCHEDULE = {
   polymarketRotate: { minute: 0, fixedHour: 6, divisorHour: 24 },
   /** Token unlocks — every 12 hours at :20 (free DefiLlama + CoinGecko) */
   unlocks: { minute: 20, divisorHour: 12 },
+  /** Hourly candles — every hour at :25 (requires MARKET_DATA_PROVIDER) */
+  bars1h: { minute: 25, divisorHour: 1 },
+  /** Daily candles — every 4 hours at :35 (requires MARKET_DATA_PROVIDER) */
+  bars1d: { minute: 35, divisorHour: 4 },
 } satisfies Record<string, ScheduleSpec>;
 
 type JobName = keyof typeof SCHEDULE;
@@ -74,6 +79,8 @@ const lastFiredAt: Record<JobName, number> = {
   polymarket: -1,
   polymarketRotate: -1,
   unlocks: -1,
+  bars1h: -1,
+  bars1d: -1,
 };
 
 function getJobTimeParts(now: Date, timezone?: string): { hour: number; minute: number } {
@@ -145,6 +152,12 @@ export function startScheduler(): void {
       Sentry.captureException(err, { tags: { scope: "gap-sync.boot" } });
       logger.error({ err: String(err) }, "gap-sync: boot sync failed");
     });
+    syncBars("1d")
+      .then(() => syncBars("1h"))
+      .catch((err) => {
+        Sentry.captureException(err, { tags: { scope: "bars-sync.boot" } });
+        logger.error({ err: String(err) }, "bars-sync: boot sync failed");
+      });
   }
 
   if (config.EMAIL_PROVIDER) {
@@ -192,6 +205,7 @@ export function startScheduler(): void {
       polymarket: "m15 every 2h",
       polymarketRotate: "06:00 daily",
       unlocks: "m20 every 12h",
+      bars: config.MARKET_DATA_PROVIDER ? "1h m25 hourly, 1d m35 every 4h" : "disabled",
     },
     "scheduler: started (setInterval 30s poll)",
   );
@@ -245,6 +259,18 @@ function pollJobs(): void {
       Sentry.captureException(err, { tags: { scope: "gap-sync.cron" } });
       logger.error({ err: String(err) }, "gap-sync: scheduled sync failed");
     });
+  }
+
+  // -- Bars (1h hourly at :25, 1d every 4h at :35, requires market data) --
+  for (const [job, interval] of [["bars1h", "1h"], ["bars1d", "1d"]] as const) {
+    if (config.MARKET_DATA_PROVIDER && shouldFire(job, now)) {
+      markFired(job, now);
+      logger.info({ interval }, "scheduler: firing bars sync");
+      syncBars(interval).catch((err) => {
+        Sentry.captureException(err, { tags: { scope: "bars-sync.cron" } });
+        logger.error({ err: String(err) }, "bars-sync: scheduled sync failed");
+      });
+    }
   }
 
   // -- Token unlocks (every 12h at :20) --
