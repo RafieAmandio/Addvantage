@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { HASHTAGS, type Hashtag } from "@tradevantage/shared";
 import { getHashtagMeta } from "@/features/tags/constants";
 import { listNewsByTag, listPrimersByTag } from "@/features/tags/queries";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
+import { BiasBadge } from "@/components/ui/Marker";
+import { Panel, PanelLink } from "@/components/ui/Panel";
 import { formatDate } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
@@ -30,134 +31,89 @@ export default async function TagPage({
 
   const total = matchedPrimers.length + matchedNews.length;
 
+  const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
+
   return (
-    <div className="stagger bg-grid-fine">
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <Link
-            href="/app/tags"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ← All hashtags
-          </Link>
-          <DataLabel className="mt-6">Hashtag · cross-cut</DataLabel>
-          <h1 className="mt-2 font-display text-6xl leading-none text-white">
-            <span className="text-brand">#</span>
-            {tag}
-          </h1>
-          <div className="mt-2 font-mono text-xs italic uppercase tracking-widest2 text-brand/80">
-            {meta.label}
-          </div>
-          <p className="mt-3 max-w-2xl text-white/70">{meta.description}</p>
-          <div className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            {total} TOTAL ITEMS · {matchedPrimers.length} PRIMERS ·{" "}
-            {matchedNews.length} NEWS
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {matchedPrimers.length > 0 && (
-          <Group n="01 /" label="PRIMERS">
-            <div className="grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-2 lg:grid-cols-3">
-              {matchedPrimers.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/app/education/${p.id}`}
-                  className="bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    {p.id}
-                  </div>
-                  <div className="mt-2 font-display text-xl text-white">
-                    {p.title}
-                  </div>
-                  <div className="mt-1 font-mono text-[10px] italic text-brand/60">
-                    {p.framework}
-                  </div>
-                  <p className="mt-3 text-sm text-white/60">{p.summary}</p>
-                </Link>
-              ))}
-            </div>
-          </Group>
-        )}
-
-        {matchedNews.length > 0 && (
-          <Group n="02 /" label="NEWS">
-            <div className="space-y-px bg-gray-3">
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        <Panel title={`News · ${matchedNews.length}`} action={<PanelLink href="/app/news">All news</PanelLink>}>
+          {matchedNews.length === 0 ? (
+            <p className="text-[14px] text-white/55">No news tagged #{tag} yet. This fills in as items are published.</p>
+          ) : (
+            <ul className="-my-3 divide-y divide-white/[0.07]">
               {matchedNews.map((n) => (
-                <Link
-                  key={n.id}
-                  href={`/app/news/${n.id}`}
-                  className="block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  <div className="flex items-baseline justify-between">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                      [{n.sourceCode}]
+                <li key={n.id}>
+                  <Link
+                    href={`/app/news/${n.id}`}
+                    className="group flex gap-4 py-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className={EYEBROW}>
+                        {n.sourceCode}
+                        {n.publishedAt && (
+                          <>
+                            <span className="px-1.5 text-white/20">/</span>
+                            {formatDate(n.publishedAt)}
+                          </>
+                        )}
+                        {n.impact === "high" && <span className="ml-2 text-brand">High impact</span>}
+                      </p>
+                      <p className="mt-0.5 text-[16px] font-medium leading-6 text-white">{n.headline}</p>
+                      <p className="mt-0.5 line-clamp-2 text-[14px] leading-[21px] text-white/55">{n.analysis}</p>
                     </div>
-                    {n.publishedAt && (
-                      <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                        {formatDate(n.publishedAt)}
-                      </div>
+                    {n.bias !== "neutral" && (
+                      <span className="hidden shrink-0 self-center sm:block">
+                        <BiasBadge bias={n.bias} />
+                      </span>
                     )}
-                  </div>
-                  <div className="mt-1 font-display text-lg text-white">
-                    {n.headline}
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-sm text-white/60">
-                    {n.analysis}
-                  </p>
-                </Link>
+                  </Link>
+                </li>
               ))}
-            </div>
-          </Group>
-        )}
-
-        {total === 0 && (
-          <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              ● EMPTY CROSS-CUT
-            </div>
-            <div className="mt-3 font-display text-2xl text-white">
-              Nothing tagged #{tag} yet.
-            </div>
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              This tag will populate as news and primers are published.
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <Link
-                href="/app/tags"
-                className="border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                ← All hashtags
-              </Link>
-              <Link
-                href="/app/news"
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                Browse news →
-              </Link>
-            </div>
-          </div>
-        )}
+            </ul>
+          )}
+        </Panel>
       </div>
-    </div>
-  );
-}
 
-function Group({
-  n,
-  label,
-  children,
-}: {
-  n: string;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mb-12">
-      <SectionNumber n={n} label={label} />
-      <div className="mt-4">{children}</div>
-    </section>
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel action={<PanelLink href="/app/tags">All tags</PanelLink>} title={meta.label}>
+          <p className="font-num text-[40px] font-semibold leading-[44px] text-white">
+            <span className="text-white/30">#</span>
+            {tag}
+          </p>
+          <p className="mt-2 text-[14px] leading-[21px] text-white/55">{meta.description}</p>
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            {[
+              ["Total", total],
+              ["News", matchedNews.length],
+              ["Primers", matchedPrimers.length],
+            ].map(([label, v]) => (
+              <div key={label}>
+                <p className={EYEBROW}>{label}</p>
+                <p className="font-num text-[28px] font-semibold leading-8 text-white">{v}</p>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        {matchedPrimers.length > 0 && (
+          <Panel title={`Primers · ${matchedPrimers.length}`}>
+            <ul className="-my-2.5 divide-y divide-white/[0.07]">
+              {matchedPrimers.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={`/app/education/${p.id}`}
+                    className="group block py-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  >
+                    <p className="text-[15px] font-semibold text-white group-hover:text-brand">{p.title}</p>
+                    <p className="text-[12px] text-white/40">{p.framework}</p>
+                    <p className="mt-0.5 line-clamp-2 text-[13px] leading-[19px] text-white/55">{p.summary}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        )}
+      </aside>
+    </div>
   );
 }

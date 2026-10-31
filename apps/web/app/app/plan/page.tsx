@@ -5,12 +5,18 @@ export const metadata: Metadata = { title: "Trading Plan" };
 import { listPublishedPlans } from "@/features/plan/queries/plans";
 import { getClosedPlanStats } from "@/features/plan/queries/stats";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
+import { splitLevel } from "@/features/plan/lib/detail-helpers";
 import { groupByMonth } from "@/features/plan/lib/archive-filters";
 import { PlanStatsBadges } from "@/features/plan/components/PlanStatsBadges";
 import { PlanArchiveMonthGroup } from "@/features/plan/components/PlanArchiveMonthGroup";
-import { SectionNumber, DataLabel } from "@/components/ui/Marker";
+import { PlanArchiveTableHead } from "@/features/plan/components/PlanArchiveRow";
+import { Panel, PanelLink } from "@/components/ui/Panel";
+import { BiasBadge } from "@/components/ui/Marker";
 import { flattenText } from "@/components/ui/ProseText";
 import { cn, formatDate } from "@/lib/cn";
+
+const BTN =
+  "rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
 
 export default async function PlanPage() {
   const [plans, stats] = await Promise.all([
@@ -23,163 +29,93 @@ export default async function PlanPage() {
 
   if (!latest) {
     return (
-      <div className="bg-grid-fine">
-        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
-          <PlanStatsBadges stats={stats} />
-        </div>
-        <div className="mx-auto max-w-7xl px-4 pb-24 pt-4 sm:px-6">
-          <div className="border border-gray-3 bg-gray-2/30 p-8 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-              TRADING PLAN
-            </div>
-            <h1 className="mt-3 font-display text-2xl text-white">
-              No published plan yet.
-            </h1>
-            <p className="mt-2 text-sm text-white/60">
-              The desk hasn&apos;t published a plan for this cycle. Check back
-              soon.
-            </p>
-          </div>
-        </div>
+      <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <Panel title="No published plan yet">
+          <p className="text-[15px] leading-[22px] text-white/55">
+            The desk hasn&apos;t published a plan for this cycle. Check back soon.
+          </p>
+        </Panel>
+        <PlanStatsBadges stats={stats} />
       </div>
     );
   }
 
   const groups = groupByMonth(allPlans);
-  const longs = latest.setups.filter((s) => s.direction === "long").length;
-  const shorts = latest.setups.filter((s) => s.direction === "short").length;
 
   return (
-    <div className="stagger bg-grid-fine">
-      {/* Page header */}
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <div className="flex flex-wrap items-baseline justify-between gap-4">
-            <div>
-              <DataLabel>Trading Plan</DataLabel>
-              <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
-                Trading <span className="italic text-brand">Plan</span>
-              </h1>
-              <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-                Every plan the desk has shipped — the live plan is up top, the
-                full history sits right below. Nothing is scrubbed when a trade
-                closes.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/app/plan/compare"
-                title="Put two plans side by side"
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                ⇌ COMPARE
-              </Link>
-              <Link
-                href="/app/plan/archive"
-                title="Search, filter by horizon, export digest"
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                ⌕ SEARCH / FILTER
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <PlanStatsBadges stats={stats} />
-
-        {/* Current plan — compact, emphasized. Full detail lives at /app/plan/[id]. */}
-        <section>
-          <SectionNumber n="01 /" label="CURRENT PLAN" />
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        {/* Current plan, compact. Full detail lives at /app/plan/[id]. */}
+        <Panel
+          title="Current plan"
+          sub={`${latest.id} · ${latest.horizon} · by ${latest.authoredBy}`}
+          action={<PanelLink href={`/app/plan/${latest.id}`}>Open plan</PanelLink>}
+        >
           <Link
             href={`/app/plan/${latest.id}`}
-            className="group mt-4 block border border-brand bg-brand/[0.06] p-6 transition-all hover:-translate-y-px hover:bg-brand/10 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:p-8"
+            className="group block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
-            <div className="grid grid-cols-12 gap-6">
-              <div className="col-span-12 lg:col-span-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    {latest.id}
-                  </span>
-                  <span className="border border-brand bg-brand/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-brand">
-                    ● LATEST
-                  </span>
-                </div>
-                <div className="mt-2 font-display text-3xl text-white">
-                  {formatDate(latest.date)}
-                </div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                  {latest.horizon} · by {latest.authoredBy}
-                </div>
-                <div className="mt-3 flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2">
-                  <span className="text-moss">▲ {longs} long</span>
-                  <span className="text-white/30">·</span>
-                  <span className="text-brand">▼ {shorts} short</span>
-                </div>
-                <div className="mt-3 border-t border-brand/30 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                  ● LIVE · no outcome yet
-                </div>
-              </div>
-
-              <div className="col-span-12 lg:col-span-9">
-                <p className="line-clamp-3 font-display text-xl leading-relaxed text-white/90 transition-colors group-hover:text-white">
-                  {flattenText(latest.thesis)}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {latest.setups.map((s) => (
-                    <span
-                      key={s.id}
-                      className={cn(
-                        "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                        s.direction === "long"
-                          ? "border-moss/50 text-moss"
-                          : "border-brand/50 text-brand",
-                      )}
-                    >
-                      {s.direction === "long" ? "▲" : "▼"} {s.instrument}
-                    </span>
-                  ))}
-                </div>
-                <div className="mt-5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors group-hover:text-white">
-                  Read full plan — thesis, setups &amp; invalidation →
-                </div>
-              </div>
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="font-num text-[36px] font-semibold leading-10 text-white">{formatDate(latest.date)}</span>
+              <BiasBadge bias={latest.bias} />
+              <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-brand">Live</span>
             </div>
+            <p className="mt-2 line-clamp-3 text-[15px] leading-[22px] text-white/90 transition-colors group-hover:text-white">
+              {flattenText(latest.thesis)}
+            </p>
           </Link>
-        </section>
+          <ul className="mt-4 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+            {latest.setups.map((s) => {
+              const long = s.direction === "long";
+              return (
+                <li key={s.id}>
+                  <Link
+                    href={`/app/plan/${latest.id}#${s.id}`}
+                    className="-mx-2 flex items-baseline gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  >
+                    <span className={cn("w-16 shrink-0 text-[13px] font-semibold", long ? "text-up" : "text-down")}>
+                      {long ? "▲ Long" : "▼ Short"}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-white">{s.instrument}</span>
+                    <span className="hidden text-[12px] text-white/40 sm:inline">Entry</span>
+                    <span className="truncate font-num text-[18px] font-semibold text-white/90 sm:max-w-[200px]">{splitLevel(s.entry).figure || s.entry}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
 
-        {/* All plans — the full scannable list, latest included and marked. */}
-        <section className="mt-12">
-          <SectionNumber
-            n="02 /"
-            label={`ALL PLANS · ${allPlans.length} · ${groups.length} ${
-              groups.length === 1 ? "MONTH" : "MONTHS"
-            }`}
-          />
-          <div className="mt-6 space-y-10">
+        <Panel
+          title="All plans"
+          sub={`${allPlans.length} ${allPlans.length === 1 ? "plan" : "plans"} · ${groups.length} ${groups.length === 1 ? "month" : "months"}`}
+          action={<PanelLink href="/app/plan/archive">Search and filter</PanelLink>}
+        >
+          <PlanArchiveTableHead />
+          <div className="-mt-2">
             {groups.map((group) => (
-              <PlanArchiveMonthGroup
-                key={group.ym}
-                group={group}
-                latestId={latest.id}
-                query=""
-              />
+              <PlanArchiveMonthGroup key={group.ym} group={group} latestId={latest.id} query="" />
             ))}
           </div>
-
           {allPlans.length >= 50 && (
-            <div className="mt-8 text-center">
-              <Link
-                href="/app/plan/archive"
-                className="inline-block border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand"
-              >
-                View full archive (search / filter) →
-              </Link>
-            </div>
+            <Link href="/app/plan/archive" className={cn(BTN, "mt-4 inline-block")}>
+              View full archive
+            </Link>
           )}
-        </section>
+        </Panel>
       </div>
+
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <PlanStatsBadges stats={stats} />
+        <div className="flex flex-wrap gap-2">
+          <Link href="/app/plan/compare" title="Put two plans side by side" className={BTN}>
+            Compare plans
+          </Link>
+          <Link href="/app/plan/archive" title="Search, filter by horizon, export digest" className={BTN}>
+            Archive
+          </Link>
+        </div>
+      </aside>
     </div>
   );
 }

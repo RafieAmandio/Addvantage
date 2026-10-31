@@ -1,28 +1,23 @@
-import { SectionNumber } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
 
 export function PlanDetailRisks({
   risks,
-  sectionNumber,
 }: {
   risks: string[];
-  sectionNumber: string;
+  /** Kept for callers; sections are no longer numbered. */
+  sectionNumber?: string;
 }) {
+  if (risks.length === 0) return null;
   return (
-    <section className="mt-12">
-      <SectionNumber n={sectionNumber} label="RISKS" />
-      <ul className="mt-4 space-y-2">
+    <Panel title={`Risks · ${risks.length}`}>
+      <ol className="-my-2.5 divide-y divide-white/[0.07]">
         {risks.map((r, i) => (
-          <li
-            key={i}
-            className="flex items-start gap-3 border-l-2 border-blood/60 bg-blood/5 p-4"
-          >
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              R0{i + 1}
-            </span>
-            <span className="text-sm text-white/80">{r}</span>
+          <li key={i} className="flex gap-3 py-2.5 text-[14px] leading-[21px] text-white/90">
+            <span className="w-4 shrink-0 font-num text-[15px] font-semibold text-down">{i + 1}</span>
+            <span>{r}</span>
           </li>
         ))}
-      </ul>
-    </section>
+      </ol>
+    </Panel>
   );
 }

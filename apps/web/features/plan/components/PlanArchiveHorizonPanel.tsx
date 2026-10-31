@@ -1,8 +1,7 @@
 import { cn } from "@/lib/cn";
-import type {
-  HorizonFilter,
-  HorizonRBreakdown,
-} from "@/features/plan/types";
+import { Panel } from "@/components/ui/Panel";
+import { rTone } from "@/features/plan/lib/detail-helpers";
+import type { HorizonFilter, HorizonRBreakdown } from "@/features/plan/types";
 
 type Props = {
   horizonFilter: HorizonFilter;
@@ -13,6 +12,7 @@ type Props = {
   className?: string;
 };
 
+/** Realised R per horizon; each row filters the list. */
 export function PlanArchiveHorizonPanel({
   horizonFilter,
   setHorizonFilter,
@@ -21,104 +21,45 @@ export function PlanArchiveHorizonPanel({
   horizonR,
   className,
 }: Props) {
+  const rows: Array<{ id: HorizonFilter; n: number; r: number }> = [
+    { id: "all", n: allClosedCount, r: aggregateR },
+    ...(["intraday", "swing", "weekly"] as const).map((h) => ({ id: h, n: horizonR[h].n, r: horizonR[h].r })),
+  ];
+
   return (
-    <div
-      className={cn("mb-10 border border-gray-3 bg-gray-2/30 p-5", className)}
+    <Panel
+      title="Edge by horizon"
+      sub={`${allClosedCount} closed plan${allClosedCount === 1 ? "" : "s"}. Direction, not proof of edge.`}
+      className={className}
     >
-      <div className="flex items-center justify-between">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          ● Edge by horizon · click to filter
-        </div>
-        {horizonFilter !== "all" && (
-          <button
-            onClick={() => setHorizonFilter("all")}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ✕ Clear
-          </button>
-        )}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-4">
-        <button
-          onClick={() => setHorizonFilter("all")}
-          className={cn(
-            "bg-black p-4 text-left transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-            horizonFilter === "all"
-              ? "border-l-2 border-brand bg-gray-2"
-              : "hover:bg-gray-2"
-          )}
-        >
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-            ALL
-          </div>
-          <div
-            className={cn(
-              "mt-1 font-display text-2xl",
-              allClosedCount === 0
-                ? "text-white/30"
-                : aggregateR > 0
-                ? "text-moss"
-                : aggregateR < 0
-                ? "text-blood-bright"
-                : "text-white/70"
-            )}
-          >
-            {allClosedCount === 0
-              ? "—"
-              : (aggregateR >= 0 ? "+" : "") + aggregateR.toFixed(1) + "R"}
-          </div>
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            {allClosedCount} closed
-          </div>
-        </button>
-        {(["intraday", "swing", "weekly"] as const).map((h) => {
-          const data = horizonR[h];
-          const noData = data.n === 0;
+      <div className="-my-1 divide-y divide-white/[0.07]">
+        {rows.map(({ id, n, r }) => {
+          const active = horizonFilter === id;
+          const noData = n === 0;
           return (
             <button
-              key={h}
-              onClick={() => setHorizonFilter(h)}
-              disabled={noData}
+              key={id}
+              onClick={() => setHorizonFilter(id)}
+              disabled={noData && id !== "all"}
+              aria-pressed={active}
               className={cn(
-                "bg-black p-4 text-left transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                horizonFilter === h
-                  ? "border-l-2 border-brand bg-gray-2"
-                  : noData
-                  ? "cursor-default opacity-60"
-                  : "hover:bg-gray-2"
+                "-mx-2 flex w-[calc(100%+1rem)] items-baseline gap-3 rounded-lg px-2 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+                active ? "bg-raised" : "hover:bg-raised disabled:cursor-default disabled:hover:bg-transparent",
               )}
             >
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                {h}
-              </div>
-              <div
-                className={cn(
-                  "mt-1 font-display text-2xl",
-                  noData
-                    ? "text-white/30"
-                    : data.r > 0
-                    ? "text-moss"
-                    : data.r < 0
-                    ? "text-blood-bright"
-                    : "text-white/70"
-                )}
-              >
-                {noData
-                  ? "—"
-                  : (data.r >= 0 ? "+" : "") + data.r.toFixed(1) + "R"}
-              </div>
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {data.n} {data.n === 1 ? "plan" : "plans"}
-              </div>
+              <span className={cn("flex-1 text-[14px] font-medium capitalize", active ? "text-white" : "text-white/55")}>
+                {id}
+              </span>
+              <span className="text-[12px] text-white/30">
+                {n} {n === 1 ? "plan" : "plans"}
+              </span>
+              <span className={cn("w-16 text-right font-num text-[20px] font-semibold", noData ? "text-white/30" : rTone(r))}>
+                {noData ? "n/a" : `${r >= 0 ? "+" : ""}${r.toFixed(1)}R`}
+              </span>
             </button>
           );
         })}
       </div>
-      <p className="mt-3 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-        ● Sample size matters more than the number itself. With {allClosedCount}{" "}
-        closed plan{allClosedCount === 1 ? "" : "s"}, this is signal direction,
-        not edge.
-      </p>
-    </div>
+    </Panel>
   );
 }

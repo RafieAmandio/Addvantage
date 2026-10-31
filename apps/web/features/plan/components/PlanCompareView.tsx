@@ -8,15 +8,12 @@ import {
   commonInstruments as getCommonInstruments,
   computeCompareSummary,
 } from "@/features/plan/lib/compare-helpers";
-import { PlanCompareHero } from "@/features/plan/components/PlanCompareHero";
+import { Panel, PanelLink } from "@/components/ui/Panel";
 import {
   PlanComparePicker,
   PlanCompareSwapButton,
 } from "@/features/plan/components/PlanComparePicker";
-import {
-  PlanCompareSummary,
-  PlanCompareCommonChips,
-} from "@/features/plan/components/PlanCompareSummary";
+import { PlanCompareSummary } from "@/features/plan/components/PlanCompareSummary";
 import { PlanCompareColumn } from "@/features/plan/components/PlanCompareColumn";
 import {
   PlanCompareEmpty,
@@ -34,11 +31,8 @@ export function PlanCompareView(props: PlanCompareViewProps) {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <span className="led" aria-hidden />
-            PREPARING COMPARE
-          </div>
+        <div className="flex min-h-[40vh] items-center justify-center text-[13px] text-white/40">
+          Loading compare
         </div>
       }
     >
@@ -83,11 +77,13 @@ function PlanCompareViewInner({
   const latestForPicker = latest ?? allPlans[0] ?? null;
 
   return (
-    <div className="stagger bg-grid-fine">
-      <PlanCompareHero />
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <div className="mb-6 grid grid-cols-1 items-end gap-4 sm:grid-cols-[1fr_auto_1fr]">
+    <div className="space-y-4 px-4 pb-10 sm:px-6">
+      <Panel
+        title="Pick two plans"
+        sub="Common instruments highlight, R totals compare, thesis lines up for reading."
+        action={<PanelLink href="/app/plan/archive">Archive</PanelLink>}
+      >
+        <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-[1fr_auto_1fr]">
           <PlanComparePicker
             label="Plan A"
             value={a}
@@ -115,6 +111,7 @@ function PlanCompareViewInner({
             excludeId={a}
           />
         </div>
+      </Panel>
 
         {!a || !b ? (
           <PlanCompareEmpty />
@@ -129,9 +126,7 @@ function PlanCompareViewInner({
               commonInstruments={commonInstruments}
             />
 
-            <PlanCompareCommonChips instruments={commonInstruments} />
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <PlanCompareColumn
                 plan={planA}
                 isLatest={planA.id === (latestForPicker?.id ?? "")}
@@ -145,7 +140,6 @@ function PlanCompareViewInner({
             </div>
           </>
         )}
-      </div>
     </div>
   );
 }

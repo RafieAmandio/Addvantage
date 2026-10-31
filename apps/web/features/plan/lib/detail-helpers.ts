@@ -116,46 +116,49 @@ export function computePlanOutcome(plan: TradingPlan): PlanOutcomeDigest | null 
   };
 }
 
+/** Text colour for an R figure: up green, down red, flat muted. */
+export function rTone(r: number | null | undefined): string {
+  if (r == null || r === 0) return "text-white/55";
+  return r > 0 ? "text-up" : "text-down";
+}
+
 type OutcomeMeta = {
   label: string;
-  style: string;
-  dot: string;
+  /** Text colour class for the status word. */
+  tone: string;
 };
 
 export const OUTCOME_META: Record<SetupOutcome, OutcomeMeta> = {
-  live: {
-    label: "LIVE",
-    style: "border-brand text-brand bg-brand/10",
-    dot: "bg-brand",
-  },
-  open: {
-    label: "OPEN",
-    style: "border-brand/70 text-brand bg-brand/5",
-    dot: "bg-brand/70",
-  },
-  win: {
-    label: "WIN",
-    style: "border-moss text-moss bg-moss/10",
-    dot: "bg-moss",
-  },
-  loss: {
-    label: "LOSS",
-    style: "border-blood text-blood-text bg-blood/15",
-    dot: "bg-blood",
-  },
-  stopped: {
-    label: "STOPPED",
-    style: "border-blood/70 text-blood-text bg-blood/10",
-    dot: "bg-blood/80",
-  },
-  invalidated: {
-    label: "FLAT",
-    style: "border-white/30 text-white/70 bg-white/5",
-    dot: "bg-white/40",
-  },
-  skipped: {
-    label: "SKIPPED",
-    style: "border-white/20 text-white/40 bg-transparent",
-    dot: "bg-white/20",
-  },
+  live: { label: "Live", tone: "text-brand" },
+  open: { label: "Open", tone: "text-brand" },
+  win: { label: "Win", tone: "text-up" },
+  loss: { label: "Loss", tone: "text-down" },
+  stopped: { label: "Stopped", tone: "text-down" },
+  invalidated: { label: "Flat", tone: "text-white/55" },
+  skipped: { label: "Skipped", tone: "text-white/30" },
 };
+
+/** "5,232 — 5,248 zone" -> { figure: "5,232-5,248", note: "zone" }. Free-text levels stay readable. */
+export function splitLevel(raw: string): { figure: string; note: string } {
+  const m = raw.trim().match(/^([\d.,]+(?:\s*[—–-]\s*[\d.,]+)?)\s*(.*)$/);
+  if (!m) return { figure: "", note: raw.trim() };
+  return { figure: m[1].replace(/\s*[—–-]\s*/, "-"), note: m[2].replace(/^\((.*)\)$/, "$1") };
+}
+
+/** Midpoint of the first one or two numbers in a level string, or null. */
+export function levelNumber(raw: string): number | null {
+  const nums = (raw.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).slice(0, 2).map((n) => parseFloat(n.replace(/,/g, "")));
+  const { figure } = splitLevel(raw);
+  if (!figure || nums.length === 0) return null;
+  return figure.includes("-") && nums.length === 2 ? (nums[0] + nums[1]) / 2 : nums[0];
+}
+
+/** Reward to first target over risk to stop, from the setup's own levels. */
+export function riskReward(s: TradingSetup): string | null {
+  const e = levelNumber(s.entry);
+  const st = levelNumber(s.stop);
+  const t = s.targets[0] ? levelNumber(s.targets[0]) : null;
+  if (e == null || st == null || t == null || e === st) return null;
+  const rr = Math.abs(t - e) / Math.abs(e - st);
+  return isFinite(rr) ? `1:${rr.toFixed(2)}` : null;
+}

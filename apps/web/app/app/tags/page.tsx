@@ -5,7 +5,8 @@ import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import { allHashtags, getHashtagMeta } from "@/features/tags/constants";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
 import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
@@ -35,11 +36,8 @@ export default function TagsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <span className="led" aria-hidden />
-            DECODING TAG INDEX
-          </div>
+        <div className="flex min-h-[40vh] items-center justify-center text-[13px] text-white/40">
+          Loading tags
         </div>
       }
     >
@@ -132,137 +130,88 @@ function TagsView() {
   }, [counts, query]);
 
   return (
-    <div className="stagger bg-grid">
+    <div className="space-y-4 px-4 pb-10 sm:px-6">
       <BackToTop />
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <DataLabel>Index · Cross-cut</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-white">
-            Hashtag <span className="italic text-brand">Explorer</span>
-          </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-            The connective tissue of the DOMAIN. Pull every primer and news
-            item under a tag.
-          </p>
-        </div>
-      </div>
+      <PageSearchInput
+        value={query}
+        onChange={setQuery}
+        placeholder="Search tags and descriptions"
+        ariaLabel="Search hashtags"
+        matchLabel={query ? `${visibleCounts.length} of ${counts.length} match "${query}"` : null}
+      />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mb-6">
-          <PageSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search tags, labels, descriptions…   (press s to focus, esc to blur)"
-            ariaLabel="Search hashtags"
-            matchLabel={
-              query
-                ? `${visibleCounts.length} / ${counts.length} MATCHES for "${query}"`
-                : null
-            }
-          />
-        </div>
-
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <SectionNumber
-            n="—"
-            label={
-              query
-                ? `${visibleCounts.length} / ${allHashtags.length} ACTIVE TAGS`
-                : `${allHashtags.length} ACTIVE TAGS`
-            }
-          />
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-              Sort
-            </span>
-            <div className="flex flex-wrap gap-px bg-gray-3">
-              {(
-                [
-                  { v: "density", label: "Most used" },
-                  { v: "sparse", label: "Least used" },
-                  { v: "alpha", label: "A→Z" },
-                ] as Array<{ v: SortMode; label: string }>
-              ).map((opt) => (
-                <button
-                  key={opt.v}
-                  onClick={() => setSortMode(opt.v)}
-                  className={cn(
-                    "px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                    sortMode === opt.v
-                      ? "bg-brand text-black"
-                      : "bg-gray-2 text-white/60 hover:text-white",
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {visibleCounts.length === 0 && query && (
-          <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              ● NULL TRANSMISSION
-            </div>
-            <div className="mt-3 font-display text-2xl text-white">
-              No tags match &quot;{query}&quot;.
-            </div>
+      <Panel
+        title={query ? `${visibleCounts.length} of ${allHashtags.length} tags` : `${allHashtags.length} tags`}
+        sub="Pull every primer and news item under a tag"
+        action={<div className="hidden sm:block"><TextTabs
+            options={[
+              { id: "density", label: "Most used" },
+              { id: "sparse", label: "Least used" },
+              { id: "alpha", label: "A to Z" },
+            ] as const}
+            value={sortMode}
+            onChange={setSortMode}
+            label="Sort"
+          /></div>}
+      >
+        <div className="-mt-1 mb-2 sm:hidden"><TextTabs
+            options={[
+              { id: "density", label: "Most used" },
+              { id: "sparse", label: "Least used" },
+              { id: "alpha", label: "A to Z" },
+            ] as const}
+            value={sortMode}
+            onChange={setSortMode}
+            label="Sort"
+          /></div>
+        {visibleCounts.length === 0 && query ? (
+          <div className="py-10 text-center">
+            <p className="text-[17px] font-medium text-white">No tags match &quot;{query}&quot;.</p>
             <button
               onClick={() => setQuery("")}
-              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="mt-4 rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
             >
-              ✕ Clear search
+              Clear search
             </button>
           </div>
+        ) : (
+          <ul className="-my-1 grid gap-x-8 md:grid-cols-2">
+            {visibleCounts.map(({ tag, c }) => {
+              const meta = getHashtagMeta(tag);
+              return (
+                <li key={tag} className="border-b border-white/[0.07]">
+                  <Link
+                    href={`/app/tags/${tag}`}
+                    className="group -mx-2 flex gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[15px] font-semibold text-white">
+                        <span className="text-white/30">#</span>
+                        <Highlight text={tag} query={query} />
+                        <span className="ml-2 text-[13px] font-normal text-white/40">
+                          <Highlight text={meta.label} query={query} />
+                        </span>
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-[13px] leading-[19px] text-white/55">
+                        <Highlight text={meta.description} query={query} />
+                      </p>
+                    </div>
+                    <div className="w-14 shrink-0 text-right">
+                      <p className={cn("font-num text-[24px] font-semibold leading-7", c > 0 ? "text-white" : "text-white/30")}>
+                        {tagCounts ? c : "…"}
+                      </p>
+                      {/* Share of the busiest tag. */}
+                      <div className={cn("mt-1 h-0.5 bg-white/[0.07]", !tagCounts && "hidden")}>
+                        <div className="h-full bg-brand" style={{ width: `${(c / maxCount) * 100}%` }} />
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         )}
-
-        <div className="mt-6 grid grid-cols-12 gap-px bg-gray-3">
-          {visibleCounts.map(({ tag, c }, i) => {
-            const meta = getHashtagMeta(tag);
-            const density = c / maxCount;
-            const isHot = i < 3 && c > 0 && !query && sortMode === "density";
-            return (
-              <Link
-                key={tag}
-                href={`/app/tags/${tag}`}
-                className="group relative col-span-12 overflow-hidden bg-black p-6 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:col-span-6 lg:col-span-4"
-              >
-                <div
-                  className="absolute bottom-0 left-0 h-0.5 bg-brand/70 transition-all group-hover:h-1"
-                  style={{ width: `${Math.max(4, density * 100)}%` }}
-                />
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {isHot && (
-                      <span className="inline-flex items-center gap-1 border border-brand/60 bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        <span className="led" aria-hidden />
-                        TRENDING
-                      </span>
-                    )}
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                    {tagCounts ? `${c} items` : "…"}
-                  </div>
-                </div>
-                <div className="mt-3 font-display text-2xl text-white">
-                  <span className="text-brand">#</span>
-                  <Highlight text={tag} query={query} />
-                </div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-brand/60">
-                  <Highlight text={meta.label} query={query} />
-                </div>
-                <p className="mt-3 text-sm text-white/60">
-                  <Highlight text={meta.description} query={query} />
-                </p>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      </Panel>
     </div>
   );
 }

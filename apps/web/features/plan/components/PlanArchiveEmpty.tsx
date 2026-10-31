@@ -7,33 +7,18 @@ type Props = {
   className?: string;
 };
 
-export function PlanArchiveEmpty({
-  horizonFilter,
-  onClear,
-  className,
-}: Props) {
+export function PlanArchiveEmpty({ horizonFilter, onClear, className }: Props) {
   return (
-    <div
-      className={cn(
-        "mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center",
-        className
-      )}
-    >
-      <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-        ● NULL TRANSMISSION
-      </div>
-      <div className="mt-3 font-display text-2xl text-white">
-        No {horizonFilter} plans on record.
-      </div>
-      <div className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-        The desk hasn't shipped a {horizonFilter} plan yet — or this horizon was
-        filtered to an empty set.
-      </div>
+    <div className={cn("py-10 text-center", className)}>
+      <p className="text-[17px] font-medium text-white">
+        No {horizonFilter === "all" ? "" : `${horizonFilter} `}plans match.
+      </p>
+      <p className="mt-1 text-[14px] text-white/55">Try another horizon or clear the search.</p>
       <button
         onClick={onClear}
-        className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+        className="mt-4 rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
       >
-        ✕ Show all plans
+        Show all plans
       </button>
     </div>
   );

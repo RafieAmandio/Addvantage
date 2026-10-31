@@ -34,8 +34,11 @@ export default async function PlanDetailPage({
   const firstId = all[0]?.id ?? plan.id;
   const lastId = all[all.length - 1]?.id ?? plan.id;
 
+  const btn =
+    "rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+
   return (
-    <div>
+    <div className="space-y-4 px-4 pb-10 sm:px-6">
       <PlanSiblingKeys
         newerId={newer?.id ?? null}
         olderId={older?.id ?? null}
@@ -56,58 +59,45 @@ export default async function PlanDetailPage({
           />
         }
         headerExtra={
-          <div className="flex gap-2">
-            <Link
-              href={`/app/plan/compare?a=${plan.id}`}
-              title="Compare this plan with another"
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              ⇌ COMPARE
+          <>
+            <Link href={`/app/plan/compare?a=${plan.id}`} title="Compare this plan with another" className={btn}>
+              Compare
             </Link>
-            <Link
-              href="/app/plan/archive"
-              className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              ← Archive
+            <Link href="/app/plan/archive" className={btn}>
+              Archive
             </Link>
-          </div>
+          </>
         }
       />
 
-      <NewsMentioningPlan planId={plan.id} />
-
-      <div className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 sm:pb-12">
-        <nav className="grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
-          <Link
-            href={newer ? `/app/plan/${newer.id}` : "/app/plan/archive"}
-            className={cn(
-              "block bg-black p-4 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              !newer && "pointer-events-none opacity-30"
-            )}
-          >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              ← Newer plan
-            </div>
-            <div className="mt-1 text-sm text-white">
-              {newer ? `${newer.id} · ${newer.date}` : "Already newest"}
-            </div>
-          </Link>
-          <Link
-            href={older ? `/app/plan/${older.id}` : "/app/plan/archive"}
-            className={cn(
-              "block bg-black p-4 text-right transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              !older && "pointer-events-none opacity-30"
-            )}
-          >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              Older plan →
-            </div>
-            <div className="mt-1 text-sm text-white">
-              {older ? `${older.id} · ${older.date}` : "Archive bottom"}
-            </div>
-          </Link>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
+          <NewsMentioningPlan planId={plan.id} />
+        </div>
+        <nav className="grid grid-cols-2 gap-4 lg:col-start-2" aria-label="Neighbouring plans">
+          <SiblingLink href={newer ? `/app/plan/${newer.id}` : null} label="Newer plan" text={newer ? `${newer.id} · ${newer.date}` : "Already newest"} />
+          <SiblingLink href={older ? `/app/plan/${older.id}` : null} label="Older plan" text={older ? `${older.id} · ${older.date}` : "Archive bottom"} right />
         </nav>
       </div>
     </div>
+  );
+}
+
+function SiblingLink({ href, label, text, right }: { href: string | null; label: string; text: string; right?: boolean }) {
+  return (
+    <Link
+      href={href ?? "/app/plan/archive"}
+      aria-disabled={!href}
+      className={cn(
+        "block rounded-2xl bg-panel p-4 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+        right && "text-right",
+        !href && "pointer-events-none opacity-40",
+      )}
+    >
+      <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+        {right ? `${label} →` : `← ${label}`}
+      </span>
+      <span className="mt-1 block truncate text-[14px] text-white">{text}</span>
+    </Link>
   );
 }

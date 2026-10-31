@@ -1,4 +1,6 @@
 import { cn } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { rTone } from "@/features/plan/lib/detail-helpers";
 import type { ClosedPlanStats } from "@/features/plan/types";
 
 type Props = {
@@ -7,94 +9,56 @@ type Props = {
 };
 
 function formatPct(v: number | null): string {
-  if (v === null) return "—";
-  return `${Math.round(v * 100)}%`;
+  return v === null ? "n/a" : `${Math.round(v * 100)}%`;
 }
 
 function formatR(v: number | null): string {
-  if (v === null) return "—";
-  const sign = v >= 0 ? "+" : "";
-  return `${sign}${v.toFixed(1)}R`;
+  if (v === null) return "n/a";
+  return `${v >= 0 ? "+" : ""}${v.toFixed(1)}R`;
 }
 
-function rTone(v: number | null): string {
-  if (v === null) return "text-white";
-  if (v > 0) return "text-moss";
-  if (v < 0) return "text-blood-bright";
-  return "text-white";
-}
+const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
 
+/** Closed-plan track record: count, win rate, average R, split by direction. */
 export function PlanStatsBadges({ stats, className }: Props) {
   if (stats.n === 0) {
     return (
-      <div
-        className={cn(
-          "mb-6 inline-flex items-center gap-2 border border-gray-3 bg-gray-2/40 px-3 py-1.5",
-          className,
-        )}
-      >
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Closed-plan stats
-        </span>
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-          No closed plans yet
-        </span>
-      </div>
+      <Panel title="Track record" sub="No closed plans yet" className={className}>
+        <p className="text-[14px] leading-[21px] text-white/55">Stats appear once the desk closes its first plan.</p>
+      </Panel>
     );
   }
 
+  const dirs = [
+    { label: "▲ Long", tone: "text-up", b: stats.byDirection.long },
+    { label: "▼ Short", tone: "text-down", b: stats.byDirection.short },
+  ];
+
   return (
-    <div
-      className={cn(
-        "mb-6 grid grid-cols-2 gap-px bg-gray-3 sm:grid-cols-4",
-        className,
-      )}
-    >
-      <div className="bg-black p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Closed
+    <Panel title="Track record" sub={`${stats.n} closed plans`} className={className}>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <p className={EYEBROW}>Win rate</p>
+          <p className="font-num text-[40px] font-semibold leading-[44px] text-white">{formatPct(stats.winRate)}</p>
         </div>
-        <div className="mt-1 font-display text-2xl text-white">{stats.n}</div>
-      </div>
-      <div className="bg-black p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Win rate
-        </div>
-        <div className="mt-1 font-display text-2xl text-white">
-          {formatPct(stats.winRate)}
+        <div>
+          <p className={EYEBROW}>Avg R</p>
+          <p className={cn("font-num text-[40px] font-semibold leading-[44px]", rTone(stats.avgR))}>
+            {formatR(stats.avgR)}
+          </p>
         </div>
       </div>
-      <div className="bg-black p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Avg R
-        </div>
-        <div
-          className={cn("mt-1 font-display text-2xl", rTone(stats.avgR))}
-        >
-          {formatR(stats.avgR)}
-        </div>
-      </div>
-      <div className="bg-black p-4">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          By direction
-        </div>
-        <div className="mt-1 flex flex-col gap-0.5 font-mono text-[10px] uppercase tracking-widest2 text-white/70">
-          <span>
-            Long {stats.byDirection.long.n} ·{" "}
-            {formatPct(stats.byDirection.long.winRate)} ·{" "}
-            <span className={rTone(stats.byDirection.long.avgR)}>
-              {formatR(stats.byDirection.long.avgR)}
+      <div className="mt-4 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+        {dirs.map(({ label, tone, b }) => (
+          <div key={label} className="flex items-baseline gap-3 py-2.5 text-[14px]">
+            <span className={cn("w-16 font-semibold", tone)}>{label}</span>
+            <span className="flex-1 text-white/55">
+              {b.n} closed · {formatPct(b.winRate)}
             </span>
-          </span>
-          <span>
-            Short {stats.byDirection.short.n} ·{" "}
-            {formatPct(stats.byDirection.short.winRate)} ·{" "}
-            <span className={rTone(stats.byDirection.short.avgR)}>
-              {formatR(stats.byDirection.short.avgR)}
-            </span>
-          </span>
-        </div>
+            <span className={cn("font-num text-[18px] font-semibold", rTone(b.avgR))}>{formatR(b.avgR)}</span>
+          </div>
+        ))}
       </div>
-    </div>
+    </Panel>
   );
 }
