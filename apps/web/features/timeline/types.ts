@@ -31,14 +31,14 @@ export type TimelineEvent = z.infer<typeof TimelineEventSchema>;
 export function kindBadge(kind: TimelineKind): string {
   switch (kind) {
     case "news":
-      return "bg-brand/15 text-brand";
+      return "text-white/70";
     case "tweet":
-      return "bg-brand/10 text-brand/70";
+      return "text-white/55";
     case "macro":
-      return "bg-blood/15 text-blood-bright";
+      return "text-brand";
     case "earnings":
-      return "bg-moss/15 text-moss";
+      return "text-white/55";
     case "user_pin":
-      return "bg-white/15 text-white/70";
+      return "text-white/40";
   }
 }

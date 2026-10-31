@@ -16,18 +16,12 @@ export function EventFeed({
   className?: string;
 }) {
   return (
-    <div className={cn("border border-gray-3 bg-gray-2", className)}>
-      {heading && (
-        <div className="border-b border-gray-3 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-          {heading}
-        </div>
-      )}
+    <section className={cn("flex min-w-0 flex-col rounded-2xl bg-panel p-5", className)}>
+      {heading && <h2 className="mb-3 text-[15px] font-semibold leading-[22px] text-white">{heading}</h2>}
       {events.length === 0 ? (
-        <div className="px-4 py-8 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          {emptyMessage}
-        </div>
+        <p className="py-6 text-center text-[14px] text-white/40">{emptyMessage}</p>
       ) : (
-        <ul className={cn("divide-y divide-gray-3 overflow-y-auto", maxHeightClass)}>
+        <ul className={cn("-mx-2 divide-y divide-white/[0.07] overflow-y-auto", maxHeightClass)}>
           {events.map((e) => (
             <li key={e.id}>
               <EventCard event={e} />
@@ -35,6 +29,6 @@ export function EventFeed({
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 }

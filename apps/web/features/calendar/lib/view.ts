@@ -54,7 +54,7 @@ export function rangeLabel(view: ViewMode, anchorYmd: string): string {
           day: "numeric",
           timeZone: "UTC",
         });
-    return `${left} — ${right}`;
+    return `${left} to ${right}`;
   }
   return ymdToDate(anchorYmd).toLocaleDateString("en-US", {
     month: "long",

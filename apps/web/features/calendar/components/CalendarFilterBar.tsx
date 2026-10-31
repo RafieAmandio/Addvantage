@@ -1,10 +1,6 @@
 import { cn } from "@/lib/cn";
-import {
-  REGIONS,
-  type ImpactFilter,
-  type RegionFilter,
-} from "@/features/calendar/types";
-import { FilterChips } from "@/features/calendar/components/FilterChips";
+import { TextTabs } from "@/components/ui/TextTabs";
+import { REGIONS, type ImpactFilter, type RegionFilter } from "@/features/calendar/types";
 
 type Props = {
   impactFilter: ImpactFilter;
@@ -16,6 +12,18 @@ type Props = {
   className?: string;
 };
 
+const IMPACTS = [
+  { id: "all", label: "All impact" },
+  { id: "high", label: "High" },
+  { id: "medium", label: "Medium" },
+  { id: "low", label: "Low" },
+] as const;
+
+const REGION_OPTS = [
+  { id: "all" as RegionFilter, label: "All regions" },
+  ...REGIONS.map((r) => ({ id: r as RegionFilter, label: r === "GLOBAL" ? "Other" : r })),
+];
+
 export function CalendarFilterBar({
   impactFilter,
   regionFilter,
@@ -26,52 +34,19 @@ export function CalendarFilterBar({
   className,
 }: Props) {
   return (
-    <div
-      className={cn(
-        "mb-6 grid grid-cols-1 gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center",
-        className
+    <div className={cn("flex flex-wrap items-center gap-x-6 gap-y-2", className)}>
+      <TextTabs options={IMPACTS} value={impactFilter} onChange={onImpactChange} label="Filter by impact" />
+      <span className="hidden h-3 w-px bg-white/10 sm:block" aria-hidden />
+      <TextTabs options={REGION_OPTS} value={regionFilter} onChange={onRegionChange} label="Filter by region" />
+      {filtersActive && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="ml-auto text-[13px] font-medium text-white/40 transition-colors hover:text-down focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+        >
+          Reset filters
+        </button>
       )}
-    >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Impact
-        </span>
-        <FilterChips
-          options={[
-            { value: "all", label: "All" },
-            { value: "high", label: "High" },
-            { value: "medium", label: "Mid" },
-            { value: "low", label: "Low" },
-          ]}
-          value={impactFilter}
-          onChange={(v) => onImpactChange(v as ImpactFilter)}
-        />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Region
-        </span>
-        <FilterChips
-          options={[
-            { value: "all", label: "All" },
-            ...REGIONS.map((r) => ({ value: r, label: r === "GLOBAL" ? "OTHER" : r })),
-          ]}
-          value={regionFilter}
-          onChange={(v) => onRegionChange(v as RegionFilter)}
-        />
-      </div>
-
-      <div className="flex justify-end">
-        {filtersActive && (
-          <button
-            onClick={onReset}
-            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ✕ Reset filters
-          </button>
-        )}
-      </div>
     </div>
   );
 }

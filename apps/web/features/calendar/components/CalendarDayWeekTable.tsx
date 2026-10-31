@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import type { CalendarEvent } from "@/features/calendar/types";
+import { TODAY_YMD } from "@/features/calendar/types";
 import { formatDayHeader } from "@/features/calendar/lib/format";
 import { deriveSummary } from "@/features/calendar/lib/group";
 import { EventRow } from "@/features/calendar/components/EventRow";
@@ -13,69 +14,30 @@ type Props = {
   className?: string;
 };
 
-export function CalendarDayWeekTable({
-  view,
-  groups,
-  emptyState,
-  className,
-}: Props) {
+/** Rows grouped by WIB day. */
+export function CalendarDayWeekTable({ view, groups, emptyState, className }: Props) {
+  if (groups.length === 0) return <div className={cn("py-12", className)}>{emptyState}</div>;
   return (
-    <div className={cn("overflow-x-auto border border-gray-3", className)}>
-      <div className="min-w-[640px]">
-        <div className="sticky top-0 z-20 grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px] items-center gap-3 border-b-2 border-brand/40 bg-gray-2/95 px-3 py-2 backdrop-blur">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Event
+    <div className={cn("space-y-6", className)}>
+      {groups.map(({ ymd, events }) => (
+        <section key={ymd}>
+          <div className="flex items-baseline justify-between gap-3 border-b border-white/[0.07] pb-2">
+            <h3 className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+              {formatDayHeader(ymd)}
+              {ymd === TODAY_YMD && <span className="ml-2 text-brand">Today</span>}
+            </h3>
+            <span className="truncate text-[12px] text-white/40">
+              {events.length} {events.length === 1 ? "event" : "events"}
+              {events.some((e) => e.impact === "high") && <span className="hidden sm:inline"> · {deriveSummary(events)}</span>}
+            </span>
           </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Time
-          </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Impact
-          </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Actual
-          </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Prev
-          </div>
-          <div className="text-center font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Cons
-          </div>
-        </div>
-
-        {groups.length === 0 && (
-          <div className="border-y border-gray-3 bg-gray-2/40 p-12">
-            {emptyState}
-          </div>
-        )}
-
-        {groups.map(({ ymd, events }) => {
-          const summary = deriveSummary(events);
-          return (
-            <section key={ymd}>
-              <div className="border-y border-gray-3 bg-gray-2/60 px-3 py-2.5">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    {formatDayHeader(ymd)}
-                  </span>
-                  <span className="h-px flex-1 bg-brand/20" />
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-                    — {summary}
-                  </span>
-                </div>
-              </div>
-              {events.map((e) => (
-                <EventRow
-                  key={e.id}
-                  event={e}
-                  anchorYmd={ymd}
-                  showTimeOffset={view !== "day"}
-                />
-              ))}
-            </section>
-          );
-        })}
-      </div>
+          <ul className="divide-y divide-white/[0.07]">
+            {events.map((e) => (
+              <EventRow key={e.id} event={e} anchorYmd={ymd} showTimeOffset={view !== "day"} />
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }

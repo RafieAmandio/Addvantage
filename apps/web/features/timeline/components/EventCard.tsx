@@ -9,40 +9,26 @@ function eventHref(e: TimelineEvent): string | null {
   return e.url ?? null;
 }
 
-function EventCardInner({
-  event,
-  className,
-}: {
-  event: TimelineEvent;
-  className?: string;
-}) {
+function EventCardInner({ event, className }: { event: TimelineEvent; className?: string }) {
   const href = eventHref(event);
   const body = (
-    <div className={cn("px-4 py-3 transition-colors hover:bg-gray-3", className)}>
-      <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            "px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-            kindBadge(event.kind),
-          )}
-        >
-          {event.kind}
-        </span>
+    <div className={cn("rounded-lg px-2 py-2.5 transition-colors hover:bg-raised", className)}>
+      <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+        <span className={kindBadge(event.kind)}>{event.kind.replace("_", " ")}</span>
         {event.sourceCode && (
-          <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-            [{event.sourceCode}]
-          </span>
+          <>
+            <span className="px-1.5 text-white/20">/</span>
+            {event.sourceCode}
+          </>
         )}
-        <span className="ml-auto font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          {formatWibDateTime(event.occurredAt)}
-        </span>
-      </div>
-      <div className="mt-1.5 text-sm leading-snug text-white">{event.title}</div>
+        <span className="float-right font-medium normal-case tracking-normal text-white/40">{formatWibDateTime(event.occurredAt)}</span>
+      </p>
+      <div className="mt-1 text-[14px] leading-[20px] text-white">{event.title}</div>
     </div>
   );
   if (!href) return body;
   return (
-    <Link href={href} className="block focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none">
+    <Link href={href} className="block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand">
       {body}
     </Link>
   );

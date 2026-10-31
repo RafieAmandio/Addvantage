@@ -1,39 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { cn, formatWibDateTime } from "@/lib/cn";
+import { formatWibDateTime } from "@/lib/cn";
 import { kindBadge } from "@/features/timeline/types";
 import type { TimelineEvent } from "@/features/timeline/types";
 
 interface EventDrawerProps {
   event: TimelineEvent | null;
   onClose: () => void;
-}
-
-function biasColor(bias: TimelineEvent["bias"]): string {
-  switch (bias) {
-    case "bullish":
-      return "bg-brand/15 text-brand";
-    case "bearish":
-      return "bg-blood/15 text-blood-bright";
-    case "neutral":
-      return "bg-white/15 text-white/70";
-    default:
-      return "bg-white/10 text-white/50";
-  }
-}
-
-function impactColor(impact: TimelineEvent["impact"]): string {
-  switch (impact) {
-    case "high":
-      return "bg-blood/15 text-blood-bright";
-    case "medium":
-      return "bg-brand/15 text-brand";
-    case "low":
-      return "bg-white/15 text-white/70";
-    default:
-      return "bg-white/10 text-white/50";
-  }
 }
 
 export function EventDrawer({ event, onClose }: EventDrawerProps) {
@@ -57,90 +31,55 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
         className="absolute inset-0 cursor-default bg-black/70 focus-visible:outline-none"
       />
 
-      <aside
-        className={cn(
-          "absolute inset-y-0 right-0 flex h-full w-full flex-col border-l border-gray-3 bg-gray-2",
-          "sm:max-w-md",
-        )}
-      >
-        <header className="flex items-start justify-between gap-3 border-b border-gray-3 px-5 py-4">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={cn(
-                  "px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                  kindBadge(event.kind),
-                )}
-              >
-                {event.kind}
-              </span>
-              {event.sourceCode && (
-                <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                  [{event.sourceCode}]
-                </span>
-              )}
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {formatWibDateTime(event.occurredAt)}
-              </span>
-            </div>
-          </div>
+      <aside className="absolute inset-y-0 right-0 flex h-full w-full flex-col bg-panel sm:max-w-md">
+        <header className="flex items-start justify-between gap-3 px-5 pb-2 pt-5">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+            <span className={kindBadge(event.kind)}>{event.kind.replace("_", " ")}</span>
+            {event.sourceCode && (
+              <>
+                <span className="px-1.5 text-white/20">/</span>
+                {event.sourceCode}
+              </>
+            )}
+            <span className="px-1.5 text-white/20">/</span>
+            {formatWibDateTime(event.occurredAt)}
+          </p>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="shrink-0 border border-gray-3 px-2 py-0.5 font-mono text-sm text-white/70 transition-colors hover:bg-gray-3 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="-mt-1 shrink-0 rounded-full px-2.5 py-0.5 text-[18px] text-white/55 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
             ×
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          <h2 className="font-display text-2xl leading-tight text-white">
-            {event.title}
-          </h2>
+        <div className="flex-1 overflow-y-auto px-5 pb-5">
+          <h2 className="font-num text-[28px] font-semibold leading-[32px] text-white">{event.title}</h2>
 
           {(event.bias || event.impact) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {event.bias && (
-                <span
-                  className={cn(
-                    "px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                    biasColor(event.bias),
-                  )}
-                >
-                  bias · {event.bias}
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.06em]">
+              {event.impact && (
+                <span className={event.impact === "high" ? "text-brand" : event.impact === "medium" ? "text-white/55" : "text-white/30"}>
+                  {event.impact} impact
                 </span>
               )}
-              {event.impact && (
-                <span
-                  className={cn(
-                    "px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                    impactColor(event.impact),
-                  )}
-                >
-                  impact · {event.impact}
+              {event.bias && (
+                <span className={event.bias === "bullish" ? "text-up" : event.bias === "bearish" ? "text-down" : "text-white/40"}>
+                  {event.bias === "bullish" ? "▲ Bullish" : event.bias === "bearish" ? "▼ Bearish" : "Neutral"}
                 </span>
               )}
             </div>
           )}
 
-          {event.body && (
-            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-white/90">
-              {event.body}
-            </p>
-          )}
+          {event.body && <p className="mt-4 whitespace-pre-wrap text-[15px] leading-[23px] text-white/85">{event.body}</p>}
 
           {event.symbols.length > 0 && (
-            <div className="mt-5">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                Affects
-              </div>
+            <div className="mt-6">
+              <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Affects</div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {event.symbols.map((s) => (
-                  <span
-                    key={s}
-                    className="border border-gray-3 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest2 text-white/80"
-                  >
+                  <span key={s} className="rounded-full border border-white/[0.12] px-2.5 py-0.5 text-[12px] text-white/70">
                     {s}
                   </span>
                 ))}
@@ -149,20 +88,18 @@ export function EventDrawer({ event, onClose }: EventDrawerProps) {
           )}
         </div>
 
-        <footer className="border-t border-gray-3 px-5 py-3">
+        <footer className="border-t border-white/[0.07] px-5 py-3">
           {event.url ? (
             <a
               href={event.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest2 text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              className="inline-flex rounded-full border border-white/[0.14] px-3 py-1 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
             >
-              View source →
+              View source ↗
             </a>
           ) : (
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-              No external source
-            </span>
+            <span className="text-[13px] text-white/30">No external source</span>
           )}
         </footer>
       </aside>

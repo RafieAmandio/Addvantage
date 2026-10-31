@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
-import { formatDate, formatWibTime } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { cn, formatDate, formatWibTime } from "@/lib/cn";
 import { apiGet } from "@/lib/api/client-server";
 import Link from "next/link";
 import { ChannelThreadNav } from "./ChannelThreadNav";
@@ -53,117 +53,103 @@ export default async function ChannelPage({
     posts = [];
   }
 
+  const pinned = posts.filter((p) => p.pinned).length;
+
   return (
-    <div className="stagger bg-grid">
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <DataLabel>Channel</DataLabel>
-              <h1 className="mt-2 font-display text-5xl text-white">
-                My <span className="italic text-brand">Channel</span>
-              </h1>
-              <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-                Founder broadcast. Daily takes. No replies, no comments, no
-                debate. Read or scroll past.
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        <Panel
+          title={activeThread ? activeThread.title : "All posts"}
+          sub={activeThread?.description ?? `${posts.length} ${posts.length === 1 ? "post" : "posts"}, newest first`}
+        >
+          {threads.length > 0 && <ChannelThreadNav threads={threads} activeSlug={activeSlug} />}
+
+          {posts.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-[17px] font-medium text-white">{activeThread ? "No posts in this thread" : "No broadcasts yet"}</p>
+              <p className="mt-1 text-[14px] text-white/40">
+                {activeThread ? "Posts assigned to this thread will appear here." : "Channel posts appear here once broadcasting begins."}
               </p>
             </div>
-            <div className="hidden text-right font-mono text-[10px] uppercase tracking-widest2 text-white/40 lg:block">
-              <div>ANTHONY</div>
-              <div>FOUNDING OPERATOR</div>
-              <div className="mt-2 text-moss">● BROADCASTING</div>
-            </div>
-          </div>
-
-          {threads.length > 0 && (
-            <ChannelThreadNav threads={threads} activeSlug={activeSlug} />
+          ) : (
+            <ul className={cn("divide-y divide-white/[0.07]", threads.length > 0 && "mt-2")}>
+              {posts.map((p) => (
+                <li key={p.id} className="py-5">
+                  <article className="max-w-[68ch]">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                      {formatDate(p.createdAt)} · {formatWibTime(p.createdAt)} WIB
+                      <span className="px-1.5 text-white/20">/</span>
+                      <span className="text-white/70">{p.author}</span>
+                      {p.pinned && <span className="ml-2 text-brand">Pinned</span>}
+                      {p.thread && !activeThread && (
+                        <>
+                          <span className="px-1.5 text-white/20">/</span>
+                          <Link href={`/app/channel?thread=${p.thread.slug}`} className="transition-colors hover:text-white">
+                            {p.thread.title}
+                          </Link>
+                        </>
+                      )}
+                    </p>
+                    <p className="mt-2 whitespace-pre-wrap text-[16px] leading-[26px] text-white/90">{p.body}</p>
+                    {p.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.imageUrl} alt="" className="mt-4 max-h-[420px] max-w-full rounded-xl object-contain" />
+                    )}
+                    {p.tags.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {p.tags.map((t) => (
+                          <Link
+                            key={t}
+                            href={`/app/tags/${t}`}
+                            className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                          >
+                            #{t}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                </li>
+              ))}
+            </ul>
           )}
-        </div>
+        </Panel>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-        {activeThread?.description && (
-          <p className="mb-6 font-display text-base text-white/50">
-            {activeThread.description}
-          </p>
-        )}
-
-        <SectionNumber n="—" label={`${posts.length} POSTS`} />
-
-        {posts.length === 0 && (
-          <div className="mt-10 border border-gray-3 bg-gray-2/30 px-6 py-12 text-center">
-            <p className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              {activeThread ? "NO POSTS IN THIS THREAD" : "NO BROADCASTS YET"}
-            </p>
-            <p className="mt-2 font-display text-lg text-white/60">
-              {activeThread
-                ? "Posts assigned to this thread will appear here."
-                : "Channel posts will appear here once broadcasting begins."}
-            </p>
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Founder broadcast" sub="Anthony, founding operator">
+          <p className="text-[14px] leading-[21px] text-white/70">Daily takes from the founder. No replies, no comments, no debate. Read or scroll past.</p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-xl bg-white/[0.03] px-3 py-2.5">
+              <div className="font-num text-[32px] font-semibold leading-8 text-white">{posts.length}</div>
+              <div className="mt-0.5 text-[12px] text-white/40">{activeThread ? "In thread" : "Posts"}</div>
+            </div>
+            <div className="rounded-xl bg-white/[0.03] px-3 py-2.5">
+              <div className={cn("font-num text-[32px] font-semibold leading-8", pinned ? "text-brand" : "text-white")}>{pinned}</div>
+              <div className="mt-0.5 text-[12px] text-white/40">Pinned</div>
+            </div>
           </div>
-        )}
+          {posts[0] && <p className="mt-3 text-[13px] text-white/40">Last post {formatDate(posts[0].createdAt)}, {formatWibTime(posts[0].createdAt)} WIB</p>}
+        </Panel>
 
-        <div className="mt-6 space-y-10">
-          {posts.map((p) => (
-            <article
-              key={p.id}
-              className="relative border-l-2 border-brand/40 pl-6"
-            >
-              <div className="absolute -left-1.5 top-1.5 h-3 w-3 bg-brand" />
-              <div className="flex flex-wrap items-baseline gap-3 font-mono text-[10px] uppercase tracking-widest2">
-                <span className="text-white/60">
-                  {formatDate(p.createdAt)} · {formatWibTime(p.createdAt)} WIB
-                </span>
-                <span className="text-white/40">·</span>
-                <span className="text-brand">BY {p.author.toUpperCase()}</span>
-                {p.pinned && (
-                  <>
-                    <span className="text-white/40">·</span>
-                    <span className="text-brand/60">PINNED</span>
-                  </>
-                )}
-                {p.thread && !activeThread && (
-                  <>
-                    <span className="text-white/40">·</span>
-                    <Link
-                      href={`/app/channel?thread=${p.thread.slug}`}
-                      className="text-white/40 transition-colors hover:text-brand"
-                    >
-                      {p.thread.title.toUpperCase()}
-                    </Link>
-                  </>
-                )}
-              </div>
-              <p className="mt-3 font-display text-xl leading-snug text-white whitespace-pre-wrap">
-                {p.body}
-              </p>
-              {p.imageUrl && (
-                <div className="mt-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.imageUrl}
-                    alt=""
-                    className="max-w-full rounded border border-gray-3"
-                  />
-                </div>
-              )}
-              {p.tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {p.tags.map((t) => (
-                    <Link
-                      key={t}
-                      href={`/app/tags/${t}`}
-                      className="font-mono text-[10px] uppercase tracking-widest2 text-brand/70 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                    >
-                      #{t}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </article>
-          ))}
-        </div>
-      </div>
+        {threads.length > 0 && (
+          <Panel title="Threads" sub="Ongoing series">
+            <ul className="-my-1 divide-y divide-white/[0.07]">
+              {threads.map((t) => (
+                <li key={t.id}>
+                  <Link
+                    href={activeSlug === t.slug ? "/app/channel" : `/app/channel?thread=${t.slug}`}
+                    className="group block py-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  >
+                    <span className={cn("text-[14px] font-semibold", activeSlug === t.slug ? "text-brand" : "text-white group-hover:text-brand")}>{t.title}</span>
+                    {t.description && <span className="mt-0.5 line-clamp-2 block text-[13px] leading-[18px] text-white/45">{t.description}</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        )}
+      </aside>
     </div>
   );
 }

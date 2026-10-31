@@ -9,37 +9,19 @@ interface ChannelThread {
   slug: string;
 }
 
-export function ChannelThreadNav({
-  threads,
-  activeSlug,
-}: {
-  threads: ChannelThread[];
-  activeSlug: string | null;
-}) {
+/** Text tabs, one per thread. Links so the server re-fetches the filtered posts. */
+export function ChannelThreadNav({ threads, activeSlug }: { threads: ChannelThread[]; activeSlug: string | null }) {
+  const items = [{ slug: null as string | null, title: "All" }, ...threads];
   return (
-    <nav className="mt-6 flex gap-2 overflow-x-auto pb-1 scrollbar-none" aria-label="Thread filter">
-      <Link
-        href="/app/channel"
-        className={cn(
-          "shrink-0 border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
-          "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-          !activeSlug
-            ? "border-brand bg-brand text-black"
-            : "border-gray-3 text-white/50 hover:border-white/30 hover:text-white"
-        )}
-      >
-        All
-      </Link>
-      {threads.map((t) => (
+    <nav className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] font-medium" aria-label="Thread filter">
+      {items.map((t) => (
         <Link
-          key={t.id}
-          href={`/app/channel?thread=${t.slug}`}
+          key={t.slug ?? "all"}
+          href={t.slug ? `/app/channel?thread=${t.slug}` : "/app/channel"}
+          aria-current={activeSlug === t.slug ? "page" : undefined}
           className={cn(
-            "shrink-0 border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 transition-colors",
-            "focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-            activeSlug === t.slug
-              ? "border-brand bg-brand text-black"
-              : "border-gray-3 text-white/50 hover:border-white/30 hover:text-white"
+            "transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+            activeSlug === t.slug ? "text-white" : "text-white/30 hover:text-white/60",
           )}
         >
           {t.title}
