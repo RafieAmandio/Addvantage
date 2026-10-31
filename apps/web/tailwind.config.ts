@@ -47,12 +47,12 @@ const config: Config = {
         // Direction only: never brand
         up: "#00DD94",
         down: "#FF454D",
-        moss: "#65A30D",
+        moss: "#00DD94",
         steel: "#6B7280",
         wire: "#383E47",
       },
       fontFamily: {
-        display: ['"Inter"', "system-ui", "sans-serif"],
+        display: ['"Geist"', '"Inter"', "system-ui", "sans-serif"],
         sans: ['"Geist"', '"Inter"', "system-ui", "sans-serif"],
         // Condensed numerals + page titles
         num: ['"Barlow Condensed"', '"Roboto Condensed"', '"Arial Narrow"', "sans-serif"],

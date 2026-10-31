@@ -20,7 +20,7 @@ export function SegmentedNav<T extends string>({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        "flex gap-2 font-mono text-[10px] uppercase tracking-widest2",
+        "flex flex-wrap gap-x-4 gap-y-1 text-[13px] font-medium",
         className,
       )}
     >
@@ -30,10 +30,8 @@ export function SegmentedNav<T extends string>({
           href={hrefFor(item)}
           aria-current={item === current ? "page" : undefined}
           className={cn(
-            "border px-2 py-1 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-            item === current
-              ? "border-brand bg-brand text-black"
-              : "border-gray-3 text-white/60 hover:border-brand hover:text-brand",
+            "transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+            item === current ? "text-white" : "text-white/30 hover:text-white/60",
           )}
         >
           {labelFor ? labelFor(item) : item}

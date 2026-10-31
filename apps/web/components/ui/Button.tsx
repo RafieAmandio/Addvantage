@@ -11,19 +11,19 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
   ref
 ) {
   const base =
-    "group relative inline-flex items-center justify-center gap-2 font-mono uppercase tracking-widest2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none";
+    "group relative inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none";
   const variants = {
     primary:
-      "bg-brand text-black hover:bg-brand-dim hover:text-white border border-brand",
+      "bg-brand text-black hover:opacity-90",
     outline:
-      "border border-brand/60 text-brand hover:bg-brand hover:text-black",
+      "border border-white/[0.14] text-white hover:bg-raised",
     ghost:
-      "text-white/70 hover:text-brand border border-transparent hover:border-brand/40",
+      "text-white/70 hover:bg-raised hover:text-white",
   } as const;
   const sizes = {
-    sm: "h-8 px-3 text-[10px]",
-    md: "h-10 px-5 text-[11px]",
-    lg: "h-14 px-8 text-[12px]",
+    sm: "h-8 px-3.5 text-[13px]",
+    md: "h-10 px-5 text-[14px]",
+    lg: "h-12 px-7 text-[15px]",
   } as const;
   return (
     <button
