@@ -169,8 +169,10 @@ export function Sidebar() {
           title="+vantage"
           className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand font-num text-lg font-bold leading-none text-black">+</span>
-          {!rail && <span className="truncate text-[17px] font-semibold tracking-[-0.02em] text-white">vantage</span>}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {rail
+            ? <img src="/figma/logo-mark.png" alt="+vantage" width={32} height={32} className="h-8 w-8 shrink-0" />
+            : <img src="/logo-vantage.png" alt="+vantage" width={319} height={73} className="h-7 w-auto" />}
         </Link>
         <button
           onClick={() => (navOpen ? setNavOpen(false) : setSidebarCollapsed(!collapsed))}
@@ -181,7 +183,7 @@ export function Sidebar() {
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
             {navOpen
               ? <path d="M3 3l10 10M13 3L3 13" strokeLinecap="round" />
-              : <><rect x="1.75" y="2.75" width="12.5" height="10.5" rx="2" /><path d="M6 3v10" />{collapsed ? <path d="M9 6.5L10.5 8 9 9.5" strokeLinecap="round" strokeLinejoin="round" /> : <path d="M11 6.5L9.5 8 11 9.5" strokeLinecap="round" strokeLinejoin="round" />}</>}
+              : <path d={collapsed ? "M3.5 4l4 4-4 4M8.5 4l4 4-4 4" : "M12.5 4l-4 4 4 4M7.5 4l-4 4 4 4"} strokeLinecap="round" strokeLinejoin="round" />}
           </svg>
         </button>
       </div>
