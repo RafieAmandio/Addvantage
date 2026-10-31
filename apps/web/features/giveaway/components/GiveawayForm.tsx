@@ -1,13 +1,13 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import { authInput, authLabel, authPrimary } from "@/features/auth/components/AuthShell";
 import { submitGiveawayEntry, type GiveawayState } from "@/features/giveaway/actions";
 
 const INITIAL: GiveawayState = { ok: false };
 
-const inputClass =
-  "mt-2 w-full rounded-lg border border-gray-3 bg-gray-2 px-4 py-3 font-mono text-base text-white outline-none transition-all placeholder:text-white/25 focus-visible:border-brand focus-visible:shadow-[0_0_0_3px_rgba(255,212,0,0.15)]";
-const labelClass = "block font-mono text-sm font-bold text-white";
+const inputClass = authInput;
+const labelClass = authLabel;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -16,7 +16,7 @@ function SubmitButton() {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="btn-pixel mt-6 flex w-full items-center justify-center gap-2.5 rounded-lg bg-brand py-4 font-mono text-base font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.98] disabled:cursor-wait"
+      className={`${authPrimary} mt-6 w-full disabled:cursor-wait`}
     >
       {pending ? "Submitting…" : "Join the giveaway"}
     </button>
@@ -28,10 +28,11 @@ export function GiveawayForm() {
 
   if (state.ok) {
     return (
-      <div className="rounded-xl border border-moss/30 bg-moss/[0.06] p-6 text-center">
-        <p className="font-display text-2xl text-white">You&apos;re in! 🎉</p>
-        <p className="mt-2 font-mono text-sm text-white/60">
-          Your entry is recorded. We&apos;ll reach you on the contact you provided when the <span className="text-brand">$100 giveaway</span> is drawn.
+      <div role="status">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-up">Entry recorded</p>
+        <p className="mt-2 text-[18px] font-semibold text-white">You&apos;re in.</p>
+        <p className="mt-1 text-[14px] leading-[21px] text-white/55">
+          We&apos;ll reach you on the contact you provided when the <span className="text-white">$100 giveaway</span> is drawn.
         </p>
       </div>
     );
@@ -49,7 +50,7 @@ export function GiveawayForm() {
         className="absolute left-[-9999px] h-0 w-0 opacity-0"
       />
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         <div>
           <label htmlFor="bingxUid" className={labelClass}>
             BingX User ID (UID)
@@ -77,11 +78,11 @@ export function GiveawayForm() {
         </div>
       </div>
 
-      {state.error && <p className="mt-4 font-mono text-sm text-red-400">{state.error}</p>}
+      {state.error && <p role="alert" className="mt-4 text-[13px] text-down">{state.error}</p>}
 
       <SubmitButton />
 
-      <p className="mt-3 text-center font-mono text-[11px] text-white/30">
+      <p className="mt-3 text-center text-[12px] leading-[18px] text-white/40">
         Submit your UID only after you&apos;ve registered and traded on BingX.
       </p>
     </form>

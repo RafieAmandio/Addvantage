@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/cn";
-import { DataLabel } from "@/components/ui/Marker";
 import { MARKETS, type ProfileForm } from "@/features/signup/types";
+import { Choice, questionEyebrow, questionTitle } from "./Choice";
 
 type Props = {
   form: ProfileForm;
@@ -12,65 +12,47 @@ type Props = {
 
 export function StepMarketsGoal({ form, setForm, toggleMarket }: Props) {
   return (
-    <div className="space-y-8 stagger">
-      <div className="space-y-4">
-        <DataLabel>Question 03 / Markets traded</DataLabel>
-        <h2 className="font-display text-3xl text-white">
-          Which markets do you trade?
-        </h2>
-        <p className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          SELECT ALL THAT APPLY
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          {MARKETS.map((opt, i) => {
+    <div className="space-y-8">
+      <div>
+        <p className={questionEyebrow}>Question 3 · Markets traded</p>
+        <h2 className={questionTitle}>Which markets do you trade?</h2>
+        <p className="mt-1 text-[13px] text-white/55">Select all that apply.</p>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          {MARKETS.map((opt) => {
             const selected = form.markets.includes(opt.value);
             return (
-              <button
-                key={opt.value}
-                onClick={() => toggleMarket(opt.value)}
-                className={cn(
-                  "relative border p-4 text-left font-mono text-xs uppercase tracking-widest2 transition-all focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                  selected
-                    ? "border-brand bg-brand/10 text-brand"
-                    : "border-gray-3 text-white/60 hover:border-brand/40 hover:text-white"
-                )}
-              >
-                <span className="absolute right-3 top-3 text-[9px] text-white/20">
-                  {i + 1}
-                </span>
-                <span className="flex items-center gap-2">
+              <Choice key={opt.value} selected={selected} onClick={() => toggleMarket(opt.value)}>
+                <span className="flex items-center gap-2.5">
                   <span
+                    aria-hidden
                     className={cn(
-                      "flex h-4 w-4 items-center justify-center border text-[10px]",
-                      selected
-                        ? "border-brand bg-brand text-black"
-                        : "border-white/30"
+                      "flex h-4 w-4 shrink-0 items-center justify-center rounded text-[10px] font-bold",
+                      selected ? "bg-brand text-black" : "ring-1 ring-white/30"
                     )}
                   >
                     {selected && "✓"}
                   </span>
                   {opt.label}
                 </span>
-              </button>
+              </Choice>
             );
           })}
         </div>
       </div>
 
-      <div className="border-t border-gray-3 pt-8 space-y-4">
-        <DataLabel>Question 04 / Annual target</DataLabel>
-        <h2 className="font-display text-3xl text-white">
-          What's your trading goal this year?
-        </h2>
-        <p className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          Be specific. A number, a milestone, a behaviour change.
-        </p>
+      <div>
+        <p className={questionEyebrow}>Question 4 · Annual target</p>
+        <label htmlFor="yearly-goal" className={questionTitle + " block"}>
+          What&apos;s your trading goal this year?
+        </label>
+        <p className="mt-1 text-[13px] text-white/55">Be specific. A number, a milestone, a behaviour change.</p>
         <input
+          id="yearly-goal"
           type="text"
           value={form.yearlyGoal}
           onChange={(e) => setForm({ ...form, yearlyGoal: e.target.value })}
           placeholder="e.g. 30% annual return, consistent 2R average, survive the year without blowing up"
-          className="mt-2 w-full border-b border-white/20 bg-transparent py-3 font-mono text-lg text-white placeholder:text-white/20 outline-none transition-colors focus-visible:border-brand"
+          className="mt-4 h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand"
         />
       </div>
     </div>

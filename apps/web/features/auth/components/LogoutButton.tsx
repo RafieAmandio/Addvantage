@@ -14,10 +14,10 @@ export function LogoutButton({ className, children }: LogoutButtonProps) {
         type="submit"
         className={
           className ??
-          "font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+          "rounded-full px-2.5 py-1 text-[13px] font-medium text-white/55 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
         }
       >
-        {children ?? "Logout →"}
+        {children ?? "Log out"}
       </button>
     </form>
   );

@@ -8,8 +8,8 @@ export type ProfileForm = {
 
 export const TRADING_LENGTHS = [
   { value: "<1", label: "Less than 1 year" },
-  { value: "1-3", label: "1 — 3 years" },
-  { value: "3-5", label: "3 — 5 years" },
+  { value: "1-3", label: "1 to 3 years" },
+  { value: "3-5", label: "3 to 5 years" },
   { value: "5+", label: "5+ years" },
 ] as const;
 
