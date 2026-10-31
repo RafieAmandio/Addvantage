@@ -8,7 +8,7 @@ export function PaywallOverlay({
   reason?: string;
 }) {
   return (
-    <div className="relative" role="region" aria-label={`${surface} — upgrade required`}>
+    <div className="relative h-full" role="region" aria-label={`${surface}: upgrade required`}>
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/0 via-black/85 to-black" aria-hidden="true" />
       <div className="absolute inset-x-0 top-1/2 z-20 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-panel p-6 ring-1 ring-white/[0.08] sm:p-8">
         <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-brand">VIP+ required</p>

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import { useAppState, isPaid } from "@/lib/state";
 import { useReadPrimers } from "@/features/education/hooks/useReadPrimers";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
@@ -34,9 +34,9 @@ export function EducationLibraryView({ primers }: { primers: Primer[] }) {
     <Suspense
       fallback={
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
+          <div className="flex items-center gap-3 text-[14px] text-white/55">
             <span className="led" aria-hidden />
-            DECODING LIBRARY
+            Loading library...
           </div>
         </div>
       }
@@ -69,14 +69,8 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
     [query, primers]
   );
 
-  const indexById = useMemo(() => {
-    const m = new Map<string, number>();
-    primers.forEach((p, i) => m.set(p.id, i));
-    return m;
-  }, [primers]);
-
   return (
-    <div className="stagger">
+    <div>
       <BackToTop />
       <ConfirmDialog
         open={confirmingReset}
@@ -91,122 +85,85 @@ function EducationViewInner({ primers }: { primers: Primer[] }) {
         }}
         onCancel={() => setConfirmingReset(false)}
       />
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <DataLabel>Education</DataLabel>
-          <h1 className="mt-2 font-display text-3xl sm:text-4xl md:text-5xl text-white">
-            Education <span className="italic text-brand">Library</span>
-          </h1>
-          <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-            Process. Psychology. Risk. System design. No price-action snake
-            oil. Each primer is anchored to a real framework and tagged into
-            the hashtag system.
-          </p>
-          <EducationTabs current="primers" />
-        </div>
-      </div>
+      <div className="space-y-4 px-4 pb-10 sm:px-6">
+        <EducationTabs current="primers" />
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0 space-y-4">
+            <PageSearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Search titles, frameworks, body text, tags   (s)"
+              ariaLabel="Search primers"
+              matchLabel={
+                query
+                  ? `${visiblePrimers.length} ${visiblePrimers.length === 1 ? "match" : "matches"} for "${query}"`
+                  : null
+              }
+            />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mb-6">
-          <PageSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search titles, frameworks, body text, tags…   (press s to focus, esc to blur)"
-            ariaLabel="Search primers"
-            matchLabel={
-              query
-                ? `${visiblePrimers.length} ${visiblePrimers.length === 1 ? "MATCH" : "MATCHES"} for "${query}"`
-                : null
-            }
-          />
-        </div>
-
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <SectionNumber
-            n="—"
-            label={
-              query
-                ? `${visiblePrimers.length} / ${primers.length} PRIMERS`
-                : `${primers.length} PRIMERS`
-            }
-          />
-          {hydrated && accessible.length > 0 && (
-            <div className="flex items-center gap-4">
-              <div className="min-w-[160px]">
-                <div className="flex items-baseline justify-between font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                  <span>Progress</span>
-                  <span className="text-brand">
-                    {readCount} / {accessible.length} · {pct}%
-                  </span>
-                </div>
-                <div className="mt-1 h-1 w-full bg-gray-3">
-                  <div
-                    className="h-full bg-brand transition-all"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-              {readCount > 0 && (
-                <button
-                  onClick={() => setConfirmingReset(true)}
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  Reset
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {primers.length === 0 && (
-          <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              ● LIBRARY EMPTY
-            </div>
-            <div className="mt-3 font-display text-2xl text-white">
-              No primers published yet.
-            </div>
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              The desk is preparing the library. Check back soon.
-            </p>
-          </div>
-        )}
-
-        {visiblePrimers.length === 0 && query && primers.length > 0 && (
-          <div className="mt-6 border border-gray-3 bg-gray-2/40 p-12 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              ● NULL TRANSMISSION
-            </div>
-            <div className="mt-3 font-display text-2xl text-white">
-              No primers match &ldquo;{query}&rdquo;.
-            </div>
-            <button
-              onClick={() => setQuery("")}
-              className="mt-6 border border-brand/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            <Panel
+              title={query ? `${visiblePrimers.length} of ${primers.length} primers` : `${primers.length} primers`}
+              sub="Process, psychology, risk and system design. Each primer is anchored to a real framework."
             >
-              ✕ Clear search
-            </button>
+              {primers.length === 0 ? (
+                <p className="py-10 text-center text-[14px] text-white/40">
+                  No primers published yet. The desk is preparing the library.
+                </p>
+              ) : visiblePrimers.length === 0 ? (
+                <div className="py-10 text-center">
+                  <p className="text-[14px] text-white/40">No primers match &ldquo;{query}&rdquo;.</p>
+                  <button
+                    onClick={() => setQuery("")}
+                    className="mt-4 rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  >
+                    Clear search
+                  </button>
+                </div>
+              ) : (
+                <div className="-my-1 divide-y divide-white/[0.07]">
+                  {visiblePrimers.map((p) => (
+                    <PrimerCard
+                      key={p.id}
+                      primer={p}
+                      query={query}
+                      locked={p.locked && !paid}
+                      read={readIds.includes(p.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </Panel>
           </div>
-        )}
 
-        <div className="mt-6 grid grid-cols-12 gap-px bg-gray-3">
-          {visiblePrimers.map((p) => {
-            const i = indexById.get(p.id) ?? 0;
-            const indexLabel =
-              String(i + 1).padStart(2, "0") +
-              "/" +
-              String(primers.length).padStart(2, "0");
-            return (
-              <PrimerCard
-                key={p.id}
-                primer={p}
-                query={query}
-                locked={p.locked && !paid}
-                read={readIds.includes(p.id)}
-                indexLabel={indexLabel}
-              />
-            );
-          })}
+          <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+            <Panel
+              title="Your progress"
+              sub="Read on this device"
+              action={
+                hydrated && readCount > 0 ? (
+                  <button
+                    onClick={() => setConfirmingReset(true)}
+                    className="text-[13px] font-medium text-white/30 hover:text-down focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  >
+                    Reset
+                  </button>
+                ) : null
+              }
+            >
+              <p className="font-num text-[40px] font-semibold leading-[44px] text-white">
+                {hydrated ? readCount : 0}
+                <span className="text-white/30"> / {accessible.length}</span>
+              </p>
+              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+                <div className="h-full bg-brand" style={{ width: `${hydrated ? pct : 0}%` }} />
+              </div>
+              {accessible.length < primers.length && (
+                <p className="mt-3 text-[13px] text-white/40">
+                  {primers.length - accessible.length} more with VIP+
+                </p>
+              )}
+            </Panel>
+          </aside>
         </div>
       </div>
     </div>

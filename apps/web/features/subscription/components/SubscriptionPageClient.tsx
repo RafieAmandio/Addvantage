@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { DataLabel, SectionNumber } from "@/components/ui/Marker";
-import { Button } from "@/components/ui/Button";
+import { Panel } from "@/components/ui/Panel";
 import { formatIDR, cn } from "@/lib/cn";
 import type { SubscriptionStatus } from "../queries/status";
 import type { PaymentRecord } from "../queries/history";
@@ -98,232 +97,150 @@ export function SubscriptionPageClient({ status, history }: Props) {
     });
   };
 
+  const fmtDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
   return (
-    <div className="stagger bg-grid-fine">
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <DataLabel>Operator account · Tier control</DataLabel>
-          <h1 className="mt-2 font-display text-5xl text-white">
-            Subscription <span className="italic text-brand">& Access</span>
-          </h1>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <section className="border border-brand/40 bg-gray-2/30 p-4 sm:p-8">
-          <div className="grid grid-cols-12 gap-4 sm:gap-6">
-            <div className="col-span-12 lg:col-span-4">
-              <DataLabel>Current tier</DataLabel>
-              <div className="mt-2 font-display text-3xl text-white sm:text-4xl">
-                {paid ? "VIP+ Trader" : "Free"}
-              </div>
-              <div
-                className={cn(
-                  "mt-1 font-mono text-[10px] uppercase tracking-widest2",
-                  paid ? "text-moss" : "text-white/40"
-                )}
-              >
-                ● {paid ? "OPERATOR · ACTIVE" : "FREE TIER · LIMITED"}
-              </div>
-            </div>
-            <div className="col-span-6 lg:col-span-3">
-              <DataLabel>Cadence</DataLabel>
-              <div className="mt-2 font-mono text-white">
-                {paid ? "1-year" : "—"}
-              </div>
-            </div>
-            <div className="col-span-6 lg:col-span-3">
-              <DataLabel>Renews</DataLabel>
-              <div
-                className={cn(
-                  "mt-2 font-mono text-sm uppercase tracking-widest2",
-                  paid ? "text-moss" : "text-white/40"
-                )}
-              >
-                {renewsAt
-                  ? new Date(renewsAt).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "—"}
-              </div>
-            </div>
-            <div className="col-span-12 lg:col-span-2">
-              <DataLabel>Liability</DataLabel>
-              <div
-                className={cn(
-                  "mt-2 font-mono text-sm uppercase tracking-widest2",
-                  liabilitySigned ? "text-moss" : "text-blood-bright"
-                )}
-              >
-                {liabilitySigned ? "✓ SIGNED" : "● UNSIGNED"}
-              </div>
-            </div>
-          </div>
-        </section>
-
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
         {error && (
-          <div className="mt-4 border border-blood-bright/40 bg-blood-bright/10 px-4 py-3 font-mono text-xs text-blood-bright">
+          <p role="alert" className="rounded-2xl bg-down/10 px-5 py-3 text-[14px] text-down">
             {error}
-          </div>
+          </p>
         )}
 
-        {!PAYMENTS_ENABLED && !paid && (
-          <div className="mt-4 border border-brand/40 bg-brand/[0.06] px-4 py-3 text-sm text-brand sm:px-6">
-            <span className="font-mono text-[10px] uppercase tracking-widest2">● Access by request</span>
-            <p className="mt-1 text-white/70">
-              Self-serve payment is temporarily disabled. To get VIP+ Trader access, please
-              contact us and we&apos;ll set you up.
-            </p>
-          </div>
-        )}
-
-        <section className="mt-12">
-          <SectionNumber n="01 /" label="AVAILABLE TIERS" />
-          <div className="mt-6 grid grid-cols-12 gap-6">
-            {PLANS.map((p, i) => {
-              const isCurrent =
-                (p.id === "free" && !paid) || (p.id === "vip-trader" && paid);
-              return (
-                <div
-                  key={p.id}
-                  className={cn(
-                    "col-span-12 border bg-black p-6 transition-colors duration-200 sm:p-8 lg:col-span-6",
-                    p.highlight
-                      ? "border-brand hover:border-brand/80"
-                      : "border-gray-3 hover:border-white/20"
-                  )}
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <DataLabel>
-                        {p.id === "free" ? "Tier 00" : "Tier 01"}
-                      </DataLabel>
-                      <div className="mt-2 font-display text-2xl text-white sm:text-3xl">
-                        {p.name}
-                      </div>
-                    </div>
-                    {isCurrent && (
-                      <div className="border border-moss bg-moss/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
-                        ● CURRENT
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-6 flex items-baseline gap-2">
-                    <div
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PLANS.map((p) => {
+            const isCurrent = (p.id === "free" && !paid) || (p.id === "vip-trader" && paid);
+            const yellow = !!p.highlight;
+            return (
+              <section
+                key={p.id}
+                aria-label={`${p.name} plan`}
+                className={cn(
+                  "flex min-w-0 flex-col rounded-2xl p-5 sm:p-6",
+                  yellow ? "bg-brand text-black" : "bg-panel text-white",
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className={cn("text-[12px] font-semibold uppercase tracking-[0.08em]", yellow ? "text-black/60" : "text-white/40")}>
+                    {p.name}
+                  </p>
+                  {isCurrent && (
+                    <span
                       className={cn(
-                        "font-display text-3xl sm:text-5xl",
-                        p.highlight ? "text-brand" : "text-white"
+                        "rounded-full px-2.5 py-0.5 text-[12px] font-semibold uppercase tracking-[0.06em]",
+                        yellow ? "bg-black text-brand" : "border border-white/[0.14] text-white/70",
                       )}
                     >
-                      IDR {p.priceIDR === 0 ? "0" : formatIDR(p.priceIDR)}
-                    </div>
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                      / {p.cadence}
-                    </div>
-                  </div>
-                  <ul className="mt-8 space-y-2 text-sm text-white/80">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <span className="font-mono text-brand">+</span>
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8">
-                    {p.id === "free" ? (
-                      <Button
-                        ref={confirmDownRef}
-                        onClick={downgrade}
-                        variant="outline"
-                        size="md"
-                        disabled={!paid || isPending}
-                        className="w-full"
-                      >
-                        {!paid
-                          ? "Current tier"
-                          : confirmingDown
-                            ? "CONFIRM DOWNGRADE — LOSE ACCESS"
-                            : "Downgrade →"}
-                      </Button>
-                    ) : (
-                      <Button
-                        size="md"
-                        disabled
-                        className="w-full"
-                      >
-                        {paid ? "Active until renewal" : "Contact to get access"}
-                      </Button>
-                    )}
-                  </div>
+                      Current
+                    </span>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="mt-12">
-          <SectionNumber n="02 /" label="PAYMENT LEDGER" />
-          {history.length === 0 ? (
-            <div className="mt-4 border border-gray-3 px-6 py-12 text-center">
-              <p className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                NO TRANSACTIONS
-              </p>
-              <p className="mt-2 text-sm text-white/60">
-                Payment history will appear here once billing is active.
-              </p>
-            </div>
-          ) : (
-            <div className="mt-4 border border-gray-3">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-gray-3 bg-gray-2/30">
-                    <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">Date</th>
-                    <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">Tier</th>
-                    <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40 text-right">Amount</th>
-                    <th className="px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.map((p) => (
-                    <tr key={p.id} className="border-b border-gray-3/50 last:border-0">
-                      <td className="px-4 py-3 font-mono text-xs text-white/60">
-                        {new Date(p.paidAt ?? p.createdAt).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs uppercase text-white/60">{p.tier}</td>
-                      <td className="px-4 py-3 text-right font-mono text-xs text-white">
-                        {p.currency} {formatIDR(p.amount)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={cn(
-                            "font-mono text-[10px] uppercase tracking-widest2",
-                            p.status === "paid" ? "text-moss" : p.status === "failed" ? "text-blood-bright" : "text-white/40"
-                          )}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                    </tr>
+                <p className="mt-4 flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-num text-[40px] font-semibold leading-[44px] tracking-[-0.01em]">
+                    IDR {p.priceIDR === 0 ? "0" : formatIDR(p.priceIDR)}
+                  </span>
+                  <span className={cn("text-[14px]", yellow ? "text-black/55" : "text-white/40")}>/ {p.cadence}</span>
+                </p>
+                <ul className={cn("mt-5 flex-1 divide-y text-[14px] leading-[21px]", yellow ? "divide-black/10" : "divide-white/[0.07] text-white/75")}>
+                  {p.features.map((f) => (
+                    <li key={f} className="py-2">
+                      {f}
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-
-        <div className="mt-12 border border-gray-3 bg-gray-2/30 p-4 font-mono text-[10px] uppercase tracking-widest2 text-white/50 sm:p-6">
-          ALL PRICING IN INDONESIAN RUPIAH (IDR). ANNUAL BILLING IS A
-          DELIBERATE FILTER — ANYONE UNWILLING TO COMMIT A YEAR IS NOT THE
-          TARGET AUDIENCE. NO PRO-RATING. NO REFUNDS.
+                </ul>
+                <div className="mt-5">
+                  {p.id === "free" ? (
+                    <button
+                      ref={confirmDownRef}
+                      type="button"
+                      onClick={downgrade}
+                      disabled={!paid || isPending}
+                      className={cn(
+                        "flex h-11 w-full items-center justify-center rounded-full border text-[14px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand disabled:cursor-not-allowed",
+                        confirmingDown ? "border-down text-down" : "border-white/[0.14] text-white hover:bg-raised disabled:text-white/40 disabled:hover:bg-transparent",
+                      )}
+                    >
+                      {!paid ? "Current tier" : confirmingDown ? "Confirm downgrade, lose access" : "Downgrade"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="flex h-11 w-full cursor-not-allowed items-center justify-center rounded-full bg-black text-[14px] font-semibold text-white/80"
+                    >
+                      {paid ? "Active until renewal" : "Contact to get access"}
+                    </button>
+                  )}
+                </div>
+              </section>
+            );
+          })}
         </div>
+
+        <Panel title="Payment history" sub={history.length ? `${history.length} transactions` : undefined}>
+          {history.length === 0 ? (
+            <p className="py-8 text-center text-[14px] text-white/40">Payment history will appear here once billing is active.</p>
+          ) : (
+            <ul className="-my-1 divide-y divide-white/[0.07]">
+              {history.map((p) => (
+                <li key={p.id} className="flex items-center gap-4 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-medium text-white">{p.tier === "vip" ? "VIP+ Trader" : p.tier}</p>
+                    <p className="text-[13px] text-white/40">{fmtDate(p.paidAt ?? p.createdAt)}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="font-num text-[20px] font-semibold leading-6 text-white">
+                      {p.currency} {formatIDR(p.amount)}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-[12px] font-semibold uppercase tracking-[0.06em]",
+                        p.status === "paid" ? "text-up" : p.status === "failed" ? "text-down" : "text-white/40",
+                      )}
+                    >
+                      {p.status}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
       </div>
+
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Your access">
+          <dl className="-my-1 divide-y divide-white/[0.07] text-[14px]">
+            {[
+              ["Tier", paid ? "VIP+ Trader" : "Free", paid ? "text-white" : "text-white/55"],
+              ["Cadence", paid ? "1-year" : "None", "text-white/75"],
+              ["Renews", renewsAt ? fmtDate(renewsAt) : "None", "text-white/75"],
+              ["Liability", liabilitySigned ? "Signed" : "Unsigned", liabilitySigned ? "text-up" : "text-down"],
+            ].map(([k, v, tone]) => (
+              <div key={k} className="flex items-center justify-between py-2.5">
+                <dt className="text-white/40">{k}</dt>
+                <dd className={cn("font-medium", tone)}>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </Panel>
+
+        {!PAYMENTS_ENABLED && !paid && (
+          <Panel title="Access by request">
+            <p className="text-[14px] leading-[21px] text-white/55">
+              Self-serve payment is temporarily disabled. To get VIP+ Trader access, contact us and we&apos;ll set you up.
+            </p>
+          </Panel>
+        )}
+
+        <Panel title="Billing terms">
+          <p className="text-[14px] leading-[21px] text-white/55">
+            All pricing in Indonesian Rupiah. Annual billing is a deliberate filter: anyone unwilling to commit a year is not the target audience. No pro-rating, no refunds.
+          </p>
+        </Panel>
+      </aside>
     </div>
   );
 }

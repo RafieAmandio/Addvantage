@@ -1,4 +1,5 @@
-import { cn, formatDate } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { cn } from "@/lib/cn";
 import {
   compactUsd,
   daysUntil,
@@ -6,154 +7,65 @@ import {
   type UnlocksData,
 } from "@/features/unlocks/types";
 
-export function UnlocksHeader({ count }: { count: number | null }) {
+const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
+
+/** Calendar-style date block (WIB): month eyebrow over a condensed day number. */
+export function DateBlock({ iso, approx = false }: { iso: string; approx?: boolean }) {
+  const d = new Date(iso);
+  const month = d.toLocaleDateString("en-GB", { timeZone: "Asia/Jakarta", month: "short" });
+  const day = d.toLocaleDateString("en-GB", { timeZone: "Asia/Jakarta", day: "2-digit" });
   return (
-    <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-      <div className="flex items-center gap-3">
-        <h1 className="font-mono text-lg font-bold text-white">Token Unlocks</h1>
-        {count !== null && count > 0 && (
-          <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
-            <span className="led" aria-hidden />
-            {count} critical
-          </span>
-        )}
-      </div>
-      <p className="mt-1 text-xs text-white/30">
-        Supply-shock radar: unlock events above 4.9% of circulating supply, top-200
-        market cap only, next 90 days. Large unlocks precede sell pressure.
+    <div className="w-11 shrink-0 text-center">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40">{month}</p>
+      <p className="font-num text-[26px] font-semibold leading-7 text-white">
+        {approx && <span className="text-white/40">~</span>}
+        {day}
       </p>
     </div>
   );
 }
 
-function Countdown({ iso }: { iso: string }) {
+export function countdownLabel(iso: string, approx = false): string {
   const days = daysUntil(iso);
-  return (
-    <span
-      className={cn(
-        "font-mono text-[11px] font-bold uppercase tracking-widest2",
-        days <= 7 ? "text-brand" : "text-white/60",
-      )}
-    >
-      {days === 0 ? "TODAY" : `IN ${days}D`}
-    </span>
-  );
+  if (days === 0) return "Today";
+  return `In ${approx ? "~" : ""}${days} ${days === 1 ? "day" : "days"}`;
 }
 
-function PctBadge({ pct }: { pct: number }) {
+function UnlockRow({ e }: { e: UnlockEvent }) {
+  const days = daysUntil(e.unlockAt);
   return (
-    <span
-      className={cn(
-        "font-mono text-sm font-bold tabular-nums",
-        pct > 10 ? "text-blood-bright" : "text-white",
-      )}
-    >
-      {pct.toFixed(1)}%
-    </span>
-  );
-}
-
-function CategoryTags({ categories }: { categories: string[] }) {
-  return (
-    <span className="flex flex-wrap justify-end gap-1">
-      {categories.map((c) => (
-        <span
-          key={c}
-          className="border border-white/[0.08] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50"
-        >
-          {c}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-function dateLabel(iso: string): string {
-  return formatDate(iso);
-}
-
-function DesktopTable({ events }: { events: UnlockEvent[] }) {
-  return (
-    <table className="w-full border-collapse">
-      <thead>
-        <tr className="border-b border-white/[0.06] font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-          <th className="px-6 py-3 text-left">Unlock</th>
-          <th className="px-3 py-3 text-left">Token</th>
-          <th className="px-3 py-3 text-right">Rank</th>
-          <th className="px-3 py-3 text-right">% of supply</th>
-          <th className="px-3 py-3 text-right">~Value</th>
-          <th className="px-6 py-3 text-right">Allocation</th>
-        </tr>
-      </thead>
-      <tbody>
-        {events.map((e) => (
-          <tr
-            key={`${e.geckoId}-${e.unlockAt}`}
-            className="border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]"
-          >
-            <td className="px-6 py-4">
-              <Countdown iso={e.unlockAt} />
-              <div className="mt-0.5 font-mono text-[10px] text-white/30">
-                {dateLabel(e.unlockAt)}
-              </div>
-            </td>
-            <td className="px-3 py-4">
-              <span className="font-mono text-sm font-bold text-white">{e.symbol}</span>
-              <span className="ml-2 text-xs text-white/40">{e.name}</span>
-            </td>
-            <td className="px-3 py-4 text-right font-mono text-xs tabular-nums text-white/40">
-              #{e.mcapRank}
-            </td>
-            <td className="px-3 py-4 text-right">
-              <PctBadge pct={e.pctSupply} />
-            </td>
-            <td className="px-3 py-4 text-right font-mono text-sm tabular-nums text-white/70">
-              {compactUsd(e.usdValue)}
-            </td>
-            <td className="px-6 py-4 text-right">
-              <CategoryTags categories={e.categories} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function MobileList({ events }: { events: UnlockEvent[] }) {
-  return (
-    <div>
-      {events.map((e) => (
-        <div
-          key={`${e.geckoId}-${e.unlockAt}`}
-          className="border-b border-white/[0.06] px-4 py-4"
-        >
-          <div className="flex items-baseline justify-between">
-            <div>
-              <span className="font-mono text-sm font-bold text-white">{e.symbol}</span>
-              <span className="ml-2 text-xs text-white/40">#{e.mcapRank}</span>
-            </div>
-            <Countdown iso={e.unlockAt} />
-          </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <PctBadge pct={e.pctSupply} />
-            <span className="font-mono text-xs tabular-nums text-white/60">
-              {compactUsd(e.usdValue)}
+    <li className="flex items-center gap-4 py-3.5">
+      <DateBlock iso={e.unlockAt} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate">
+          <span className="text-[15px] font-semibold text-white">{e.symbol}</span>
+          <span className="ml-2 text-[13px] text-white/40">
+            {e.name}
+            <span className="px-1.5 text-white/20">/</span>#{e.mcapRank}
+          </span>
+        </p>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <span className={cn("mr-1 text-[13px] font-medium", days <= 7 ? "text-brand" : "text-white/55")}>
+            {countdownLabel(e.unlockAt)}
+          </span>
+          {e.categories.map((c) => (
+            <span key={c} className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] capitalize text-white/60">
+              {c}
             </span>
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="font-mono text-[10px] text-white/30">
-              {dateLabel(e.unlockAt)}
-            </span>
-            <CategoryTags categories={e.categories} />
-          </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+      <div className="shrink-0 text-right">
+        <p className={cn("font-num text-[24px] font-semibold leading-7", e.pctSupply > 10 ? "text-down" : "text-white")}>
+          {e.pctSupply.toFixed(1)}%
+        </p>
+        <p className="text-[12px] text-white/40">{compactUsd(e.usdValue)}</p>
+      </div>
+    </li>
   );
 }
 
-function relativeSync(iso: string | null): string {
+export function relativeSync(iso: string | null): string {
   if (!iso) return "never";
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
   if (mins < 60) return `${mins}m ago`;
@@ -162,40 +74,69 @@ function relativeSync(iso: string | null): string {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-export function ContextFooter({ data }: { data: UnlocksData }) {
+/** Page grid shared by the live, empty, unavailable and locked states. */
+export function UnlocksShell({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
   return (
-    <div className="border-t border-white/[0.06] px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:px-6">
-      tracking {data.trackedTop200} of top-200 · source: defillama · synced{" "}
-      {relativeSync(data.updatedAt)}
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">{children}</div>
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        {aside}
+        <Panel title="How it works">
+          <p className="text-[14px] leading-[21px] text-white/55">
+            Unlock events above 4.9% of circulating supply, top-200 market cap only, next 90 days. Large unlocks tend to precede sell pressure.
+          </p>
+        </Panel>
+      </aside>
     </div>
+  );
+}
+
+function Summary({ data }: { data: UnlocksData }) {
+  const total = data.events.reduce((s, e) => s + e.usdValue, 0);
+  const week = data.events.filter((e) => daysUntil(e.unlockAt) <= 7).length;
+  const largest = data.events.reduce<UnlockEvent | null>((m, e) => (!m || e.pctSupply > m.pctSupply ? e : m), null);
+  const stats: [string, React.ReactNode, string?][] = [
+    ["On radar", data.events.length],
+    ["This week", week, week > 0 ? "text-brand" : undefined],
+    ["Value", compactUsd(total)],
+    ["Largest", largest ? `${largest.pctSupply.toFixed(1)}%` : "0%", largest && largest.pctSupply > 10 ? "text-down" : undefined],
+  ];
+  return (
+    <Panel title="Next 90 days" sub={`Tracking ${data.trackedTop200} of top-200, synced ${relativeSync(data.updatedAt)}`}>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+        {stats.map(([k, v, tone]) => (
+          <div key={k}>
+            <dt className={EYEBROW}>{k}</dt>
+            <dd className={cn("font-num text-[28px] font-semibold leading-8 text-white", tone)}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {largest && (
+        <p className="mt-3 text-[13px] text-white/55">
+          Largest: {largest.symbol}, {countdownLabel(largest.unlockAt).toLowerCase()}
+        </p>
+      )}
+      <p className="mt-3 text-[12px] text-white/30">Source: DefiLlama</p>
+    </Panel>
   );
 }
 
 export function UnlocksView({ data }: { data: UnlocksData }) {
   return (
-    <div className="min-h-screen">
-      <UnlocksHeader count={data.events.length} />
-      {data.events.length === 0 ? (
-        <div className="px-4 py-20 text-center sm:px-6">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            ● No critical unlocks on radar
-          </div>
-          <p className="mt-3 text-sm text-white/30">
-            No top-200 unlock above {data.minPctSupply}% of circulating supply in the
-            next {data.horizonDays} days.
+    <UnlocksShell aside={<Summary data={data} />}>
+      <Panel title="Upcoming unlocks" sub="Soonest first, dates in WIB. Right: % of circulating supply and value.">
+        {data.events.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-white/40">
+            No top-200 unlock above {data.minPctSupply}% of circulating supply in the next {data.horizonDays} days.
           </p>
-        </div>
-      ) : (
-        <>
-          <div className="hidden md:block">
-            <DesktopTable events={data.events} />
-          </div>
-          <div className="md:hidden">
-            <MobileList events={data.events} />
-          </div>
-        </>
-      )}
-      <ContextFooter data={data} />
-    </div>
+        ) : (
+          <ul className="-my-1 divide-y divide-white/[0.07]">
+            {data.events.map((e) => (
+              <UnlockRow key={`${e.geckoId}-${e.unlockAt}`} e={e} />
+            ))}
+          </ul>
+        )}
+      </Panel>
+    </UnlocksShell>
   );
 }
