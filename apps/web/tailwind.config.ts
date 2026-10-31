@@ -18,7 +18,7 @@ const config: Config = {
         },
         // Black — page backgrounds
         black: {
-          DEFAULT: "#111111",
+          DEFAULT: "#0A0A0A",
           2: "#1A1A1A",
           3: "#222222",
         },
@@ -41,13 +41,21 @@ const config: Config = {
           bright: "#E03C3C",
           text: "#fda4af",
         },
+        // Revamp surfaces (Kalshi-dark ladder, neutral black)
+        panel: "#121212",
+        raised: "#1A1A1A",
+        // Direction only: never brand
+        up: "#00DD94",
+        down: "#FF454D",
         moss: "#65A30D",
         steel: "#6B7280",
         wire: "#383E47",
       },
       fontFamily: {
         display: ['"Inter"', "system-ui", "sans-serif"],
-        sans: ['"Inter"', "system-ui", "sans-serif"],
+        sans: ['"Geist"', '"Inter"', "system-ui", "sans-serif"],
+        // Condensed numerals + page titles
+        num: ['"Barlow Condensed"', '"Roboto Condensed"', '"Arial Narrow"', "sans-serif"],
         mono: ['"Intel One Mono"', "ui-monospace", "monospace"],
         serif: ['"Fraunces"', "Georgia", "serif"],
       },

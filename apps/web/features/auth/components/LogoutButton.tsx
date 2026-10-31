@@ -4,9 +4,10 @@ import { logoutAction } from "@/features/auth/actions";
 
 interface LogoutButtonProps {
   className?: string;
+  children?: React.ReactNode;
 }
 
-export function LogoutButton({ className }: LogoutButtonProps) {
+export function LogoutButton({ className, children }: LogoutButtonProps) {
   return (
     <form action={logoutAction}>
       <button
@@ -16,7 +17,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
           "font-mono text-[10px] uppercase tracking-widest2 text-white/60 underline decoration-brand/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
         }
       >
-        Logout →
+        {children ?? "Logout →"}
       </button>
     </form>
   );
