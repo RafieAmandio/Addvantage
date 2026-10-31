@@ -15,9 +15,9 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 const inputClass =
-  "mt-2 w-full rounded-lg border border-gray-3 bg-gray-2 px-4 py-3 font-mono text-base text-white shadow-none outline-none transition-all duration-200 placeholder:text-white/25 focus-visible:border-brand focus-visible:shadow-[0_0_0_3px_rgba(255,212,0,0.15)] focus-visible:ring-0";
+  "mt-2 h-11 w-full rounded-full bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] transition-shadow placeholder:text-white/25 focus-visible:ring-brand";
 
-const labelClass = "block font-mono text-sm font-bold text-white";
+const labelClass = "block text-[13px] font-medium text-white/70";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -26,7 +26,7 @@ function SubmitButton() {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="btn-pixel mt-8 flex w-full items-center justify-center gap-2.5 rounded-lg bg-brand py-4 font-mono text-base font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.98] disabled:cursor-wait"
+      className="mt-6 flex h-11 w-full items-center justify-center gap-2.5 rounded-full bg-brand text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -49,7 +49,7 @@ export function ChangePasswordForm() {
 
   return (
     <form action={formAction} className="w-full max-w-md">
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div>
           <label htmlFor="currentPassword" className={labelClass}>
             Current password
@@ -76,7 +76,7 @@ export function ChangePasswordForm() {
             autoComplete="new-password"
             className={inputClass}
           />
-          <p className="mt-2 font-mono text-xs text-white/35">At least 8 characters.</p>
+          <p className="mt-2 text-[12px] text-white/40">At least 8 characters.</p>
         </div>
         <div>
           <label htmlFor="confirmPassword" className={labelClass}>
@@ -93,12 +93,12 @@ export function ChangePasswordForm() {
         </div>
 
         {state.error && (
-          <div role="alert" className="font-mono text-sm text-blood-bright">
+          <div role="alert" className="text-[13px] text-down">
             ● {ERROR_MESSAGES[state.error] ?? "SYSTEM FAULT. Retry."}
           </div>
         )}
         {state.ok && (
-          <div role="status" className="font-mono text-sm text-moss">
+          <div role="status" className="text-[13px] text-up">
             ● Password changed. Use it next time you sign in.
           </div>
         )}
