@@ -11,26 +11,30 @@ import {
   filterNewsByWatch,
   filterSetupsByWatch,
 } from "@/features/dashboard/lib/watchlist-mentions";
-import { DashboardHero } from "@/features/dashboard/components/DashboardHero";
-import { PredictionGrid } from "@/features/predictions/components/PredictionGrid";
-import { CalendarStrip } from "@/features/dashboard/components/CalendarStrip";
-import { ActivePlanSection } from "@/features/dashboard/components/ActivePlanSection";
 import { WatchlistSection } from "@/features/dashboard/components/WatchlistSection";
-import { NewsRows } from "@/features/dashboard/components/NewsRows";
 import { BulletinSection } from "@/features/bulletin/components/BulletinSection";
+import { PriceStrip } from "@/features/dashboard/components/PriceStrip";
+import { ConsensusHero, type ConsensusMarket } from "@/features/dashboard/components/ConsensusHero";
+import { PlanCard } from "@/features/dashboard/components/PlanCard";
+import { CalendarPanel } from "@/features/dashboard/components/CalendarPanel";
+import { RangePanel } from "@/features/dashboard/components/RangePanel";
+import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan } from "@/features/plan/types";
-import type { PredictionCardData } from "@/features/predictions/types";
 import type { Bulletin } from "@/features/bulletin/types";
+import type { AtrScannerData } from "@/features/atr/types";
+import type { CalendarEvent } from "@/features/calendar/types";
 
 interface Props {
   news: NewsListItem[];
   plans: Plan[];
-  predictions: PredictionCardData[];
   bulletins: Bulletin[];
+  consensus: ConsensusMarket[];
+  atr: AtrScannerData;
+  calendar: CalendarEvent[];
 }
 
-export function DashboardClient({ news, plans, predictions, bulletins }: Props) {
+export function DashboardClient({ news, plans, bulletins, consensus, atr, calendar }: Props) {
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
   const { ids: seenNewsIds, hydrated: seenHydrated } = useSeenNews();
@@ -80,25 +84,38 @@ export function DashboardClient({ news, plans, predictions, bulletins }: Props) 
   const openSetups = plan?.setups.length ?? 0;
 
   return (
-    <div className="stagger">
-      <DashboardHero
-        stamp={stamp}
-        greet={greet}
-        operatorName={operatorName}
-        highImpactToday={highImpactToday}
-        openSetups={openSetups}
-      />
+    <div className="flex flex-col gap-4 px-4 pb-10 sm:px-6">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pt-1">
+        <p className="font-num text-[30px] font-semibold leading-8 text-white">
+          {greet}, <span className="text-brand">{operatorName}</span>
+        </p>
+        <div className="flex items-center gap-4 text-[13px] text-white/55">
+          {stamp && <span>{stamp}</span>}
+          <span><b className="font-semibold text-white">{highImpactToday}</b> high-impact items</span>
+          <span><b className="font-semibold text-white">{openSetups}</b> open setups</span>
+        </div>
+      </div>
 
-      <PredictionGrid
-        predictions={predictions.length > 0 ? predictions : null}
-        className="py-5"
-      />
+      <PriceStrip pairs={atr.pairs} updatedAt={atr.updatedAt} />
 
-      <CalendarStrip />
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-2">
+          <ConsensusHero markets={consensus} />
+        </div>
+        <PlanCard plan={plan} paid={paid} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="min-w-0 lg:col-span-2">
+          <NewsPanel news={news} seen={seenHydrated ? new Set(seenNewsIds) : new Set()} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-4">
+          <CalendarPanel events={calendar} />
+          <RangePanel pairs={atr.pairs} />
+        </div>
+      </div>
 
       <BulletinSection bulletins={bulletins} />
-
-      <ActivePlanSection plan={plan} paid={paid} />
 
       <WatchlistSection
         tickers={tickers}
@@ -107,12 +124,6 @@ export function DashboardClient({ news, plans, predictions, bulletins }: Props) 
         watchSetupMentions={watchSetupMentions}
         watchArchiveSetups={watchArchiveSetups}
         planId={plan?.id ?? null}
-      />
-
-      <NewsRows
-        news={news}
-        seenNewsIds={seenNewsIds}
-        seenHydrated={seenHydrated}
       />
     </div>
   );
