@@ -8,11 +8,12 @@ import { ScrollableConversation } from "@/features/consult/components/Scrollable
 import type { ConsultMessage, ConsultMessageRow } from "@/features/consult/types";
 import type { AdminConsultSession, AdminConsultStats } from "@/features/consult/queries/admin";
 import { rowToMessage } from "@/features/consult/lib/mappers";
+import { TextTabs } from "@/components/ui/TextTabs";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  open: { label: "OPEN", color: "text-moss" },
-  awaiting_reply: { label: "AWAITING", color: "text-brand" },
-  closed: { label: "CLOSED", color: "text-white/30" },
+  open: { label: "Open", color: "text-up" },
+  awaiting_reply: { label: "Awaiting reply", color: "text-brand" },
+  closed: { label: "Closed", color: "text-white/30" },
 };
 
 type FilterTab = "all" | "awaiting_reply" | "closed";
@@ -149,110 +150,100 @@ export function AdminConsultView({
   }, [messages]);
 
   return (
-    <div>
-      {/* Stats header */}
-      <div className="mb-6 flex flex-wrap items-center gap-6 font-mono text-[10px] uppercase tracking-widest2">
-        <span className="text-white/40">
-          Open: <span className="text-moss">{stats.open}</span>
-        </span>
-        <span className="text-white/40">
-          Awaiting reply: <span className="text-brand">{stats.awaitingReply}</span>
-        </span>
-        <span className="text-white/40">
-          Unread: <span className="text-blood-bright">{stats.unread}</span>
-        </span>
-      </div>
-
-      {/* Filter tabs */}
-      <div className="mb-4 flex gap-3 font-mono text-[10px] uppercase tracking-widest2">
-        {(["all", "awaiting_reply", "closed"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={cn(
-              "border px-3 py-1 transition-colors",
-              filter === tab
-                ? "border-brand bg-brand/10 text-brand"
-                : "border-gray-3 text-white/40 hover:text-white"
-            )}
-          >
-            {tab === "all" ? "ALL" : tab === "awaiting_reply" ? "AWAITING" : "CLOSED"}
-          </button>
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { label: "Open", value: stats.open, color: "text-white" },
+          { label: "Awaiting reply", value: stats.awaitingReply, color: "text-brand" },
+          { label: "Unread", value: stats.unread, color: stats.unread > 0 ? "text-down" : "text-white" },
+        ].map((k) => (
+          <div key={k.label} className="rounded-2xl bg-panel px-5 py-4">
+            <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">{k.label}</div>
+            <div className={cn("mt-1 font-num text-[32px] font-semibold leading-none", k.color)}>{k.value}</div>
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
         {/* Session list */}
-        <aside className="col-span-12 lg:col-span-4 max-h-[75vh] overflow-y-auto space-y-px bg-gray-3">
-          {filteredSessions.length === 0 && (
-            <div className="bg-black p-6 text-center font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-              No sessions
-            </div>
-          )}
-          {filteredSessions.map((s) => {
-            const statusInfo = STATUS_LABELS[s.status] ?? STATUS_LABELS.open;
-            return (
-              <button
-                key={s.id}
-                onClick={() => selectSession(s.id)}
-                className={cn(
-                  "block w-full bg-black p-3 text-left transition-colors hover:bg-gray-2",
-                  s.id === activeId && "border-l-2 border-brand bg-gray-2"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                    {s.user.handle ?? s.user.email}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {s.unreadAdmin && (
-                      <span className="inline-block h-2 w-2 rounded-full bg-brand" title="Unread" />
-                    )}
-                    <span className={cn("font-mono text-[8px] uppercase tracking-widest2", statusInfo.color)}>
-                      {statusInfo.label}
+        <aside className="flex min-w-0 flex-col rounded-2xl bg-panel p-5 lg:max-h-[75vh]">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-[15px] font-semibold text-white">Sessions</h2>
+            <TextTabs
+              label="Filter sessions"
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { id: "all", label: "All" },
+                { id: "awaiting_reply", label: "Awaiting" },
+                { id: "closed", label: "Closed" },
+              ]}
+            />
+          </div>
+          <div className="-mx-5 max-h-[50vh] divide-y divide-white/[0.07] overflow-y-auto border-t border-white/[0.07] lg:max-h-none">
+            {filteredSessions.length === 0 && (
+              <p className="px-5 py-8 text-center text-[14px] text-white/40">No sessions</p>
+            )}
+            {filteredSessions.map((s) => {
+              const statusInfo = STATUS_LABELS[s.status] ?? STATUS_LABELS.open;
+              const active = s.id === activeId;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => selectSession(s.id)}
+                  aria-current={active || undefined}
+                  className={cn(
+                    "block w-full px-5 py-3 text-left transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand",
+                    active && "bg-raised shadow-[inset_2px_0_0_#FFD400]",
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-[13px] text-white/55">{s.user.handle ?? s.user.email}</span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      {s.unreadAdmin && <span className="inline-block h-2 w-2 bg-brand" title="Unread" />}
+                      <span className={cn("text-[12px] font-medium", statusInfo.color)}>{statusInfo.label}</span>
                     </span>
                   </div>
-                </div>
-                <div className="mt-1 text-sm text-white truncate">{s.title}</div>
-                <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                  {formatDate(s.updatedAt)} · {s._count.messages} msgs
-                </div>
-              </button>
-            );
-          })}
+                  <div className="mt-0.5 truncate text-[14px] font-medium text-white">{s.title}</div>
+                  <div className="mt-0.5 text-[12px] text-white/30">
+                    {formatDate(s.updatedAt)} · {s._count.messages} msgs
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </aside>
 
         {/* Conversation */}
-        <section className="col-span-12 flex h-[75vh] flex-col border border-gray-3 lg:col-span-8">
+        <section className={cn("flex min-w-0 flex-col overflow-hidden rounded-2xl bg-panel lg:h-[75vh]", activeSession ? "h-[75vh]" : "h-40")}>
           {!activeSession ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-                Select a session to view
-              </div>
+            <div className="flex h-full items-center justify-center text-[14px] text-white/40">
+              Select a session to view
             </div>
           ) : (
             <>
-              <div className="border-b border-gray-3 bg-gray-2/40 px-5 py-3">
+              <div className="border-b border-white/[0.07] px-5 py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+                    <div className="truncate text-[13px] text-white/55">
                       {activeSession.user.handle ?? activeSession.user.email}
                     </div>
-                    <div className="mt-1 font-display text-lg text-white">
-                      {activeSession.title}
-                    </div>
-                    <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2">
-                      <span className={STATUS_LABELS[activeSession.status]?.color ?? "text-white/30"}>
-                        {STATUS_LABELS[activeSession.status]?.label ?? activeSession.status}
-                      </span>
+                    <div className="mt-0.5 text-[17px] font-semibold leading-[24px] text-white">{activeSession.title}</div>
+                    <div
+                      className={cn(
+                        "mt-0.5 text-[12px] font-medium",
+                        STATUS_LABELS[activeSession.status]?.color ?? "text-white/30",
+                      )}
+                    >
+                      {STATUS_LABELS[activeSession.status]?.label ?? activeSession.status}
                     </div>
                   </div>
                   {activeSession.status !== "closed" && (
                     <button
                       onClick={closeSession}
-                      className="shrink-0 border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                      className="shrink-0 rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white transition-colors hover:bg-raised hover:text-down focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                     >
-                      Close Session
+                      Close session
                     </button>
                   )}
                 </div>
@@ -260,10 +251,8 @@ export function AdminConsultView({
 
               <ScrollableConversation bottomRef={endRef} messages={messages}>
                 {messages.length === 0 && (
-                  <div className="flex h-full min-h-[200px] items-center justify-center">
-                    <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-                      No messages yet
-                    </div>
+                  <div className="flex h-full min-h-[200px] items-center justify-center text-[14px] text-white/40">
+                    No messages yet
                   </div>
                 )}
                 {messages.map((m) => (
@@ -273,7 +262,7 @@ export function AdminConsultView({
               </ScrollableConversation>
 
               {activeSession.status !== "closed" && (
-                <div className="border-t border-gray-3 bg-gray-2/40 p-4">
+                <div className="border-t border-white/[0.07] p-4">
                   <div className="flex items-end gap-3">
                     <textarea
                       value={draft}
@@ -285,25 +274,19 @@ export function AdminConsultView({
                         }
                       }}
                       rows={2}
-                      placeholder="Reply as the desk…"
-                      className="flex-1 resize-none border border-gray-3 bg-black p-3 font-mono text-sm text-white placeholder:text-white/30 outline-none transition-colors focus-visible:border-brand"
+                      aria-label="Reply"
+                      placeholder="Reply as the desk"
+                      className="min-w-0 flex-1 resize-none rounded-xl bg-raised px-4 py-3 text-[15px] leading-[22px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand"
                     />
                     <button
                       onClick={sendReply}
                       disabled={sending || !draft.trim()}
-                      className={cn(
-                        "px-5 py-3 font-mono text-[10px] uppercase tracking-widest2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                        sending || !draft.trim()
-                          ? "bg-gray-3 text-white/30 cursor-not-allowed"
-                          : "bg-brand text-black hover:bg-brand-dim hover:text-white"
-                      )}
+                      className="inline-flex h-11 shrink-0 items-center rounded-full bg-brand px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                     >
-                      {sending ? "Sending…" : "Reply →"}
+                      {sending ? "Sending" : "Reply"}
                     </button>
                   </div>
-                  <div className="mt-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                    Enter to send · Shift+Enter for newline
-                  </div>
+                  <div className="mt-2 text-[12px] text-white/30">Enter to send, Shift+Enter for a new line</div>
                 </div>
               )}
             </>

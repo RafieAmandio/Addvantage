@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/session";
 import { listBulletinsForAdmin } from "@/features/bulletin/admin/queries";
+import { Panel } from "@/components/ui/Panel";
+import { BiasBadge } from "@/components/ui/Marker";
+import { StructureStrip } from "@/features/bulletin/components/StructureStrip";
 
 export const metadata: Metadata = { title: "Bulletin" };
 export const dynamic = "force-dynamic";
@@ -17,52 +20,55 @@ export default async function AdminBulletinPage() {
   const bulletins = await listBulletinsForAdmin();
 
   return (
-    <div className="stagger mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-6 flex items-baseline justify-between">
-        <h1 className="font-display text-4xl text-white">
-          Bulletin <span className="italic text-brand">board</span>
-        </h1>
-        <div className="flex items-center gap-3">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            {bulletins.length} total
-          </div>
+    <div className="space-y-4">
+      <Panel
+        title="Bulletin board"
+        sub={`${bulletins.length} instruments`}
+        action={
           <Link
             href="/admin/bulletin/new"
-            className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-9 items-center rounded-full bg-brand px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            + New instrument
+            New instrument
           </Link>
-        </div>
-      </div>
-
-      {bulletins.length === 0 ? (
-        <div className="flex min-h-[20vh] items-center justify-center border border-gray-3 bg-black font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          No instruments yet — add the first
-        </div>
-      ) : (
-        <div className="border-t border-gray-3">
-          {bulletins.map((b) => (
-            <Link
-              key={b.id}
-              href={`/admin/bulletin/${b.id}`}
-              className="grid grid-cols-[6rem_1fr_auto_auto] items-center gap-4 border-b border-gray-3 bg-black px-4 py-3 transition-colors hover:bg-white/[0.02] sm:gap-6 sm:px-6"
-            >
-              <span className="font-mono text-sm font-bold uppercase tracking-widest2 text-white">
-                {b.symbol}
-              </span>
-              <span className="truncate font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                {STATUS_LABEL[b.status] ?? b.status} · {b.bias}
-              </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                {b.levels.length} tf
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                Edit →
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
+        }
+      >
+        {bulletins.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-white/40">No instruments yet. Add the first one.</p>
+        ) : (
+          <div className="-mx-5 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+            {bulletins.map((b) => (
+              <Link
+                key={b.id}
+                href={`/admin/bulletin/${b.id}`}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-3 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand md:grid-cols-[8rem_7rem_minmax(0,1fr)_auto]"
+              >
+                <div className="min-w-0">
+                  <div className="font-num text-[20px] font-semibold uppercase leading-tight text-white">{b.symbol}</div>
+                  <div className="text-[12px] text-white/55 md:hidden">
+                    {STATUS_LABEL[b.status] ?? b.status} · {b.levels.length} timeframes
+                  </div>
+                </div>
+                <div className="hidden md:block">
+                  <div className={b.status === "active" ? "text-[13px] font-medium text-brand" : "text-[13px] font-medium text-white/55"}>
+                    {STATUS_LABEL[b.status] ?? b.status}
+                  </div>
+                  <BiasBadge bias={b.bias} />
+                </div>
+                <div className="hidden max-w-[420px] md:block">
+                  <StructureStrip levels={b.levels} size={18} showBos={false} />
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="md:hidden">
+                    <BiasBadge bias={b.bias} />
+                  </span>
+                  <span className="rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white">Edit</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </Panel>
     </div>
   );
 }

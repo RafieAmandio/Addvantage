@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
+import { Panel } from "@/components/ui/Panel";
 
 interface MeetLink {
   slug: string;
@@ -71,40 +72,21 @@ export default function AdminMeetPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          ● Loading Meet Link
-        </div>
+      <div className="space-y-4">
+        <div className="h-48 max-w-2xl animate-pulse rounded-2xl bg-panel" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div>
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          Shortlink · Redirect
-        </span>
-        <h1 className="mt-2 font-mono text-2xl font-bold text-white">Meet Link</h1>
-        <p className="mt-2 max-w-2xl font-mono text-sm font-light text-white/50">
-          <span className="text-white/70">meet.tradevantage.gg</span> redirects here. Changes go
-          live within a minute, no redeploy.
-        </p>
-      </div>
-
-      <div className="mt-8 h-px bg-white/20" />
-
-      <div className="mt-6 max-w-2xl border border-brand/40 bg-black p-6">
-        {error && (
-          <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-            {error}
-          </div>
-        )}
-
+    <div className="space-y-4">
+      <Panel
+        className="max-w-2xl"
+        title="Meet link"
+        sub="meet.tradevantage.gg redirects here. Changes go live within a minute, no redeploy."
+      >
         <label className="block">
-          <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            Redirect Target (Zoom URL)
-          </span>
+          <span className="block text-[13px] font-medium text-white/70">Redirect target (Zoom URL)</span>
           <input
             value={url}
             onChange={(e) => {
@@ -112,39 +94,36 @@ export default function AdminMeetPage() {
               setSaved(false);
             }}
             placeholder="https://zoom.us/j/..."
-            className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+            className="mt-2 h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand"
           />
         </label>
 
-        <div className="mt-3 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             onClick={onSave}
             disabled={saving || !url.trim() || !dirty}
-            className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-11 items-center rounded-full bg-brand px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving" : "Save"}
           </button>
-          {saved && !dirty && (
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-moss">
-              ● Saved
-            </span>
-          )}
+          {saved && !dirty && <span className="text-[13px] text-up">Saved</span>}
+          {error && <span className="text-[13px] text-down">{error}</span>}
         </div>
 
         {link && (
-          <div className="mt-5 border-t border-white/10 pt-4 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            <div>Last updated {new Date(link.updatedAt).toLocaleString()}</div>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.07] pt-4 text-[13px] text-white/40">
+            <span>Last updated {new Date(link.updatedAt).toLocaleString()}</span>
             <a
               href="https://meet.tradevantage.gg"
               target="_blank"
               rel="noreferrer"
-              className="mt-1 inline-block text-white/30 transition-colors hover:text-brand"
+              className="rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white transition-colors hover:bg-raised"
             >
-              Test → meet.tradevantage.gg
+              Test meet.tradevantage.gg
             </a>
           </div>
         )}
-      </div>
+      </Panel>
     </div>
   );
 }

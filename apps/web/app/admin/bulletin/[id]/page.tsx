@@ -14,16 +14,14 @@ export default async function EditBulletinPage({ params }: { params: { id: strin
   if (!bulletin) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
-      <Link
-        href="/admin/bulletin"
-        className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
-      >
-        ← Bulletin
-      </Link>
-      <h1 className="mt-3 mb-8 font-display text-4xl text-white">
-        {bulletin.symbol} <span className="italic text-brand">bulletin</span>
-      </h1>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 text-[13px]">
+        <Link href="/admin/bulletin" className="font-medium text-white/55 transition-colors hover:text-white">
+          Bulletin
+        </Link>
+        <span className="text-white/25">/</span>
+        <span className="font-medium text-white">{bulletin.symbol}</span>
+      </div>
       <BulletinEditorForm bulletin={bulletin} />
     </div>
   );

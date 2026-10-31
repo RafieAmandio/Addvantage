@@ -76,27 +76,25 @@ export function SetupEditorCard({
   };
 
   return (
-    <div className="border border-gray-3 bg-gray-2/20 p-4">
+    <div className="rounded-xl bg-raised/60 p-4 ring-1 ring-white/[0.06]">
       <div className="mb-4 flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
+        <span className="font-num text-[18px] font-semibold text-white">
           {setup.id}
+          {setup.instrument && <span className="ml-2 text-white/55">{setup.instrument.toUpperCase()}</span>}
+          <span className={cn("ml-2 text-[14px] uppercase", setup.direction === "long" ? "text-up" : "text-down")}>
+            {setup.direction}
+          </span>
         </span>
         {canRemove && (
           <button
             type="button"
             onClick={onRemove}
-            className="font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-blood-bright"
+            className="rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white/70 transition-colors hover:bg-raised hover:text-down"
           >
             Remove
           </button>
         )}
       </div>
-
-      <SetupImageUpload
-        imageUrl={setup.imageUrl}
-        onUploaded={(url) => update("imageUrl", url)}
-        onRemoved={() => update("imageUrl", null)}
-      />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Label text="Instrument">
@@ -104,7 +102,7 @@ export function SetupEditorCard({
             value={setup.instrument}
             onChange={(e) => update("instrument", e.target.value)}
             placeholder="EURUSD, ES1!, BBCA"
-            className={INPUT}
+            className={cn(INPUT, "uppercase")}
           />
         </Label>
         <Label text="Direction">
@@ -143,7 +141,7 @@ export function SetupEditorCard({
           <input
             value={setup.entry}
             onChange={(e) => update("entry", e.target.value)}
-            placeholder="5,232 — 5,248 zone"
+            placeholder="5,232 to 5,248 zone"
             className={INPUT}
           />
         </Label>
@@ -158,13 +156,11 @@ export function SetupEditorCard({
       </div>
 
       <div className="mt-3">
-        <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-          Targets
-        </span>
-        <div className="space-y-2">
+        <span className={LABEL}>Targets</span>
+        <div className="mt-2 space-y-2">
           {setup.targets.map((t, i) => (
             <div key={i} className="flex items-center gap-2">
-              <span className="font-mono text-[9px] text-white/30">
+              <span className="w-6 shrink-0 font-num text-[15px] font-semibold text-white/40">
                 T{i + 1}
               </span>
               <input
@@ -177,20 +173,17 @@ export function SetupEditorCard({
                 <button
                   type="button"
                   onClick={() => removeTarget(i)}
-                  className="font-mono text-[9px] text-white/30 transition-colors hover:text-blood-bright"
+                  aria-label={`Remove target ${i + 1}`}
+                  className="h-8 w-8 shrink-0 rounded-full text-[15px] text-white/40 transition-colors hover:bg-raised hover:text-down"
                 >
-                  x
+                  ×
                 </button>
               )}
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={addTarget}
-          className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
-        >
-          + target
+        <button type="button" onClick={addTarget} className={cn(SMALL_BTN, "mt-2")}>
+          Add target
         </button>
       </div>
 
@@ -200,7 +193,7 @@ export function SetupEditorCard({
           onChange={(e) => update("invalidation", e.target.value)}
           rows={3}
           placeholder="What kills this setup"
-          className={cn(INPUT, PROSE, "leading-relaxed")}
+          className={TEXTAREA}
         />
       </Label>
 
@@ -210,50 +203,46 @@ export function SetupEditorCard({
           onChange={(e) => update("rationale", e.target.value)}
           rows={4}
           placeholder="Why this trade"
-          className={cn(INPUT, PROSE, "leading-relaxed")}
+          className={TEXTAREA}
         />
       </Label>
 
       <div className="mt-3">
-        <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-          Confidence
-        </span>
-        <div className="flex gap-1">
+        <span className={LABEL}>Confidence</span>
+        <div className="mt-2 flex items-center gap-1.5">
           {([1, 2, 3, 4, 5] as const).map((n) => (
             <button
               key={n}
               type="button"
               onClick={() => update("confidence", n)}
               className={cn(
-                "h-5 w-8 border transition-colors",
-                n <= setup.confidence
-                  ? "border-brand bg-brand"
-                  : "border-gray-3 bg-gray-2 hover:border-brand/40",
+                "h-3.5 w-3.5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white",
+                n <= setup.confidence ? "bg-brand" : "bg-white/[0.12] hover:bg-white/25",
               )}
               aria-label={`Confidence ${n}`}
+              aria-pressed={n <= setup.confidence}
             />
           ))}
-          <span className="ml-2 self-center font-mono text-[9px] text-white/40">
+          <span className="ml-2 font-num text-[16px] font-semibold text-white/70">
             {setup.confidence}/5
           </span>
         </div>
       </div>
 
       <div className="mt-3">
-        <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-          Tags
-        </span>
-        <div className="flex flex-wrap gap-1">
+        <span className={LABEL}>Tags</span>
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {HASHTAGS.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
+              aria-pressed={setup.tags.includes(tag)}
               className={cn(
-                "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors",
+                "rounded-full border px-2.5 py-0.5 text-[12px] transition-colors",
                 setup.tags.includes(tag)
-                  ? "border-brand bg-brand/20 text-brand"
-                  : "border-gray-3 text-white/40 hover:border-brand/40",
+                  ? "border-brand bg-brand text-black"
+                  : "border-white/[0.12] text-white/60 hover:text-white",
               )}
             >
               {tag}
@@ -261,6 +250,12 @@ export function SetupEditorCard({
           ))}
         </div>
       </div>
+
+      <SetupImageUpload
+        imageUrl={setup.imageUrl}
+        onUploaded={(url) => update("imageUrl", url)}
+        onRemoved={() => update("imageUrl", null)}
+      />
     </div>
   );
 }
@@ -307,27 +302,15 @@ function SetupImageUpload({
   };
 
   return (
-    <div className="mb-4">
-      <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-        Chart Image
-      </span>
-      {error && (
-        <div className="mb-2 border border-blood bg-blood/10 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-          {error}
-        </div>
-      )}
+    <div className="mt-4">
+      <span className={LABEL}>Chart image</span>
+      {error && <p className="mt-1 text-[13px] text-down">{error}</p>}
       {imageUrl && (
-        <div className="mb-2">
-          <a href={imageUrl} target="_blank" rel="noopener noreferrer">
-            <img
-              src={imageUrl}
-              alt="Setup chart"
-              className="max-h-48 w-full rounded border border-gray-3 object-contain"
-            />
-          </a>
-        </div>
+        <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="mt-2 block">
+          <img src={imageUrl} alt="Setup chart" className="max-h-48 w-full rounded-xl bg-black object-contain" />
+        </a>
       )}
-      <div className="flex items-center gap-2">
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <input
           ref={fileRef}
           type="file"
@@ -337,16 +320,11 @@ function SetupImageUpload({
             const f = e.target.files?.[0];
             if (f) upload(f);
           }}
-          className="font-mono text-[9px] text-white/60 file:mr-2 file:border file:border-gray-3 file:bg-gray-2 file:px-2 file:py-1 file:font-mono file:text-[9px] file:uppercase file:tracking-widest2 file:text-white/60 file:transition-colors hover:file:border-brand hover:file:text-brand disabled:opacity-40"
+          className={FILE_INPUT}
         />
         {imageUrl && (
-          <button
-            type="button"
-            onClick={onRemoved}
-            disabled={uploading}
-            className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright disabled:opacity-40"
-          >
-            {uploading ? "…" : "Remove"}
+          <button type="button" onClick={onRemoved} disabled={uploading} className={SMALL_BTN}>
+            {uploading ? "Working" : "Remove"}
           </button>
         )}
       </div>
@@ -355,11 +333,18 @@ function SetupImageUpload({
 }
 
 const INPUT =
-  "w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none";
+  "mt-2 h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
 
-// Prose fields (invalidation, rationale) are sentences, not tickers — undo the
-// terminal-style uppercase/tracking so what you type is what you read back.
-const PROSE = "normal-case tracking-normal text-sm resize-y";
+const TEXTAREA =
+  "mt-2 w-full resize-y rounded-xl bg-raised px-4 py-3 text-[15px] leading-[22px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+
+const LABEL = "block text-[13px] font-medium text-white/70";
+
+const SMALL_BTN =
+  "rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white transition-colors hover:bg-raised disabled:opacity-40";
+
+const FILE_INPUT =
+  "min-w-0 max-w-full text-[13px] text-white/55 file:mr-3 file:rounded-full file:border file:border-solid file:border-white/[0.14] file:bg-transparent file:px-3 file:py-1 file:text-[12px] file:font-medium file:text-white hover:file:bg-raised disabled:opacity-40";
 
 function Label({
   text,
@@ -372,9 +357,7 @@ function Label({
 }) {
   return (
     <label className={cn("block", className)}>
-      <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-        {text}
-      </span>
+      <span className={LABEL}>{text}</span>
       {children}
     </label>
   );

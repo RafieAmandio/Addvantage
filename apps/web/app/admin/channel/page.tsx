@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { cn, formatWibDateTime } from "@/lib/cn";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
+import { Panel } from "@/components/ui/Panel";
 
 interface ChannelThread {
   id: string;
@@ -226,378 +227,261 @@ export default function AdminChannelPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          ● Loading Channel
-        </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="h-96 animate-pulse rounded-2xl bg-panel" />
+        <div className="h-48 animate-pulse rounded-2xl bg-panel" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            Broadcast · Founder Channel
-          </span>
-          <h1 className="mt-2 font-mono text-2xl font-bold text-white">
-            My Channel
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => { resetThreadForm(); setShowThreadForm(true); }}
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            + Thread
-          </button>
-          <button
-            onClick={() => { resetForm(); setShowForm(true); }}
-            className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            + New Post
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-8 h-px bg-white/20" />
-
-      {/* ─── thread management ─────────────────────────────────────────── */}
-      {threads.length > 0 && !showThreadForm && (
-        <div className="mt-6">
-          <div className="mb-3 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            Threads
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {threads.map((t, i) => (
-              <div
-                key={t.id}
-                className="flex items-center gap-1 border border-gray-3 bg-gray-2/50 px-2 py-1"
-              >
-                <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/70">
-                  {t.title}
-                </span>
-                <button
-                  onClick={() => moveThread(t.id, "up")}
-                  disabled={i === 0}
-                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand disabled:opacity-20"
-                  title="Move up"
-                >
-                  ▲
-                </button>
-                <button
-                  onClick={() => moveThread(t.id, "down")}
-                  disabled={i === threads.length - 1}
-                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand disabled:opacity-20"
-                  title="Move down"
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => startEditThread(t)}
-                  className="px-1 font-mono text-[9px] text-white/30 transition-colors hover:text-brand"
-                  title="Edit"
-                >
-                  ✎
-                </button>
-                <button
-                  onClick={() => onDeleteThread(t.id)}
-                  className="px-1 font-mono text-[9px] text-blood-bright/50 transition-colors hover:text-blood-bright"
-                  title="Delete"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─── thread form ───────────────────────────────────────────────── */}
-      {showThreadForm && (
-        <div className="mt-6 border border-white/10 bg-black p-4">
-          <div className="mb-3 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-            {editThreadId ? "Edit Thread" : "New Thread"}
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        {showForm && (
+          <Panel title={editId ? "Edit post" : "New broadcast"}>
             <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Title
-              </span>
-              <input
-                value={threadTitle}
-                onChange={(e) => setThreadTitle(e.target.value)}
-                maxLength={50}
-                placeholder="e.g. Gold Thesis"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+              <span className={LABEL}>Body</span>
+              <textarea
+                rows={5}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Write your broadcast"
+                className={TEXTAREA}
               />
             </label>
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Description (optional)
-              </span>
+
+            <div className="mt-4">
+              <span className={LABEL}>Image (optional)</span>
               <input
-                value={threadDesc}
-                onChange={(e) => setThreadDesc(e.target.value)}
-                maxLength={200}
-                placeholder="Short description"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
+                type="file"
+                accept="image/*"
+                aria-label="Image"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
+                    setImageFile(file);
+                    setImagePreview(URL.createObjectURL(file));
+                  }
+                }}
+                className="mt-2 block w-full min-w-0 text-[13px] text-white/55 file:mr-3 file:rounded-full file:border file:border-solid file:border-white/[0.14] file:bg-transparent file:px-3 file:py-1 file:text-[12px] file:font-medium file:text-white hover:file:bg-raised"
               />
+              {imagePreview && (
+                <div className="mt-3 flex items-start gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imagePreview} alt="Preview" className="max-h-48 min-w-0 rounded-xl" />
+                  <button
+                    type="button"
+                    onClick={() => { setImagePreview(null); setImageFile(null); }}
+                    className={SMALL_BTN}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <label className="block">
+                <span className={LABEL}>Author</span>
+                <input value={author} onChange={(e) => setAuthor(e.target.value)} className={INPUT} />
+              </label>
+              <label className="block">
+                <span className={LABEL}>Tags (comma separated)</span>
+                <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="macro, outlook" className={INPUT} />
+              </label>
+              <label className="block">
+                <span className={LABEL}>Thread</span>
+                <select value={threadId} onChange={(e) => setThreadId(e.target.value)} className={INPUT}>
+                  <option value="">None</option>
+                  {threads.map((t) => (
+                    <option key={t.id} value={t.id}>{t.title}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="mt-4 flex items-center gap-2.5 text-[14px] text-white/90">
+              <input
+                type="checkbox"
+                checked={pinned}
+                onChange={(e) => setPinned(e.target.checked)}
+                className="h-4 w-4 accent-[#FFD400]"
+              />
+              Pin to top
             </label>
-          </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={onThreadSubmit}
-              disabled={savingThread || !threadTitle.trim()}
-              className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              {savingThread ? "Saving..." : editThreadId ? "Update" : "Create"}
-            </button>
-            <button
-              onClick={resetThreadForm}
-              className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
-      {/* ─── post form ─────────────────────────────────────────────────── */}
-      {showForm && (
-        <div className="mt-6 border border-brand/40 bg-black p-6">
-          <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            {editId ? "Edit Post" : "New Broadcast"}
-          </div>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button onClick={onSubmit} disabled={saving || !body.trim()} className={PRIMARY_BTN}>
+                {saving ? "Saving" : editId ? "Update" : "Publish"}
+              </button>
+              <button onClick={resetForm} className={SECONDARY_BTN}>
+                Cancel
+              </button>
+              {saveError && <span className="text-[13px] text-down">{saveError}</span>}
+            </div>
+          </Panel>
+        )}
 
-          {saveError && (
-            <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              {saveError}
+        <Panel
+          title="Founder channel"
+          sub={`${posts.length} posts · ${posts.filter((p) => !p.published).length} drafts`}
+          action={
+            !showForm && (
+              <button onClick={() => { resetForm(); setShowForm(true); }} className={cn(PRIMARY_BTN, "h-9 px-4 text-[13px]")}>
+                New post
+              </button>
+            )
+          }
+        >
+          {posts.length === 0 ? (
+            <p className="py-10 text-center text-[14px] text-white/40">No broadcasts yet.</p>
+          ) : (
+            <div className="-mx-5 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+              {posts.map((post) => (
+                <article key={post.id} className="px-5 py-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px]">
+                        <span className="font-semibold text-white">{post.author}</span>
+                        {post.thread && <span className="text-white/55">in {post.thread.title}</span>}
+                        {post.pinned && <span className="font-medium text-brand">Pinned</span>}
+                        <span className={post.published ? "font-medium text-up" : "font-medium text-white/40"}>
+                          {post.published ? "Published" : "Draft"}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 text-[12px] text-white/30">{formatWibDateTime(post.createdAt)}</div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => togglePublish(post)} className={SMALL_BTN}>
+                        {post.published ? "Unpublish" : "Publish"}
+                      </button>
+                      <button onClick={() => startEdit(post)} className={SMALL_BTN}>
+                        Edit
+                      </button>
+                      <button onClick={() => onDelete(post.id)} className={cn(SMALL_BTN, "text-down")}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  <p className={cn("mt-2 whitespace-pre-wrap text-[14px] leading-[21px]", post.published ? "text-white/90" : "text-white/55")}>
+                    {post.body}
+                  </p>
+                  {post.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={post.imageUrl} alt="" className="mt-3 max-h-64 max-w-full rounded-xl" />
+                  )}
+                  {post.tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {post.tags.map((t) => (
+                        <span key={t} className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] text-white/60">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              ))}
             </div>
           )}
-
-          <label className="mb-4 block">
-            <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-              Body
-            </span>
-            <textarea
-              rows={5}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Write your broadcast..."
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </label>
-
-          <label className="mb-4 block">
-            <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-              Image (optional)
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  if (imagePreview?.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
-                  setImageFile(file);
-                  setImagePreview(URL.createObjectURL(file));
-                }
-              }}
-              className="w-full font-mono text-[10px] text-white/50 file:mr-3 file:border file:border-gray-3 file:bg-gray-2 file:px-3 file:py-1.5 file:font-mono file:text-[10px] file:uppercase file:tracking-widest2 file:text-brand file:transition-colors hover:file:bg-brand hover:file:text-black"
-            />
-            {imagePreview && (
-              <div className="mt-3 relative inline-block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="max-h-48 border border-gray-3"
-                />
-                <button
-                  type="button"
-                  onClick={() => { setImagePreview(null); setImageFile(null); }}
-                  className="absolute -right-2 -top-2 h-5 w-5 bg-blood-bright text-[10px] text-white"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </label>
-
-          <div className="mb-4 grid grid-cols-3 gap-4">
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Author
-              </span>
-              <input
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Tags (comma-separated)
-              </span>
-              <input
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="macro, outlook"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Thread
-              </span>
-              <select
-                value={threadId}
-                onChange={(e) => setThreadId(e.target.value)}
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-              >
-                <option value="">None</option>
-                {threads.map((t) => (
-                  <option key={t.id} value={t.id}>{t.title}</option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <label className="mb-6 flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={pinned}
-              onChange={(e) => setPinned(e.target.checked)}
-              className="accent-brand"
-            />
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-              Pin to top
-            </span>
-          </label>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onSubmit}
-              disabled={saving || !body.trim()}
-              className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              {saving ? "Saving..." : editId ? "Update" : "Publish"}
-            </button>
-            <button
-              onClick={resetForm}
-              className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ─── post list ─────────────────────────────────────────────────── */}
-      {posts.length === 0 && !showForm && (
-        <div className="py-20 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            No broadcasts yet
-          </div>
-          <div className="mt-4 font-mono text-xl font-bold text-white">
-            Start broadcasting.
-          </div>
-        </div>
-      )}
-
-      <div className="mt-px">
-        {posts.map((post, i) => (
-          <div
-            key={post.id}
-            className={cn(
-              "border-b border-white/[0.08] py-6",
-              !post.published && "opacity-50"
-            )}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] tabular-nums text-white/20">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                      {post.author}
-                    </span>
-                    {post.thread && (
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                        {post.thread.title}
-                      </span>
-                    )}
-                    {post.pinned && (
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand/60">
-                        Pinned
-                      </span>
-                    )}
-                    {!post.published && (
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-                        Draft
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-0.5 font-mono text-[9px] text-white/30">
-                    {formatWibDateTime(post.createdAt)}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => togglePublish(post)}
-                  className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  {post.published ? "Unpublish" : "Publish"}
-                </button>
-                <button
-                  onClick={() => startEdit(post)}
-                  className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(post.id)}
-                  className="border border-blood/40 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright/60 transition-colors hover:bg-blood hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-            <div className="mt-3 pl-9">
-              <p className="font-mono text-sm font-light leading-relaxed text-white/80 whitespace-pre-wrap">
-                {post.body}
-              </p>
-              {post.imageUrl && (
-                <div className="mt-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={post.imageUrl}
-                    alt=""
-                    className="max-h-64 border border-gray-3"
-                  />
-                </div>
-              )}
-              {post.tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {post.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="border border-brand/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand/70"
-                    >
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+        </Panel>
       </div>
+
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel
+          title="Threads"
+          sub="Order sets how they appear to members."
+          action={
+            !showThreadForm && (
+              <button onClick={() => { resetThreadForm(); setShowThreadForm(true); }} className={SMALL_BTN}>
+                New thread
+              </button>
+            )
+          }
+        >
+          {showThreadForm && (
+            <div className="mb-4 space-y-3">
+              <label className="block">
+                <span className={LABEL}>{editThreadId ? "Edit thread title" : "Title"}</span>
+                <input
+                  value={threadTitle}
+                  onChange={(e) => setThreadTitle(e.target.value)}
+                  maxLength={50}
+                  placeholder="e.g. Gold Thesis"
+                  className={INPUT}
+                />
+              </label>
+              <label className="block">
+                <span className={LABEL}>Description (optional)</span>
+                <input
+                  value={threadDesc}
+                  onChange={(e) => setThreadDesc(e.target.value)}
+                  maxLength={200}
+                  placeholder="Short description"
+                  className={INPUT}
+                />
+              </label>
+              <div className="flex gap-2">
+                <button onClick={onThreadSubmit} disabled={savingThread || !threadTitle.trim()} className={cn(PRIMARY_BTN, "h-10")}>
+                  {savingThread ? "Saving" : editThreadId ? "Update" : "Create"}
+                </button>
+                <button onClick={resetThreadForm} className={cn(SECONDARY_BTN, "h-10")}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+          {threads.length === 0 ? (
+            <p className="text-[14px] text-white/40">No threads yet.</p>
+          ) : (
+            <div className="-mx-5 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+              {threads.map((t, i) => (
+                <div key={t.id} className="flex items-center gap-2 px-5 py-2.5">
+                  <span className="min-w-0 flex-1 truncate text-[14px] text-white/90">{t.title}</span>
+                  <button
+                    onClick={() => moveThread(t.id, "up")}
+                    disabled={i === 0}
+                    className={ICON_BTN}
+                    title="Move up"
+                    aria-label={`Move ${t.title} up`}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveThread(t.id, "down")}
+                    disabled={i === threads.length - 1}
+                    className={ICON_BTN}
+                    title="Move down"
+                    aria-label={`Move ${t.title} down`}
+                  >
+                    ↓
+                  </button>
+                  <button onClick={() => startEditThread(t)} className={SMALL_BTN}>
+                    Edit
+                  </button>
+                  <button onClick={() => onDeleteThread(t.id)} className={cn(SMALL_BTN, "text-down")}>
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Panel>
+      </aside>
     </div>
   );
 }
+
+const LABEL = "block text-[13px] font-medium text-white/70";
+const INPUT =
+  "mt-2 h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+const TEXTAREA =
+  "mt-2 w-full resize-y rounded-xl bg-raised px-4 py-3 text-[15px] leading-[22px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+const PRIMARY_BTN =
+  "inline-flex h-11 items-center justify-center rounded-full bg-brand px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white";
+const SECONDARY_BTN =
+  "inline-flex h-11 items-center justify-center rounded-full border border-white/[0.14] px-5 text-[14px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+const SMALL_BTN =
+  "shrink-0 rounded-full border border-white/[0.14] px-3 py-1 text-[12px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+const ICON_BTN =
+  "h-7 w-7 shrink-0 rounded-full text-[14px] text-white/55 transition-colors hover:bg-raised hover:text-white disabled:opacity-20";
