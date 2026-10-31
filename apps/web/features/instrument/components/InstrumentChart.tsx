@@ -8,6 +8,8 @@ import {
   createChart,
   createSeriesMarkers,
   type AutoscaleInfo,
+  type SeriesMarker,
+  type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
 import type { Bar } from "@/features/chart/components/PriceChart";
@@ -15,7 +17,15 @@ import type { Bar } from "@/features/chart/components/PriceChart";
 export interface ChartLevel {
   price: number;
   label: string;
-  kind: "plan" | "stop" | "target" | "atr" | "prev";
+  kind: "plan" | "stop" | "target" | "atr" | "prev" | "method";
+}
+
+/** Labelled marker on one candle, for explaining a setup on the chart. */
+export interface ChartNote {
+  time: string;
+  text: string;
+  position: "aboveBar" | "belowBar";
+  color: string;
 }
 
 export interface ChartPin {
@@ -30,12 +40,28 @@ const LEVEL_STYLE: Record<ChartLevel["kind"], { color: string; style: LineStyle 
   target: { color: "#00DD94", style: LineStyle.Solid },
   atr: { color: "rgba(255,212,0,.55)", style: LineStyle.Dashed },
   prev: { color: "rgba(255,255,255,.45)", style: LineStyle.Dotted },
+  method: { color: "rgba(255,255,255,.8)", style: LineStyle.Dashed },
 };
 
 const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000) as UTCTimestamp;
 
 /** Candles with the desk's levels drawn on: plan, ATR band, previous day high/low, news and macro pins. */
-export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Bar[]; levels: ChartLevel[]; pins: ChartPin[]; height?: number }) {
+export function InstrumentChart({
+  bars,
+  levels,
+  pins,
+  notes = [],
+  focusFrom,
+  height = 460,
+}: {
+  bars: Bar[];
+  levels: ChartLevel[];
+  pins: ChartPin[];
+  notes?: ChartNote[];
+  /** Zoom to start a few candles before this time instead of fitting everything. */
+  focusFrom?: string;
+  height?: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +75,8 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
       crosshair: { mode: 0, vertLine: { color: "rgba(255,255,255,.3)", labelBackgroundColor: "#1A1A1A" }, horzLine: { color: "rgba(255,255,255,.3)", labelBackgroundColor: "#1A1A1A" } },
     });
+    const ref0 = bars.at(-1)!.close;
+    const prec = ref0 >= 1000 ? 2 : ref0 >= 10 ? 3 : 5;
     const series = chart.addSeries(CandlestickSeries, {
       upColor: "#00DD94",
       downColor: "#FF454D",
@@ -56,10 +84,12 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
       wickUpColor: "#00DD94",
       wickDownColor: "#FF454D",
       priceLineColor: "rgba(255,255,255,.5)",
+      // Full instrument precision on the axis and level labels: 5 dp FX, 3 dp yen, 2 dp metals and indices.
+      priceFormat: { type: "price", precision: prec, minMove: 10 ** -prec },
       // Keep plan entry/stop/targets on screen; ATR and PDH/PDL may sit outside the view.
       autoscaleInfoProvider: (base: () => AutoscaleInfo | null) => {
         const r = base();
-        const plan = levels.filter((l) => l.kind === "plan" || l.kind === "stop" || l.kind === "target").map((l) => l.price);
+        const plan = levels.filter((l) => l.kind !== "atr" && l.kind !== "prev").map((l) => l.price);
         if (!r?.priceRange || plan.length === 0) return r;
         return { ...r, priceRange: { minValue: Math.min(r.priceRange.minValue, ...plan), maxValue: Math.max(r.priceRange.maxValue, ...plan) } };
       },
@@ -81,7 +111,7 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
     const first = times[0]!;
     createSeriesMarkers(
       series,
-      pins
+      (pins
         .filter((p) => sec(p.time) >= first)
         .map((p) => ({
           time: snap(sec(p.time)),
@@ -89,12 +119,19 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
           shape: "square" as const,
           size: 0.6,
           color: p.kind === "macro" ? "#FFD400" : p.bias === "bullish" ? "#00DD94" : p.bias === "bearish" ? "#FF454D" : "rgba(255,255,255,.7)",
-        }))
-        .sort((a, b) => a.time - b.time),
+        })) as SeriesMarker<Time>[])
+        .concat(
+          notes
+            .filter((n) => sec(n.time) >= first)
+            .map((n) => ({ time: snap(sec(n.time)), position: n.position, shape: n.position === "aboveBar" ? ("arrowDown" as const) : ("arrowUp" as const), size: 1, color: n.color, text: n.text })),
+        )
+        .sort((a, b) => (a.time as number) - (b.time as number)),
     );
-    chart.timeScale().fitContent();
+    const from = focusFrom ? times.findIndex((t) => t >= sec(focusFrom)) : -1;
+    if (from >= 0) chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, from - 6), to: times.length + 2 });
+    else chart.timeScale().fitContent();
     return () => chart.remove();
-  }, [bars, levels, pins]);
+  }, [bars, levels, pins, notes, focusFrom]);
 
   if (bars.length === 0) {
     return (
