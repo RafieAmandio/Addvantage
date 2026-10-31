@@ -115,16 +115,22 @@ export function DashboardClient({ news, plans, bulletins, consensus, atr, calend
         </div>
       </div>
 
-      <BulletinSection bulletins={bulletins} />
-
-      <WatchlistSection
-        tickers={tickers}
-        watchHydrated={watchHydrated}
-        watchNewsMentions={watchNewsMentions}
-        watchSetupMentions={watchSetupMentions}
-        watchArchiveSetups={watchArchiveSetups}
-        planId={plan?.id ?? null}
-      />
+      <div className="grid gap-4 lg:grid-cols-3">
+        {bulletins.length > 0 && (
+          <div className="min-w-0 lg:col-span-2">
+            <BulletinSection bulletins={bulletins} />
+          </div>
+        )}
+        <WatchlistSection
+          tickers={tickers}
+          pairs={atr.pairs}
+          watchHydrated={watchHydrated}
+          watchNewsMentions={watchNewsMentions}
+          watchSetupMentions={watchSetupMentions}
+          watchArchiveSetups={watchArchiveSetups}
+          planId={plan?.id ?? null}
+        />
+      </div>
     </div>
   );
 }

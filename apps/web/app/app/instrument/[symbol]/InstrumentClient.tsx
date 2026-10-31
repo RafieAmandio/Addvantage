@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { BULLETIN_TIMEFRAMES } from "@tradevantage/shared/schema";
 import { cn } from "@/lib/cn";
 import { useAppState, isPaid } from "@/lib/state";
 import { Panel, PanelLink } from "@/components/ui/Panel";
@@ -10,7 +9,8 @@ import { CalendarPanel } from "@/features/dashboard/components/CalendarPanel";
 import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import { fmtPrice, dayChange } from "@/features/dashboard/components/PriceStrip";
 import { InstrumentChart, type ChartLevel, type ChartPin } from "@/features/instrument/components/InstrumentChart";
-import { AtrGauge, NewsPulse, RsiMeter, SessionRing, StructureGlyph } from "@/features/instrument/components/DotMatrix";
+import { AtrGauge, NewsPulse, RsiMeter, SessionRing } from "@/features/instrument/components/DotMatrix";
+import { StructureStrip } from "@/features/bulletin/components/StructureStrip";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import type { AtrPair } from "@/features/atr/types";
 import type { Bulletin } from "@/features/bulletin/types";
@@ -113,7 +113,6 @@ export default function InstrumentClient({
   }, [bars, news, calendar]);
 
   const days = useMemo(() => pulse(news), [news]);
-  const byTf = new Map(bulletin?.levels.map((l) => [l.timeframe, l]) ?? []);
 
   return (
     <div className="space-y-4 px-4 pb-10 sm:px-6">
@@ -252,18 +251,7 @@ export default function InstrumentClient({
               <p className="text-[14px] text-white/40">The desk hasn&apos;t posted a read on {symbol}.</p>
             ) : (
               <>
-                <div className="grid grid-cols-6 gap-2">
-                  {BULLETIN_TIMEFRAMES.map((t) => {
-                    const l = byTf.get(t);
-                    return (
-                      <div key={t} className="flex flex-col items-center gap-1.5" title={l?.comment ?? undefined}>
-                        <StructureGlyph bias={l?.marketStructure ?? null} />
-                        <span className="font-mono text-[11px] text-white/55">{t}</span>
-                        <span className="font-num text-[13px] text-white/40">{l?.bosLevel ?? "—"}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+                <StructureStrip levels={bulletin.levels} />
                 {(bulletin.entry || bulletin.exit) && (
                   <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-white/[0.07] pt-3">
                     {[

@@ -1,6 +1,7 @@
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan, ClosedPlanStats } from "@/features/plan/types";
 import type { TimelineEvent } from "@/features/timeline/types";
+import type { Bulletin, BulletinLevel } from "@/features/bulletin/types";
 import { news as mockNews } from "@/features/news/mock";
 import { tradingPlans as mockPlans } from "@/features/plan/mock";
 import { calendar as mockCalendar } from "@/features/calendar/mock";
@@ -242,4 +243,47 @@ function tweetEvents(): TimelineEvent[] {
 
 export function mockTimelineEvents(): TimelineEvent[] {
   return [...macroEvents(), ...newsTimelineEvents(), ...tweetEvents()];
+}
+
+export function mockBulletins(): Bulletin[] {
+  const at = new Date(Date.now() - 3 * 3600_000).toISOString();
+  const lv = (timeframe: BulletinLevel["timeframe"], marketStructure: BulletinLevel["marketStructure"], bosLevel: string | null, comment: string | null = null): BulletinLevel => ({
+    id: `${timeframe}-${marketStructure}-${bosLevel}`,
+    timeframe,
+    marketStructure,
+    bosLevel,
+    comment,
+    createdAt: at,
+    updatedAt: at,
+  });
+  return [
+    {
+      id: "mock-bulletin-xau",
+      symbol: "XAUUSD",
+      status: "active",
+      bias: "bearish",
+      whatToWatch: "Rejection from 3952 ATR top on the London retest. Below 3871 opens the 3840 shelf.",
+      entry: "3948 to 3952 short",
+      exit: "3871 then 3842",
+      note: null,
+      sortOrder: 0,
+      createdAt: at,
+      updatedAt: at,
+      levels: [lv("1H", "bearish", "3921.40"), lv("4H", "bearish", "3966.10"), lv("12H", "bearish", "4012.80"), lv("1D", "neutral", null), lv("3D", "bullish", "3790.00"), lv("1W", "bullish", "3655.20")],
+    },
+    {
+      id: "mock-bulletin-eur",
+      symbol: "EURUSD",
+      status: "watching",
+      bias: "neutral",
+      whatToWatch: "Range 1.0812 to 1.0890 until NFP. Trade the break, not the middle.",
+      entry: null,
+      exit: null,
+      note: null,
+      sortOrder: 1,
+      createdAt: at,
+      updatedAt: at,
+      levels: [lv("1H", "bullish", "1.08470"), lv("4H", "neutral", null), lv("1D", "bearish", "1.08900"), lv("1W", "bearish", "1.09650")],
+    },
+  ];
 }
