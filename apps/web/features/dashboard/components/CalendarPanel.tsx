@@ -8,11 +8,11 @@ const day = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { weekday: "short", timeZone: "Asia/Jakarta" });
 
 /** Next scheduled macro events, Kalshi row style: label left, big number right. */
-export function CalendarPanel({ events }: { events: CalendarEvent[] }) {
+export function CalendarPanel({ events, sub = "Next medium and high impact events, WIB" }: { events: CalendarEvent[]; sub?: string }) {
   return (
-    <Panel title="Calendar" sub="Next medium and high impact events, WIB" action={<PanelLink href="/app/calendar">All</PanelLink>}>
+    <Panel title="Calendar" sub={sub} action={<PanelLink href="/app/calendar">All</PanelLink>}>
       {events.length === 0 ? (
-        <p className="py-6 text-[14px] text-white/40">Nothing scheduled in the next two days.</p>
+        <p className="py-6 text-[14px] text-white/40">Nothing scheduled in the next few days.</p>
       ) : (
         <ul className="-my-1 divide-y divide-white/[0.07]">
           {events.map((e) => {

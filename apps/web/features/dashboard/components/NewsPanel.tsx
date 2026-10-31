@@ -13,17 +13,30 @@ function ago(iso: string) {
 }
 
 /** Latest news as Kalshi-style rows: eyebrow, headline, affected pairs, bias at the end. */
-export function NewsPanel({ news, seen }: { news: NewsListItem[]; seen: Set<string> }) {
-  const rows = news.slice(0, 6);
+export function NewsPanel({
+  news,
+  seen,
+  title = "Latest news",
+  limit = 6,
+  children,
+}: {
+  news: NewsListItem[];
+  seen: Set<string>;
+  title?: string;
+  limit?: number;
+  children?: React.ReactNode;
+}) {
+  const rows = news.slice(0, limit);
   const newest = rows[0]?.publishedAt ?? rows[0]?.fetchedAt;
   const staleDays = newest ? Math.floor((Date.now() - new Date(newest).getTime()) / 86_400_000) : 0;
 
   return (
     <Panel
-      title="Latest news"
+      title={title}
       sub={staleDays >= 2 ? <span className="text-down">No new items in {staleDays} days</span> : "Market-moving, with what it means for price"}
       action={<PanelLink href="/app/news">All news</PanelLink>}
     >
+      {children}
       {rows.length === 0 ? (
         <p className="py-6 text-[14px] text-white/40">No news yet.</p>
       ) : (
