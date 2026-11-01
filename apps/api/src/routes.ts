@@ -20,6 +20,7 @@ import { channelRoutes } from "./features/channel/channel.routes.js";
 import { rsiRoutes } from "./features/rsi/rsi.routes.js";
 import { atrRoutes } from "./features/atr/atr.routes.js";
 import { macroRoutes } from "./features/macro/macro.routes.js";
+import { methodRoutes } from "./features/method/method.routes.js";
 import { referralRoutes } from "./features/referral/referral.routes.js";
 import { predictionRoutes } from "./features/prediction/prediction.routes.js";
 import { graphRoutes } from "./features/graph/graph.routes.js";
@@ -29,6 +30,7 @@ import { earlyAccessRoutes } from "./features/early-access/early-access.routes.j
 import { shortLinksRoutes } from "./features/short-links/short-links.routes.js";
 import { bulletinRoutes } from "./features/bulletin/bulletin.routes.js";
 import { giveawayRoutes } from "./features/giveaway/giveaway.routes.js";
+import { journalRoutes } from "./features/journal/journal.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -52,6 +54,7 @@ export function mountRoutes(app: Express) {
   app.use("/rsi", rsiRoutes);
   app.use("/atr", atrRoutes);
   app.use("/macro", macroRoutes);
+  app.use("/method", methodRoutes);
   app.use("/referral", referralRoutes);
   app.use("/predictions", predictionRoutes);
   app.use("/graph", graphRoutes);
@@ -61,4 +64,5 @@ export function mountRoutes(app: Express) {
   app.use("/short-links", shortLinksRoutes);
   app.use("/bulletin", bulletinRoutes);
   app.use("/giveaway", giveawayRoutes);
+  app.use("/journal", journalRoutes);
 }

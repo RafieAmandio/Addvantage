@@ -49,6 +49,8 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
       crosshair: { mode: 0, vertLine: { color: "rgba(255,255,255,.3)", labelBackgroundColor: "#1A1A1A" }, horzLine: { color: "rgba(255,255,255,.3)", labelBackgroundColor: "#1A1A1A" } },
     });
+    const ref0 = bars.at(-1)!.close;
+    const prec = ref0 >= 1000 ? 2 : ref0 >= 10 ? 3 : 5;
     const series = chart.addSeries(CandlestickSeries, {
       upColor: "#00DD94",
       downColor: "#FF454D",
@@ -56,6 +58,8 @@ export function InstrumentChart({ bars, levels, pins, height = 460 }: { bars: Ba
       wickUpColor: "#00DD94",
       wickDownColor: "#FF454D",
       priceLineColor: "rgba(255,255,255,.5)",
+      // Full instrument precision on the axis and level labels: 5 dp FX, 3 dp yen, 2 dp metals and indices.
+      priceFormat: { type: "price", precision: prec, minMove: 10 ** -prec },
       // Keep plan entry/stop/targets on screen; ATR and PDH/PDL may sit outside the view.
       autoscaleInfoProvider: (base: () => AutoscaleInfo | null) => {
         const r = base();
