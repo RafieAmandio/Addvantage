@@ -4,10 +4,10 @@ import { cn } from "@/lib/cn";
 import { useStory } from "@/features/marketing/lib/use-story";
 import { Panel } from "./Panel";
 
-type Item = { t: string; at: string; tag: null | { impact: "HIGH" | "MED"; moves: [string, "up" | "down"][] } };
+export type WireItem = { t: string; at: string; tag: null | { impact: "HIGH" | "MED"; moves: [string, "up" | "down"][] } };
 
 // A sample wire. Headlines are illustrative, not reports of real events.
-const WIRE: Item[] = [
+export const WIRE: WireItem[] = [
   { at: "07:02", t: "Central bank chair repeats policy will stay data dependent", tag: null },
   { at: "07:15", t: "US inflation prints above forecast for a second month", tag: { impact: "HIGH", moves: [["USD", "up"], ["XAU", "down"]] } },
   { at: "07:21", t: "Bank raises its year-end gold target, again", tag: null },

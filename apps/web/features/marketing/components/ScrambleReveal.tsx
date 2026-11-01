@@ -6,7 +6,7 @@ const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
 const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** Letters decode left to right from noise. Spaces hold their place so the line never reflows. */
-function play(text: string, duration: number, set: (s: string) => void) {
+export function play(text: string, duration: number, set: (s: string) => void) {
   const frames = Math.ceil(duration / 30);
   let frame = 0;
   const id = setInterval(() => {
