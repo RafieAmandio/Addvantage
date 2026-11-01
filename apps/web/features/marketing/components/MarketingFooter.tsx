@@ -23,7 +23,7 @@ export function MarketingFooter() {
         <div className="flex w-full max-w-[227px] flex-col gap-[17px] text-base">
           <p className="font-bold">Surface</p>
           <p>Telegram (free pillars)</p>
-          <p>DOMAIN web (paid)</p>
+          <p>Web app (paid)</p>
           <p>1v1 Consult</p>
         </div>
         <div className="flex w-full max-w-[227px] flex-col gap-[17px] text-base">
