@@ -11,6 +11,7 @@ import { Highlight } from "@/components/ui/Highlight";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { cn } from "@/lib/cn";
+import { API_BASE } from "@/lib/api/client";
 import type { Hashtag } from "@tradevantage/shared";
 
 type SortMode = "density" | "alpha" | "sparse";
@@ -69,8 +70,7 @@ function TagsView() {
 
   useEffect(() => {
     let cancelled = false;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
-    fetch(`${apiBase}/tags/counts`)
+    fetch(`${API_BASE}/tags/counts`)
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (!cancelled && json?.data && Array.isArray(json.data)) {

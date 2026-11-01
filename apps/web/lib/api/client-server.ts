@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { serverConfig } from "@/lib/config/server";
+import { isMockMode } from "@/lib/config/public";
 
 const API_BASE = serverConfig.NEXT_PUBLIC_API_URL;
 
@@ -7,6 +8,9 @@ function getAccessToken(): string | null {
   const cookieStore = cookies();
   return cookieStore.get("access_token")?.value ?? null;
 }
+
+// Demo has no API: answer from fixtures and live market data instead (lib/mock/api.ts).
+const demo = async (method: string, path: string) => (await import("@/lib/mock/api")).demoApi(method, path);
 
 interface ApiResponse<T> {
   success: boolean;
@@ -18,6 +22,7 @@ interface ApiResponse<T> {
 }
 
 export async function apiGet<T>(path: string, opts?: { token?: string }): Promise<T> {
+  if (isMockMode()) return (await demo("GET", path)) as T;
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -37,6 +42,7 @@ export async function apiGet<T>(path: string, opts?: { token?: string }): Promis
 }
 
 export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
+  if (isMockMode()) return (await demo("POST", path)) as T;
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -61,6 +67,7 @@ export async function apiPostForm<T>(
   formData: FormData,
   opts?: { token?: string },
 ): Promise<T> {
+  if (isMockMode()) return (await demo("POST", path)) as T;
   const token = opts?.token ?? getAccessToken();
   // No Content-Type header — fetch sets the multipart boundary from the FormData body.
   const headers: Record<string, string> = {};
@@ -82,6 +89,7 @@ export async function apiPostForm<T>(
 }
 
 export async function apiPut<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
+  if (isMockMode()) return (await demo("PUT", path)) as T;
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -102,6 +110,7 @@ export async function apiPut<T>(path: string, body?: unknown, opts?: { token?: s
 }
 
 export async function apiDelete(path: string, opts?: { token?: string }): Promise<void> {
+  if (isMockMode()) return void (await demo("DELETE", path));
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
