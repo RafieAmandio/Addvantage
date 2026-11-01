@@ -31,7 +31,7 @@ export default function LandingPage() {
       <ConsoleEasterEgg />
       <LandingMotion />
       <MarketingNav />
-      <HeroSection ticker={d.ticker} rounds={d.rounds} />
+      <HeroSection />
       <BoardStrip board={d.board} asOf={d.asOf} />
       <PositioningSection />
       <TransmissionsSection />
