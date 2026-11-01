@@ -29,6 +29,7 @@ vi.mock("@/integrations/telegram/notify.js", () => ({
 
 import { consultService } from "../consult.service.js";
 import { consultRepository } from "../consult.repository.js";
+import { notifyConsultWhatsApp } from "@/integrations/whatsapp/notify.js";
 
 const repo = vi.mocked(consultRepository);
 
@@ -107,7 +108,25 @@ describe("consultService", () => {
 
       expect(repo.updateSessionFlags).toHaveBeenCalledWith(
         "session-1",
-        expect.objectContaining({ unreadAdmin: true, status: "awaiting_reply" }),
+        { unreadAdmin: true, status: "awaiting_reply", updatedAt: expect.any(Date) },
+      );
+    });
+    it.each([
+      [true, false],
+      [false, true],
+    ])("WhatsApp alert: allowMention %s sends private %s", async (allowMention, isPrivate) => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      repo.createMessage.mockResolvedValue({ id: "m-1" } as never);
+      repo.touchSession.mockResolvedValue(undefined as never);
+      repo.updateSessionFlags.mockResolvedValue(undefined as never);
+      repo.getAllowMention.mockResolvedValue(allowMention as never);
+
+      await consultService.appendMessage("user-1", "session-1", { role: "user", content: "hello" }, "member@test.com");
+      await vi.waitFor(() => expect(notifyConsultWhatsApp).toHaveBeenCalled());
+
+      expect(repo.getAllowMention).toHaveBeenCalledWith("user-1");
+      expect(notifyConsultWhatsApp).toHaveBeenCalledWith(
+        expect.objectContaining({ sessionId: "session-1", messagePreview: "hello", private: isPrivate }),
       );
     });
   });
@@ -156,7 +175,7 @@ describe("consultService", () => {
       );
       expect(repo.updateSessionFlags).toHaveBeenCalledWith(
         "session-1",
-        expect.objectContaining({ unreadUser: true, status: "open" }),
+        { unreadUser: true, status: "open", updatedAt: expect.any(Date) },
       );
     });
 
