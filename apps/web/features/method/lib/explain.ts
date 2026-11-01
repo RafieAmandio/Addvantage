@@ -79,6 +79,10 @@ const SIGNAL_TEXT: Record<Signal["kind"], (s: Signal) => string> = {
   idf: (s) => `Mother day, an inside day within it, then a poke ${s.dir === "bullish" ? "under" : "over"} the inside day that closed back in. The breakout failed.`,
   sfp: (s) => `Ran the stops ${s.dir === "bullish" ? "under an old swing low" : "over an old swing high"} and closed back. ${s.shallow ? "Swing under 3 daily ATRs deep, so it does not count." : "Deep swing, so it counts."}`,
   cross: () => "Two bias patterns on one candle. The strongest daily read there is.",
+  accdist: (s) =>
+    s.dir === "bullish"
+      ? "Three lower lows, each bought straight back by a green candle, while MACD made higher lows. Sellers are running out."
+      : "Three higher highs, each sold straight back by a red candle, while MACD made lower highs. Buyers are running out.",
 };
 
 export function explainSignal(s: Signal): Explainer {

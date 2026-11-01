@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FOREX_PAIRS, boardRow, type BoardRow } from "@tradevantage/shared";
+import type { BoardRow } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
-import { apiGet } from "@/lib/api/client-server";
-import { isMockMode } from "@/lib/config/public";
-import { listBars } from "@/features/chart/queries/bars";
-import { toChartBars } from "@/features/chart/lib/bars";
+import { getBoard } from "@/features/method/queries";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { VERDICT, wib } from "@/features/method/lib/explain";
 import { shortName } from "@/features/method/lib/overlays";
@@ -14,25 +11,6 @@ import { MiniChart } from "@/features/method/components/MiniChart";
 export const metadata: Metadata = { title: "Chart Lab" };
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-const DAY = 86_400_000;
-
-async function getBoard(): Promise<BoardRow[]> {
-  if (!isMockMode()) return apiGet<{ rows: BoardRow[] }>("/method/board").then((d) => d.rows).catch(() => []);
-  // Mock: same read as the API, on real candles pulled for preview.
-  const now = Date.now();
-  const rows = await Promise.all(
-    FOREX_PAIRS.map(async (p) => {
-      const [d, h] = await Promise.all([
-        listBars({ symbol: p.symbol, interval: "1d", from: new Date(now - 200 * DAY), to: new Date(now) }),
-        listBars({ symbol: p.symbol, interval: "1h", from: new Date(now - 14 * DAY), to: new Date(now) }),
-      ]);
-      const daily = toChartBars(d);
-      return daily.length ? boardRow(p, daily, toChartBars(h)) : null;
-    }),
-  );
-  return rows.filter((r): r is BoardRow => r !== null);
-}
 
 const RANK = { order: 0, watch: 1, pass: 2 } as const;
 const href = (r: BoardRow) => `/app/lab/${encodeURIComponent(r.symbol.replace("/", ""))}`;
@@ -43,7 +21,7 @@ function Card({ r }: { r: BoardRow }) {
   const l = r.level!;
   const sig = r.signals.find((s) => !s.shallow);
   return (
-    <Link href={href(r)} className={cn("block rounded-2xl bg-panel p-4 ring-1 transition-colors hover:bg-raised", here(r) ? "ring-brand/70" : "ring-transparent")}>
+    <Link href={href(r)} className={cn("block rounded-2xl bg-panel p-4 ring-1 transition duration-150 hover:bg-raised motion-safe:active:scale-[0.99]", here(r) ? "ring-brand/70" : "ring-transparent")}>
       <div className="flex items-baseline justify-between gap-2">
         <span className="font-num text-[22px] font-semibold leading-6 text-white">{r.symbol.replace("/", "")}</span>
         {here(r) ? (

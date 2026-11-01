@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FOREX_PAIRS, boardRow } from "@tradevantage/shared";
+import { FOREX_PAIRS, boardRow, pipSize } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
 import { listBars } from "@/features/chart/queries/bars";
 import { toChartBars } from "@/features/chart/lib/bars";
@@ -24,12 +24,13 @@ export default async function MethodSymbolPage({ params }: { params: Promise<{ s
   const symbol = pair?.symbol ?? raw.toUpperCase();
   const now = Date.now();
   const [h, d] = await Promise.all([
-    listBars({ symbol, interval: "1h", from: new Date(now - 20 * DAY), to: new Date(now) }),
+    // 60 days of hourly history so practice can replay past breaks.
+    listBars({ symbol, interval: "1h", from: new Date(now - 60 * DAY), to: new Date(now) }),
     listBars({ symbol, interval: "1d", from: new Date(now - 200 * DAY), to: new Date(now) }),
   ]);
   const hourly = toChartBars(h);
   const daily = toChartBars(d);
-  const row = boardRow({ symbol, label: pair?.label ?? symbol, group: pair?.group ?? "other" }, daily, hourly);
+  const row = boardRow({ symbol, label: pair?.label ?? symbol, group: pair?.group ?? "other" }, daily, hourly.slice(-480));
 
   return (
     <div className="space-y-3 px-4 pb-10 sm:px-6">
@@ -64,7 +65,7 @@ export default async function MethodSymbolPage({ params }: { params: Promise<{ s
           All markets
         </Link>
       </div>
-      <MethodChart hourly={hourly} daily={daily} />
+      <MethodChart hourly={hourly} daily={daily} pip={pipSize(symbol)} />
     </div>
   );
 }

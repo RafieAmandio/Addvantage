@@ -1,4 +1,4 @@
-import type { Candle, DailyRead, Level } from "@tradevantage/shared";
+import { readDaily, readLevels, type Candle, type DailyRead, type Level } from "@tradevantage/shared";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { indexer } from "./overlays";
 
@@ -90,6 +90,68 @@ export function gradeQualifies(l: Level, says: boolean, failing: string[]): Answ
   return {
     ok: says === does,
     choice: says,
-    feedback: does ? "It does. Every rule holds, so a limit order is allowed. Sizing is still your call." : `It does not. Failing: ${failing.join(", ").toLowerCase()}.`,
+    // Lowercase the rule names mid-sentence, except "R" which is a unit.
+    feedback: does
+      ? "It does. Every rule holds, so a limit order is allowed. Sizing is still your call."
+      : `It does not. Failing: ${failing.map((r) => (r.startsWith("R ") ? r : r[0]!.toLowerCase() + r.slice(1))).join(", ")}.`,
   };
+}
+
+/** A past moment to practise on: the chart is cut at `cut`, the level was live then, and we know what happened after. */
+export interface Drill {
+  level: Level;
+  daily: DailyRead;
+  /** Hourly window shown during the drill: [from, cut). */
+  from: number;
+  cut: number;
+  outcome: Outcome;
+}
+
+export interface Outcome {
+  kind: "win" | "loss" | "no-fill" | "running";
+  fillTime: string | null;
+  exitTime: string | null;
+  r: number | null;
+}
+
+const DAY = 86_400_000;
+
+/** What the level did after the cut: filled or not, then target or stop first (same candle counts as the stop). */
+export function outcome(l: Level, after: Candle[]): Outcome {
+  const buy = l.side === "buy";
+  const fill = after.findIndex((b) => (buy ? b.low <= l.price : b.high >= l.price));
+  if (fill < 0) return { kind: "no-fill", fillTime: null, exitTime: null, r: null };
+  for (let j = fill; j < after.length; j++) {
+    const b = after[j]!;
+    if (l.stop !== null && (buy ? b.low <= l.stop : b.high >= l.stop)) return { kind: "loss", fillTime: after[fill]!.time, exitTime: b.time, r: -1 };
+    if (l.target !== null && (buy ? b.high >= l.target : b.low <= l.target)) return { kind: "win", fillTime: after[fill]!.time, exitTime: b.time, r: l.r };
+  }
+  return { kind: "running", fillTime: after[fill]!.time, exitTime: null, r: null };
+}
+
+/**
+ * Walk back through the hourly history a day at a time and collect every fresh
+ * break-and-retest level as it first appeared. The daily read only sees closed
+ * days plus the part of the current day before the cut, so nothing leaks from the future.
+ */
+export function buildDrills(hourly: Candle[], daily: Candle[], days = 40): Drill[] {
+  const found = new Map<string, Drill>();
+  for (let cut = hourly.length; cut >= Math.max(200, hourly.length - days * 24); cut -= 24) {
+    const at = Date.parse(hourly[cut - 1]!.time);
+    const dayStart = Math.floor(at / DAY) * DAY;
+    const closed = daily.filter((b) => Date.parse(b.time) + DAY <= at + 3_600_000);
+    const today = hourly.slice(0, cut).filter((b) => Date.parse(b.time) >= dayStart);
+    const forming = today.length
+      ? [{ time: new Date(dayStart).toISOString(), open: today[0]!.open, high: Math.max(...today.map((b) => b.high)), low: Math.min(...today.map((b) => b.low)), close: today.at(-1)!.close }]
+      : [];
+    const d = readDaily([...closed, ...forming], at + 1);
+    const from = Math.max(0, cut - 480);
+    for (const l of readLevels(hourly.slice(from, cut), d)) {
+      if (l.type !== "inverse" || !l.thrust || !l.naked) continue;
+      // Iterating backwards, so the last write is the earliest moment the level was readable.
+      found.set(`${l.price}|${l.thrust.time}`, { level: l, daily: d, from, cut, outcome: outcome(l, hourly.slice(cut)) });
+    }
+  }
+  // Oldest first; today's live level (if any) comes last.
+  return [...found.values()].sort((a, b) => a.cut - b.cut);
 }

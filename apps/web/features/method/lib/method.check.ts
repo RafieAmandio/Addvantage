@@ -1,7 +1,8 @@
 // Run from apps/web: pnpm exec tsx features/method/lib/method.check.ts
 import assert from "node:assert/strict";
 import { atr, readDaily, readLevels, type Candle } from "@tradevantage/shared";
-import { gradeLevel, gradeStop, gradeThrust } from "./practice";
+import { weekendGap } from "@tradevantage/shared";
+import { gradeLevel, gradeQualifies, gradeStop, gradeThrust, outcome } from "./practice";
 
 const day = (i: number, o: number, h: number, l: number, c: number): Candle => ({ time: new Date(Date.UTC(2026, 0, 1) + i * 86_400_000).toISOString(), open: o, high: h, low: l, close: c });
 const now = Date.UTC(2026, 6, 1);
@@ -41,4 +42,18 @@ assert.equal(gradeLevel(lv, h, 100.1, d).ok, true);
 assert.match(gradeLevel(lv, h, 101.2, d).feedback, /breakout candle/);
 assert.match(gradeStop(lv, 99, d).feedback, /Too tight/);
 assert.equal(gradeStop(lv, lv.stop!, d).ok, true);
+assert.match(gradeQualifies(lv, true, ["Naked", "R at least 1 for a limit"]).feedback, /naked, R at least 1/);
+
+// Outcome after the cut: fill, then whichever of stop or target comes first.
+const after = (lows: number[], highs: number[]) => lows.map((l, i) => hour(100 + i, l + 0.2, highs[i]!, l, l + 0.1));
+assert.equal(outcome(lv, after([101.5, 100.9, 99.9, 101], [102, 101.5, 101, 103.5])).kind, "win");
+assert.equal(outcome(lv, after([101.5, 99.9, 96], [102, 101, 100])).kind, "loss");
+assert.equal(outcome(lv, after([101.5, 101.2], [102, 102])).kind, "no-fill");
+
+// Weekend gap: Friday close 1.1000, Monday opens 1.1020 (20 pips) => sell back to 1.1000, stop at half the gap over the open.
+const fri = hour(0, 1.1, 1.1005, 1.0995, 1.1);
+const mon = { ...hour(0, 1.102, 1.1025, 1.1015, 1.102), time: new Date(Date.parse(fri.time) + 49 * 3_600_000).toISOString() };
+const g = weekendGap([fri, mon], 0.006, 0.0001);
+assert.ok(g && g.side === "sell" && g.target === 1.1 && Math.abs(g.stop - 1.103) < 1e-9 && !g.filled);
+assert.equal(weekendGap([fri, { ...mon, open: 1.1004 }], 0.006, 0.0001), null);
 console.log("method.check ok");

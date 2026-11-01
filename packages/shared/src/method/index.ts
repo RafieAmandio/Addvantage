@@ -14,7 +14,7 @@ export interface Candle {
 export type Dir = "bullish" | "bearish";
 
 export interface Signal {
-  kind: "pin" | "engulfing" | "sfp" | "idf" | "cross";
+  kind: "pin" | "engulfing" | "sfp" | "idf" | "cross" | "accdist";
   name: string;
   dir: Dir;
   /** Bar the signal printed on. */
@@ -109,6 +109,7 @@ function signalsOn(bars: Candle[], i: number, a: number | null): Signal[] {
     if (b.low < p.low && b.close > p.low) out.push({ kind: "idf", name: "Inside day failure", dir: "bullish", time: b.time, refs: [m.time, p.time], entry: p.low, entryNote: "Buy back at the inside day low" });
   }
   out.push(...sfpOn(bars, i, a, 3));
+  out.push(...accDistOn(bars, i));
   if (new Set(out.filter((s) => !s.shallow).map((s) => s.kind)).size >= 2) {
     const dirs = new Set(out.filter((s) => !s.shallow).map((s) => s.dir));
     if (dirs.size === 1) {
@@ -158,6 +159,64 @@ export function sfpOn(bars: Candle[], i: number, a: number | null, depth: number
   };
   pick(highs, true);
   pick(lows, false);
+  return out;
+}
+
+function ema(xs: number[], n: number): number[] {
+  const k = 2 / (n + 1);
+  const out: number[] = [];
+  xs.forEach((x, i) => out.push(i === 0 ? x : (x - out[i - 1]!) * k + out[i - 1]!));
+  return out;
+}
+
+/** MACD line (12/26 EMA difference of closes). */
+export function macd(bars: Candle[]): number[] {
+  const c = bars.map((b) => b.close);
+  const f = ema(c, 12);
+  const sl = ema(c, 26);
+  return f.map((x, i) => x - sl[i]!);
+}
+
+/**
+ * Accumulation on bar i: three progressively lower lows, each reversed by a green
+ * candle the very next bar, with MACD making higher lows across them. Bar i is the
+ * third green candle. Distribution is the mirror.
+ */
+export function accDistOn(bars: Candle[], i: number, lookback = 30): Signal[] {
+  if (i < 30) return [];
+  const m = macd(bars.slice(0, i + 1));
+  const out: Signal[] = [];
+  const find = (acc: boolean) => {
+    const turn = (j: number) => {
+      const b = bars[j]!;
+      const n = bars[j + 1];
+      if (!n) return false;
+      const extreme = acc ? b.low < Math.min(...bars.slice(Math.max(0, j - 3), j).map((x) => x.low)) : b.high > Math.max(...bars.slice(Math.max(0, j - 3), j).map((x) => x.high));
+      return extreme && (acc ? n.close > n.open : n.close < n.open);
+    };
+    const p3 = i - 1;
+    if (!turn(p3)) return;
+    const val = (j: number) => (acc ? bars[j]!.low : bars[j]!.high);
+    const beyond = (x: number, y: number) => (acc ? x < y : x > y); // x is a lower low (or higher high) than y
+    const diverges = (x: number, y: number) => (acc ? m[x]! > m[y]! : m[x]! < m[y]!); // MACD at x is a higher low than at y
+    let p2 = -1;
+    for (let j = p3 - 2; j >= i - lookback && j >= 1; j--) if (turn(j) && beyond(val(p3), val(j)) && diverges(p3, j)) { p2 = j; break; }
+    if (p2 < 0) return;
+    let p1 = -1;
+    for (let j = p2 - 2; j >= i - lookback && j >= 1; j--) if (turn(j) && beyond(val(p2), val(j)) && diverges(p2, j)) { p1 = j; break; }
+    if (p1 < 0) return;
+    out.push({
+      kind: "accdist",
+      name: acc ? "Accumulation" : "Distribution",
+      dir: acc ? "bullish" : "bearish",
+      time: bars[i]!.time,
+      refs: [bars[p1]!.time, bars[p2]!.time, bars[p3]!.time],
+      entry: bars[i]!.close,
+      entryNote: `${acc ? "Buy" : "Sell"} the close of the third ${acc ? "green" : "red"} candle, stop just ${acc ? "under the lowest low" : "over the highest high"}`,
+    });
+  };
+  find(true);
+  find(false);
   return out;
 }
 
@@ -231,6 +290,8 @@ export interface Level {
   thrust: Candle | null;
   /** Never traded back to since the break. */
   naked: boolean;
+  /** Each bounce off the level reaches less far than the last: it is likely to break. */
+  weakening: boolean;
   /** Price moved away from the level after the break before coming back. */
   space: boolean;
   confluence: { d1: boolean; fib: number | null; atr: boolean };
@@ -293,7 +354,7 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
     const postBreak = (buy ? highs : lows).filter((s) => s > t).map((s) => (buy ? hourly[s]!.high : hourly[s]!.low));
     const fta = [...(buy ? highsUp : lowsDn), ...postBreak, ...(peak !== null ? [peak] : [])].filter((x) => (buy ? x > lvl : x < lvl));
     const target = fta.length ? (buy ? Math.min(...fta) : Math.max(...fta)) : null;
-    out.push(grade({ type: "inverse", side, price: lvl, touches, thrust, naked, space, stop, target }, d, last));
+    out.push(grade({ type: "inverse", side, price: lvl, touches, thrust, naked, space, stop, target, weakening: weakening(after, lvl, buy, tol) }, d, last));
   };
 
   // Walk every break in the window. One candle can clear several swings; the last one before it is the LHPB/LLPB.
@@ -317,7 +378,7 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
     const target = fta.length ? (buy ? Math.min(...fta) : Math.max(...fta)) : null;
     // SFP stop: one 24-period hourly ATR beyond the level.
     const stop = h24 === null ? null : buy ? lvl - h24 : lvl + h24;
-    out.push(grade({ type: "same-way", side, price: lvl, touches: [hourly[s]!.time, ...visits], thrust: null, naked: visits.length === 0, space: true, stop, target }, d, last));
+    out.push(grade({ type: "same-way", side, price: lvl, touches: [hourly[s]!.time, ...visits], thrust: null, naked: visits.length === 0, space: true, stop, target, weakening: false }, d, last));
   };
   sameWay("buy");
   sameWay("sell");
@@ -334,7 +395,24 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
   return [...pickSide("buy"), ...pickSide("sell")].sort((x, y) => rank[x.verdict] - rank[y.verdict] || Math.abs(x.price - price) - Math.abs(y.price - price));
 }
 
-type Draft = Pick<Level, "type" | "side" | "price" | "touches" | "thrust" | "naked" | "space" | "stop" | "target">;
+type Draft = Pick<Level, "type" | "side" | "price" | "touches" | "thrust" | "naked" | "space" | "stop" | "target" | "weakening">;
+
+/** Bounces off a level after the break: if the latest rally away is smaller than the one before, it is weakening. */
+function weakening(after: Candle[], lvl: number, buy: boolean, tol: number): boolean {
+  const rallies: number[] = [];
+  let away: number | null = null;
+  for (const b of after) {
+    const touching = buy ? b.low <= lvl + tol : b.high >= lvl - tol;
+    if (touching) {
+      if (away !== null) rallies.push(away);
+      away = buy ? b.high : b.low;
+    } else if (away !== null) away = buy ? Math.max(away, b.high) : Math.min(away, b.low);
+  }
+  if (away !== null) rallies.push(away);
+  if (rallies.length < 2) return false;
+  const [prev, last] = rallies.slice(-2) as [number, number];
+  return buy ? last < prev : last > prev;
+}
 
 function grade(l: Draft, d: DailyRead, last: Candle): Level {
   const tol = (d.atr ?? 0) * 0.1;
@@ -398,6 +476,8 @@ export interface BoardRow {
   why: string;
   /** Last 72 hourly candles, for the board's mini chart. */
   candles: Candle[];
+  /** Last 40 daily candles, for the morning scan. */
+  days: Candle[];
 }
 
 /** One market's line on the board, from its daily and hourly candles. */
@@ -426,5 +506,85 @@ export function boardRow(meta: { symbol: string; label: string; group: string },
     call = "pass";
     why = "Not enough daily candles";
   }
-  return { ...meta, close, asOf: d.bar?.time ?? null, bias: d.bias, signals, usedPct: d.usedPct, atr: d.atr, insideDay: !!d.insideDay, level, call, why, candles: hourly.slice(-72) };
+  return { ...meta, close, asOf: d.bar?.time ?? null, bias: d.bias, signals, usedPct: d.usedPct, atr: d.atr, insideDay: !!d.insideDay, level, call, why, candles: hourly.slice(-72), days: daily.filter((b) => b.high > b.low).slice(-40) };
 }
+
+
+/** Weekly candles from daily ones, weeks starting Monday (UTC). */
+export function weekly(daily: Candle[]): Candle[] {
+  const weeks = new Map<string, Candle>();
+  for (const b of daily) {
+    const d = new Date(b.time);
+    const monday = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7)));
+    const k = monday.toISOString();
+    const w = weeks.get(k);
+    if (!w) weeks.set(k, { ...b, time: k });
+    else Object.assign(w, { high: Math.max(w.high, b.high), low: Math.min(w.low, b.low), close: b.close });
+  }
+  return [...weeks.values()];
+}
+
+export interface MarketMap {
+  /** Unbroken weekly swing highs and lows near price. */
+  weekly: number[];
+  /** Unbroken daily swing highs and lows near price. */
+  daily: number[];
+  weekOpen: number | null;
+}
+
+/** Top-down map: the weekly and daily swings no close has taken out, nearest price first. */
+export function marketMap(daily: Candle[], max = 3): MarketMap {
+  const price = daily.at(-1)?.close;
+  if (price === undefined) return { weekly: [], daily: [], weekOpen: null };
+  const pick = (bars: Candle[], n: number) => {
+    const { highs, lows } = swings(bars, n);
+    const out: number[] = [];
+    for (const i of highs) if (bars.slice(i + 1).every((b) => b.close <= bars[i]!.high)) out.push(bars[i]!.high);
+    for (const i of lows) if (bars.slice(i + 1).every((b) => b.close >= bars[i]!.low)) out.push(bars[i]!.low);
+    const above = out.filter((x) => x > price).sort((a, b) => a - b).slice(0, max);
+    const below = out.filter((x) => x < price).sort((a, b) => b - a).slice(0, max);
+    return [...above, ...below];
+  };
+  const w = weekly(daily);
+  return { weekly: pick(w, 1), daily: pick(daily, 2), weekOpen: w.at(-1)?.open ?? null };
+}
+
+export interface Gap {
+  /** Last close before the weekend and the first price after it. */
+  fridayClose: number;
+  open: number;
+  time: string;
+  /** Gap up is sold back down to the close, gap down is bought. */
+  side: "buy" | "sell";
+  filled: boolean;
+  /** Stop at half the gap beyond the open, target the Friday close. */
+  stop: number;
+  target: number;
+  /** An hourly SFP in the fill direction since the open: the strongest version of the trade. */
+  sfp: string | null;
+}
+
+/** This week's weekend gap, if the open moved at least 10 pips (pass `pip` for FX) or 15% of daily ATR otherwise. */
+export function weekendGap(hourly: Candle[], dailyAtr: number | null, pip: number | null = null): Gap | null {
+  for (let i = hourly.length - 1; i > 0; i--) {
+    const prev = hourly[i - 1]!;
+    const b = hourly[i]!;
+    if (Date.parse(b.time) - Date.parse(prev.time) < 36 * 3_600_000) continue;
+    const gap = b.open - prev.close;
+    const min = pip !== null ? 10 * pip : (dailyAtr ?? Infinity) * 0.15;
+    if (Math.abs(gap) < min) return null;
+    const side = gap > 0 ? "sell" : "buy";
+    const after = hourly.slice(i);
+    const filled = after.some((x) => (side === "sell" ? x.low <= prev.close : x.high >= prev.close));
+    let sfp: string | null = null;
+    for (let j = i; j < hourly.length && !sfp; j++) {
+      const hit = sfpOn(hourly, j, dailyAtr, 1).find((x) => (side === "buy" ? x.dir === "bullish" : x.dir === "bearish") && !x.shallow);
+      if (hit) sfp = hit.time;
+    }
+    return { fridayClose: prev.close, open: b.open, time: b.time, side, filled, stop: b.open + gap / 2, target: prev.close, sfp };
+  }
+  return null;
+}
+
+/** Pip size for spot FX symbols like "EUR/USD" (0.01 for yen quotes); null for metals, oil and indices. */
+export const pipSize = (symbol: string) => (/^[A-Z]{3}\/[A-Z]{3}$/.test(symbol) && !/^X(AU|AG)/.test(symbol) ? (symbol.endsWith("JPY") ? 0.01 : 0.0001) : null);

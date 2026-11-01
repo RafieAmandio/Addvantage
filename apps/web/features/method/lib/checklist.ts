@@ -61,6 +61,11 @@ export function checklist(l: Level, d: DailyRead): Rule[] {
     },
     { rule: "Naked", met: l.naked, evidence: l.naked ? "Not traded back to since the break" : "Price already came back to it" },
     { rule: "Space before the retest", met: l.space, evidence: l.space ? "Price moved away before returning" : "Price has not moved away yet" },
+    {
+      rule: "Level holding",
+      met: !l.weakening,
+      evidence: l.weakening ? `Each bounce off it reaches less far than the last. Likely to break, the method exits early here` : "No weakening bounces",
+    },
     biasRule,
     atrRule,
     rRule,

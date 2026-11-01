@@ -1,17 +1,19 @@
-import type { Candle, DailyRead, Level, Signal } from "@tradevantage/shared";
+import type { Candle, DailyRead, Gap, Level, MarketMap, Signal } from "@tradevantage/shared";
 import type { Box } from "../components/BoxPrimitive";
 import { levelName } from "./explain";
 
 /** Chart labels stay short, like LuxAlgo's BOS/CHoCH tags; the full read is in the panel. */
 export const shortName = (l: Level) => (l.type === "inverse" ? levelName(l) : l.side === "buy" ? "Support" : "Resistance");
 
-export type Layer = "atr" | "fib" | "liquidity" | "signals" | "levels" | "sameway" | "passed";
+export type Layer = "atr" | "fib" | "liquidity" | "signals" | "levels" | "sameway" | "passed" | "map" | "gap";
 
 export const LAYERS: { key: Layer; label: string }[] = [
   { key: "levels", label: "LHPB / LLPB" },
   { key: "sameway", label: "Same-way" },
   { key: "passed", label: "Passed levels" },
   { key: "signals", label: "Daily signals" },
+  { key: "map", label: "Weekly & daily map" },
+  { key: "gap", label: "Weekend gap" },
   { key: "atr", label: "ATR band" },
   { key: "fib", label: "Fib" },
   { key: "liquidity", label: "Equal highs/lows" },
@@ -59,8 +61,8 @@ export function indexer(bars: Candle[]) {
   };
 }
 
-export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: DailyRead; levels: Level[]; layers: Set<Layer>; pick: Pick; step: number }): Overlays {
-  const { tf, bars, daily: d, levels, layers, pick, step } = opts;
+export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: DailyRead; levels: Level[]; layers: Set<Layer>; pick: Pick; step: number; map?: MarketMap; gap?: Gap | null }): Overlays {
+  const { tf, bars, daily: d, levels, layers, pick, step, map, gap } = opts;
   const out: Overlays = { boxes: [], lines: [], marks: [], focus: null };
   const last = bars.length - 1;
   if (last < 0) return out;
@@ -78,6 +80,21 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
   if (on("liquidity")) {
     d.equalHighs.forEach((x) => out.lines.push({ price: x, color: "rgba(255,255,255,.3)", style: "dotted", label: "EQH" }));
     d.equalLows.forEach((x) => out.lines.push({ price: x, color: "rgba(255,255,255,.3)", style: "dotted", label: "EQL" }));
+  }
+
+  // Top-down map: weekly swings heavy, daily swings light, the weekly open dotted.
+  if (on("map") && map) {
+    map.weekly.forEach((x) => out.lines.push({ price: x, color: "rgba(255,255,255,.85)", style: "solid", label: "W", width: 2 }));
+    map.daily.filter((x) => !map.weekly.includes(x)).forEach((x) => out.lines.push({ price: x, color: "rgba(255,255,255,.45)", style: "solid", label: "D" }));
+    if (map.weekOpen !== null) out.lines.push({ price: map.weekOpen, color: rgba(BRAND, 0.8), style: "dotted", label: "WO" });
+  }
+  if (on("gap") && gap && tf === "1H") {
+    const gi = at(gap.time);
+    if (gi > 0) {
+      out.boxes.push({ i0: gi - 1, i1: gap.filled ? gi + 6 : right, top: Math.max(gap.fridayClose, gap.open), bottom: Math.min(gap.fridayClose, gap.open), fill: rgba(BRAND, gap.filled ? 0.06 : 0.14), stroke: rgba(BRAND, 0.5), dashed: true, label: `Gap${gap.filled ? " · filled" : ""}${gap.sfp ? " · + SFP" : ""}`, labelColor: BRAND });
+      if (!gap.filled) out.lines.push({ price: gap.stop, color: rgba(DOWN, 0.7), style: "dashed", label: "Half gap" });
+      if (gap.sfp) out.marks.push({ time: gap.sfp, text: "SFP", above: gap.side === "sell", color: sideColor(gap.side === "buy") });
+    }
   }
 
   const touchPrice = (l: Level, t: string) => {
@@ -158,6 +175,7 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
       const ins = bars[refs[1]]!;
       out.boxes.push({ i0: refs[1], i1: si, top: ins.high, bottom: ins.low, fill: "rgba(255,255,255,.08)", stroke: "rgba(255,255,255,.5)", dashed: true, label: "Inside day" });
     }
+    if (s.kind === "accdist") s.refs.forEach((t, k) => out.marks.push({ time: t, text: `${k + 1}`, above: !bull, color: "rgba(255,255,255,.8)" }));
     if (s.kind === "sfp" && refs[0] !== undefined) {
       const sw = bars[refs[0]]!;
       out.lines.push({ price: bull ? sw.low : sw.high, color: "rgba(255,255,255,.6)", style: "dashed", label: "Swing" });
@@ -172,7 +190,7 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
       if (l.type === "inverse" ? on("levels") : on("sameway")) zone(l, false);
     }
   if (on("signals") && tf === "1D")
-    for (const s of d.signals) out.marks.push({ time: s.time, text: s.kind === "pin" ? (s.dir === "bullish" ? "Hammer" : "Star") : s.kind === "engulfing" ? "Engulf" : s.kind === "idf" ? "IDF" : s.kind === "cross" ? "Cross" : "SFP", above: s.dir === "bearish", color: s.shallow ? "rgba(255,255,255,.4)" : sideColor(s.dir === "bullish") });
+    for (const s of d.signals) out.marks.push({ time: s.time, text: s.kind === "pin" ? (s.dir === "bullish" ? "Hammer" : "Star") : s.kind === "engulfing" ? "Engulf" : s.kind === "idf" ? "IDF" : s.kind === "cross" ? "Cross" : s.kind === "accdist" ? (s.dir === "bullish" ? "Acc" : "Dist") : "SFP", above: s.dir === "bearish", color: s.shallow ? "rgba(255,255,255,.4)" : sideColor(s.dir === "bullish") });
   return out;
 }
 
@@ -182,8 +200,10 @@ export function practiceOverlays(opts: {
   daily: DailyRead;
   level: Level;
   answers: { time?: string; price?: number; ok: boolean }[];
+  /** After the drill: where the order filled and where it exited. */
+  outcome?: { kind: string; fillTime: string | null; exitTime: string | null; r: number | null };
 }): Overlays {
-  const { bars, daily: d, level: l, answers } = opts;
+  const { bars, daily: d, level: l, answers, outcome } = opts;
   const out: Overlays = { boxes: [], lines: [], marks: [], focus: null };
   const last = bars.length - 1;
   if (last < 0) return out;
@@ -215,6 +235,8 @@ export function practiceOverlays(opts: {
     yours(answers[2]!, "Your stop");
   }
   if (n >= 4 && l.thrust) out.boxes.push({ i0: at(l.thrust.time) + 1, i1: last, top: l.price + tol, bottom: l.price - tol, fill: rgba(l.naked ? BRAND : "#FFFFFF", 0.25), label: l.naked ? "Naked" : "Tested", labelColor: l.naked ? BRAND : "rgba(255,255,255,.7)" });
+  if (outcome?.fillTime) out.marks.push({ time: outcome.fillTime, text: "Filled", above: !buy, color: BRAND });
+  if (outcome?.exitTime) out.marks.push({ time: outcome.exitTime, text: outcome.kind === "win" ? `Target +${outcome.r?.toFixed(2)}R` : "Stop -1R", above: outcome.kind === "win" ? buy : !buy, color: outcome.kind === "win" ? UP : DOWN });
   if (n >= 5) {
     const i0 = last + 1;
     const i1 = last + 22;

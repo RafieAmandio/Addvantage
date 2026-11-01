@@ -14,14 +14,14 @@ import {
   type Time,
   type UTCTimestamp,
 } from "lightweight-charts";
-import { readDaily, readLevels, type Candle, type Level, type Signal } from "@tradevantage/shared";
+import { marketMap, readDaily, readLevels, weekendGap, type Candle, type Level, type Signal } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { BoxPrimitive } from "./BoxPrimitive";
 import { LAYERS, buildOverlays, indexer, practiceOverlays, type Layer, type Pick } from "../lib/overlays";
-import { explainLevel, explainSignal, levelName } from "../lib/explain";
+import { explainLevel, explainSignal, levelName, wib } from "../lib/explain";
 import { checklist, type Rule } from "../lib/checklist";
-import { QUESTIONS, gradeLevel, gradeNaked, gradeQualifies, gradeStop, gradeThrust, type Answer } from "../lib/practice";
+import { QUESTIONS, buildDrills, gradeLevel, gradeNaked, gradeQualifies, gradeStop, gradeThrust, type Answer, type Drill } from "../lib/practice";
 
 const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000) as UTCTimestamp;
 const STYLE = { solid: LineStyle.Solid, dashed: LineStyle.Dashed, dotted: LineStyle.Dotted } as const;
@@ -29,49 +29,77 @@ const DEFAULT_LAYERS: Layer[] = ["levels", "sameway", "signals", "atr"];
 
 const chip = (on: boolean) =>
   cn(
-    "shrink-0 rounded-full px-3 py-1 text-[13px] font-medium ring-1 transition-colors focus-visible:outline-none focus-visible:ring-brand",
+    "shrink-0 rounded-full px-3 py-1 text-[13px] font-medium ring-1 transition duration-150 focus-visible:outline-none focus-visible:ring-brand motion-safe:active:scale-[0.96]",
     on ? "bg-white text-black ring-white" : "text-white/55 ring-white/[0.14] hover:text-white",
   );
 
 /** Chart-first view of the method: structures drawn on the candles, filters to toggle them, tap one to walk through it. */
-export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle[] }) {
+export function MethodChart({ hourly, daily, pip = null }: { hourly: Candle[]; daily: Candle[]; /** Pip size for FX, for the weekend gap threshold. */ pip?: number | null }) {
   const read = useMemo(() => readDaily(daily), [daily]);
-  const levels = useMemo(() => readLevels(hourly, read, 3), [hourly, read]);
+  // Levels read on the last 20 days, same window as the board, even though the chart keeps 60 for replay.
+  const levels = useMemo(() => readLevels(hourly.slice(-480), read, 3), [hourly, read]);
   const [tf, setTf] = useState<"1H" | "1D">("1H");
   const [layers, setLayers] = useState<Set<Layer>>(() => new Set(DEFAULT_LAYERS));
   const [pick, setPick] = useState<Pick>(null);
   const [step, setStep] = useState(0);
+  const map = useMemo(() => marketMap(daily), [daily]);
+  const gap = useMemo(() => weekendGap(hourly, read.atr, pip), [hourly, read.atr, pip]);
   const [mode, setMode] = useState<"study" | "practice">("study");
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const bars = tf === "1H" ? hourly : daily;
+  const [drillAt, setDrillAt] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [tally, setTally] = useState({ right: 0, asked: 0 });
 
-  // Practice runs on the strongest break-and-retest level on the chart.
-  const drill = useMemo(() => levels.filter((l) => l.type === "inverse" && l.thrust).sort((a, b) => b.score - a.score)[0] ?? null, [levels]);
+  // Replay: past moments where a fresh break-and-retest level was readable, most recent finished one first, today's last.
+  const drills = useMemo(() => {
+    if (mode !== "practice") return [];
+    const all = buildDrills(hourly, daily);
+    const live = all.filter((x) => x.cut === hourly.length);
+    return [...all.filter((x) => x.cut !== hourly.length).reverse(), ...live];
+  }, [mode, hourly, daily]);
+  const drill = drills[drillAt] ?? null;
   const practicing = mode === "practice" && drill !== null && tf === "1H";
+  // Memoised: a new array identity would rebuild the chart on every render.
+  const bars = useMemo(
+    () => (practicing ? hourly.slice(drill!.from, revealed ? Math.min(hourly.length, drill!.cut + 96) : drill!.cut) : tf === "1H" ? hourly : daily),
+    [practicing, drill, revealed, tf, hourly, daily],
+  );
   const q = QUESTIONS[answers.length];
-  const drillRules = useMemo(() => (drill ? checklist(drill, read) : []), [drill, read]);
+  const drillRules = useMemo(() => (drill ? checklist(drill.level, drill.daily) : []), [drill]);
 
   const answer = (a: { time?: string; price?: number; choice?: boolean }) => {
     if (!drill || !q) return;
+    const l = drill.level;
+    const window = hourly.slice(drill.from, drill.cut);
     const graded =
-      q.key === "thrust" && a.time ? gradeThrust(drill, hourly, a.time)
-      : q.key === "level" && a.price !== undefined ? gradeLevel(drill, hourly, a.price, read)
-      : q.key === "stop" && a.price !== undefined ? gradeStop(drill, a.price, read)
-      : q.key === "naked" && a.choice !== undefined ? gradeNaked(drill, a.choice)
-      : q.key === "qualifies" && a.choice !== undefined ? gradeQualifies(drill, a.choice, drillRules.filter((r) => !r.met).map((r) => r.rule))
+      q.key === "thrust" && a.time ? gradeThrust(l, window, a.time)
+      : q.key === "level" && a.price !== undefined ? gradeLevel(l, window, a.price, drill.daily)
+      : q.key === "stop" && a.price !== undefined ? gradeStop(l, a.price, drill.daily)
+      : q.key === "naked" && a.choice !== undefined ? gradeNaked(l, a.choice)
+      : q.key === "qualifies" && a.choice !== undefined ? gradeQualifies(l, a.choice, drillRules.filter((r) => !r.met).map((r) => r.rule))
       : null;
-    if (graded) setAnswers((xs) => [...xs, graded]);
+    if (!graded) return;
+    setAnswers((xs) => [...xs, graded]);
+    setTally((t) => ({ right: t.right + Number(graded.ok), asked: t.asked + 1 }));
+  };
+  const goDrill = (i: number) => {
+    setDrillAt(i);
+    setAnswers([]);
+    setRevealed(false);
   };
   const startPractice = () => {
     setMode("practice");
     setTf("1H");
     setPick(null);
-    setAnswers([]);
+    goDrill(0);
   };
 
   const overlays = useMemo(
-    () => (practicing ? practiceOverlays({ bars, daily: read, level: drill!, answers }) : buildOverlays({ tf, bars, daily: read, levels, layers, pick, step })),
-    [practicing, drill, answers, tf, bars, read, levels, layers, pick, step],
+    () =>
+      practicing
+        ? practiceOverlays({ bars, daily: drill!.daily, level: drill!.level, answers, outcome: revealed ? drill!.outcome : undefined })
+        : buildOverlays({ tf, bars, daily: read, levels, layers, pick, step, map, gap }),
+    [practicing, drill, answers, revealed, tf, bars, read, levels, layers, pick, step, map, gap],
   );
   const story = pick?.kind === "level" ? explainLevel(pick.level, read.bias) : pick?.kind === "signal" ? explainSignal(pick.signal) : null;
   const lastStep = (story?.steps.length ?? 1) - 1;
@@ -193,7 +221,7 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
               type="button"
               aria-pressed={mode === m}
               onClick={() => (m === "practice" ? startPractice() : setMode("study"))}
-              className={cn("rounded-full px-3 py-1 capitalize", mode === m ? "bg-brand text-black" : "text-white/55 hover:text-white")}
+              className={cn("rounded-full px-3 py-1 capitalize transition-colors duration-200 motion-safe:active:scale-[0.96]", mode === m ? "bg-brand text-black" : "text-white/55 hover:text-white")}
             >
               {m}
             </button>
@@ -223,7 +251,7 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
           <div ref={el} className="h-[62vh] min-h-[420px] w-full" />
         )}
         {practicing && q && (
-          <p className="pointer-events-none absolute left-4 top-3 rounded-full bg-black/70 px-3 py-1 text-[13px] font-medium text-white">{q.ask(drill!)}</p>
+          <p className="pointer-events-none absolute left-4 top-3 rounded-full bg-black/70 px-3 py-1 text-[13px] font-medium text-white">{q.ask(drill!.level)}</p>
         )}
         {mode === "study" && !pick && bars.length > 0 && (
           <p className="pointer-events-none absolute left-4 top-3 text-[12px] text-white/40">Tap a level on the chart, or pick one below</p>
@@ -233,7 +261,21 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
       {/* Walkthrough for the picked structure, or the pickers */}
       <div className="border-t border-white/[0.07] px-4 py-3">
         {mode === "practice" ? (
-          <Practice level={drill} tf={tf} answers={answers} rules={drillRules} onChoice={(choice) => answer({ choice })} onRestart={startPractice} />
+          <Practice
+            drill={drill}
+            index={drillAt}
+            total={drills.length}
+            tf={tf}
+            answers={answers}
+            rules={drillRules}
+            tally={tally}
+            revealed={revealed}
+            live={drill?.cut === hourly.length}
+            onChoice={(choice) => answer({ choice })}
+            onRestart={() => goDrill(drillAt)}
+            onReveal={() => setRevealed(true)}
+            onNext={() => goDrill((drillAt + 1) % Math.max(1, drills.length))}
+          />
         ) : story ? (
           <div>
             <div className="flex items-center gap-3">
@@ -251,12 +293,14 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
               ))}
             </div>
             <div className="mt-3 flex items-start gap-3">
-              <p className="min-w-0 flex-1 text-[14px] leading-[21px] text-white/70">{story.steps[step]?.body}</p>
+              <p key={`${story.title}-${step}`} className="min-w-0 flex-1 text-[14px] leading-[21px] text-white/70 motion-safe:animate-[rise_200ms_ease-out]">
+                {story.steps[step]?.body}
+              </p>
               <div className="flex shrink-0 gap-2">
-                <button type="button" disabled={step === 0} onClick={() => setStep(step - 1)} className="h-9 rounded-full px-3 text-[13px] text-white ring-1 ring-white/[0.14] disabled:opacity-30">
+                <button type="button" disabled={step === 0} onClick={() => setStep(step - 1)} className="h-9 rounded-full px-3 text-[13px] text-white ring-1 ring-white/[0.14] transition disabled:opacity-30 motion-safe:active:scale-[0.96]">
                   Back
                 </button>
-                <button type="button" disabled={step === lastStep} onClick={() => setStep(step + 1)} className="h-9 rounded-full bg-brand px-4 text-[13px] font-semibold text-black disabled:opacity-30">
+                <button type="button" disabled={step === lastStep} onClick={() => setStep(step + 1)} className="h-9 rounded-full bg-brand px-4 text-[13px] font-semibold text-black transition disabled:opacity-30 motion-safe:active:scale-[0.96]">
                   Next
                 </button>
               </div>
@@ -266,7 +310,7 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
         ) : (
           <div className="flex gap-2 overflow-x-auto pb-1">
             {shown.map((l) => (
-              <button key={`${l.type}${l.side}${l.price}`} type="button" onClick={() => select({ kind: "level", level: l })} className="shrink-0 rounded-xl bg-raised px-3 py-2 text-left hover:bg-white/[0.08]">
+              <button key={`${l.type}${l.side}${l.price}`} type="button" onClick={() => select({ kind: "level", level: l })} className="shrink-0 rounded-xl bg-raised px-3 py-2 text-left transition duration-150 hover:bg-white/[0.08] motion-safe:active:scale-[0.98]">
                 <span className="flex items-center gap-2 text-[12px] font-semibold">
                   <RuleCount rules={checklist(l, read)} />
                   {l.status === "at-level" && l.type === "inverse" && <span className="rounded-full bg-brand px-1.5 text-[11px] text-black">At level now</span>}
@@ -281,7 +325,7 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
               </button>
             ))}
             {signalsToday.map((s: Signal) => (
-              <button key={`${s.kind}${s.dir}`} type="button" onClick={() => select({ kind: "signal", signal: s })} className="shrink-0 rounded-xl bg-raised px-3 py-2 text-left hover:bg-white/[0.08]">
+              <button key={`${s.kind}${s.dir}`} type="button" onClick={() => select({ kind: "signal", signal: s })} className="shrink-0 rounded-xl bg-raised px-3 py-2 text-left transition duration-150 hover:bg-white/[0.08] motion-safe:active:scale-[0.98]">
                 <span className="block text-[12px] font-semibold text-white/40">Daily signal</span>
                 <span className={cn("block text-[14px]", s.shallow ? "text-white/55" : s.dir === "bullish" ? "text-up" : "text-down")}>{s.name}</span>
               </button>
@@ -301,7 +345,7 @@ function RuleCount({ rules }: { rules: Rule[] }) {
 
 function Checklist({ rules }: { rules: Rule[] }) {
   return (
-    <div className="mt-4">
+    <div className="mt-4 motion-safe:animate-[rise_250ms_ease-out]">
       <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
         Rules · <RuleCount rules={rules} />
       </p>
@@ -322,42 +366,110 @@ function Checklist({ rules }: { rules: Rule[] }) {
   );
 }
 
-function Practice({ level, tf, answers, rules, onChoice, onRestart }: { level: Level | null; tf: "1H" | "1D"; answers: Answer[]; rules: Rule[]; onChoice: (yes: boolean) => void; onRestart: () => void }) {
-  if (!level) return <p className="py-2 text-[14px] text-white/55">No clean break on this chart right now to practise on. Try another market from the board.</p>;
+function Practice({
+  drill,
+  index,
+  total,
+  tf,
+  answers,
+  rules,
+  tally,
+  revealed,
+  live,
+  onChoice,
+  onRestart,
+  onReveal,
+  onNext,
+}: {
+  live: boolean;
+  drill: Drill | null;
+  index: number;
+  total: number;
+  tf: "1H" | "1D";
+  answers: Answer[];
+  rules: Rule[];
+  tally: { right: number; asked: number };
+  revealed: boolean;
+  onChoice: (yes: boolean) => void;
+  onRestart: () => void;
+  onReveal: () => void;
+  onNext: () => void;
+}) {
+  if (!drill) return <p className="py-2 text-[14px] text-white/55">No clean breaks in this market&apos;s recent history to practise on. Try another market from the board.</p>;
   if (tf !== "1H") return <p className="py-2 text-[14px] text-white/55">Practice runs on the 1H chart. Switch back to 1H to continue.</p>;
+  const level = drill.level;
   const q = QUESTIONS[answers.length];
   const last = answers.at(-1);
   const score = answers.filter((a) => a.ok).length;
+  const o = drill.outcome;
+  const story = live
+    ? "This is today's chart. Nobody knows what happens next yet, so check back later."
+    : o.kind === "win" ? `Price came back on ${wib(o.fillTime!)} and reached the target on ${wib(o.exitTime!)}: +${o.r?.toFixed(2)}R.`
+    : o.kind === "loss" ? `Price came back on ${wib(o.fillTime!)} and hit the stop on ${wib(o.exitTime!)}: -1R. Rules give an edge over many trades, not a guarantee on one.`
+    : o.kind === "running" ? `Filled on ${wib(o.fillTime!)}, still between stop and target.`
+    : "Price never came back to the level. No fill, no trade: a limit order costs nothing when it misses.";
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+          Drill {index + 1} of {total} · {wib(drill.level.thrust?.time ?? "", false)}
+        </span>
         <div className="flex gap-1" aria-label={`Question ${Math.min(answers.length + 1, QUESTIONS.length)} of ${QUESTIONS.length}`}>
           {QUESTIONS.map((x, i) => (
-            <span key={x.key} className={cn("h-1.5 w-6 rounded-full", i < answers.length ? (answers[i]!.ok ? "bg-up" : "bg-down") : i === answers.length ? "bg-white/60" : "bg-white/10")} />
+            <span
+              key={x.key}
+              className={cn(
+                "h-1.5 w-6 rounded-full transition-colors duration-300",
+                i < answers.length ? (answers[i]!.ok ? "bg-up" : "bg-down") : i === answers.length ? "bg-white/60 motion-safe:animate-pulse" : "bg-white/10",
+              )}
+            />
           ))}
         </div>
-        <p className="min-w-0 flex-1 text-[15px] font-semibold text-white">{q ? q.ask(level) : `Done: ${score} of ${QUESTIONS.length} right`}</p>
-        <button type="button" onClick={onRestart} className="shrink-0 text-[13px] text-white/40 hover:text-white">
-          Start again
-        </button>
+        <span className="ml-auto text-[12px] text-white/40">
+          Session <span className="font-num text-[14px] font-semibold text-white">{tally.right}</span>/{tally.asked}
+        </span>
       </div>
+      <p className="text-[15px] font-semibold text-white">{q ? q.ask(level) : `Done: ${score} of ${QUESTIONS.length} right`}</p>
       {last && (
-        <p className={cn("text-[14px] leading-[21px]", last.ok ? "text-up" : "text-white/80")}>
+        <p key={answers.length} className={cn("text-[14px] leading-[21px] motion-safe:animate-[rise_200ms_ease-out]", last.ok ? "text-up" : "text-white/80")}>
           <span className={cn("mr-1 font-semibold", last.ok ? "text-up" : "text-down")}>{last.ok ? "Right." : "Not quite."}</span>
           {last.feedback.replace(/^Yes\. |^Yes, /, "")}
         </p>
       )}
       {q && !q.tap && (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(q.key === "naked" ? [["Yes, it came back", true], ["No, still naked", false]] : [["Yes, it qualifies", true], ["No, it doesn't", false]]).map(([label, v]) => (
-            <button key={String(label)} type="button" onClick={() => onChoice(v as boolean)} className="h-10 rounded-full px-4 text-[14px] font-medium text-white ring-1 ring-white/[0.14] hover:bg-raised">
+            <button
+              key={String(label)}
+              type="button"
+              onClick={() => onChoice(v as boolean)}
+              className="h-10 rounded-full px-4 text-[14px] font-medium text-white ring-1 ring-white/[0.14] transition hover:bg-raised motion-safe:active:scale-[0.97]"
+            >
               {label as string}
             </button>
           ))}
         </div>
       )}
       {q?.tap && <p className="text-[13px] text-white/40">Tap the chart to answer.</p>}
-      {!q && <Checklist rules={rules} />}
+      {!q && (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            {!revealed && !live && (
+              <button type="button" onClick={onReveal} className="h-10 rounded-full bg-brand px-4 text-[14px] font-semibold text-black transition motion-safe:active:scale-[0.97]">
+                Show what happened next
+              </button>
+            )}
+            <button type="button" onClick={onNext} className="h-10 rounded-full px-4 text-[14px] font-medium text-white ring-1 ring-white/[0.14] transition hover:bg-raised motion-safe:active:scale-[0.97]">
+              Next drill
+            </button>
+            <button type="button" onClick={onRestart} className="text-[13px] text-white/40 hover:text-white">
+              Try this one again
+            </button>
+          </div>
+          {(revealed || live) && <p className={cn("text-[14px] leading-[21px] motion-safe:animate-[rise_200ms_ease-out]", o.kind === "win" ? "text-up" : o.kind === "loss" ? "text-down" : "text-white/70")}>{story}</p>}
+          <Checklist rules={rules} />
+        </>
+      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { BoxPrimitive, type Box } from "./BoxPrimitive";
 const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000) as UTCTimestamp;
 
 /** Board thumbnail: last hourly candles with the main zone and its risk/reward box. No axes, no interaction. */
-export function MiniChart({ candles, level, height = 132 }: { candles: Candle[]; level: Level | null; height?: number }) {
+export function MiniChart({ candles, level, extra = [], height = 132 }: { candles: Candle[]; level: Level | null; /** More boxes, by candle index. */ extra?: Box[]; height?: number }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,10 +54,10 @@ export function MiniChart({ candles, level, height = 132 }: { candles: Candle[];
     }
     const prim = new BoxPrimitive([]);
     series.attachPrimitive(prim);
-    prim.set(boxes, times);
+    prim.set([...boxes, ...extra], times);
     chart.timeScale().fitContent();
     return () => chart.remove();
-  }, [candles, level]);
+  }, [candles, level, extra]);
 
   if (candles.length === 0) return <div className="rounded-lg bg-black/20" style={{ height }} />;
   return <div ref={ref} className="pointer-events-none w-full" style={{ height }} />;
