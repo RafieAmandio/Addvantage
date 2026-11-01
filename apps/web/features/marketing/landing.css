@@ -1,0 +1,108 @@
+/* Landing page motion. Entrances spring, scripted demos ease out, everything
+   has a still state under reduced motion. `html.lv-motion` is set by LandingMotion. */
+:root {
+  --lv-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --lv-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes lv-rise {
+  from { opacity: 0; transform: translateY(28px); }
+}
+@keyframes lv-card {
+  from { opacity: 0; transform: translateY(70px) rotate(var(--r, -3deg)) scale(0.96); }
+}
+@keyframes lv-pop {
+  0% { opacity: 0; transform: scale(0.4) rotate(12deg); }
+  70% { opacity: 1; transform: scale(1.08) rotate(-2deg); }
+}
+@keyframes lv-line {
+  from { transform: scaleX(0); }
+}
+@keyframes lv-vline {
+  from { transform: scaleY(0); }
+}
+@keyframes lv-letter {
+  from { transform: translateY(105%); }
+}
+@keyframes lv-shake {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+@keyframes lv-stamp {
+  0% { opacity: 0; transform: scale(2.2) rotate(-18deg); }
+  60% { opacity: 1; transform: scale(0.92) rotate(-7deg); }
+  100% { transform: scale(1) rotate(-8deg); }
+}
+@keyframes lv-flash {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  40% { opacity: 1; transform: translateY(0) scale(1.06); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes lv-in {
+  from { opacity: 0; transform: translateY(10px); }
+}
+@keyframes lv-tap {
+  from { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
+  to { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+}
+@keyframes lv-dance {
+  0%, 86%, 100% { transform: rotate(0) scale(1); }
+  90% { transform: rotate(-5deg) scale(1.06); }
+  94% { transform: rotate(4deg) scale(0.98); }
+}
+@keyframes lv-caret {
+  50% { opacity: 0; }
+}
+@keyframes lv-live {
+  50% { opacity: 0.25; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lv-motion [data-reveal]:not([data-in]) { opacity: 0; }
+  .lv-motion [data-reveal][data-in] { animation: lv-rise 0.75s calc(var(--i, 0) * 90ms) var(--lv-out) backwards; }
+  .lv-motion [data-reveal="card"][data-in] { animation: lv-card 0.9s calc(var(--i, 0) * 120ms) var(--lv-back) backwards; }
+  .lv-motion [data-reveal="pop"][data-in] { animation: lv-pop 0.6s calc(var(--i, 0) * 90ms) var(--lv-out) backwards; }
+  .lv-motion [data-reveal="line"] { transform-origin: left; }
+  .lv-motion [data-reveal="line"]:not([data-in]) { opacity: 1; transform: scaleX(0); }
+  .lv-motion [data-reveal="line"][data-in] { animation: lv-line 1.1s var(--lv-out) backwards; }
+  .lv-motion [data-reveal="vline"] { transform-origin: top; }
+  .lv-motion [data-reveal="vline"]:not([data-in]) { opacity: 1; transform: scaleY(0); }
+  .lv-motion [data-reveal="vline"][data-in] { animation: lv-vline 1.1s calc(var(--i, 0) * 90ms) var(--lv-out) backwards; }
+  /* The footer wordmark: letters rise out of the baseline one by one. */
+  .lv-motion [data-reveal="letters"]:not([data-in]) { opacity: 1; }
+  .lv-motion [data-reveal="letters"]:not([data-in]) > span > span { transform: translateY(105%); }
+  .lv-motion [data-reveal="letters"][data-in] { animation: none; }
+  .lv-motion [data-reveal="letters"][data-in] > span > span { animation: lv-letter 1.1s calc(var(--i, 0) * 80ms) var(--lv-out) backwards; }
+
+  .lv-shake { animation: lv-shake 0.42s ease-in-out; }
+  .lv-stamp { animation: lv-stamp 0.5s var(--lv-back) both; }
+  .lv-flash { animation: lv-flash 0.45s var(--lv-out) both; }
+  .lv-in { animation: lv-in 0.45s calc(var(--i, 0) * 60ms) var(--lv-out) backwards; }
+  .lv-tap { animation: lv-tap 0.6s var(--lv-out) forwards; }
+  .lv-dance { transform-origin: 50% 90%; animation: lv-dance 5s 1s ease-in-out infinite; }
+  .lv-caret { animation: lv-caret 0.9s steps(1) infinite; }
+  .lv-live { animation: lv-live 1.6s ease-in-out infinite; }
+
+  /* Header tucks away reading down, returns on the way up. */
+  .lv-header { transition: translate 0.35s var(--lv-out); }
+  html[data-scroll-dir="down"] .lv-header:not(:focus-within) { translate: 0 -110%; }
+
+  /* Button label roll: the label slides up and a copy rolls in under it. */
+  .lv-roll { display: inline-grid; overflow: clip; line-height: 1.25; }
+  .lv-roll > span, .lv-roll::after { grid-area: 1 / 1; transition: transform 0.32s cubic-bezier(0.5, 0, 0.25, 1); }
+  .lv-roll::after { content: attr(data-label); content: attr(data-label) / ""; transform: translateY(110%); }
+  :is(a, button):is(:hover, :focus-visible) .lv-roll > span { transform: translateY(-110%); }
+  :is(a, button):is(:hover, :focus-visible) .lv-roll::after { transform: translateY(0); }
+
+  /* Scripted demos: drawn lines and boxes. */
+  .lv-draw { transition: stroke-dashoffset 0.9s var(--lv-out); }
+  .lv-grow { transform-box: fill-box; transform-origin: left; transition: transform 0.7s var(--lv-out), opacity 0.3s; }
+  .lv-fade { transition: opacity 0.4s var(--lv-out), transform 0.5s var(--lv-out); }
+  .lv-cursor { transition: left 0.7s var(--lv-out), top 0.7s var(--lv-out), opacity 0.3s; }
+  .lv-marquee:hover > * { animation-play-state: paused; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lv-marquee > * { animation: none !important; }
+  .lv-cursor { display: none; }
+}

@@ -2,47 +2,40 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/cn";
-import { heroTicker } from "@/features/marketing/lib/data";
+import type { TickerRow } from "@/features/marketing/lib/landing";
 import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
 import { TickerItem } from "@/features/marketing/components/TickerItem";
 
-function Flicker({
-  children,
-  className,
-  minWait = 2000,
-  maxWait = 4000,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  minWait?: number;
-  maxWait?: number;
-}) {
+/** Drops to near black now and then, like a sign with a loose wire. */
+function Flicker({ children, className, minWait = 2000, maxWait = 4000 }: { children: React.ReactNode; className?: string; minWait?: number; maxWait?: number }) {
   const [opacity, setOpacity] = useState(1);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let cancelled = false;
-    function scheduleFlicker() {
-      const wait = minWait + Math.random() * (maxWait - minWait);
-      const timeout = setTimeout(() => {
-        if (cancelled) return;
+    let timeout: ReturnType<typeof setTimeout>;
+    let id: ReturnType<typeof setInterval>;
+    const schedule = () => {
+      timeout = setTimeout(() => {
         const flickers = 2 + Math.floor(Math.random() * 3);
         let i = 0;
-        const id = setInterval(() => {
-          if (cancelled) { clearInterval(id); return; }
+        id = setInterval(() => {
+          if (cancelled) return clearInterval(id);
           setOpacity(i % 2 === 0 ? 0.1 + Math.random() * 0.3 : 1);
-          i++;
-          if (i >= flickers * 2) {
+          if (++i >= flickers * 2) {
             clearInterval(id);
             setOpacity(1);
-            scheduleFlicker();
+            schedule();
           }
         }, 40 + Math.random() * 60);
-      }, wait);
-      return timeout;
-    }
-    const t = scheduleFlicker();
-    return () => { cancelled = true; clearTimeout(t); };
+      }, minWait + Math.random() * (maxWait - minWait));
+    };
+    schedule();
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+      clearInterval(id);
+    };
   }, [minWait, maxWait]);
 
   return (
@@ -52,112 +45,88 @@ function Flicker({
   );
 }
 
+/** A button label that rolls up on hover. */
+export function Roll({ label }: { label: string }) {
+  return (
+    <span className="lv-roll" data-label={label}>
+      <span>{label}</span>
+    </span>
+  );
+}
+
+export function MarketingNav() {
+  return (
+    <header className="lv-header fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-5 sm:px-6 md:px-[100px] md:py-8">
+      <Link href="/" className="group flex items-center" aria-label="+vantage home">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-vantage.png" alt="+vantage" width={319} height={73} className="h-7 w-auto transition-transform duration-300 ease-out group-hover:scale-110 md:h-8" />
+      </Link>
+      <nav className="flex items-center gap-2 sm:gap-4">
+        <Link href="/login" className="px-2 py-2 font-mono text-sm font-bold text-white hover:text-brand md:text-base">
+          <Roll label="Log in" />
+        </Link>
+        <Link href="/signup" className="btn-pixel rounded-[10px] bg-brand px-3 py-2 font-mono text-sm font-bold text-black md:px-4 md:text-base">
+          <Roll label="Request access" />
+        </Link>
+      </nav>
+    </header>
+  );
+}
+
 // The globe in hero.png sits 3.92% left of the image's horizontal center
 // (measured from its apex). Nudge it right so it reads as centered.
 const EARTH_X = "3.92%";
 
-export function HeroSection() {
+export function HeroSection({ ticker, asOf }: { ticker: TickerRow[]; asOf: string }) {
   const earthRef = useRef<HTMLImageElement>(null);
-  const [entered, setEntered] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setEntered(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let ticking = false;
-
-    function onScroll() {
+    const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const scrolled = window.scrollY;
-        if (earthRef.current) {
-          const zoom = 1 + Math.min(1, scrolled / window.innerHeight) * 0.4;
-          earthRef.current.style.transform = `translate(${EARTH_X}, ${scrolled * 0.08}px) scale(${zoom})`;
+        const y = window.scrollY;
+        if (earthRef.current && y < window.innerHeight * 1.5) {
+          const zoom = 1 + Math.min(1, y / window.innerHeight) * 0.4;
+          earthRef.current.style.transform = `translate(${EARTH_X}, ${y * 0.08}px) scale(${zoom})`;
         }
         ticking = false;
       });
-    }
-
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <>
-      {/* Navbar — always on top */}
-      <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-8 md:px-[140px] md:py-10">
-        <Link href="/" className="group flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-vantage.png"
-            alt="+vantage"
-            width={319}
-            height={73}
-            className="h-8 w-auto transition-transform duration-300 ease-out group-hover:scale-110"
-          />
-        </Link>
-        <Link
-          href="/signup"
-          className="btn-pixel rounded-[10px] bg-brand px-4 py-2 font-mono text-base font-bold text-black"
-        >
-          Join Now!
-        </Link>
-      </nav>
-
-      {/* Hero — fixed behind everything */}
+      {/* Fixed behind the page: the rest of the site slides up over the globe. */}
       <div className="fixed inset-0 z-0 overflow-hidden bg-gray">
-        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col items-center gap-12 px-6 pt-[120px] text-center md:pt-[160px]">
-          <h1 className="font-sans leading-none text-white">
-            <span
-              className={cn(
-                "block text-[clamp(3rem,10vw,128px)] font-normal transition-all duration-700",
-                entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-              )}
-            >
-              <ScrambleReveal text="WELCOME TO" delay={200} duration={900} />
+        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col items-center gap-8 px-4 pt-[112px] text-center sm:px-6 md:gap-10 md:pt-[150px]">
+          <h1 className="font-sans leading-[0.95] tracking-[-0.03em] text-white [text-wrap:balance]">
+            <span className="block text-[clamp(2.6rem,10vw,120px)] font-normal">
+              <ScrambleReveal text="WELCOME TO" delay={150} duration={900} />
             </span>
-            <span
-              className={cn(
-                "block text-[clamp(3rem,10vw,128px)] font-bold transition-all duration-700 delay-300",
-                entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-              )}
-            >
+            <span className="block text-[clamp(2.6rem,10vw,120px)] font-bold">
               <Flicker minWait={3000} maxWait={7000}>
-                <ScrambleReveal text="TRADEVANTAGE" delay={500} duration={900} />
+                <ScrambleReveal text="TRADEVANTAGE" delay={450} duration={900} />
               </Flicker>
-              <Flicker className="text-brand" minWait={2000} maxWait={4000}>.</Flicker>
+              <Flicker className="text-brand" minWait={2000} maxWait={4000}>
+                .
+              </Flicker>
             </span>
           </h1>
-          <p
-            className={cn(
-              "max-w-2xl font-mono text-base leading-[1.4] text-white transition-all duration-700 delay-700",
-              entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            )}
-          >
-            Directional Outlook &amp; Macro Alpha Intelligence — a market
-            radar powered by AI and professionals, built for experienced
-            traders.
+          <p className="max-w-[58ch] font-mono text-sm leading-[1.5] text-white md:text-base">
+            Market intelligence for traders who read the chart themselves.
+            <br className="hidden sm:block" /> No signals. No chat room. No hand-holding.
           </p>
-          <div
-            className={cn(
-              "flex w-full max-w-[675px] flex-col gap-4 transition-all duration-700 delay-[900ms] sm:flex-row sm:gap-6",
-              entered ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-            )}
-          >
-            <Link
-              href="/signup"
-              className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2"
-            >
-              Request Access
+          <div className="flex w-full max-w-[560px] flex-col gap-3 sm:flex-row sm:gap-5">
+            <Link href="/signup" className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2">
+              <Roll label="Request access" />
             </Link>
-            <Link
-              href="/login"
-              className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand backdrop-blur-[9.4px]"
-            >
-              Operator Login
+            <Link href="/login" className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand">
+              <Roll label="Log in" />
             </Link>
           </div>
         </div>
@@ -168,23 +137,30 @@ export function HeroSection() {
             ref={earthRef}
             src="/figma/hero.png"
             alt=""
+            fetchPriority="high"
             style={{ transform: `translateX(${EARTH_X})` }}
-            className="absolute inset-x-0 bottom-[-48px] w-full max-w-none origin-bottom select-none will-change-transform"
+            className="absolute inset-x-0 bottom-[-48px] w-full min-w-[1080px] max-w-none origin-bottom select-none will-change-transform max-md:left-[calc(50%-540px)]"
           />
           <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-gray via-gray/60 to-transparent" />
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 overflow-hidden py-[50px]">
-          <div className="flex w-max animate-ticker gap-[50px] [animation-direction:reverse] will-change-transform">
-            {[...heroTicker, ...heroTicker].map((t, i) => (
-              <TickerItem key={`${t.sym}-${i}`} {...t} />
-            ))}
+        <div className="absolute inset-x-0 bottom-0 pb-8 md:pb-12">
+          <p className="mb-3 px-4 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-white/70 md:text-xs">
+            <span className="lv-live mr-2 inline-block h-1.5 w-1.5 translate-y-[-1px] rounded-full bg-brand align-middle" aria-hidden />
+            Last close {asOf}. Real candles, read by the app itself.
+          </p>
+          <div className="lv-marquee overflow-hidden">
+            <div className="flex w-max animate-ticker gap-4 [animation-direction:reverse] will-change-transform md:gap-[40px]">
+              {[...ticker, ...ticker].map((t, i) => (
+                <TickerItem key={`${t.sym}-${i}`} {...t} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Spacer — pushes content below the hero viewport */}
-      <div className="h-screen" />
+      {/* Spacer: pushes content below the hero viewport */}
+      <div className="h-[100svh]" />
     </>
   );
 }

@@ -1,364 +1,74 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/cn";
-import { ArrowUpPixel } from "@/features/marketing/components/icons";
+import { Scramble } from "@/features/marketing/components/ScrambleReveal";
+import { Roll } from "@/features/marketing/components/HeroSection";
+import { ArrowUpPixel, IconCloseSquare } from "@/features/marketing/components/icons";
 
-function useInView(threshold = 0.2) {
-  const ref = useRef<HTMLElement>(null);
-  const [inView, setInView] = useState(false);
+const FREE = ["Unfiltered news + impact analysis", "Economic calendar", "My Channel (founder broadcast)", "Public psychology primers"];
+const VIP = ["Everything in Free", "Daily / weekly Trading Plan", "1v1 Consultation (founders)", "Full Education library", "Hashtag explorer (full)", "All collab channels"];
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
+/** A full-bleed rule that draws itself across the page. */
+const Rule = ({ from = "left" }: { from?: "left" | "right" }) => (
+  <div className="w-full overflow-hidden">
+    <div data-reveal="line" className="h-px bg-white/40" style={{ transformOrigin: from }} />
+  </div>
+);
 
-  return { ref, inView };
-}
-
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
-
-function useScrambleText(text: string, trigger: boolean, duration = 600) {
-  const [display, setDisplay] = useState(text);
-  const prevTrigger = useRef(false);
-
-  useEffect(() => {
-    if (!trigger) { prevTrigger.current = false; return; }
-    if (prevTrigger.current) return;
-    prevTrigger.current = true;
-
-    const steps = 12;
-    const interval = duration / steps;
-    let step = 0;
-
-    setDisplay(text.replace(/\S/g, () => CHARS[Math.floor(Math.random() * CHARS.length)]));
-
-    const id = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const settled = Math.floor(progress * text.length);
-      const result = text
-        .split("")
-        .map((ch, i) => {
-          if (ch === " ") return " ";
-          if (i < settled) return text[i];
-          return CHARS[Math.floor(Math.random() * CHARS.length)];
-        })
-        .join("");
-      setDisplay(result);
-
-      if (step >= steps) {
-        clearInterval(id);
-        setDisplay(text);
-      }
-    }, interval);
-
-    return () => clearInterval(id);
-  }, [trigger, text, duration]);
-
-  return display;
-}
-
-function ScramblePrice({ text, trigger, delay = 0 }: { text: string; trigger: boolean; delay?: number }) {
-  const [go, setGo] = useState(false);
-  useEffect(() => {
-    if (!trigger) { setGo(false); return; }
-    const t = setTimeout(() => setGo(true), delay);
-    return () => clearTimeout(t);
-  }, [trigger, delay]);
-  const display = useScrambleText(text, go, 800);
-  return <span>{display}</span>;
-}
-
-function AnimatedCounter({ value, trigger }: { value: string; trigger: boolean }) {
-  const [display, setDisplay] = useState("00");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) { setStarted(false); setDisplay("00"); return; }
-    setStarted(true);
-  }, [trigger]);
-
-  useEffect(() => {
-    if (!started) return;
-    const steps = 8;
-    let step = 0;
-    const id = setInterval(() => {
-      step++;
-      if (step >= steps) { clearInterval(id); setDisplay(value); }
-      else setDisplay(String(Math.floor(Math.random() * 10)) + String(Math.floor(Math.random() * 10)));
-    }, 50);
-    return () => clearInterval(id);
-  }, [started, value]);
-
-  return <span>{display}</span>;
-}
-
-function TypewriterLabel({ text, trigger, delay = 0 }: { text: string; trigger: boolean; delay?: number }) {
-  const [display, setDisplay] = useState("");
-  const [showCursor, setShowCursor] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) { setDisplay(""); setShowCursor(false); return; }
-    const startTimeout = setTimeout(() => {
-      setShowCursor(true);
-      let i = 0;
-      const id = setInterval(() => {
-        i++;
-        setDisplay(text.slice(0, i));
-        if (i >= text.length) { clearInterval(id); setTimeout(() => setShowCursor(false), 1200); }
-      }, 60);
-      return () => clearInterval(id);
-    }, delay);
-    return () => clearTimeout(startTimeout);
-  }, [trigger, text, delay]);
-
-  return (
-    <span>
-      {display}
-      {showCursor && <span className="animate-blink ml-[1px] inline-block h-[1em] w-[2px] bg-brand align-middle" />}
-    </span>
-  );
-}
-
-function useMouseTexture(sectionRef: React.RefObject<HTMLElement | null>) {
-  const [pos, setPos] = useState({ x: 0, y: 0, active: false });
-  const raf = useRef(0);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    function onMove(e: MouseEvent) {
-      cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => {
-        const rect = el!.getBoundingClientRect();
-        setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top, active: true });
-      });
-    }
-    function onLeave() { setPos((p) => ({ ...p, active: false })); }
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-      cancelAnimationFrame(raf.current);
-    };
-  }, [sectionRef]);
-
-  return pos;
-}
-
+/** The old page's framed block: a header bar, rules that bleed off both edges, two tiers side by side. */
 export function AccessSection() {
-  const { ref: sectionRef, inView } = useInView(0.1);
-  const mouse = useMouseTexture(sectionRef as React.RefObject<HTMLElement>);
-
   return (
-    <section
-      ref={sectionRef as React.RefObject<HTMLElement>}
-      className="relative mt-[80px] md:mt-[140px]"
-    >
-      {/* Cursor-reveal texture */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          backgroundImage:
-            "linear-gradient(to right, rgba(255, 212, 0, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 212, 0, 0.12) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-          WebkitMaskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          background: `radial-gradient(circle 200px at ${mouse.x}px ${mouse.y}px, rgba(255, 212, 0, 0.06) 0%, transparent 100%)`,
-        }}
-      />
-
-      {/* Header */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        <div
-          className="flex items-center justify-between px-8 py-4 transition-all duration-700"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? "translateY(0)" : "translateY(20px)",
-          }}
-        >
-          <span className="font-mono text-base font-bold text-white">
-            <TypewriterLabel text="Access" trigger={inView} delay={200} />
-          </span>
-          <span className="font-mono text-base font-bold text-brand">
-            <AnimatedCounter value="04" trigger={inView} />
+    <section id="access" className="relative z-10 bg-black pb-20 text-white md:pb-32">
+      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
+        <div data-reveal className="flex items-center justify-between px-6 py-4 font-mono text-base font-bold md:px-8">
+          <Scramble text="Access" />
+          <span className="text-brand">
+            <Scramble text="04" delay={150} />
           </span>
         </div>
       </div>
+      <Rule />
 
-      {/* Top line */}
-      <div className="w-full overflow-hidden">
-        <div
-          className={cn(
-            "h-px origin-left bg-white/40 transition-all duration-700 ease-out",
-            inView && "line-pulse"
-          )}
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "200ms",
-          }}
-        />
-      </div>
-
-      {/* Content grid */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
+      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]">
-          {/* Tier 00 */}
-          <div
-            className="flex flex-col gap-6 p-6 transition-all duration-700 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "300ms",
-            }}
-          >
-            <div className="flex items-center justify-between font-mono text-base">
-              <span className="font-light text-white">Tier 00</span>
-              <span
-                className="font-bold text-brand transition-all duration-500"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transitionDelay: "500ms",
-                }}
-              >
-                Free
-              </span>
-            </div>
-            <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4] text-white">
-              <ScramblePrice text="IDR 0" trigger={inView} delay={400} />
+          <div data-reveal style={{ ["--i" as string]: 1 }} className="flex flex-col gap-6 p-6 md:p-12">
+            <p className="flex items-center justify-between font-mono text-base">
+              <span className="font-light">Tier 00</span>
+              <span className="font-bold text-brand">Free</span>
             </p>
-            <p
-              className="font-mono text-base font-light leading-[1.4] text-white transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(12px)",
-                transitionDelay: "500ms",
-              }}
-            >
-              No Commitment
+            <p className="font-mono text-[clamp(2.5rem,6vw,64px)] font-bold leading-[1.2] tabular-nums">
+              <Scramble text="IDR 0" delay={200} duration={800} />
             </p>
-            <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4] text-white">
-              {[
-                "Unfiltered news + impact analysis",
-                "Economic calendar",
-                "My Channel (founder broadcast)",
-                "Public psychology primers",
-              ].map((item, i) => (
-                <li
-                  key={item}
-                  className="transition-all duration-500"
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "translateX(0)" : "translateX(-16px)",
-                    transitionDelay: `${600 + i * 100}ms`,
-                  }}
-                >
-                  {item}
-                </li>
+            <p className="font-mono text-base font-light">No commitment</p>
+            <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4]">
+              {FREE.map((x) => (
+                <li key={x}>{x}</li>
               ))}
             </ul>
+            <Link href="/signup" className="btn-pixel mt-auto flex w-full items-center justify-center border border-brand p-4 font-mono text-base font-bold text-brand">
+              <Roll label="Start free" />
+            </Link>
           </div>
 
-          {/* Animated vertical divider */}
-          <div
-            className="hidden origin-top bg-white/20 transition-all duration-700 ease-out md:block"
-            style={{
-              transform: inView ? "scaleY(1)" : "scaleY(0)",
-              transitionDelay: "400ms",
-            }}
-          />
+          <div data-reveal="vline" className="hidden bg-white/20 md:block" style={{ ["--i" as string]: 2 }} />
 
-          {/* Tier 01 */}
-          <div
-            className="flex flex-col gap-6 bg-white p-6 text-black transition-all duration-700 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "450ms",
-            }}
-          >
-            <div className="flex items-center justify-between font-mono text-base">
+          <div data-reveal style={{ ["--i" as string]: 2 }} className="flex flex-col gap-6 bg-white p-6 text-black md:p-12">
+            <p className="flex items-center justify-between font-mono text-base">
               <span className="font-light">Tier 01</span>
-              <span
-                className="font-bold transition-all duration-500"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transitionDelay: "600ms",
-                }}
-              >
-                VIP+ Trader
-              </span>
-            </div>
-            <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4]">
-              <ScramblePrice text="IDR 18.000.000" trigger={inView} delay={500} />
+              <span className="font-bold">VIP+ Trader</span>
             </p>
-            <p
-              className="font-mono text-base font-light leading-[1.4] transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(12px)",
-                transitionDelay: "600ms",
-              }}
-            >
-              Per year · Annual commitment
+            <p className="whitespace-nowrap font-mono text-[clamp(1.9rem,4.4vw,64px)] font-bold leading-[1.2] tabular-nums">
+              <Scramble text="IDR 18.000.000" delay={300} duration={900} />
             </p>
+            <p className="font-mono text-base font-light">Per year · Annual commitment</p>
             <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4]">
-              {[
-                "Everything in Free",
-                "Daily / weekly Trading Plan",
-                "1v1 Consultation (founders)",
-                "Full Education library",
-                "Hashtag explorer (full)",
-                "All collab channels",
-              ].map((item, i) => (
-                <li
-                  key={item}
-                  className="transition-all duration-500"
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "translateX(0)" : "translateX(16px)",
-                    transitionDelay: `${700 + i * 80}ms`,
-                  }}
-                >
-                  {item}
-                </li>
+              {VIP.map((x) => (
+                <li key={x}>{x}</li>
               ))}
             </ul>
-            <Link
-              href="/signup"
-              className="btn-pixel flex w-full items-center justify-center gap-4 bg-brand p-4 font-mono text-base font-bold text-black"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(16px)",
-                transitionDelay: "1100ms",
-              }}
-            >
-              Request Access
+            <Link href="/signup" className="btn-pixel flex w-full items-center justify-center gap-4 bg-brand p-4 font-mono text-base font-bold text-black">
+              <Roll label="Request access" />
               <ArrowUpPixel className="h-4 w-4 rotate-90" />
             </Link>
-            <p
-              className="font-mono text-base font-light leading-[1.4] transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transitionDelay: "1200ms",
-              }}
-            >
+            <p className="font-mono text-base font-light leading-[1.4]">
               Liability waiver required at signup.
               <br />
               No exceptions.
@@ -366,17 +76,23 @@ export function AccessSection() {
           </div>
         </div>
       </div>
+      <Rule from="right" />
 
-      {/* Bottom line */}
-      <div className="w-full overflow-hidden">
-        <div
-          className="h-px origin-right bg-white/40 transition-all duration-700 ease-out"
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "800ms",
-          }}
-        />
+      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
+        <div className="flex flex-col gap-4 px-6 py-6 font-mono md:flex-row md:items-center md:justify-between md:px-8">
+          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 text-base">
+            <span className="font-bold">Who this is not for</span>
+            {["Beginners", "Gamblers", "Hobbyists"].map((x, i) => (
+              <span key={x} data-reveal style={{ ["--i" as string]: i }} className="flex items-center gap-2 font-light text-blood-bright line-through">
+                <IconCloseSquare className="h-5 w-5 shrink-0" />
+                {x}
+              </span>
+            ))}
+          </p>
+          <p className="text-sm font-light text-white/85">We don&apos;t soften this. Onboarding is a filter, not a funnel.</p>
+        </div>
       </div>
+      <Rule />
     </section>
   );
 }
