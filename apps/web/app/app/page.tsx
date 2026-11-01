@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { listApprovedNews } from "@/features/news/queries/news";
 import { listPublishedPlans } from "@/features/plan/queries/plans";
-import { listPredictions } from "@/features/predictions/queries/predictions";
+import { getPredictionHistory, listPredictions } from "@/features/predictions/queries/predictions";
 import { listBulletins } from "@/features/bulletin/queries/bulletins";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";
 import { timelineEventToCalendarEvent } from "@/features/calendar/lib/fromTimeline";
@@ -54,12 +54,7 @@ export default async function HomePage() {
         card.outcomes
           .slice(0, 2)
           .filter((o) => o.tokenId)
-          .map(async (o) => {
-            const res = await apiGet<{ history: PriceHistoryPoint[] }>(
-              `/predictions/history?tokenId=${encodeURIComponent(o.tokenId!)}&interval=max`,
-            ).catch(() => ({ history: [] }));
-            return { label: o.label, points: thin(res.history) };
-          }),
+          .map(async (o) => ({ label: o.label, points: thin(await getPredictionHistory(o.tokenId!)) })),
       ),
     })),
   );
