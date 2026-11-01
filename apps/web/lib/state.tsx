@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiGet } from "@/lib/api/client";
+import { isMockMode } from "@/lib/config/public";
 export type Tier = "visitor" | "free" | "vip";
 
 interface TraderProfile {
@@ -72,6 +73,11 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   // Sync tier + display name from backend so localStorage reflects real values.
   useEffect(() => {
     if (!hydrated) return;
+    // Demo mode has no API: the demo operator is VIP+ so every page is open.
+    if (isMockMode()) {
+      setTierState("vip");
+      return;
+    }
     apiGet<{ tier: string; email?: string; handle?: string }>("/users/me")
       .then((data) => {
         const backendTier: Tier = data?.tier === "vip" ? "vip" : "free";

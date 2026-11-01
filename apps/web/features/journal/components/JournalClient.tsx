@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Panel, PanelLink } from "@/components/ui/Panel";
 import { cn } from "@/lib/cn";
-import { DEFAULT_SETTINGS, deleteTrade, getSettings, listTrades, saveSettings } from "../queries";
+import { isMockMode } from "@/lib/config/public";
+import { DEFAULT_SETTINGS, deleteTrade, getSettings, listTrades, resetDemoJournal, saveSettings } from "../queries";
 import { tradeR, type NewsEvent, type Trade, type TraderSettings } from "../lib/journal";
 import { TradeForm } from "./TradeForm";
 import { ActiveRow, ClosedRow } from "./TradeRows";
@@ -114,7 +115,20 @@ export function JournalClient({ events }: { events: NewsEvent[] }) {
           <span className={cn("font-num text-[28px] font-semibold leading-7", rCls(total))}>{rs.length ? fmtR(total) : "·"}</span>
           <span className="text-[13px] text-white/55">Closed, {rs.length} trades</span>
         </span>
-        <span className="ml-auto">
+        <span className="ml-auto flex items-center gap-4">
+          {isMockMode() && (
+            <button
+              type="button"
+              className="text-[13px] text-white/40 hover:text-white"
+              onClick={() => {
+                if (!window.confirm("Reset the demo journal to a fresh history?")) return;
+                setTrades(null);
+                resetDemoJournal().then(() => window.location.reload());
+              }}
+            >
+              Reset demo journal
+            </button>
+          )}
           <PanelLink href="/app/journal/review">Review my trades</PanelLink>
         </span>
       </div>

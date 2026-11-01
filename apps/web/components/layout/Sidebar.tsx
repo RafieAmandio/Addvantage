@@ -1,5 +1,6 @@
 "use client";
 
+import { isMockMode } from "@/lib/config/public";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -119,6 +120,11 @@ export function Sidebar() {
   const lastFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Demo mode has no API: show the admin entry and skip the partner fetch.
+    if (isMockMode()) {
+      setIsAdmin(true);
+      return;
+    }
     apiGet<{ isAdmin: boolean }>("/users/me")
       .then((data) => {
         if (data?.isAdmin) setIsAdmin(true);

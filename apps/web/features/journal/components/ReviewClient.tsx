@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Panel, PanelLink } from "@/components/ui/Panel";
 import { TextTabs } from "@/components/ui/TextTabs";
 import { cn } from "@/lib/cn";
+import { isMockMode } from "@/lib/config/public";
 import { listTrades } from "../queries";
 import {
   SETUPS, SETUP_LABEL, SETUP_BREAKER, TOTAL_BREAKER, breakers, closedTrades, demonDays, demonTally, groupStats, maeFinding, stats, tradeExcursion, tradeR, wibHour, wibWeekStart, wibWeekday,
@@ -110,7 +111,7 @@ export function ReviewClient() {
   const [trades, setTrades] = useState<Trade[] | null>(null);
   const [ex, setEx] = useState<Excursion[] | null>(null);
   const [by, setBy] = useState<"weekday" | "hour" | "market">("weekday");
-  const [span, setSpan] = useState<"week" | "all">("week");
+  const [span, setSpan] = useState<"week" | "all">(isMockMode() ? "all" : "week");
 
   useEffect(() => {
     listTrades().then(setTrades, () => setTrades([]));

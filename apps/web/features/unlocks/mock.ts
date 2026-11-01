@@ -6,12 +6,28 @@ function inDays(n: number): string {
 
 // Offline-dev fixtures (NEXT_PUBLIC_MOCK_MODE=1), shaped like the live
 // 2026-07 dry run against DefiLlama + CoinGecko.
-export const unlocksFixture: UnlocksData = {
+export const unlocksFixture = (): UnlocksData => ({
   updatedAt: new Date(Date.now() - 2 * 3600000).toISOString(),
-  trackedTop200: 71,
+  trackedTop200: 73,
   horizonDays: 90,
   minPctSupply: 4.9,
   events: [
+    {
+      geckoId: "sui",
+      unlockAt: inDays(1),
+      symbol: "SUI",
+      name: "Sui",
+      mcapRank: 22,
+      tokens: 44_000_000,
+      pctSupply: 5.1,
+      usdValue: 118_800_000,
+      price: 2.7,
+      categories: ["insiders", "ecosystem"],
+      recipients: [
+        { recipient: "Series A & B Investors", category: "insiders", amount: 26_000_000 },
+        { recipient: "Community Reserve", category: "ecosystem", amount: 18_000_000 },
+      ],
+    },
     {
       geckoId: "rain",
       unlockAt: inDays(3),
@@ -41,6 +57,22 @@ export const unlocksFixture: UnlocksData = {
       categories: ["ecosystem"],
       recipients: [
         { recipient: "Community & Ecosystem", category: "ecosystem", amount: 48_200_000_000 },
+      ],
+    },
+    {
+      geckoId: "aptos",
+      unlockAt: inDays(10),
+      symbol: "APT",
+      name: "Aptos",
+      mcapRank: 41,
+      tokens: 11_310_000,
+      pctSupply: 5.0,
+      usdValue: 46_400_000,
+      price: 4.1,
+      categories: ["insiders", "ecosystem"],
+      recipients: [
+        { recipient: "Core Contributors", category: "insiders", amount: 3_960_000 },
+        { recipient: "Community", category: "ecosystem", amount: 7_350_000 },
       ],
     },
     {
@@ -90,4 +122,4 @@ export const unlocksFixture: UnlocksData = {
       ],
     },
   ],
-};
+});
