@@ -15,7 +15,12 @@ vi.mock("../consult.repository.js", () => ({
     listAllSessions: vi.fn(),
     getSessionStats: vi.fn(),
     getLatestMessage: vi.fn(),
+    getAllowMention: vi.fn().mockResolvedValue(true),
   },
+}));
+
+vi.mock("@/integrations/whatsapp/notify.js", () => ({
+  notifyConsultWhatsApp: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/integrations/telegram/notify.js", () => ({
@@ -100,10 +105,10 @@ describe("consultService", () => {
         content: "hello",
       });
 
-      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
-        unreadAdmin: true,
-        status: "awaiting_reply",
-      });
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith(
+        "session-1",
+        expect.objectContaining({ unreadAdmin: true, status: "awaiting_reply" }),
+      );
     });
   });
 
@@ -149,10 +154,10 @@ describe("consultService", () => {
       expect(repo.createMessage).toHaveBeenCalledWith(
         expect.objectContaining({ role: "admin", userId: "admin-1" }),
       );
-      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
-        unreadUser: true,
-        status: "open",
-      });
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith(
+        "session-1",
+        expect.objectContaining({ unreadUser: true, status: "open" }),
+      );
     });
 
     it("throws NotFoundError for missing session", async () => {
