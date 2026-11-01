@@ -20,26 +20,33 @@ vi.mock("@aws-sdk/client-s3", () => ({
   DeleteObjectCommand: vi.fn(),
 }));
 
-import { getStorageProvider } from "../index.js";
+// The provider is cached for the life of the process, so each test loads a fresh module.
+async function load() {
+  vi.resetModules();
+  return (await import("../index.js")).getStorageProvider;
+}
 
 describe("getStorageProvider", () => {
   beforeEach(() => {
     mockEnv.STORAGE_PROVIDER = undefined;
   });
 
-  it("returns null when STORAGE_PROVIDER is unset", () => {
+  it("returns null when STORAGE_PROVIDER is unset", async () => {
+    const getStorageProvider = await load();
     expect(getStorageProvider()).toBeNull();
   });
 
-  it("returns SupabaseStorageProvider when set to supabase", () => {
+  it("returns SupabaseStorageProvider when set to supabase", async () => {
     mockEnv.STORAGE_PROVIDER = "supabase";
+    const getStorageProvider = await load();
     const provider = getStorageProvider();
     expect(provider).not.toBeNull();
     expect(provider!.name).toBe("supabase");
   });
 
-  it("returns S3StorageProvider when set to s3", () => {
+  it("returns S3StorageProvider when set to s3", async () => {
     mockEnv.STORAGE_PROVIDER = "s3";
+    const getStorageProvider = await load();
     const provider = getStorageProvider();
     expect(provider).not.toBeNull();
     expect(provider!.name).toBe("s3");
