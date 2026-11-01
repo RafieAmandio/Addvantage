@@ -1,14 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { SectionNumber } from "@/components/ui/Marker";
 import { cn } from "@/lib/cn";
-import { AuthShell, authEyebrow } from "@/features/auth/components/AuthShell";
 import { StepExperience } from "@/features/signup/components/StepExperience";
 import { StepMarketsGoal } from "@/features/signup/components/StepMarketsGoal";
 import { StepPhilosophy } from "@/features/signup/components/StepPhilosophy";
 import { useProfileWizard } from "@/features/signup/hooks/useProfileWizard";
-
-const STEP_LABELS = ["Experience", "Markets and goal", "Philosophy"];
 
 export default function ProfilePage() {
   const {
@@ -24,31 +22,59 @@ export default function ProfilePage() {
   } = useProfileWizard();
 
   return (
-    <AuthShell width="lg" footer={<>Use number keys (1 to 4) to select, Enter to advance.</>}>
-      <p className={authEyebrow}>Trader profile</p>
-      <h1 className="mt-2 text-[22px] font-semibold leading-7 text-white">Tailor your terminal</h1>
-      <p className="mt-2 text-[14px] leading-[21px] text-white/55">
-        Five questions. Your answers shape what the platform surfaces, how it speaks, and what it
-        assumes you already know.
-      </p>
+    <main className="stagger relative mx-auto grid max-w-7xl grid-cols-12 gap-6 px-4 py-12 sm:px-6 sm:py-20">
+      <div className="col-span-12 lg:col-span-5">
+        <SectionNumber n="05 /" label="TRADER PROFILE" />
+        <h1 className="mt-8 font-display text-6xl leading-[0.9] text-white">
+          Tailoring
+          <br />
+          your <span className="italic text-brand">terminal.</span>
+        </h1>
+        <p className="mt-8 max-w-sm font-display text-lg text-white/60">
+          Five questions. Your answers shape how the platform thinks about you.
+          What it surfaces, how it speaks, what it assumes you already know.
+        </p>
 
-      <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
-        {STEP_LABELS.map((label, i) => (
-          <button
-            key={label}
-            onClick={() => goToStep(i)}
-            disabled={i > step}
-            className={cn(
-              "rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
-              i === step ? "font-medium text-white" : i < step ? "text-white/55 hover:text-white" : "text-white/30"
-            )}
-          >
-            <span className={cn("font-num", i === step && "text-brand")}>{i + 1}</span> {label}
-          </button>
-        ))}
+        <div className="mt-12 flex items-center gap-4">
+          {[0, 1, 2].map((i) => (
+            <button
+              key={i}
+              onClick={() => goToStep(i)}
+              className="group flex items-center gap-2 hover:opacity-80 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+              disabled={i > step}
+            >
+              <div
+                className={cn(
+                  "h-2.5 w-2.5 rounded-full transition-all",
+                  i === step
+                    ? "bg-brand scale-125"
+                    : i < step
+                    ? "bg-[#65A30D]"
+                    : "bg-white/20"
+                )}
+              />
+              <span
+                className={cn(
+                  "font-mono text-[9px] uppercase tracking-widest2",
+                  i === step
+                    ? "text-brand"
+                    : i < step
+                    ? "text-white/50"
+                    : "text-white/20"
+                )}
+              >
+                {i + 1}/3
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <p className="mt-6 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
+          Use number keys (1-4) to select · Enter to advance
+        </p>
       </div>
 
-      <div className="mt-6 border-t border-white/[0.07] pt-6">
+      <div className="col-span-12 border border-gray-3 p-10 lg:col-span-7">
         {step === 0 && <StepExperience form={form} setForm={setForm} />}
         {step === 1 && (
           <StepMarketsGoal
@@ -58,28 +84,28 @@ export default function ProfilePage() {
           />
         )}
         {step === 2 && <StepPhilosophy form={form} setForm={setForm} />}
-      </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <button
-          onClick={back}
-          disabled={step === 0}
-          className="h-11 rounded-full px-4 text-[14px] text-white/55 transition-colors hover:bg-raised hover:text-white disabled:invisible"
-        >
-          Back
-        </button>
-        <div className="flex items-center gap-2">
+        <div className="mt-10 flex items-center justify-between">
           <button
-            onClick={skip}
-            className="h-11 rounded-full px-4 text-[14px] text-white/40 transition-colors hover:bg-raised hover:text-white"
+            onClick={back}
+            disabled={step === 0}
+            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand disabled:opacity-30 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            Skip for now
+            ← Back
           </button>
-          <Button onClick={next} disabled={!canAdvance} className="h-11">
-            {step < 2 ? "Continue" : "Enter terminal"}
-          </Button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={skip}
+              className="font-mono text-[10px] uppercase tracking-widest2 text-white/30 hover:text-white/60 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            >
+              Skip for now
+            </button>
+            <Button onClick={next} disabled={!canAdvance} size="lg">
+              {step < 2 ? "Continue →" : "Enter terminal →"}
+            </Button>
+          </div>
         </div>
       </div>
-    </AuthShell>
+    </main>
   );
 }

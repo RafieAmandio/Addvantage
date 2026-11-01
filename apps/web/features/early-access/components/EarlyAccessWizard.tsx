@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { API_BASE } from "@/lib/api/client";
 import { isMockMode } from "@/lib/config/public";
@@ -18,7 +18,6 @@ import {
   PAYMENT_DESTINATIONS,
   CONFIRMATION,
 } from "@/features/early-access/content";
-import { authInput, authLabel, authPrimary } from "@/features/auth/components/AuthShell";
 
 type PaymentMethod = "usdt" | "bca";
 
@@ -46,10 +45,9 @@ const INITIAL: FormState = {
   proofImageUrl: "",
 };
 
-const inputClass = authInput;
-const labelClass = authLabel;
-const eyebrow = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
-const bodyText = "text-[14px] leading-[21px] text-white/55";
+const inputClass =
+  "mt-2 w-full rounded-lg border border-gray-3 bg-white-2 px-4 py-3 font-mono text-base text-black shadow-none outline-none transition-all duration-300 placeholder:text-black/30 focus-visible:border-brand focus-visible:shadow-[0_0_0_3px_rgba(255,212,0,0.15)]";
+const labelClass = "block font-mono text-sm font-bold text-black";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -60,6 +58,8 @@ function looksLikeFullName(v: string) {
 
 export function EarlyAccessWizard() {
   const [step, setStep] = useState(0);
+  const [stepKey, setStepKey] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState<FormState>(INITIAL);
   const [website, setWebsite] = useState(""); // honeypot
   const [proofPreview, setProofPreview] = useState<string | null>(null);
@@ -70,11 +70,46 @@ export function EarlyAccessWizard() {
   const [leadPending, setLeadPending] = useState(false);
   const [returning, setReturning] = useState<"draft" | "submitted" | null>(null);
   const [done, setDone] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => setMounted(true), []);
+
+  // Slow background drift on the left panel (parity with the signup flow).
+  // Skipped entirely when the user prefers reduced motion, and paused while the
+  // tab is hidden so it never burns cycles in the background.
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    let frame: number;
+    let t = 0;
+    const drift = () => {
+      if (document.hidden) {
+        frame = requestAnimationFrame(drift);
+        return;
+      }
+      t += 0.001;
+      if (imgRef.current) {
+        const x = Math.sin(t) * 8;
+        const y = Math.cos(t * 0.7) * 5;
+        imgRef.current.style.transform = `translate(${x}px, ${y}px) scale(1.05)`;
+      }
+      frame = requestAnimationFrame(drift);
+    };
+    frame = requestAnimationFrame(drift);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  const advanceStep = (next: number) => setStep(next);
+  const advanceStep = (next: number) => {
+    setStep(next);
+    setStepKey((k) => k + 1);
+  };
 
   const nameOk = looksLikeFullName(form.signedName);
   const allAcked = ACK_ITEMS.every((a) => form.acks[a.key]);
@@ -172,60 +207,108 @@ export function EarlyAccessWizard() {
     advanceStep(step + 1);
   }
 
-  const spinner = (
-    <span
-      aria-hidden
-      className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
-      style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
-    />
-  );
-
   return (
-    <main className="flex min-h-screen flex-col bg-[#0A0A0A] px-4 py-5 text-white sm:px-6">
-      <Link href="/" aria-label="TradeVantage home" className="inline-flex self-start">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-vantage.png" alt="TradeVantage" className="h-7 w-auto" />
-      </Link>
+    <main className="grid min-h-screen grid-cols-1 md:h-screen md:grid-cols-[1fr_2fr] md:overflow-hidden">
+      {/* Left, dark branding panel */}
+      <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
+        <div className="absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            ref={imgRef}
+            src="/figma/login-bg.png"
+            alt=""
+            className="h-full w-full object-cover opacity-20 mix-blend-lighten will-change-transform"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+        </div>
 
-      <div className="mx-auto grid w-full max-w-4xl flex-1 content-center gap-4 py-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
-        <aside className="lg:sticky lg:top-6 lg:pt-8">
-          <p className={eyebrow}>Apply</p>
-          <h1 className="mt-2 text-[24px] font-semibold leading-[30px] text-white">
-            This is an application, not a waitlist.
+        <div
+          className="relative z-10 flex items-center justify-between transition-all duration-700"
+          style={{ opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(-12px)" }}
+        >
+          <Link href="/" className="font-mono text-base font-bold text-white">
+            +vantage
+          </Link>
+        </div>
+
+        <div
+          className="relative z-10 mt-4 flex items-baseline gap-3 font-mono text-sm transition-all duration-700"
+          style={{ opacity: mounted ? 1 : 0, transitionDelay: "200ms" }}
+        >
+          <span className="font-bold text-brand">00 /</span>
+          <span className="h-px flex-1 bg-brand/40" />
+          <span className="font-bold text-white">Apply</span>
+        </div>
+
+        <div className="relative z-10 mt-auto">
+          <h1 className="font-sans text-[clamp(2.5rem,7vw,72px)] font-bold leading-[0.95] text-white">
+            {["This is an", "application,", "not a waitlist."].map((line, i) => (
+              <span
+                key={line}
+                className="block transition-all duration-700"
+                style={{
+                  opacity: mounted ? 1 : 0,
+                  transform: mounted ? "translateY(0)" : "translateY(30px)",
+                  transitionDelay: `${300 + i * 150}ms`,
+                }}
+              >
+                {i === 1 ? <Redact>{line}</Redact> : line}
+              </span>
+            ))}
           </h1>
-          <p className={cn(bodyText, "mt-2")}>
+          <p
+            className="mt-6 max-w-sm font-mono text-sm font-light leading-[1.5] text-white/60 transition-all duration-700"
+            style={{ opacity: mounted ? 1 : 0, transitionDelay: "800ms" }}
+          >
             Your details, the cashback offer, the waiver, then payment. Access is issued by hand, not automated.
           </p>
-          <ol className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[13px] lg:flex-col lg:gap-2">
-            {STEPS.map((s, i) => (
-              <li
-                key={s.n}
-                aria-current={!done && i === step ? "step" : undefined}
-                className={cn(
-                  "flex items-center gap-2",
-                  !done && i === step ? "font-medium text-white" : done || i < step ? "text-white/55" : "text-white/30",
-                )}
-              >
-                <span className={cn("w-4 font-num text-[15px] font-semibold", !done && i === step && "text-brand", (done || i < step) && "text-up")}>
-                  {done || i < step ? "✓" : i + 1}
-                </span>
-                {s.label}
-              </li>
-            ))}
-          </ol>
-        </aside>
+        </div>
 
-        <div className="rounded-2xl bg-panel p-6 sm:p-8">
+        <div className="relative z-10 mt-12 space-y-2">
+          {STEPS.map((s, i) => (
+            <div
+              key={s.n}
+              className={cn(
+                "flex items-center gap-3 font-mono text-xs transition-all duration-300",
+                done || i < step ? "text-white/50" : i === step ? "text-brand" : "text-white/20",
+              )}
+              style={{
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? "translateX(0)" : "translateX(-16px)",
+                transitionDelay: `${900 + i * 80}ms`,
+              }}
+            >
+              <span className="font-bold">{s.n}</span>
+              <span
+                className="h-px flex-1 bg-current transition-all duration-500"
+                style={{
+                  opacity: done || i <= step ? 0.6 : 0.15,
+                  transform: done || i <= step ? "scaleX(1)" : "scaleX(0.4)",
+                  transformOrigin: "left",
+                }}
+              />
+              <span>{s.label}</span>
+              {!done && i === step && <span className="led animate-pulse" aria-hidden />}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right, white form panel (scrolls independently when content is tall) */}
+      <div className="flex flex-col bg-white px-6 md:h-screen md:overflow-y-auto md:px-12">
+        <div className="m-auto w-full max-w-md py-16">
         {done ? (
           <ConfirmationPanel />
         ) : (
-          <div className="w-full">
+          <div key={stepKey} className="w-full">
             {returning && (
               <p
                 role="status"
                 className={cn(
-                  "mb-6 rounded-xl bg-raised px-4 py-3 text-[13px] leading-[19px]",
-                  returning === "submitted" ? "text-brand" : "text-white/70",
+                  "mb-6 rounded-lg border px-4 py-3 font-mono text-xs leading-[1.5]",
+                  returning === "submitted"
+                    ? "border-brand/50 bg-brand/5 text-black"
+                    : "border-gray-3 bg-white-2 text-black/60",
                 )}
               >
                 {returning === "submitted"
@@ -234,8 +317,8 @@ export function EarlyAccessWizard() {
               </p>
             )}
             {step === 0 && (
-              <StepShell n={1} label="Identity" title="Request access">
-                <div>
+              <StepShell n="01" label="Identity" title="Request access">
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
                   <label htmlFor="ea-email" className={labelClass}>
                     Email you&apos;ll use for access
                   </label>
@@ -253,10 +336,10 @@ export function EarlyAccessWizard() {
                     className={inputClass}
                   />
                 </div>
-                <div>
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
                   <label htmlFor="ea-telegram" className={labelClass}>Telegram handle</label>
                   <div className="relative mt-2">
-                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[15px] text-white/40">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-base text-black/60">
                       @
                     </span>
                     <input
@@ -276,11 +359,14 @@ export function EarlyAccessWizard() {
             )}
 
             {step === 1 && (
-              <StepShell n={2} label="Cashback" title="The cashback program">
-                <p className={bodyText}>
+              <StepShell n="02" label="Cashback" title="The cashback program">
+                <p
+                  className="font-mono text-sm text-black/60"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
                   Opt into the 100% money-back guarantee, or take early access on its own. Either way, the next steps are the same.
                 </p>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
                   <Choice
                     active={form.wantsCashback === true}
                     onClick={() => set("wantsCashback", true)}
@@ -296,25 +382,30 @@ export function EarlyAccessWizard() {
                 </div>
 
                 {form.wantsCashback !== null && (
-                  <div>
-                    <p className={eyebrow}>Partner brokers</p>
-                    <p className={cn(bodyText, "mt-2")}>{BROKER_COPY}</p>
-                    <div className="mt-2 divide-y divide-white/[0.07]">
+                  <div className="space-y-4" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-widest2 text-black/60">
+                        Partner brokers
+                      </p>
+                      <p className="mt-2 font-mono text-sm leading-[1.5] text-black/60">{BROKER_COPY}</p>
+                    </div>
+                    <div className="divide-y divide-gray-3 overflow-hidden rounded-lg border border-gray-3">
                       {PARTNER_BROKERS.map((b) => (
                         <a
                           key={b.name}
                           href={b.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group flex items-center gap-4 py-3"
+                          className="group flex items-center gap-4 p-4 transition-colors duration-200 hover:bg-black/[0.03]"
                         >
                           <BrokerLogo name={b.name} logoUrl={b.logoUrl} />
                           <span className="min-w-0 flex-1">
-                            <span className="block text-[14px] font-medium text-white">{b.name}</span>
-                            <span className="block text-[13px] text-white/55">{b.kind}</span>
+                            <span className="block font-mono text-sm font-bold text-black">{b.name}</span>
+                            <span className="block font-mono text-xs text-black/60">{b.kind}</span>
                           </span>
-                          <span className="shrink-0 rounded-full border border-white/[0.14] px-3 py-1.5 text-[13px] font-medium text-white transition-colors group-hover:bg-raised">
-                            Register ↗
+                          <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-widest2 text-black/60 transition-colors group-hover:text-black">
+                            Register
+                            <span className="transition-transform duration-200 group-hover:translate-x-0.5">↗</span>
                           </span>
                         </a>
                       ))}
@@ -323,14 +414,19 @@ export function EarlyAccessWizard() {
                 )}
 
                 {form.wantsCashback === true && (
-                  <div className="space-y-4 rounded-xl bg-raised p-5 text-[14px] leading-[21px] text-white/70">
-                    <p className="text-[15px] font-semibold text-white">{CASHBACK.headline}</p>
+                  <div
+                    className="space-y-4 rounded-lg border border-gray-3 bg-white-2 p-5 font-mono text-sm leading-[1.6] text-black/60"
+                    style={{ animation: "fadeSlideUp 0.4s ease-out both" }}
+                  >
+                    <p className="text-base font-bold text-black">{CASHBACK.headline}</p>
                     <div>
-                      <p className="mb-2 font-medium text-white">How to qualify</p>
+                      <p className="mb-2 font-bold text-black">How to qualify</p>
                       <ol className="space-y-2">
                         {CASHBACK.qualify.map((q, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="w-4 shrink-0 font-num text-[15px] font-semibold text-brand">{i + 1}</span>
+                            <span className="mt-px flex h-5 w-5 shrink-0 items-center justify-center bg-brand text-[11px] font-bold text-black">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
                             <span>{q}</span>
                           </li>
                         ))}
@@ -343,26 +439,33 @@ export function EarlyAccessWizard() {
             )}
 
             {step === 2 && (
-              <StepShell n={3} label="Waiver" title="Liability waiver">
-                <p className={bodyText}>
+              <StepShell n="03" label="Waiver" title="Liability waiver">
+                <p
+                  className="font-mono text-sm text-black/60"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
                   Read every line. This is binding. Tick all four, then sign with your full legal name.
                 </p>
-                <div className="divide-y divide-white/[0.07]">
+                <div className="space-y-3" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
                   {ACK_ITEMS.map((a) => (
-                    <label key={a.key} className="flex cursor-pointer items-start gap-3 py-3">
+                    <label
+                      key={a.key}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors",
+                        form.acks[a.key] ? "border-brand bg-brand/5" : "border-gray-3 hover:border-black/30",
+                      )}
+                    >
                       <input
                         type="checkbox"
                         checked={form.acks[a.key]}
                         onChange={(e) => set("acks", { ...form.acks, [a.key]: e.target.checked })}
                         className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
                       />
-                      <span className={cn("text-[14px] leading-[21px]", form.acks[a.key] ? "text-white" : "text-white/70")}>
-                        {a.label}
-                      </span>
+                      <span className="font-mono text-sm leading-[1.5] text-black/70">{a.label}</span>
                     </label>
                   ))}
                 </div>
-                <div>
+                <div style={{ animation: "fadeSlideUp 0.4s ease-out 0.3s both" }}>
                   <label htmlFor="ea-signature" className={labelClass}>
                     Sign by typing your full legal name
                   </label>
@@ -379,12 +482,16 @@ export function EarlyAccessWizard() {
                     onChange={(e) => set("signedName", e.target.value)}
                     placeholder="Your full legal name"
                     className={cn(
-                      "mt-2 h-12 w-full rounded-xl bg-raised px-4 font-serif text-[20px] italic text-white outline-none ring-1 placeholder:text-white/25 focus-visible:ring-brand",
-                      form.signedName.length > 0 && !nameOk ? "ring-down" : nameOk ? "ring-up" : "ring-white/[0.08]",
+                      "mt-2 w-full rounded-lg border px-4 py-3 font-serif text-2xl italic outline-none transition-colors",
+                      form.signedName.length > 0 && !nameOk
+                        ? "border-blood-bright bg-blood/5 text-blood-bright"
+                        : nameOk
+                          ? "border-[#65A30D] bg-[#65A30D]/5 text-black"
+                          : "border-gray-3 bg-white-2 text-black placeholder:text-black/30 focus-visible:border-brand",
                     )}
                   />
                   {form.signedName.length > 0 && !nameOk && (
-                    <p id="ea-signature-error" className="mt-2 text-[13px] text-down">
+                    <p id="ea-signature-error" className="mt-2 font-mono text-xs text-blood-bright">
                       Type your full legal name, first and last.
                     </p>
                   )}
@@ -393,11 +500,14 @@ export function EarlyAccessWizard() {
             )}
 
             {step === 3 && (
-              <StepShell n={4} label="Payment" title="Payment">
-                <p className={bodyText}>
+              <StepShell n="04" label="Payment" title="Payment">
+                <p
+                  className="font-mono text-sm text-black/60"
+                  style={{ animation: "fadeSlideUp 0.4s ease-out 0.15s both" }}
+                >
                   One upfront payment secures your place. USDT is the cheaper option. Transfer, then upload your receipt.
                 </p>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={{ animation: "fadeSlideUp 0.4s ease-out 0.2s both" }}>
                   <Choice
                     active={form.paymentMethod === "usdt"}
                     onClick={() => set("paymentMethod", "usdt")}
@@ -413,7 +523,7 @@ export function EarlyAccessWizard() {
                 </div>
 
                 {form.paymentMethod && (
-                  <div className="space-y-5">
+                  <div className="space-y-5" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
                     <PaymentDetails method={form.paymentMethod} />
                     <ProofUpload
                       preview={proofPreview}
@@ -428,8 +538,8 @@ export function EarlyAccessWizard() {
             )}
 
             {submitError && (
-              <p role="alert" className="mt-6 text-[13px] text-down">
-                {submitError}
+              <p role="alert" className="mt-6 animate-[shake_0.3s_ease-out] font-mono text-sm text-blood-bright">
+                ● {submitError}
               </p>
             )}
 
@@ -446,25 +556,29 @@ export function EarlyAccessWizard() {
             />
 
             {/* Nav */}
-            <div className="mt-8 flex items-center justify-between gap-3">
+            <div className="mt-10 flex items-center justify-between" style={{ animation: "fadeSlideUp 0.4s ease-out 0.4s both" }}>
               <button
                 type="button"
                 onClick={() => step > 0 && advanceStep(step - 1)}
                 disabled={step === 0}
-                className="h-11 rounded-full px-4 text-[14px] text-white/55 transition-colors hover:bg-raised hover:text-white disabled:invisible"
+                className="-ml-2 min-h-[44px] px-2 py-3 font-mono text-sm text-black/60 transition-all duration-200 hover:text-black disabled:opacity-0"
               >
-                Back
+                &larr; Back
               </button>
               {step < lastStep ? (
                 <button
                   type="button"
                   onClick={handleContinue}
                   disabled={!canContinue || leadPending}
-                  className={authPrimary}
+                  className="btn-pixel flex items-center gap-2.5 rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
                 >
                   {leadPending ? (
                     <>
-                      {spinner}
+                      <span
+                        aria-hidden
+                        className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
+                        style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
+                      />
                       Saving
                     </>
                   ) : (
@@ -476,11 +590,15 @@ export function EarlyAccessWizard() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={!canContinue || submitting}
-                  className={authPrimary}
+                  className="btn-pixel flex items-center gap-2.5 rounded-lg bg-brand px-6 py-3 font-mono text-sm font-bold text-black transition-all hover:bg-brand-dim active:scale-[0.97] disabled:opacity-40"
                 >
                   {submitting ? (
                     <>
-                      {spinner}
+                      <span
+                        aria-hidden
+                        className="inline-block h-4 w-4 shrink-0 border-2 border-black/25 border-t-black"
+                        style={{ animation: "btnSpin 0.7s steps(8) infinite" }}
+                      />
                       Submitting
                     </>
                   ) : (
@@ -489,11 +607,47 @@ export function EarlyAccessWizard() {
                 </button>
               )}
             </div>
+
+            {/* Step dots */}
+            <div className="mt-8 flex items-center justify-center gap-2">
+              {STEPS.map((s, i) => (
+                <div
+                  key={s.n}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    i === step ? "w-6 bg-black" : i < step ? "w-2 bg-brand" : "w-2 bg-black/20",
+                  )}
+                />
+              ))}
+            </div>
+            <p className="mt-2 text-center font-mono text-xs text-black/60">
+              ({step + 1}/{STEPS.length}) {STEPS[step]?.label}
+            </p>
           </div>
         )}
         </div>
       </div>
     </main>
+  );
+}
+
+// The headline accent, "declassified": white text sits under a solid black
+// redaction bar that holds, gets scanned, then wipes off to the right on load.
+function Redact({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="relative inline-block text-white">
+      {children}
+      <span
+        aria-hidden
+        className="absolute inset-x-[-0.1em] top-[0.08em] bottom-[0.14em] origin-right overflow-hidden bg-black"
+        style={{ animation: "declassify 1.2s cubic-bezier(0.16,1,0.3,1) 0.5s both" }}
+      >
+        <span
+          className="absolute inset-y-0 -left-8 w-8 bg-white/60 blur-md"
+          style={{ animation: "redactScan 1.2s ease-out 0.5s both" }}
+        />
+      </span>
+    </span>
   );
 }
 
@@ -510,12 +664,12 @@ function BrokerLogo({ name, logoUrl }: { name: string; logoUrl?: string }) {
         height={40}
         loading="lazy"
         onError={() => setFailed(true)}
-        className="h-10 w-10 shrink-0 rounded-xl bg-white object-contain p-1.5"
+        className="h-10 w-10 shrink-0 rounded-lg border border-gray-3 bg-white object-contain p-1.5"
       />
     );
   }
   return (
-    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-raised text-[15px] font-semibold text-white">
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-3 bg-black/[0.04] font-mono text-base font-bold text-black">
       {name.charAt(0)}
     </span>
   );
@@ -527,19 +681,19 @@ function StepShell({
   title,
   children,
 }: {
-  n: number;
+  n: string;
   label: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-5">
-      <div>
-        <p className={eyebrow}>
-          Step {n} of {STEPS.length} · {label}
-        </p>
-        <h2 className="mt-2 text-[22px] font-semibold leading-7 text-white">{title}</h2>
-      </div>
+    <div className="space-y-6">
+      <p className="font-mono text-sm text-black/60" style={{ animation: "fadeSlideUp 0.4s ease-out both" }}>
+        Step {n} / {label}
+      </p>
+      <h2 className="font-mono text-xl font-bold text-black" style={{ animation: "fadeSlideUp 0.4s ease-out 0.1s both" }}>
+        {title}
+      </h2>
       {children}
     </div>
   );
@@ -560,14 +714,16 @@ function Choice({
     <button
       type="button"
       onClick={onClick}
-      aria-pressed={active}
       className={cn(
-        "flex flex-col gap-0.5 rounded-xl px-4 py-3 text-left ring-1 transition-colors focus-visible:outline-none focus-visible:ring-brand",
-        active ? "bg-brand/[0.08] ring-brand" : "bg-raised ring-white/[0.08] hover:ring-white/20",
+        "flex flex-col gap-1 rounded-lg border p-4 text-left transition-all duration-200 active:scale-[0.98]",
+        active ? "border-brand bg-brand/5 shadow-[0_0_0_3px_rgba(255,212,0,0.15)]" : "border-gray-3 hover:border-black/40 hover:bg-black/[0.02]",
       )}
     >
-      <span className="text-[15px] font-semibold text-white">{title}</span>
-      <span className="text-[13px] text-white/55">{sub}</span>
+      <span className="flex items-center gap-2 font-mono text-sm font-bold text-black">
+        <span className={cn("led", !active && "opacity-30")} aria-hidden />
+        {title}
+      </span>
+      <span className="pl-4 font-mono text-xs text-black/60">{sub}</span>
     </button>
   );
 }
@@ -587,12 +743,12 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
   };
 
   return (
-    <div className="rounded-xl bg-raised p-5">
+    <div className="rounded-lg border border-gray-3 bg-white-2 p-5">
       <div className="flex items-baseline justify-between">
-        <span className={eyebrow}>{dest.method}</span>
-        <span className="font-num text-[24px] font-semibold leading-none text-white">{dest.amountLabel}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest2 text-black/60">{dest.method}</span>
+        <span className="font-mono text-lg font-bold text-black">{dest.amountLabel}</span>
       </div>
-      <div className="mt-3 divide-y divide-white/[0.07]">
+      <div className="mt-4 space-y-1">
         {dest.rows.map((row) => {
           const copyable = "copyable" in row && row.copyable;
           if (copyable) {
@@ -603,12 +759,12 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
                 key={row.label}
                 type="button"
                 onClick={() => copy(row.value)}
-                className="group flex min-h-[44px] w-full items-start justify-between gap-3 py-2.5 text-left"
+                className="group -mx-2 flex min-h-[44px] w-full items-start justify-between gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-black/[0.05]"
               >
-                <span className="mt-0.5 shrink-0 text-[13px] text-white/55">{row.label}</span>
+                <span className="mt-0.5 shrink-0 font-mono text-xs text-black/60">{row.label}</span>
                 <span className="flex items-start gap-2">
-                  <span className="break-all text-right text-[14px] text-white">{row.value}</span>
-                  <span className={cn("mt-px shrink-0 text-[12px] font-medium transition-colors", copied === row.value ? "text-up" : "text-white/40 group-hover:text-white")}>
+                  <span className="break-all text-right font-mono text-sm text-black">{row.value}</span>
+                  <span className="mt-px shrink-0 font-mono text-[10px] uppercase tracking-widest2 text-black/60 transition-colors group-hover:text-black">
                     {copied === row.value ? "Copied" : "Copy"}
                   </span>
                 </span>
@@ -616,14 +772,14 @@ function PaymentDetails({ method }: { method: PaymentMethod }) {
             );
           }
           return (
-            <div key={row.label} className="flex items-center justify-between gap-4 py-2.5">
-              <span className="text-[13px] text-white/55">{row.label}</span>
-              <span className="break-all text-right text-[14px] text-white">{row.value}</span>
+            <div key={row.label} className="flex items-center justify-between gap-4 px-0 py-2">
+              <span className="font-mono text-xs text-black/60">{row.label}</span>
+              <span className="break-all text-right font-mono text-sm text-black">{row.value}</span>
             </div>
           );
         })}
       </div>
-      <p className="mt-3 text-[13px] leading-[19px] text-white/55">{dest.note}</p>
+      <p className="mt-4 font-mono text-xs leading-[1.5] text-black/60">{dest.note}</p>
     </div>
   );
 }
@@ -646,8 +802,8 @@ function ProofUpload({
       <p className={labelClass}>Proof of payment</p>
       <label
         className={cn(
-          "mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-raised px-4 py-8 text-center transition-colors focus-within:ring-1 focus-within:ring-brand",
-          uploaded ? "border-up/60" : "border-white/[0.14] hover:border-white/30",
+          "mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors",
+          uploaded ? "border-[#65A30D] bg-[#65A30D]/5" : "border-gray-3 hover:border-brand hover:bg-black/[0.02]",
         )}
       >
         <input
@@ -661,11 +817,11 @@ function ProofUpload({
         />
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Payment proof preview" className="max-h-40 rounded-lg object-contain" />
+          <img src={preview} alt="Payment proof preview" className="max-h-40 rounded border border-gray-3 object-contain" />
         ) : (
-          <span className="text-[22px] text-white/30">↑</span>
+          <span className="font-mono text-2xl text-black/30">↑</span>
         )}
-        <span className={cn("text-[13px]", uploaded ? "text-up" : "text-white/55")}>
+        <span className="font-mono text-xs text-black/60">
           {uploading
             ? "Uploading your receipt..."
             : uploaded
@@ -674,7 +830,7 @@ function ProofUpload({
         </span>
       </label>
       {error && (
-        <p role="alert" className="mt-2 text-[13px] text-down">
+        <p role="alert" className="mt-2 font-mono text-xs text-blood-bright">
           {error}
         </p>
       )}
@@ -683,35 +839,40 @@ function ProofUpload({
 }
 
 function ConfirmationPanel() {
-  const rows: [string, string][] = [
-    ["Bonus", `+${CONFIRMATION.bonusMonths} months free`],
-    ["Subscription starts", CONFIRMATION.subscriptionStart],
-    ["Free through", CONFIRMATION.freeThrough],
-    ["Subscription until", CONFIRMATION.subscriptionThrough],
-  ];
   return (
-    <div className="w-full">
-      <p className={cn(eyebrow, "!text-up")}>Application received</p>
-      <h2 className="mt-2 text-[24px] font-semibold leading-[30px] text-white">You&apos;re in.</h2>
-      <p className={cn(bodyText, "mt-2")}>Welcome aboard, operator. You&apos;re locked in as a founding member.</p>
-      <dl className="mt-5 divide-y divide-white/[0.07]">
-        {rows.map(([k, v]) => (
-          <div key={k} className="flex items-center justify-between gap-4 py-2.5 text-[14px]">
-            <dt className="text-white/55">{k}</dt>
-            <dd className="text-right font-medium text-white">{v}</dd>
-          </div>
-        ))}
-      </dl>
-      <p className={cn(bodyText, "mt-5")}>
+    <div className="w-full max-w-md text-center" style={{ animation: "fadeSlideUp 0.5s ease-out both" }}>
+      <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">● Application received</div>
+      <h2 className="mt-5 font-sans text-[clamp(2rem,6vw,44px)] font-bold leading-[1.02] text-black">
+        You&apos;re in.
+      </h2>
+      <p className="mx-auto mt-4 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
+        Welcome aboard, operator. You&apos;re locked in as a founding member.
+      </p>
+      <div className="mt-8 space-y-2 rounded-lg border border-gray-3 bg-white-2 p-5 text-left font-mono text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Bonus</span>
+          <span className="font-bold text-black">+{CONFIRMATION.bonusMonths} months free</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Subscription starts</span>
+          <span className="font-bold text-black">{CONFIRMATION.subscriptionStart}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Free through</span>
+          <span className="font-bold text-black">{CONFIRMATION.freeThrough}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-black/60">Subscription until</span>
+          <span className="font-bold text-black">{CONFIRMATION.subscriptionThrough}</span>
+        </div>
+      </div>
+      <p className="mx-auto mt-6 max-w-sm font-mono text-sm leading-[1.6] text-black/60">
         We&apos;re verifying your payment and broker details now. On{" "}
-        <span className="font-medium text-white">{CONFIRMATION.accessEmailDate}</span> we&apos;ll email your access, with a
+        <span className="font-bold text-black">{CONFIRMATION.accessEmailDate}</span> we&apos;ll email your access, with a
         link to set your password. Nothing else needed until then.
       </p>
-      <Link
-        href="/"
-        className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-white/[0.14] px-6 text-[14px] font-medium text-white transition-colors hover:bg-raised"
-      >
-        Back to TradeVantage
+      <Link href="/" className="mt-8 inline-block font-mono text-sm text-black/60 transition-colors hover:text-brand">
+        &larr; Back to TradeVantage
       </Link>
     </div>
   );
