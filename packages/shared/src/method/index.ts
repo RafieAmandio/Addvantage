@@ -240,6 +240,10 @@ export interface Level {
   r: number | null;
   verdict: Verdict;
   reasons: string[];
+  /** 0 to 100: touches, confluence and freshness. Drives how bright the zone is drawn. */
+  score: number;
+  /** Price is in the zone on the latest candle, or still away from it. */
+  status: "at-level" | "waiting";
 }
 
 const NEEDED: Record<number, number> = { 1: 2, 2: 1 };
@@ -289,7 +293,7 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
     const postBreak = (buy ? highs : lows).filter((s) => s > t).map((s) => (buy ? hourly[s]!.high : hourly[s]!.low));
     const fta = [...(buy ? highsUp : lowsDn), ...postBreak, ...(peak !== null ? [peak] : [])].filter((x) => (buy ? x > lvl : x < lvl));
     const target = fta.length ? (buy ? Math.min(...fta) : Math.max(...fta)) : null;
-    out.push(grade({ type: "inverse", side, price: lvl, touches, thrust, naked, space, stop, target }, d));
+    out.push(grade({ type: "inverse", side, price: lvl, touches, thrust, naked, space, stop, target }, d, last));
   };
 
   // Walk every break in the window. One candle can clear several swings; the last one before it is the LHPB/LLPB.
@@ -313,7 +317,7 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
     const target = fta.length ? (buy ? Math.min(...fta) : Math.max(...fta)) : null;
     // SFP stop: one 24-period hourly ATR beyond the level.
     const stop = h24 === null ? null : buy ? lvl - h24 : lvl + h24;
-    out.push(grade({ type: "same-way", side, price: lvl, touches: [hourly[s]!.time, ...visits], thrust: null, naked: visits.length === 0, space: true, stop, target }, d));
+    out.push(grade({ type: "same-way", side, price: lvl, touches: [hourly[s]!.time, ...visits], thrust: null, naked: visits.length === 0, space: true, stop, target }, d, last));
   };
   sameWay("buy");
   sameWay("sell");
@@ -332,7 +336,9 @@ export function readLevels(hourly: Candle[], d: DailyRead, max = 3): Level[] {
 
 type Draft = Pick<Level, "type" | "side" | "price" | "touches" | "thrust" | "naked" | "space" | "stop" | "target">;
 
-function grade(l: Draft, d: DailyRead): Level {
+function grade(l: Draft, d: DailyRead, last: Candle): Level {
+  const tol = (d.atr ?? 0) * 0.1;
+  const status = last.low <= l.price + tol && last.high >= l.price - tol ? "at-level" : "waiting";
   const buy = l.side === "buy";
   const a = d.atr ?? 0;
   const confluence = {
@@ -358,7 +364,8 @@ function grade(l: Draft, d: DailyRead): Level {
     if (against) reasons.push(`Against the daily bias (${d.bias === "bullish" ? "buys" : "sells"}), watch only`);
     verdict = have < needed || (r !== null && r < 0.5) ? "pass" : l.naked && l.space && r !== null && r >= 1 && !against ? "order" : "watch";
     if (verdict === "watch" && r !== null && r < 1 && l.naked && l.space) reasons.push(`R is ${r.toFixed(2)}, order in only above 1`);
-    return { ...l, confluence, needed, r, verdict, reasons };
+    const score = Math.min(100, Math.min(l.touches.length, 4) * 12 + have * 14 + (l.naked ? 6 : 0) + (l.space ? 4 : 0));
+    return { ...l, confluence, needed, r, verdict, reasons, score, status };
   }
 
   const visit = l.touches.length; // 1 = first time back
@@ -367,7 +374,9 @@ function grade(l: Draft, d: DailyRead): Level {
   else reasons.push("Second visit, needs an SFP plus MACD divergence");
   if (r !== null && r < 0.5) reasons.push(`R is ${r.toFixed(2)}, under the 0.5 minimum`);
   verdict = visit >= 3 || (r !== null && r < 0.5) ? "pass" : "watch";
-  return { ...l, confluence, needed: 0, r, verdict, reasons };
+  // Same-way levels need an SFP first, so they never outrank a clean inverse level.
+  const score = Math.min(40, have * 12 + (visit === 1 ? 10 : 0));
+  return { ...l, confluence, needed: 0, r, verdict, reasons, score, status };
 }
 
 export interface BoardRow {
@@ -387,13 +396,20 @@ export interface BoardRow {
   /** Board call: order in, watch for PA, or pass, with the reason. */
   call: Verdict;
   why: string;
+  /** Last 72 hourly candles, for the board's mini chart. */
+  candles: Candle[];
 }
 
 /** One market's line on the board, from its daily and hourly candles. */
 export function boardRow(meta: { symbol: string; label: string; group: string }, daily: Candle[], hourly: Candle[], now = Date.now()): BoardRow {
   const d = readDaily(daily, now);
   const levels = readLevels(hourly, d);
-  const level = levels.find((l) => l.verdict !== "pass") ?? null;
+  // Break-and-retest levels first (same-way ones sit next to price by definition), then price in the zone, the call, strength.
+  const rank: Record<Verdict, number> = { order: 0, watch: 1, pass: 2 };
+  const level =
+    levels
+      .filter((l) => l.verdict !== "pass")
+      .sort((x, y) => Number(y.type === "inverse") - Number(x.type === "inverse") || Number(y.status === "at-level") - Number(x.status === "at-level") || rank[x.verdict] - rank[y.verdict] || y.score - x.score)[0] ?? null;
   const signals = d.signals.filter((s) => s.time === d.bar?.time);
   const close = hourly.at(-1)?.close ?? d.today?.close ?? null;
   let call: Verdict = level?.verdict ?? "pass";
@@ -410,5 +426,5 @@ export function boardRow(meta: { symbol: string; label: string; group: string },
     call = "pass";
     why = "Not enough daily candles";
   }
-  return { ...meta, close, asOf: d.bar?.time ?? null, bias: d.bias, signals, usedPct: d.usedPct, atr: d.atr, insideDay: !!d.insideDay, level, call, why };
+  return { ...meta, close, asOf: d.bar?.time ?? null, bias: d.bias, signals, usedPct: d.usedPct, atr: d.atr, insideDay: !!d.insideDay, level, call, why, candles: hourly.slice(-72) };
 }

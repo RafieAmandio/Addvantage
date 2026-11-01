@@ -34,7 +34,7 @@ const chip = (on: boolean) =>
 /** Chart-first view of the method: structures drawn on the candles, filters to toggle them, tap one to walk through it. */
 export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle[] }) {
   const read = useMemo(() => readDaily(daily), [daily]);
-  const levels = useMemo(() => readLevels(hourly, read, 4), [hourly, read]);
+  const levels = useMemo(() => readLevels(hourly, read, 3), [hourly, read]);
   const [tf, setTf] = useState<"1H" | "1D">("1H");
   const [layers, setLayers] = useState<Set<Layer>>(() => new Set(DEFAULT_LAYERS));
   const [pick, setPick] = useState<Pick>(null);
@@ -205,11 +205,17 @@ export function MethodChart({ hourly, daily }: { hourly: Candle[]; daily: Candle
           <div className="flex gap-2 overflow-x-auto pb-1">
             {shown.map((l) => (
               <button key={`${l.type}${l.side}${l.price}`} type="button" onClick={() => select({ kind: "level", level: l })} className="shrink-0 rounded-xl bg-raised px-3 py-2 text-left hover:bg-white/[0.08]">
-                <span className={cn("block text-[12px] font-semibold", VERDICT[l.verdict].cls)}>{VERDICT[l.verdict].label}</span>
+                <span className="flex items-center gap-2 text-[12px] font-semibold">
+                  <span className={VERDICT[l.verdict].cls}>{VERDICT[l.verdict].label}</span>
+                  {l.status === "at-level" && l.type === "inverse" && <span className="rounded-full bg-brand px-1.5 text-[11px] text-black">At level now</span>}
+                </span>
                 <span className="block text-[14px] text-white">
                   <span className={l.side === "buy" ? "text-up" : "text-down"}>{l.side === "buy" ? "Buy" : "Sell"}</span> {levelName(l)} <span className="font-num font-semibold">{fmtPrice(l.price)}</span>
                 </span>
-                {l.r !== null && <span className="block text-[12px] text-white/40">{l.r.toFixed(2)}R</span>}
+                <span className="block text-[12px] text-white/40">
+                  Strength {l.score}
+                  {l.r !== null ? ` · ${l.r.toFixed(2)}R` : ""}
+                </span>
               </button>
             ))}
             {signalsToday.map((s: Signal) => (

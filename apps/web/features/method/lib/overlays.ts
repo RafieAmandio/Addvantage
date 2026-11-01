@@ -1,6 +1,9 @@
 import type { Candle, DailyRead, Level, Signal } from "@tradevantage/shared";
 import type { Box } from "../components/BoxPrimitive";
-import { levelName, VERDICT } from "./explain";
+import { levelName } from "./explain";
+
+/** Chart labels stay short, like LuxAlgo's BOS/CHoCH tags; the full read is in the panel. */
+export const shortName = (l: Level) => (l.type === "inverse" ? levelName(l) : l.side === "buy" ? "Support" : "Resistance");
 
 export type Layer = "atr" | "fib" | "liquidity" | "signals" | "levels" | "sameway" | "passed";
 
@@ -84,23 +87,25 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
   };
 
   const zone = (l: Level, strong: boolean) => {
-    const buy = l.side === "buy";
     const px = tf === "1H" ? l.touches.map((t) => touchPrice(l, t)) : [];
     const top = Math.max(l.price, ...px) + tol;
     const bottom = Math.min(l.price, ...px) - tol;
     const i0 = tf === "1H" && l.touches[0] ? Math.max(0, at(l.touches[0])) : last - 2;
-    const base = l.verdict === "order" ? BRAND : l.verdict === "watch" ? "#FFFFFF" : "#FFFFFF";
+    const base = l.verdict === "order" ? BRAND : "#FFFFFF";
+    const here = l.status === "at-level" && l.type === "inverse";
     out.boxes.push({
       i0,
       i1: right,
       top,
       bottom,
-      fill: rgba(base, strong ? 0.14 : l.verdict === "pass" ? 0.03 : 0.07),
-      stroke: strong ? rgba(base, 0.6) : undefined,
-      label: `${buy ? "Buy" : "Sell"} ${levelName(l)} · ${VERDICT[l.verdict].label}${l.r !== null ? ` · ${l.r.toFixed(2)}R` : ""}`,
+      // Brighter = stronger: touches, confluence and freshness (TrendSpider-style density, one zone at a time).
+      fill: rgba(base, strong ? 0.2 : 0.04 + (l.score / 100) * 0.22),
+      stroke: strong || here ? rgba(base, here ? 0.9 : 0.6) : undefined,
+      dashed: here && !strong,
+      label: `${shortName(l)}${here ? " · at level" : ""}${l.verdict === "order" && l.r !== null ? ` · ${l.r.toFixed(2)}R` : ""}`,
       labelColor: l.verdict === "order" ? BRAND : "rgba(255,255,255,.7)",
     });
-    out.lines.push({ price: l.price, color: l.verdict === "order" ? BRAND : l.verdict === "watch" ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.3)", style: l.naked ? "solid" : "dashed", label: levelName(l), width: strong ? 2 : 1 });
+    out.lines.push({ price: l.price, color: l.verdict === "order" ? BRAND : l.verdict === "watch" ? "rgba(255,255,255,.75)" : "rgba(255,255,255,.3)", style: l.naked ? "solid" : "dashed", label: "", width: strong ? 2 : 1 }); // the zone carries the label
   };
 
   const tradeBox = (l: Level) => {

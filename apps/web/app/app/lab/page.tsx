@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FOREX_PAIRS, boardRow, type BoardRow } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
-import { Panel } from "@/components/ui/Panel";
 import { apiGet } from "@/lib/api/client-server";
 import { isMockMode } from "@/lib/config/public";
 import { listBars } from "@/features/chart/queries/bars";
 import { toChartBars } from "@/features/chart/lib/bars";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
-import { VERDICT, levelName, wib } from "@/features/method/lib/explain";
+import { VERDICT, wib } from "@/features/method/lib/explain";
+import { shortName } from "@/features/method/lib/overlays";
+import { MiniChart } from "@/features/method/components/MiniChart";
 
 export const metadata: Metadata = { title: "Chart Lab" };
 export const dynamic = "force-dynamic";
@@ -34,84 +35,91 @@ async function getBoard(): Promise<BoardRow[]> {
 }
 
 const RANK = { order: 0, watch: 1, pass: 2 } as const;
+const href = (r: BoardRow) => `/app/lab/${encodeURIComponent(r.symbol.replace("/", ""))}`;
+// Only a break-and-retest level being touched is news; same-way levels hug price all the time.
+const here = (r: BoardRow) => r.call !== "pass" && r.level?.type === "inverse" && r.level.status === "at-level";
 
-export default async function MethodPage() {
-  const rows = (await getBoard()).sort((a, b) => RANK[a.call] - RANK[b.call] || Number(!a.bias) - Number(!b.bias));
-  const count = (c: BoardRow["call"]) => rows.filter((r) => r.call === c).length;
-  const biased = rows.filter((r) => r.bias).length;
+function Card({ r }: { r: BoardRow }) {
+  const l = r.level!;
+  const sig = r.signals.find((s) => !s.shallow);
+  return (
+    <Link href={href(r)} className={cn("block rounded-2xl bg-panel p-4 ring-1 transition-colors hover:bg-raised", here(r) ? "ring-brand/70" : "ring-transparent")}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="font-num text-[22px] font-semibold leading-6 text-white">{r.symbol.replace("/", "")}</span>
+        {here(r) ? (
+          <span className="rounded-full bg-brand px-2 py-px text-[11px] font-semibold text-black">At level now</span>
+        ) : (
+          <span className={cn("text-[13px] font-semibold", VERDICT[r.call].cls)}>{VERDICT[r.call].label}</span>
+        )}
+      </div>
+      <MiniChart candles={r.candles} level={l} />
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-[14px] text-white">
+          <span className={l.side === "buy" ? "text-up" : "text-down"}>{l.side === "buy" ? "Buy" : "Sell"}</span> {shortName(l)} <span className="font-num font-semibold">{fmtPrice(l.price)}</span>
+        </span>
+        {l.r !== null && <span className="font-num text-[16px] font-semibold text-white/80">{l.r.toFixed(2)}R</span>}
+      </div>
+      <div className="mt-1 flex items-center gap-2 text-[12px] text-white/40">
+        <span className="h-1 w-12 overflow-hidden rounded-full bg-white/10" aria-hidden>
+          <span className="block h-full bg-brand" style={{ width: `${l.score}%` }} />
+        </span>
+        <span>Strength {l.score}</span>
+        <span>·</span>
+        <span className={r.bias === "bullish" ? "text-up" : r.bias === "bearish" ? "text-down" : ""}>{r.bias ? `${r.bias === "bullish" ? "Buys" : "Sells"}${sig ? `, ${sig.name.toLowerCase()}` : ""}` : "No daily bias"}</span>
+      </div>
+    </Link>
+  );
+}
+
+export default async function LabPage() {
+  const rows = await getBoard();
+  const live = rows
+    .filter((r) => r.call !== "pass" && r.level)
+    .sort((a, b) => Number(here(b)) - Number(here(a)) || RANK[a.call] - RANK[b.call] || Number(b.level!.type === "inverse") - Number(a.level!.type === "inverse") || b.level!.score - a.level!.score);
+  const passed = rows.filter((r) => !live.includes(r));
   const asOf = rows.map((r) => r.asOf).filter(Boolean).sort().at(-1);
+  const stats: [string, number, string][] = [
+    ["At level now", live.filter(here).length, "text-brand"],
+    ["Order in", live.filter((r) => r.call === "order").length, "text-white"],
+    ["Watch for PA", live.filter((r) => r.call === "watch").length, "text-white"],
+    ["Pass", passed.length, "text-white/40"],
+  ];
 
   return (
     <div className="space-y-4 px-4 pb-10 sm:px-6">
-      <div className="flex flex-wrap gap-2 text-[11px]">
-        <span className="rounded-full border border-white/[0.12] px-2 py-px text-white/60">{asOf ? `Daily read from the ${wib(asOf, false)} close` : "No daily candles stored yet"}</span>
-        <span className="rounded-full border border-white/[0.12] px-2 py-px text-white/60">Hourly levels update every hour</span>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-4">
-        {[
-          ["Order in", count("order"), "text-brand"],
-          ["Watch for PA", count("watch"), "text-white"],
-          ["Pass", count("pass"), "text-white/40"],
-          ["Daily bias", biased, "text-white"],
-        ].map(([k, v, cls]) => (
-          <div key={k as string} className="rounded-2xl bg-panel p-5">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">{k}</p>
-            <p className={cn("font-num text-[40px] font-semibold leading-[44px]", cls as string)}>{v}</p>
-          </div>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        {stats.map(([k, v, cls]) => (
+          <span key={k} className="flex items-baseline gap-2">
+            <span className={cn("font-num text-[28px] font-semibold leading-7", cls)}>{v}</span>
+            <span className="text-[13px] text-white/55">{k}</span>
+          </span>
         ))}
+        <span className="ml-auto text-[12px] text-white/40">{asOf ? `Daily read from the ${wib(asOf, false)} close · hourly levels refresh every hour` : "No daily candles stored yet"}</span>
       </div>
 
-      <Panel title="Board" sub="Every market checked against the method: daily bias first, then the nearest hourly level. Open a market to see the levels drawn and explained.">
-        {rows.length === 0 ? (
-          <p className="py-6 text-[14px] text-white/40">No candles stored yet. The board fills once the bars sync runs.</p>
-        ) : (
-          <div className="divide-y divide-white/[0.07]">
-            <div className="hidden grid-cols-[120px_150px_80px_130px_minmax(0,1fr)_70px] gap-4 pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 md:grid">
-              <span>Market</span>
-              <span>Daily bias</span>
-              <span className="text-right">ATR used</span>
-              <span>Call</span>
-              <span>Why</span>
-              <span className="text-right">R</span>
-            </div>
-            {rows.map((r) => {
-              const sig = r.signals.find((s) => !s.shallow);
-              return (
-                <Link
-                  key={r.symbol}
-                  href={`/app/lab/${encodeURIComponent(r.symbol.replace("/", ""))}`}
-                  className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 py-3 hover:bg-raised/60 md:grid-cols-[120px_150px_80px_130px_minmax(0,1fr)_70px] md:items-center"
-                >
-                  <span>
-                    <span className="block font-num text-[18px] font-semibold text-white">{r.symbol.replace("/", "")}</span>
-                    <span className="block text-[12px] text-white/40">{r.close !== null ? fmtPrice(r.close) : "n/a"}</span>
-                  </span>
-                  <span className={cn("text-right text-[14px] md:text-left", r.bias === "bullish" ? "text-up" : r.bias === "bearish" ? "text-down" : "text-white/40")}>
-                    {r.bias === "bullish" ? "Buys" : r.bias === "bearish" ? "Sells" : "No bias"}
-                    {sig && <span className="block text-[12px] text-white/40">{sig.name}{r.signals.some((s) => s.kind === "cross") ? ", cross bar" : ""}</span>}
-                  </span>
-                  <span className={cn("hidden text-right font-num text-[16px] font-semibold md:block", (r.usedPct ?? 0) >= 100 ? "text-down" : "text-white/80")}>
-                    {r.usedPct !== null ? `${r.usedPct.toFixed(0)}%` : "n/a"}
-                  </span>
-                  <span className={cn("text-[14px] font-semibold", VERDICT[r.call].cls)}>{VERDICT[r.call].label}</span>
-                  <span className="col-span-2 min-w-0 text-[13px] text-white/55 md:col-span-1">
-                    {r.level && r.call !== "pass" ? (
-                      <>
-                        <span className={r.level.side === "buy" ? "text-up" : "text-down"}>{r.level.side === "buy" ? "Buy" : "Sell"}</span> {levelName(r.level)} {fmtPrice(r.level.price)}
-                        {r.level.reasons[0] && <span className="text-white/40">. {r.level.reasons[0]}</span>}
-                      </>
-                    ) : (
-                      r.why
-                    )}
-                  </span>
-                  <span className="hidden text-right font-num text-[16px] font-semibold text-white/80 md:block">{r.level?.r != null && r.call !== "pass" ? r.level.r.toFixed(2) : ""}</span>
-                </Link>
-              );
-            })}
+      {rows.length === 0 ? (
+        <p className="rounded-2xl bg-panel p-6 text-[14px] text-white/40">No candles stored yet. The board fills once the bars sync runs.</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {live.map((r) => (
+            <Card key={r.symbol} r={r} />
+          ))}
+        </div>
+      )}
+
+      {passed.length > 0 && (
+        <details className="rounded-2xl bg-panel p-4">
+          <summary className="cursor-pointer text-[14px] text-white/55 hover:text-white">{passed.length} markets passed</summary>
+          <div className="mt-2 divide-y divide-white/[0.07]">
+            {passed.map((r) => (
+              <Link key={r.symbol} href={href(r)} className="flex items-baseline gap-3 py-2.5 hover:bg-raised/60">
+                <span className="w-24 shrink-0 font-num text-[16px] font-semibold text-white">{r.symbol.replace("/", "")}</span>
+                <span className="min-w-0 flex-1 truncate text-[13px] text-white/40">{r.why}</span>
+              </Link>
+            ))}
           </div>
-        )}
-      </Panel>
+        </details>
+      )}
     </div>
   );
 }
