@@ -181,3 +181,22 @@ export function NewsCalendar({ days }: { days: { count: number; net: number }[] 
     />
   );
 }
+
+/** Diverging strip: centre column is zero, green dots grow right for +, red dots grow left for -. */
+export function StrengthBar({ value, max }: { value: number; max: number }) {
+  const half = 10;
+  const n = Math.min(half, Math.round((Math.abs(value) / (max || 1)) * half));
+  return (
+    <Dots
+      cols={half * 2 + 1}
+      rows={2}
+      label={`${value >= 0 ? "+" : ""}${value.toFixed(2)}%`}
+      fill={(c) => {
+        if (c === half) return "rgba(255,255,255,.35)";
+        if (value >= 0 && c > half && c <= half + n) return UP;
+        if (value < 0 && c < half && c >= half - n) return DOWN;
+        return OFF;
+      }}
+    />
+  );
+}

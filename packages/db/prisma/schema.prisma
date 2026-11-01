@@ -600,3 +600,13 @@ model UpgradeEventsMeta {
 
   @@map("upgrade_events_meta")
 }
+
+/// Latest macro snapshot (policy rates, yields, risk gauges, rate-decision odds).
+/// Single row, overwritten by the worker's macro sync.
+model MacroSnapshot {
+  id       Int      @id @default(1)
+  data     Json
+  syncedAt DateTime @map("synced_at") @db.Timestamptz(6)
+
+  @@map("macro_snapshot")
+}

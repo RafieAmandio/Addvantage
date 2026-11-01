@@ -40,6 +40,7 @@ const nav: NavEntry[] = [
   { label: "Hashtags", href: "/app/tags", group: "tools", icon: "tags", tagline: "Every item filed by theme." },
   { label: "RSI Heatmap", href: "/app/heatmap", group: "tools-forex", icon: "heatmap", tagline: "Overbought and oversold across pairs and timeframes." },
   { label: "ATR Levels", href: "/app/atr", group: "tools-forex", icon: "atr", tagline: "Daily range bands per instrument." },
+  { label: "Macro", href: "/app/macro", group: "tools-forex", icon: "macro", tagline: "Central banks, rate gaps, yields and risk mood for FX." },
   { label: "Gap Scanner", href: "/app/gap-screener", group: "tools-forex", icon: "gap", tagline: "Weekend gaps and whether they filled." },
   { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", locked: true, icon: "unlocks", tagline: "Supply shocks from upcoming unlocks, top 200 only." },
   { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", locked: true, icon: "radar", tagline: "Network upgrades and launches that move price." },
@@ -76,6 +77,7 @@ function NavIcon({ name, className }: { name: string; className?: string }) {
     case "consult": return <svg {...props}><circle cx="8" cy="5" r="3" /><path d="M2 14c0-3 2.5-5 6-5s6 2 6 5" /></svg>;
     case "education": return <svg {...props}><path d="M8 2L1 6l7 4 7-4-7-4z" /><path d="M3 8v4c0 1 2.2 2 5 2s5-1 5-2V8" /></svg>;
     case "tags": return <svg {...props}><path d="M2 8V3a1 1 0 011-1h5l6 6-5 5-6-6z" /><circle cx="5.5" cy="5.5" r="1" /></svg>;
+    case "macro": return <svg {...props}><path d="M2 13h12" /><path d="M3 10l3-3 3 2 4-5" /><circle cx="13" cy="4" r="1" /></svg>;
     case "heatmap": return <svg {...props}><rect x="2" y="2" width="4" height="4" rx="0.5" /><rect x="6" y="6" width="4" height="4" rx="0.5" /><rect x="10" y="2" width="4" height="4" rx="0.5" /><rect x="2" y="10" width="4" height="4" rx="0.5" /><rect x="10" y="10" width="4" height="4" rx="0.5" /><circle cx="8" cy="12" r="1.5" /><circle cx="12" cy="8" r="1.5" /></svg>;
     case "atr": return <svg {...props}><path d="M2 4h12M2 8h8M2 12h10" strokeWidth="2" strokeLinecap="round" /></svg>;
     case "gap": return <svg {...props}><path d="M2 5h12M2 11h12" /><path d="M8 5V2M8 14v-3" strokeWidth="2" /><path d="M5 8h6" strokeDasharray="2 2" /></svg>;

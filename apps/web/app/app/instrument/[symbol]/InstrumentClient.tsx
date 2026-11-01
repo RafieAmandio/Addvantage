@@ -10,6 +10,8 @@ import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import { fmtPrice, dayChange } from "@/features/dashboard/components/PriceStrip";
 import { InstrumentChart, type ChartLevel, type ChartPin } from "@/features/instrument/components/InstrumentChart";
 import { AtrGauge, NewsPulse, RsiMeter, SessionRing, newsPulse } from "@/features/instrument/components/DotMatrix";
+import { PairRatesPanel } from "@/features/macro/components/MacroPanels";
+import type { Ccy, MacroData } from "@/features/macro/types";
 import { StructureStrip } from "@/features/bulletin/components/StructureStrip";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
 import type { AtrPair } from "@/features/atr/types";
@@ -50,6 +52,8 @@ export default function InstrumentClient({
   setups,
   bulletin,
   calendar,
+  macro,
+  legs,
 }: {
   symbol: string;
   label: string;
@@ -62,6 +66,8 @@ export default function InstrumentClient({
   setups: Setup[];
   bulletin: Bulletin | null;
   calendar: CalendarEvent[];
+  macro: MacroData;
+  legs: Ccy[];
 }) {
   const { tier } = useAppState();
   const paid = isPaid(tier);
@@ -270,6 +276,8 @@ export default function InstrumentClient({
               })}
             </ul>
           </Panel>
+
+          <PairRatesPanel data={macro} legs={legs} />
 
           <Panel title="Sessions" sub="Which desks are trading now">
             <SessionRing />
