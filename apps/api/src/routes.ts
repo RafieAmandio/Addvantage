@@ -30,6 +30,7 @@ import { earlyAccessRoutes } from "./features/early-access/early-access.routes.j
 import { shortLinksRoutes } from "./features/short-links/short-links.routes.js";
 import { bulletinRoutes } from "./features/bulletin/bulletin.routes.js";
 import { giveawayRoutes } from "./features/giveaway/giveaway.routes.js";
+import { journalRoutes } from "./features/journal/journal.routes.js";
 
 export function mountRoutes(app: Express) {
   app.use("/health", healthRoutes);
@@ -63,4 +64,5 @@ export function mountRoutes(app: Express) {
   app.use("/short-links", shortLinksRoutes);
   app.use("/bulletin", bulletinRoutes);
   app.use("/giveaway", giveawayRoutes);
+  app.use("/journal", journalRoutes);
 }
