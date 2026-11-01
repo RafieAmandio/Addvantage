@@ -67,14 +67,7 @@
   background: linear-gradient(#eeeeee, #eeeeee) right / 0% 100% no-repeat;
 }
 
-/* Hero: the pen ring around "noise" draws once; the logo on the card bobs. */
-.lv-ring { stroke-dasharray: 1; }
-@keyframes lv-ring { from { stroke-dashoffset: 1; } }
-@keyframes lv-bob { 50% { translate: 0 -6px; } }
-
 @media (prefers-reduced-motion: no-preference) {
-  .lv-ring { animation: lv-ring 0.9s 0.4s ease-out backwards; }
-  .lv-bob { animation: lv-bob 3.2s ease-in-out infinite; }
   .lv-motion .lv-redact { background-size: 100% 100%; }
   .lv-motion [data-in] .lv-redact { animation: lv-redact 0.9s calc(0.5s + var(--i, 0) * 120ms) steps(9) forwards; }
   .lv-motion [data-reveal]:not([data-in]) { opacity: 0; }

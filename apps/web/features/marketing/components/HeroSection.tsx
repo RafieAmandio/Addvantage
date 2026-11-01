@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
+import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
+import { useCursorGrid, cursorGrid } from "@/features/marketing/lib/use-cursor-grid";
 import type { LevelRound, TickerRow } from "@/features/marketing/lib/landing";
 import { LevelCard } from "@/features/marketing/components/LevelCard";
 
@@ -32,63 +35,47 @@ export function MarketingNav() {
   );
 }
 
-/** Kaoba's pen ring: drawn once on load, still under reduced motion. */
-function Ring() {
-  return (
-    <svg aria-hidden viewBox="0 0 300 110" preserveAspectRatio="none" className="pointer-events-none absolute -inset-x-[9%] -inset-y-[20%] h-[140%] w-[118%] overflow-visible">
-      <path
-        d="M24 62 C 18 22, 140 6, 232 14 C 296 20, 302 72, 246 92 C 178 112, 52 104, 24 74 C 12 60, 30 40, 66 30"
-        pathLength={1}
-        fill="none"
-        stroke="#FFD400"
-        strokeWidth={5}
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-        className="lv-ring"
-      />
-    </svg>
-  );
-}
-
 const CHECKS = ["Free tier, no card", "2% max risk, built in", "No signals to copy"];
 
+
 export function HeroSection({ ticker, rounds }: { ticker: TickerRow[]; rounds: LevelRound[] }) {
+  const ref = useRef<HTMLElement>(null);
+  const m = useCursorGrid(ref);
   return (
-    <section className="relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gray">
-      <div className="mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-12 px-4 pb-14 pt-[112px] sm:px-6 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-16 md:px-10 md:pt-[140px]">
+    <section ref={ref} className="relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gray">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,.05)_1px,transparent_1px)] [background-size:32px_32px]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 transition-opacity duration-300" style={cursorGrid(m)} />
+      <div className="relative mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-12 px-4 pb-14 pt-[112px] sm:px-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-14 md:px-10 md:pt-[140px]">
         <div className="flex flex-col">
-          <p className="font-mono text-xs text-white/60 md:text-sm">
+          <p className="font-mono text-[11px] uppercase tracking-[0.06em] text-white/60 sm:tracking-[0.12em] md:text-sm">
             <span className="font-bold text-brand">+vantage</span> · market intelligence for traders
           </p>
-          <h1 className="mt-5 font-sans text-[clamp(2.4rem,4.7vw,4.5rem)] leading-[1.02] [&>span]:whitespace-nowrap tracking-[-0.035em] text-white">
+          <h1 className="mt-5 font-sans text-[clamp(2.05rem,4.6vw,4.4rem)] uppercase leading-[1.06] tracking-[-0.02em] text-white [&>span]:whitespace-nowrap">
             <span className="block font-normal">Read the market.</span>
             <span className="block font-bold">
               Not the{" "}
-              <span className="relative ml-[0.06em] inline-block">
-                noise
-                <Ring />
+              <span className="whitespace-pre bg-brand px-[0.08em] text-black">
+                <ScrambleReveal text="NOISE" delay={500} duration={900} />
               </span>
               <span className="text-brand">.</span>
             </span>
           </h1>
-          <p className="mt-7 max-w-[50ch] font-mono text-sm leading-[1.6] text-white/80 md:text-base">
+          <p className="mt-7 max-w-[50ch] font-mono text-sm leading-[1.6] text-white md:text-base">
             Directional Outlook &amp; Macro Alpha Intelligence, a market radar powered by AI and professionals, built for experienced traders.
           </p>
-          <hr className="my-8 max-w-[560px] border-white/15" />
-          <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
-            <Link href="/signup" className="btn-pixel rounded-[10px] bg-brand px-7 py-3.5 font-mono text-base font-bold text-gray-2">
+          <hr className="my-8 max-w-[560px] border-white/20" />
+          <div className="flex w-full max-w-[520px] flex-col gap-3 sm:flex-row sm:gap-5">
+            <Link href="/signup" className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2">
               <Roll label="Request access" />
             </Link>
-            <Link href="/login" className="font-mono text-base font-bold text-white underline decoration-white/40 decoration-2 underline-offset-[6px] hover:decoration-brand">
-              Log in
+            <Link href="/login" className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand">
+              <Roll label="Log in" />
             </Link>
           </div>
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[13px] text-white/80">
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-[0.06em] text-white/80 md:text-[13px]">
             {CHECKS.map((c) => (
-              <li key={c} className="flex items-center gap-2">
-                <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 text-brand">
-                  <path d="M2.5 8.5 6.5 12 13.5 4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="square" />
-                </svg>
+              <li key={c} className="flex items-center gap-2.5">
+                <span aria-hidden className="h-2 w-2 bg-brand" />
                 {c}
               </li>
             ))}
@@ -97,7 +84,7 @@ export function HeroSection({ ticker, rounds }: { ticker: TickerRow[]; rounds: L
         <LevelCard rounds={rounds} />
       </div>
 
-      <div className="flex items-center border-t border-white/10">
+      <div className="relative flex items-center border-t border-white/20">
         <p className="shrink-0 py-5 pl-4 pr-6 font-mono text-[11px] uppercase tracking-[0.14em] text-white/60 sm:pl-6 md:py-7 md:pl-10 md:pr-10 md:text-xs xl:pl-[max(2.5rem,calc((100vw-1240px)/2+2.5rem))]">
           Markets on the board
         </p>
