@@ -4,7 +4,7 @@ import { videoModules as mockVideoModules } from "@/features/videos/mock";
 import { apiGet } from "@/lib/api/client-server";
 
 export async function listVideos(): Promise<VideoModule[]> {
-  if (isMockMode()) return mockVideoModules;
+  if (isMockMode()) return mockVideoModules();
   try {
     const data = await apiGet<VideoModule[]>("/videos");
     return data ?? [];
@@ -14,7 +14,7 @@ export async function listVideos(): Promise<VideoModule[]> {
 }
 
 export async function getVideo(slug: string): Promise<VideoModule | null> {
-  if (isMockMode()) return mockVideoModules.find((v) => v.slug === slug) ?? null;
+  if (isMockMode()) return mockVideoModules().find((v) => v.slug === slug) ?? null;
   try {
     return await apiGet<VideoModule>(`/videos/${encodeURIComponent(slug)}`);
   } catch {
