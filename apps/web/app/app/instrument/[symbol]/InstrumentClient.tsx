@@ -9,9 +9,6 @@ import { CalendarPanel } from "@/features/dashboard/components/CalendarPanel";
 import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import { fmtPrice, dayChange } from "@/features/dashboard/components/PriceStrip";
 import { InstrumentChart, type ChartLevel, type ChartPin } from "@/features/instrument/components/InstrumentChart";
-import { MethodPanel } from "@/features/method/components/MethodPanel";
-import type { Explainer } from "@/features/method/lib/explain";
-import { readDaily, readLevels } from "@tradevantage/shared";
 import { AtrGauge, NewsPulse, RsiMeter, SessionRing, newsPulse } from "@/features/instrument/components/DotMatrix";
 import { PairRatesPanel } from "@/features/macro/components/MacroPanels";
 import type { Ccy, MacroData } from "@/features/macro/types";
@@ -76,18 +73,6 @@ export default function InstrumentClient({
   const paid = isPaid(tier);
   const { ids: seenIds, hydrated } = useSeenNews();
   const [tf, setTf] = useState<"1H" | "1D">("1H");
-  const [explain, setExplain] = useState<Explainer | null>(null);
-  const method = useMemo(() => {
-    const d = readDaily(daily);
-    return { daily: d, levels: readLevels(hourly, d) };
-  }, [daily, hourly]);
-  const openExplainer = (e: Explainer | null) => {
-    setExplain(e);
-    if (e) {
-      setTf(e.tf);
-      document.getElementById("price-chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   const last = hourly.at(-1)?.close ?? atr?.price ?? rsi?.price ?? null;
   const change = atr ? dayChange(atr) : null;
@@ -164,9 +149,8 @@ export default function InstrumentClient({
 
       <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0 space-y-4">
-          <div id="price-chart" className="scroll-mt-4">
           <Panel
-            title={explain ? explain.title : "Price"}
+            title="Price"
             sub={
               <span className="flex flex-wrap gap-x-3">
                 <span><i className="mr-1 inline-block h-px w-3 border-t border-dashed border-brand align-middle" />ATR band</span>
@@ -191,17 +175,11 @@ export default function InstrumentClient({
               </div>
             }
           >
-            <InstrumentChart
-              bars={bars}
-              levels={explain ? explain.levels : levels}
-              pins={explain ? [] : pins}
-              notes={explain?.notes}
-              focusFrom={explain && explain.tf === tf ? explain.focusFrom : undefined}
-            />
+            <InstrumentChart bars={bars} levels={levels} pins={pins} />
+            <Link href={`/app/method/${symbol}`} className="mt-3 inline-flex h-9 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white hover:bg-raised">
+              Open in Anthony Method
+            </Link>
           </Panel>
-          </div>
-
-          <MethodPanel daily={method.daily} levels={method.levels} open={explain} onOpen={openExplainer} />
 
           <Panel title="Scenarios" sub="Desk setups on this pair from published plans" action={<PanelLink href="/app/plan">Plans</PanelLink>}>
             {setups.length === 0 ? (
