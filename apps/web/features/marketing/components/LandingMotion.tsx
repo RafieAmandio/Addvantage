@@ -1,5 +1,7 @@
 "use client";
 
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import { useEffect } from "react";
 
 /**
@@ -42,9 +44,13 @@ export function LandingMotion() {
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    const unsmooth = smoothWheel();
+    // Smooth wheel scrolling, same setup as Kaoba: mouse and trackpad only,
+    // touch stays native, reduced motion gets none.
+    const lenis = matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches
+      ? new Lenis({ autoRaf: true, anchors: { offset: -80 } })
+      : null;
     return () => {
-      unsmooth();
+      lenis?.destroy();
       io.disconnect();
       window.removeEventListener("beforeprint", all);
       window.removeEventListener("scroll", onScroll);
@@ -54,52 +60,4 @@ export function LandingMotion() {
     };
   }, []);
   return null;
-}
-
-/**
- * Smooth wheel scrolling: the wheel moves a target and the page eases toward
- * it each frame. Mouse and trackpad only; touch, keyboard, zoom (ctrl+wheel)
- * and reduced motion stay native. Anchor links already glide through the
- * global `scroll-behavior: smooth`, which is switched off here while the wheel
- * drives so the two don't fight.
- */
-function smoothWheel() {
-  if (!matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return () => {};
-  const html = document.documentElement;
-  let target = window.scrollY;
-  let raf = 0;
-  const max = () => html.scrollHeight - window.innerHeight;
-  const tick = () => {
-    const y = window.scrollY;
-    const d = target - y;
-    if (Math.abs(d) < 0.5) {
-      window.scrollTo(0, target);
-      raf = 0;
-      html.style.scrollBehavior = "";
-      return;
-    }
-    window.scrollTo(0, y + d * 0.12);
-    raf = requestAnimationFrame(tick);
-  };
-  const onWheel = (e: WheelEvent) => {
-    if (e.ctrlKey || e.defaultPrevented) return;
-    e.preventDefault();
-    if (!raf) target = window.scrollY;
-    const dy = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaMode === 2 ? e.deltaY * window.innerHeight : e.deltaY;
-    target = Math.max(0, Math.min(max(), target + dy));
-    html.style.scrollBehavior = "auto";
-    if (!raf) raf = requestAnimationFrame(tick);
-  };
-  // Scrollbar drags, keys and anchor jumps move the page directly: follow them.
-  const sync = () => {
-    if (!raf) target = window.scrollY;
-  };
-  window.addEventListener("wheel", onWheel, { passive: false });
-  window.addEventListener("scroll", sync, { passive: true });
-  return () => {
-    cancelAnimationFrame(raf);
-    html.style.scrollBehavior = "";
-    window.removeEventListener("wheel", onWheel);
-    window.removeEventListener("scroll", sync);
-  };
 }
