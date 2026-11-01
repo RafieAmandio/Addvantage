@@ -1,33 +1,16 @@
 import Link from "next/link";
 import { Scramble } from "@/features/marketing/components/ScrambleReveal";
+import { Frame } from "@/features/marketing/components/Frame";
 import { Roll } from "@/features/marketing/components/HeroSection";
-import { ArrowUpPixel, IconCloseSquare } from "@/features/marketing/components/icons";
+import { ArrowUpPixel } from "@/features/marketing/components/icons";
 
 const FREE = ["Unfiltered news + impact analysis", "Economic calendar", "My Channel (founder broadcast)", "Public psychology primers"];
 const VIP = ["Everything in Free", "Daily / weekly Trading Plan", "1v1 Consultation (founders)", "Full Education library", "Hashtag explorer (full)", "All collab channels"];
 
-/** A full-bleed rule that draws itself across the page. */
-const Rule = ({ from = "left" }: { from?: "left" | "right" }) => (
-  <div className="w-full overflow-hidden">
-    <div data-reveal="line" className="h-px bg-white/40" style={{ transformOrigin: from }} />
-  </div>
-);
-
 /** The old page's framed block: a header bar, rules that bleed off both edges, two tiers side by side. */
 export function AccessSection() {
   return (
-    <section id="access" className="relative z-10 bg-black pb-20 text-white md:pb-32">
-      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
-        <div data-reveal className="flex items-center justify-between px-6 py-4 font-mono text-base font-bold md:px-8">
-          <Scramble text="Access" />
-          <span className="text-brand">
-            <Scramble text="04" delay={150} />
-          </span>
-        </div>
-      </div>
-      <Rule />
-
-      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
+    <Frame id="access" label="Access" num="04" className="pb-20 md:pb-32">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]">
           <div data-reveal style={{ ["--i" as string]: 1 }} className="flex flex-col gap-6 p-6 md:p-12">
             <p className="flex items-center justify-between font-mono text-base">
@@ -75,24 +58,6 @@ export function AccessSection() {
             </p>
           </div>
         </div>
-      </div>
-      <Rule from="right" />
-
-      <div className="mx-4 border-x border-white/20 sm:mx-6 md:mx-[100px]">
-        <div className="flex flex-col gap-4 px-6 py-6 font-mono md:flex-row md:items-center md:justify-between md:px-8">
-          <p className="flex flex-wrap items-center gap-x-5 gap-y-2 text-base">
-            <span className="font-bold">Who this is not for</span>
-            {["Beginners", "Gamblers", "Hobbyists"].map((x, i) => (
-              <span key={x} data-reveal style={{ ["--i" as string]: i }} className="flex items-center gap-2 font-light text-blood-bright line-through">
-                <IconCloseSquare className="h-5 w-5 shrink-0" />
-                {x}
-              </span>
-            ))}
-          </p>
-          <p className="text-sm font-light text-white/85">We don&apos;t soften this. Onboarding is a filter, not a funnel.</p>
-        </div>
-      </div>
-      <Rule />
-    </section>
+    </Frame>
   );
 }

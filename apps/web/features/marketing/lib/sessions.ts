@@ -58,3 +58,23 @@ export function countdown(ms: number) {
   const m = Math.floor((t % 3600) / 60);
   return `${d ? `${d}D ` : ""}${h}H ${pad(m)}M ${pad(t % 60)}S`;
 }
+
+/** Every session's state now, and the next thing the market does: a session opening or closing, or the FX weekend ending. */
+export function marketNow(now: number) {
+  const sessions = SESSIONS.map((s) => {
+    const open = isOpen(s, now);
+    const flip = nextFlip(s, now);
+    return { name: s.name, open, flip, local: hhmm(now, s.tz), nextOpen: open ? nextFlip(s, flip) : flip };
+  });
+  let headline: { text: string; at: number };
+  if (fxWeekend(now)) {
+    let t = Math.floor(now / H) * H + H;
+    while (fxWeekend(t)) t += H;
+    headline = { text: "FX reopens in", at: t };
+  } else {
+    const n = [...sessions].sort((a, b) => a.flip - b.flip)[0]!;
+    headline = { text: `${n.name} ${n.open ? "closes" : "opens"} in`, at: n.flip };
+  }
+  const w = wall(now, "Asia/Jakarta");
+  return { wib: `${pad(w.h)}:${pad(w.m)}:${pad(w.s)}`, sessions, headline };
+}

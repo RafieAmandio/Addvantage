@@ -8,6 +8,8 @@ import { FaqSection } from "@/features/marketing/components/FaqSection";
 import { HeroSection, MarketingNav } from "@/features/marketing/components/HeroSection";
 import { LandingMotion } from "@/features/marketing/components/LandingMotion";
 import { MarketingFooter } from "@/features/marketing/components/MarketingFooter";
+import { PositioningSection } from "@/features/marketing/components/PositioningSection";
+import { TransmissionsSection } from "@/features/marketing/components/TransmissionsSection";
 import { MethodSection } from "@/features/marketing/components/MethodSection";
 import { TrainSection } from "@/features/marketing/components/TrainSection";
 import { landingData } from "@/features/marketing/lib/landing";
@@ -31,6 +33,8 @@ export default function LandingPage() {
       <MarketingNav />
       <HeroSection ticker={d.ticker} asOf={d.asOf} />
       <BoardStrip board={d.board} asOf={d.asOf} />
+      <PositioningSection />
+      <TransmissionsSection />
       <MethodSection read={d.read} plan={d.plan} />
       <TrainSection practice={d.practice} scan={d.scan} kill={d.kill} />
       <FaqSection />

@@ -50,6 +50,9 @@
   90% { transform: rotate(-5deg) scale(1.06); }
   94% { transform: rotate(4deg) scale(0.98); }
 }
+@keyframes lv-redact {
+  to { background-size: 0% 100%; }
+}
 @keyframes lv-caret {
   50% { opacity: 0; }
 }
@@ -57,7 +60,16 @@
   50% { opacity: 0.25; }
 }
 
+/* VIP+ copy arrives under redaction bars that wipe away; without motion it is plain text. */
+.lv-redact {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: linear-gradient(#eeeeee, #eeeeee) right / 0% 100% no-repeat;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .lv-motion .lv-redact { background-size: 100% 100%; }
+  .lv-motion [data-in] .lv-redact { animation: lv-redact 0.9s calc(0.5s + var(--i, 0) * 120ms) steps(9) forwards; }
   .lv-motion [data-reveal]:not([data-in]) { opacity: 0; }
   .lv-motion [data-reveal][data-in] { animation: lv-rise 0.75s calc(var(--i, 0) * 90ms) var(--lv-out) backwards; }
   .lv-motion [data-reveal="card"][data-in] { animation: lv-card 0.9s calc(var(--i, 0) * 120ms) var(--lv-back) backwards; }

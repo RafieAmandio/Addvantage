@@ -1,62 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { Roll } from "@/features/marketing/components/HeroSection";
 import { Scramble } from "@/features/marketing/components/ScrambleReveal";
-import {
-  SESSIONS,
-  countdown,
-  fxWeekend,
-  hhmm,
-  isOpen,
-  nextFlip,
-  wall,
-} from "@/features/marketing/lib/sessions";
+import { SESSIONS, countdown, hhmm, marketNow } from "@/features/marketing/lib/sessions";
+import { useNow } from "@/features/marketing/lib/use-now";
 
-const H = 3_600_000;
-const pad = (n: number) => String(n).padStart(2, "0");
-
-/** The next thing the market does: a session opening or closing, or the weekend ending. */
-function read(now: number) {
-  const sessions = SESSIONS.map((s) => {
-    const open = isOpen(s, now);
-    const flip = nextFlip(s, now);
-    return {
-      name: s.name,
-      open,
-      flip,
-      local: hhmm(now, s.tz),
-      nextOpen: open ? nextFlip(s, flip) : flip,
-    };
-  });
-  let headline: { text: string; at: number };
-  if (fxWeekend(now)) {
-    let t = Math.floor(now / H) * H + H;
-    while (fxWeekend(t)) t += H;
-    headline = { text: "FX reopens in", at: t };
-  } else {
-    const n = [...sessions].sort((a, b) => a.flip - b.flip)[0]!;
-    headline = {
-      text: `${n.name} ${n.open ? "closes" : "opens"} in`,
-      at: n.flip,
-    };
-  }
-  const w = wall(now, "Asia/Jakarta");
-  return { wib: `${pad(w.h)}:${pad(w.m)}:${pad(w.s)}`, sessions, headline };
-}
-
-/** Ticks every second after mount; null on the server so it never guesses a time. */
-function useNow() {
-  const [now, setNow] = useState<number | null>(null);
-  useEffect(() => {
-    setNow(Date.now());
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  return now;
-}
+const read = marketNow;
 
 function Meta({ r }: { r: Read }) {
   return (

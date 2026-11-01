@@ -118,8 +118,7 @@ export function HeroSection({ ticker, asOf }: { ticker: TickerRow[]; asOf: strin
             </span>
           </h1>
           <p className="max-w-[58ch] font-mono text-sm leading-[1.5] text-white md:text-base">
-            Market intelligence for traders who read the chart themselves.
-            <br className="hidden sm:block" /> No signals. No chat room. No hand-holding.
+            Directional Outlook &amp; Macro Alpha Intelligence, a market radar powered by AI and professionals, built for experienced traders.
           </p>
           <div className="flex w-full max-w-[560px] flex-col gap-3 sm:flex-row sm:gap-5">
             <Link href="/signup" className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2">

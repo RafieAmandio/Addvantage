@@ -1,5 +1,44 @@
 export const FUTURA = "'Futura', 'Inter', system-ui, sans-serif";
 
+export const pillars = [
+  {
+    code: "TX-01",
+    title: "Unfiltered News + Impact",
+    desc: "Raw market-moving news in real time. Each item annotated with what it actually means for price.",
+    locked: false,
+  },
+  {
+    code: "TX-02",
+    title: "Economic Calendar",
+    desc: "Curated calendar of high-impact events, central bank decisions, earnings, macro releases.",
+    locked: false,
+  },
+  {
+    code: "TX-03",
+    title: "Trading Plan",
+    desc: "Daily / weekly directional plan. Setups, levels, invalidation. Authored, not signaled.",
+    locked: true,
+  },
+  {
+    code: "TX-04",
+    title: "1v1 Consultation",
+    desc: "Private chat with the AI and the desk. Trade reviews, second opinions, blind-spot checks.",
+    locked: true,
+  },
+  {
+    code: "TX-05",
+    title: "Education",
+    desc: "Process, psychology, risk, system design. No price-action snake oil.",
+    locked: false,
+  },
+  {
+    code: "TX-06",
+    title: "My Channel",
+    desc: "Founder broadcast. Daily takes. Continuous market context. No filter, no replies.",
+    locked: false,
+  },
+];
+
 export const faq = [
   {
     q: "Noise Reduction",

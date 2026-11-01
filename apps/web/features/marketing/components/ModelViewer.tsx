@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes } from "react";
 
 // <model-viewer> is a custom element (Google). Declare it for JSX/TS.
@@ -206,5 +206,49 @@ export function ModelViewer({
         ...style,
       }}
     />
+  );
+}
+
+/**
+ * The model only once it is near the screen and only on a desktop pointer.
+ * Phones and reduced motion get the poster, which is the same model rendered
+ * still, with a small idle dance.
+ */
+export function LazyModel({ src, poster, ...motion }: { src: string; poster: string } & Pick<Props, "idleSpeed" | "scrollSpin" | "pointerTrack" | "basePhi" | "radius">) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [live, setLive] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  // The poster stays up until the model has actually drawn, so the spot is never empty.
+  useEffect(() => {
+    if (!live) return;
+    const mv = ref.current?.querySelector("model-viewer");
+    const done = () => setLoaded(true);
+    mv?.addEventListener("load", done, { once: true });
+    return () => mv?.removeEventListener("load", done);
+  }, [live]);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !matchMedia("(min-width: 768px) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) return;
+        setLive(true);
+        io.disconnect();
+      },
+      { rootMargin: "400px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="relative h-full w-full">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={poster} alt="" loading="lazy" className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${live ? "" : "lv-dance"} ${loaded ? "opacity-0" : ""}`} />
+      {live && (
+        <div className="relative h-full w-full">
+          <ModelViewer src={src} poster={poster} {...motion} />
+        </div>
+      )}
+    </div>
   );
 }
