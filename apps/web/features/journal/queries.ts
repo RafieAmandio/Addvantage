@@ -3,6 +3,7 @@
 import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api/client";
 import { isMockMode } from "@/lib/config/public";
 import type { Trade, TraderSettings } from "./lib/journal";
+import { seedDemoTrades } from "./demo";
 
 /** One market picked in the morning scan, with the trader's answers to the prep questions. */
 export interface PlanPick {
@@ -42,8 +43,27 @@ function write(key: string, v: unknown) {
   }
 }
 
+// Demo: an empty journal gets a seeded history once per page load.
+let seeding: Promise<Trade[]> | null = null;
+function demoTrades(): Promise<Trade[]> {
+  const t = read<Trade[]>(K.trades, []);
+  if (t.length) return Promise.resolve(t);
+  seeding ??= seedDemoTrades().then((xs) => {
+    if (xs.length) write(K.trades, xs);
+    return xs;
+  });
+  return seeding;
+}
+
+/** Demo only: drop the journal and seed a fresh history. */
+export async function resetDemoJournal(): Promise<void> {
+  Object.values(K).forEach((k) => localStorage.removeItem(k));
+  seeding = null;
+  await demoTrades();
+}
+
 export async function listTrades(): Promise<Trade[]> {
-  if (isMockMode()) return read<Trade[]>(K.trades, []);
+  if (isMockMode()) return demoTrades();
   return apiGet<Trade[]>("/journal/trades");
 }
 
