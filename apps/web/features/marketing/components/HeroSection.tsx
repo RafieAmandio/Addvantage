@@ -1,50 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import type { TickerRow } from "@/features/marketing/lib/landing";
-import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
-import { TickerItem } from "@/features/marketing/components/TickerItem";
-import { HeroFilter } from "@/features/marketing/components/HeroFilter";
-
-/** Drops to near black now and then, like a sign with a loose wire. */
-function Flicker({ children, className, minWait = 2000, maxWait = 4000 }: { children: React.ReactNode; className?: string; minWait?: number; maxWait?: number }) {
-  const [opacity, setOpacity] = useState(1);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let cancelled = false;
-    let timeout: ReturnType<typeof setTimeout>;
-    let id: ReturnType<typeof setInterval>;
-    const schedule = () => {
-      timeout = setTimeout(() => {
-        const flickers = 2 + Math.floor(Math.random() * 3);
-        let i = 0;
-        id = setInterval(() => {
-          if (cancelled) return clearInterval(id);
-          setOpacity(i % 2 === 0 ? 0.1 + Math.random() * 0.3 : 1);
-          if (++i >= flickers * 2) {
-            clearInterval(id);
-            setOpacity(1);
-            schedule();
-          }
-        }, 40 + Math.random() * 60);
-      }, minWait + Math.random() * (maxWait - minWait));
-    };
-    schedule();
-    return () => {
-      cancelled = true;
-      clearTimeout(timeout);
-      clearInterval(id);
-    };
-  }, [minWait, maxWait]);
-
-  return (
-    <span className={className} style={{ opacity }}>
-      {children}
-    </span>
-  );
-}
+import type { LevelRound, TickerRow } from "@/features/marketing/lib/landing";
+import { LevelCard } from "@/features/marketing/components/LevelCard";
 
 /** A button label that rolls up on hover. */
 export function Roll({ label }: { label: string }) {
@@ -74,89 +32,83 @@ export function MarketingNav() {
   );
 }
 
-/** Stripe-style live number: Jakarta time to the millisecond, written straight to the DOM each frame. */
-function LiveClock() {
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const fmt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
-    let raf = 0;
-    let t: ReturnType<typeof setInterval> | undefined;
-    const write = () => {
-      const now = Date.now();
-      el.textContent = calm ? fmt.format(now) : `${fmt.format(now)}.${String(now % 1000).padStart(3, "0")}`;
-    };
-    if (calm) {
-      write();
-      t = setInterval(write, 1000);
-    } else {
-      const loop = () => {
-        write();
-        raf = requestAnimationFrame(loop);
-      };
-      loop();
-    }
-    return () => {
-      cancelAnimationFrame(raf);
-      clearInterval(t);
-    };
-  }, []);
+/** Kaoba's pen ring: drawn once on load, still under reduced motion. */
+function Ring() {
   return (
-    <span ref={ref} className="tabular-nums" suppressHydrationWarning>
-      --:--:--
-    </span>
+    <svg aria-hidden viewBox="0 0 300 110" preserveAspectRatio="none" className="pointer-events-none absolute -inset-x-[9%] -inset-y-[20%] h-[140%] w-[118%] overflow-visible">
+      <path
+        d="M24 62 C 18 22, 140 6, 232 14 C 296 20, 302 72, 246 92 C 178 112, 52 104, 24 74 C 12 60, 30 40, 66 30"
+        pathLength={1}
+        fill="none"
+        stroke="#FFD400"
+        strokeWidth={5}
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        className="lv-ring"
+      />
+    </svg>
   );
 }
 
-export function HeroSection({ ticker, asOf }: { ticker: TickerRow[]; asOf: string }) {
+const CHECKS = ["Free tier, no card", "2% max risk, built in", "No signals to copy"];
+
+export function HeroSection({ ticker, rounds }: { ticker: TickerRow[]; rounds: LevelRound[] }) {
   return (
     <section className="relative z-10 flex min-h-[100svh] flex-col overflow-hidden bg-gray">
-      <div className="mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-10 px-4 pb-10 pt-[104px] sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] md:gap-14 md:px-10 md:pt-[132px]">
-        <div className="flex flex-col gap-7 md:gap-8">
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.12em] text-white/70 md:text-xs">
-            <span className="flex items-center gap-2 text-white">
-              <span className="lv-live inline-block h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
-              Jakarta <LiveClock /> WIB
-            </span>
-            <span aria-hidden className="hidden text-white/30 sm:inline">/</span>
-            <span>{ticker.length} markets on the board</span>
+      <div className="mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-12 px-4 pb-14 pt-[112px] sm:px-6 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-16 md:px-10 md:pt-[140px]">
+        <div className="flex flex-col">
+          <p className="font-mono text-xs text-white/60 md:text-sm">
+            <span className="font-bold text-brand">+vantage</span> · market intelligence for traders
           </p>
-          <h1 className="font-sans text-[clamp(2.5rem,4.9vw,4.4rem)] font-bold leading-[0.98] tracking-[-0.03em] text-white [text-wrap:balance]">
-            <span className="block font-normal">
-              <ScrambleReveal text="Most news is noise." delay={150} duration={900} />
-            </span>
-            <span className="block">
-              <Flicker minWait={3000} maxWait={7000}>
-                <ScrambleReveal text="We read it so you don't" delay={450} duration={1000} />
-              </Flicker>
-              <Flicker className="text-brand" minWait={2000} maxWait={4000}>
-                .
-              </Flicker>
+          <h1 className="mt-5 font-sans text-[clamp(2.4rem,4.7vw,4.5rem)] leading-[1.02] [&>span]:whitespace-nowrap tracking-[-0.035em] text-white">
+            <span className="block font-normal">Read the market.</span>
+            <span className="block font-bold">
+              Not the{" "}
+              <span className="relative ml-[0.06em] inline-block">
+                noise
+                <Ring />
+              </span>
+              <span className="text-brand">.</span>
             </span>
           </h1>
-          <p className="max-w-[52ch] font-mono text-sm leading-[1.55] text-white md:text-base">
+          <p className="mt-7 max-w-[50ch] font-mono text-sm leading-[1.6] text-white/80 md:text-base">
             Directional Outlook &amp; Macro Alpha Intelligence, a market radar powered by AI and professionals, built for experienced traders.
           </p>
-          <div className="flex w-full max-w-[520px] flex-col gap-3 sm:flex-row sm:gap-5">
-            <Link href="/signup" className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2">
+          <hr className="my-8 max-w-[560px] border-white/15" />
+          <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
+            <Link href="/signup" className="btn-pixel rounded-[10px] bg-brand px-7 py-3.5 font-mono text-base font-bold text-gray-2">
               <Roll label="Request access" />
             </Link>
-            <Link href="/login" className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand">
-              <Roll label="Log in" />
+            <Link href="/login" className="font-mono text-base font-bold text-white underline decoration-white/40 decoration-2 underline-offset-[6px] hover:decoration-brand">
+              Log in
             </Link>
           </div>
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[13px] text-white/80">
+            {CHECKS.map((c) => (
+              <li key={c} className="flex items-center gap-2">
+                <svg aria-hidden viewBox="0 0 16 16" className="h-3.5 w-3.5 text-brand">
+                  <path d="M2.5 8.5 6.5 12 13.5 4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="square" />
+                </svg>
+                {c}
+              </li>
+            ))}
+          </ul>
         </div>
-        <HeroFilter ticker={ticker} />
+        <LevelCard rounds={rounds} />
       </div>
 
-      <div className="border-t border-white/10 pb-6 pt-4 md:pb-8">
-        <p className="mb-3 px-4 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-white/60 md:text-xs">Last close {asOf}. Real candles, read by the app itself.</p>
-        <div className="lv-marquee overflow-hidden">
-          <div className="flex w-max animate-ticker gap-4 [animation-direction:reverse] will-change-transform md:gap-[40px]">
+      <div className="flex items-center border-t border-white/10">
+        <p className="shrink-0 py-5 pl-4 pr-6 font-mono text-[11px] uppercase tracking-[0.14em] text-white/60 sm:pl-6 md:py-7 md:pl-10 md:pr-10 md:text-xs xl:pl-[max(2.5rem,calc((100vw-1240px)/2+2.5rem))]">
+          Markets on the board
+        </p>
+        <div className="lv-marquee min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
+          <div className="flex w-max animate-ticker gap-10 [animation-direction:reverse] will-change-transform md:gap-14">
             {[...ticker, ...ticker].map((t, i) => (
-              <TickerItem key={`${t.sym}-${i}`} {...t} />
+              <span key={`${t.sym}-${i}`} aria-hidden={i >= ticker.length || undefined} className="flex items-baseline gap-2 whitespace-nowrap font-mono text-sm tabular-nums md:text-base">
+                <span className="font-bold text-white">{t.sym}</span>
+                <span className="text-white/70">{t.val}</span>
+                <span className={t.dir === "up" ? "text-up" : "text-down"}>{t.chg}</span>
+              </span>
             ))}
           </div>
         </div>

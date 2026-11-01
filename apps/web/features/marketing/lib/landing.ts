@@ -1,4 +1,4 @@
-import type { BoardRow, Candle, Level } from "@tradevantage/shared";
+import type { BoardRow, Candle, DailyRead, Level } from "@tradevantage/shared";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { checkPlan, killList, positionSize, riskTier, type Rule, type Trade } from "@/features/journal/lib/journal";
 import { buildDrills, gradeThrust } from "@/features/method/lib/practice";
@@ -38,8 +38,11 @@ export interface PlanData {
 }
 export interface KillData { sym: string; side: Level["side"]; risk: number; losses: { at: string; lost: string; blocks: Rule[] }[] }
 
+/** One "tap the level" round for the hero card: a real drill cut at the retest, graded in the browser by the app's gradeLevel. */
+export interface LevelRound { sym: string; bars: Bar[]; thrust: number; level: Level; daily: DailyRead }
+
 export interface LandingData {
-  asOf: string; markets: number; ticker: TickerRow[]; board: BoardLine[];
+  asOf: string; markets: number; ticker: TickerRow[]; board: BoardLine[]; rounds: LevelRound[];
   read: ReadData; practice: PracticeData; scan: ScanData; plan: PlanData; kill: KillData;
 }
 
@@ -84,6 +87,24 @@ function practice(): PracticeData {
     r: drill.outcome.kind === "win" ? `+${(drill.outcome.r ?? 0).toFixed(2)}R` : "-1R",
     fmt: { price: p(l.price), stop: p(l.stop!), target: p(l.target!) },
   };
+}
+
+function rounds(): LevelRound[] {
+  const { symbol } = heroSample();
+  const { hourly, daily } = candles(symbol);
+  // The latest few drills whose swing and break both sit inside a 48 candle window.
+  return buildDrills(hourly, daily)
+    .map((d) => {
+      const l = d.level;
+      const start = Math.max(d.from, d.cut - 48);
+      const bars = hourly.slice(start, d.cut);
+      const t = bars.findIndex((c) => c.time === l.thrust?.time);
+      const touch = l.touches.some((x) => bars.some((c) => c.time === x));
+      return t >= 6 && touch ? { sym: sym(symbol), bars: bars.map(bar), thrust: t, level: l, daily: d.daily } : null;
+    })
+    .filter((x): x is LevelRound => x !== null)
+    .slice(-4)
+    .reverse();
 }
 
 function scan(): ScanData {
@@ -156,6 +177,7 @@ export function landingData(): LandingData {
     markets: rows.length,
     ticker: ticker(rows),
     board: rows.map((r) => ({ sym: sym(r.symbol), call: r.call, why: r.why })),
+    rounds: rounds(),
     read: read(),
     practice: practice(),
     scan: scan(),
