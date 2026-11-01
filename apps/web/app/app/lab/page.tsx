@@ -10,7 +10,7 @@ import { toChartBars } from "@/features/chart/lib/bars";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { VERDICT, levelName, wib } from "@/features/method/lib/explain";
 
-export const metadata: Metadata = { title: "Anthony Method" };
+export const metadata: Metadata = { title: "Chart Lab" };
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -80,7 +80,7 @@ export default async function MethodPage() {
               return (
                 <Link
                   key={r.symbol}
-                  href={`/app/method/${encodeURIComponent(r.symbol.replace("/", ""))}`}
+                  href={`/app/lab/${encodeURIComponent(r.symbol.replace("/", ""))}`}
                   className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 py-3 hover:bg-raised/60 md:grid-cols-[120px_150px_80px_130px_minmax(0,1fr)_70px] md:items-center"
                 >
                   <span>

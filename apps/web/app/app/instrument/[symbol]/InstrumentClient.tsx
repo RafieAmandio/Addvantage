@@ -176,8 +176,8 @@ export default function InstrumentClient({
             }
           >
             <InstrumentChart bars={bars} levels={levels} pins={pins} />
-            <Link href={`/app/method/${symbol}`} className="mt-3 inline-flex h-9 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white hover:bg-raised">
-              Open in Anthony Method
+            <Link href={`/app/lab/${symbol}`} className="mt-3 inline-flex h-9 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white hover:bg-raised">
+              Open in Chart Lab
             </Link>
           </Panel>
 

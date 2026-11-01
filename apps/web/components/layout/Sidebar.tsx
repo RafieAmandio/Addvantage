@@ -41,7 +41,7 @@ const nav: NavEntry[] = [
   { label: "RSI Heatmap", href: "/app/heatmap", group: "tools-forex", icon: "heatmap", tagline: "Overbought and oversold across pairs and timeframes." },
   { label: "ATR Levels", href: "/app/atr", group: "tools-forex", icon: "atr", tagline: "Daily range bands per instrument." },
   { label: "Macro", href: "/app/macro", group: "tools-forex", icon: "macro", tagline: "Central banks, rate gaps, yields and risk mood for FX." },
-  { label: "Anthony Method", href: "/app/method", group: "tools-forex", icon: "method", tagline: "Daily bias and hourly levels for every market, by the rules." },
+  { label: "Chart Lab", href: "/app/lab", group: "tools-forex", icon: "method", tagline: "Key levels, breakouts and setups drawn on the chart for every market." },
   { label: "Gap Scanner", href: "/app/gap-screener", group: "tools-forex", icon: "gap", tagline: "Weekend gaps and whether they filled." },
   { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", locked: true, icon: "unlocks", tagline: "Supply shocks from upcoming unlocks, top 200 only." },
   { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", locked: true, icon: "radar", tagline: "Network upgrades and launches that move price." },

@@ -1,5 +1,5 @@
 /**
- * Anthony Method: mechanical reads of the daily bias and the hourly levels.
+ * Chart Lab: mechanical reads of the daily bias and the hourly levels.
  * Pure functions over candles. Prices are passed through untouched, never rounded.
  */
 

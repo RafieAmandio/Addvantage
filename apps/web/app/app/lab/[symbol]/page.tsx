@@ -15,7 +15,7 @@ const flat = (s: string) => s.replace("/", "").toUpperCase();
 const DAY = 86_400_000;
 
 export async function generateMetadata({ params }: { params: Promise<{ symbol: string }> }): Promise<Metadata> {
-  return { title: `${flat(decodeURIComponent((await params).symbol))} · Anthony Method` };
+  return { title: `${flat(decodeURIComponent((await params).symbol))} · Chart Lab` };
 }
 
 export default async function MethodSymbolPage({ params }: { params: Promise<{ symbol: string }> }) {
@@ -60,7 +60,7 @@ export default async function MethodSymbolPage({ params }: { params: Promise<{ s
             </dd>
           </div>
         </dl>
-        <Link href="/app/method" className="ml-auto text-[13px] text-white/55 hover:text-white">
+        <Link href="/app/lab" className="ml-auto text-[13px] text-white/55 hover:text-white">
           All markets
         </Link>
       </div>
