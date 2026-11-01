@@ -80,9 +80,9 @@ export default async function LabPage() {
   const asOf = rows.map((r) => r.asOf).filter(Boolean).sort().at(-1);
   const stats: [string, number, string][] = [
     ["At level now", live.filter(here).length, "text-brand"],
-    ["Order in", live.filter((r) => r.call === "order").length, "text-white"],
-    ["Watch for PA", live.filter((r) => r.call === "watch").length, "text-white"],
-    ["Pass", passed.length, "text-white/40"],
+    ["Meet every rule", live.filter((r) => r.call === "order").length, "text-white"],
+    ["Need confirmation", live.filter((r) => r.call === "watch").length, "text-white"],
+    ["Don't qualify", passed.length, "text-white/40"],
   ];
 
   return (
@@ -109,7 +109,7 @@ export default async function LabPage() {
 
       {passed.length > 0 && (
         <details className="rounded-2xl bg-panel p-4">
-          <summary className="cursor-pointer text-[14px] text-white/55 hover:text-white">{passed.length} markets passed</summary>
+          <summary className="cursor-pointer text-[14px] text-white/55 hover:text-white">{passed.length} markets with nothing that qualifies</summary>
           <div className="mt-2 divide-y divide-white/[0.07]">
             {passed.map((r) => (
               <Link key={r.symbol} href={href(r)} className="flex items-baseline gap-3 py-2.5 hover:bg-raised/60">

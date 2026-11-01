@@ -51,7 +51,7 @@ export default async function MethodSymbolPage({ params }: { params: Promise<{ s
             <dd className={cn("font-semibold", (row.usedPct ?? 0) >= 100 ? "text-down" : "text-white")}>{row.usedPct !== null ? `${row.usedPct.toFixed(0)}%` : "n/a"}</dd>
           </div>
           <div>
-            <dt className="text-white/40">Call</dt>
+            <dt className="text-white/40">Strongest level</dt>
             <dd className={cn("font-semibold", VERDICT[row.call].cls)}>
               {VERDICT[row.call].label}{" "}
               <span className="font-normal text-white/40">
