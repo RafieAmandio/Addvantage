@@ -1,0 +1,217 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Consensus figures</title>
+<style>body{background:#121212;color:#fff;font:12px monospace;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:12px}
+.cell{background:#121212;border:1px solid #222} .cell svg{width:100%;display:block} pre{display:none}</style></head><body>
+<script src="core.js"></script>
+<script>
+/* Source for apps/web/public/consensus/*.svg. Built on the colorfigures engine: copy
+   ~/.claude/skills/colorfigures/assets/core.js next to this file, open it in Chrome, and each figure's
+   SVG is in a <pre data-name> block (dump with --dump-dom, unescape, write to public/consensus/{name}.svg).
+   Ten isometric figures for the consensus panel, one per macro theme. Static renders at the default view
+   (front-left-top), exported as SVG. Every figure stands on a dark plinth and carries one #FFD400 part. */
+const YEL   = { l:'#FFD400', m:'#d9b400', d:'#7a6500' };
+const STONE = { l:'#ecebe6', m:'#c4c1b9', d:'#85827b' };
+const GRAPH = { l:'#5c5c5c', m:'#3e3e3e', d:'#262626' };
+const PLINTH= { l:'#2e2e2e', m:'#242424', d:'#191919' };
+const GLASS = '#1d2a2c', PAPER = '#f6f4ee';
+const BH = 3;
+
+// prism along x: convex (y,z) profile swept from x0 to x1, with the cap facing the viewer and a silhouette
+function prismX(prof, x0, x1, m, w = 2){
+  const A = on(PX(x0), prof), B = on(PX(x1), prof);
+  let s = loft(A, B, n => tone(n, m));
+  if (facing([1,0,0])) s += shape(B, tone([1,0,0], m), 1.2);
+  return s + hullInk([...A, ...B], w);
+}
+// prism along y: convex (x,z) profile swept from y0 to y1
+function prismY(prof, y0, y1, m, w = 2){
+  const A = on(PY(y0), prof), B = on(PY(y1), prof);
+  let s = loft(A, B, n => tone(n, m));
+  if (facing([0,1,0])) s += shape(B, tone([0,1,0], m), 1.2);
+  return s + hullInk([...A, ...B], w);
+}
+// a block whose top is inset (a gold bar, a plinth step)
+function frustum(x0,y0,x1,y1,z0,z1,k,m,w=1.6){
+  const A = on(PZ(z0), rectUV(x0,y0,x1,y1)), B = on(PZ(z1), rectUV(x0+k,y0+k,x1-k,y1-k));
+  return loft(A, B, n => tone(n, m)) + shape(B, tone([0,0,1], m), 1) + hullInk([...A, ...B], w);
+}
+const bx = (x0,y0,z0,x1,y1,z1,m,w=1.6) => box(x0,y0,z0,x1,y1,z1,m,tone,1) + hullInk([[x0,y0,z0],[x1,y0,z0],[x0,y1,z0],[x1,y1,z0],[x0,y0,z1],[x1,y0,z1],[x0,y1,z1],[x1,y1,z1]], w);
+const cy = (x,y,z0,z1,r,m,w=1.4) => cyl(x,y,z0,z1,r,m,tone,w,28);
+const stroke = (pts, col, w) => `<path d="${pd(pts,false)}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const cord = (pts, col, w) => stroke(pts, INK, w + 1.6) + stroke(pts, col, w);
+const pts8 = (x0,y0,z0,x1,y1,z1) => [[x0,y0,z0],[x1,y0,z0],[x0,y1,z0],[x1,y1,z0],[x0,y0,z1],[x1,y0,z1],[x0,y1,z1],[x1,y1,z1]];
+
+const FIGS = {
+  /* Central bank: portico on a stepped base, five columns, pediment with a yellow rate dial, a yellow roof. */
+  bank: { size:[70, 92, 72], board:[0,0,70,92], scene(){
+    let s = castShadow(pts8(6,6,BH,64,86,BH+58), BH, boardTop(0,0,70,92,BH));
+    s += frustum(6,6,64,86,BH,BH+4,1.5,STONE) + frustum(9,9,61,83,BH+4,BH+8,1.5,STONE);
+    s += bx(14,16,BH+8,44,76,BH+40,STONE);
+    // door on the front wall, behind the columns
+    s += shape(on(PX(44.1), rrUV(38,BH+8,54,BH+28,3)), GRAPH.d, 1.2);
+    s += byDepth([0,1,2,3,4].map(i => { const y = 18 + i*14; return { box:[[50,y-3,BH+8],[56,y+3,BH+40]], svg: cy(53,y,BH+8,BH+40,3,STONE,1.3) }; }));
+    s += bx(10,12,BH+40,59,80,BH+46,STONE,1.8);
+    s += prismX([[12,BH+46],[80,BH+46],[46,BH+60]], 10, 59, YEL, 2.2);
+    // rate dial on the pediment front
+    s += shape(on(PX(59.2), ellUV(46,BH+51.5,4.4,4.4,24)), GRAPH.d, 1.2);
+    s += stroke([[59.4,46,BH+51.5],[59.4,43,BH+54]], YEL.l, 1.4);
+    return s; } },
+
+  /* Inflation: a wire shopping basket with groceries and a big yellow price tag. */
+  inflation: { size:[70, 90, 60], board:[0,0,70,90], scene(){
+    const A = on(PZ(BH), rrUV(14,14,52,70,4)), B = on(PZ(BH+26), rrUV(10,10,56,74,4));
+    let s = castShadow([...A, ...B], BH, boardTop(0,0,70,90,BH));
+    const goods = byDepth([
+      { box:[[18,18,BH],[30,34,BH+40]], svg: bx(18,18,BH+4,30,34,BH+40,STONE) },
+      { box:[[32,24,BH],[44,36,BH+34]], svg: cy(38,30,BH+4,BH+34,6,GRAPH) },
+      { box:[[22,42,BH],[46,62,BH+30]], svg: prismY([[22,BH+4],[46,BH+4],[46,BH+24],[34,BH+31],[22,BH+24]], 42, 62, { l:'#d39a5a', m:'#b07a3d', d:'#6c4720' }) },
+    ]);
+    s += openShell(A, B, n => tone(n, GRAPH), goods);
+    s += ink(pd(B), 1.6) + hullInk([...A, ...B], 2.4);
+    // wire ribs on the near walls
+    for (let k = 1; k < 4; k++){ const z = BH + k*6.5, t = k*6.5/26; s += stroke([[52+4*t, 14-4*t, z],[52+4*t, 70+4*t, z],[14-4*t, 70+4*t, z]], INK, .8); }
+    // handle
+    const h = []; for (let i = 0; i <= 16; i++){ const a = Math.PI*i/16; h.push([33, 10 + 64*(1-Math.cos(a))/2 + 0, BH+26 + 22*Math.sin(a)]); }
+    s += cord(h, STONE.d, 2.6);
+    // price tag leaning on the front wall
+    const tag = [[0,0],[0,16],[18,16],[24,8],[18,0]].map(([u,v]) => [58, 60 - u, BH + 6 + v]);
+    s += shape(tag, YEL.l, 1.6) + shape(on(PX(58.2), ellUV(41,BH+14,1.6,1.6,12)), PLINTH.d, .8);
+    s += stroke([[58.3,56,BH+18],[58.3,48,BH+18]], YEL.d, 1.4) + stroke([[58.3,56,BH+12],[58.3,50,BH+12]], YEL.d, 1.4);
+    return s; } },
+
+  /* Jobs: a punch clock on the wall post with a card in the slot, and a yellow hard hat beside it. */
+  jobs: { size:[70, 92, 66], board:[0,0,70,92], scene(){
+    let s = castShadow([...pts8(10,50,BH,46,82,BH+62), ...pts8(16,8,BH,58,44,BH+16)], BH, boardTop(0,0,70,92,BH));
+    const clock = bx(10,50,BH,46,82,BH+62,GRAPH,2.2)
+      + shape(on(PX(46.1), ellUV(66,BH+44,11,11,32)), PAPER, 1.4)
+      + stroke([[46.3,66,BH+44],[46.3,66,BH+51]], INK, 1.6) + stroke([[46.3,66,BH+44],[46.3,71,BH+44]], INK, 1.6)
+      + shape(on(PX(46.1), rectUV(56,BH+20,76,BH+24)), '#111', 1)
+      + bx(30,58,BH+8,46.5,74,BH+22,{ l:PAPER, m:'#dcd9d0', d:'#a9a59a' },1.2)
+      + stroke([[46.7,61,BH+18],[46.7,71,BH+18]], YEL.d, 1) + stroke([[46.7,61,BH+14],[46.7,68,BH+14]], INK, .8);
+    // hard hat: brim, dome rings, ridge
+    const hx = 36, hy = 26, ring = (z, r) => on(PZ(z), ellUV(hx, hy, r, r*.92, 28));
+    let hat = loft(ring(BH+1, 20), ring(BH+3, 20), n => tone(n, YEL)) + fill(pd(ring(BH+3, 20)), YEL.m) + hullInk([...ring(BH+1,20), ...ring(BH+3,20)], 1.6);
+    const rs = [[BH+3,14],[BH+9,13.6],[BH+14,12],[BH+18,9],[BH+20.5,5],[BH+21.5,1]];
+    let dome = ''; for (let i = 0; i < rs.length - 1; i++) dome += loft(ring(...rs[i]), ring(...rs[i+1]), n => tone(n, YEL));
+    hat += dome + hullInk(rs.flatMap(r => ring(...r)), 2);
+    hat += stroke(Array.from({length:9}, (_, i) => { const a = Math.PI*i/8; return [hx + 13.6*Math.cos(a)*0 + 0, hy - 12*Math.cos(a), BH + 3 + 18.5*Math.sin(a)]; }), YEL.d, 1.4);
+    s += byDepth([{ box:[[10,50,BH],[46,82,BH+62]], svg: clock }, { box:[[16,6,BH],[56,46,BH+22]], svg: hat }]);
+    return s; } },
+
+  /* Growth / recession: a sawtooth factory with a chimney and a yellow output gauge on the front. */
+  growth: { size:[72, 96, 80], board:[0,0,72,96], scene(){
+    let s = castShadow([...pts8(10,10,BH,60,86,BH+30), ...pts8(16,66,BH,26,76,BH+70)], BH, boardTop(0,0,72,96,BH));
+    s += cy(21,71,BH+20,BH+70,5,STONE,1.6) + shape(on(PZ(BH+70.1), ellUV(21,71,3.2,3.2,20)), '#111', .8);
+    s += bx(10,10,BH,60,86,BH+24,STONE,2.2);
+    // sawtooth roof, teeth along y, each a triangle swept along x
+    for (let i = 0; i < 4; i++){ const y0 = 10 + i*19; s += prismX([[y0,BH+24],[y0+19,BH+24],[y0+19,BH+34]], 10, 60, i === 3 ? GRAPH : GRAPH, 1.4)
+      + shape(on(PZ(BH+24), [[12,y0+17],[58,y0+17],[58,y0+19],[12,y0+19]]).map(p => [p[0], p[1], p[2] + .02]), '#cfe9f0', 0); }
+    // windows and a roller door on the front
+    for (let i = 0; i < 3; i++) s += shape(on(PX(60.1), rectUV(16 + i*12, BH+12, 24 + i*12, BH+19)), GLASS, 1);
+    s += shape(on(PX(60.1), rectUV(58, BH, 76, BH+16)), GRAPH.m, 1.2);
+    for (let k = 1; k < 5; k++) s += stroke([[60.2,58,BH+k*3.2],[60.2,76,BH+k*3.2]], INK, .6);
+    // gauge on the left side wall
+    s += shape(on(PY(86.1), ellUV(35,BH+14,7,7,28)), YEL.l, 1.4) + stroke([[35,86.3,BH+14],[30.5,86.3,BH+10]], INK, 1.6);
+    return s; } },
+
+  /* Gold: a pyramid of six bars. */
+  gold: { size:[70, 86, 40], board:[0,0,70,86], scene(){
+    let s = castShadow(pts8(10,12,BH,60,74,BH+27), BH, boardTop(0,0,70,86,BH));
+    const bar = (x0, y0, z0) => frustum(x0, y0, x0 + 16, y0 + 30, z0, z0 + 9, 2.4, YEL, 1.6);
+    const parts = [];
+    [[10,12],[10,44],[28,12],[28,44],[46,12],[46,44]].slice(0,6);
+    for (const [x, y] of [[10,12],[10,44],[27,12],[27,44],[44,12],[44,44]]) parts.push({ box:[[x,y,BH],[x+16,y+30,BH+9]], svg: bar(x, y, BH) });
+    for (const [x, y] of [[18.5,28],[35.5,28]]) parts.push({ box:[[x,y,BH+9],[x+16,y+30,BH+18]], svg: bar(x, y, BH+9) });
+    parts.push({ box:[[27,28,BH+18],[43,58,BH+27]], svg: bar(27, 28, BH+18) });
+    // bars run along y here; turn them: x span 16, y span 30
+    return s + byDepth(parts); } },
+
+  /* Oil: two drums, one dark, one yellow, with rolling hoops and bungs. */
+  oil: { size:[72, 88, 60], board:[0,0,72,88], scene(){
+    let s = castShadow([...pts8(10,40,BH,44,74,BH+52), ...pts8(30,10,BH,64,44,BH+46)], BH, boardTop(0,0,72,88,BH));
+    const drum = (x, y, h, m) => { let d = cy(x, y, BH, BH + h, 17, m, 2.2);
+      for (const z of [h*.36, h*.68]){ d += stroke(on(PZ(BH + z), arcUV(x, y, 17.2, YAW - 90, YAW + 90, 24)), INK, 1.4); }
+      d += ink(pd(on(PZ(BH + h + .1), ellUV(x, y, 14.5, 14.5, 32))), .8) + cy(x - 7, y + 4, BH + h, BH + h + 1.6, 2.4, STONE, .8);
+      return d; };
+    s += byDepth([{ box:[[10,40,BH],[44,74,BH+52]], svg: drum(27, 57, 52, GRAPH) }, { box:[[30,6,BH],[64,40,BH+46]], svg: drum(47, 23, 46, YEL) }]);
+    return s; } },
+
+  /* FX: an exchange booth, glass front, yellow awning, a rate board on the roof. */
+  fx: { size:[72, 84, 84], board:[0,0,72,84], scene(){
+    let s = castShadow(pts8(12,12,BH,58,72,BH+78), BH, boardTop(0,0,72,84,BH));
+    s += bx(12,12,BH,54,72,BH+56,STONE,2.2);
+    s += shape(on(PX(54.1), rectUV(18,BH+22,66,BH+46)), GLASS, 1.4);
+    s += stroke([[54.3,24,BH+42],[54.3,30,BH+36]], '#ffffff', 1.1) + stroke([[54.3,42,BH+44],[54.3,50,BH+36]], '#ffffff', .8);
+    s += bx(54,16,BH+20,62,70,BH+22,GRAPH,1.4);
+    // coins on the counter
+    s += cy(58,30,BH+22,BH+23.4,2.6,YEL,.9) + cy(58.5,38,BH+22,BH+24.4,2.6,STONE,.9);
+    // awning: a slope from the wall out over the counter
+    s += prismY([[54,BH+56],[54,BH+50],[66,BH+46],[66,BH+48]], 10, 74, YEL, 2);
+    for (let y = 16; y <= 68; y += 9) s += stroke([[54.5,y,BH+55],[65.6,y,BH+47.6]], YEL.d, .9);
+    // rate board on the roof
+    s += bx(30,22,BH+56,34,62,BH+76,GRAPH,1.8);
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) s += shape(on(PX(34.1), rectUV(26 + c*9, BH+69 - r*5, 32 + c*9, BH+71.5 - r*5)), c === 3 ? YEL.l : '#8a8a8a', 0);
+    return s; } },
+
+  /* Crypto: an open-frame mining rig, four cards with yellow fans, a PSU on the shelf below. */
+  crypto: { size:[70, 96, 64], board:[0,0,70,96], scene(){
+    let s = castShadow(pts8(10,8,BH,60,88,BH+52), BH, boardTop(0,0,70,96,BH));
+    const post = (x, y) => ({ box:[[x-1,y-1,BH],[x+1,y+1,BH+52]], svg: bx(x-1,y-1,BH,x+1,y+1,BH+52,STONE,1) });
+    const parts = [post(10,8), post(10,88), post(60,8), post(60,88)];
+    parts.push({ box:[[9,8,BH+16],[61,88,BH+18]], svg: bx(9,8,BH+16,61,88,BH+18,STONE,1.4) });
+    parts.push({ box:[[14,14,BH+18],[56,82,BH+19]], svg: '' });
+    parts.push({ box:[[16,50,BH],[44,82,BH+14]], svg: bx(16,50,BH,44,82,BH+14,GRAPH,1.6) + shape(on(PX(44.1), ellUV(66,BH+7,4.5,4.5,18)), '#111', .8) });
+    for (let i = 0; i < 4; i++){ const y = 16 + i*17;
+      const card = bx(18,y,BH+18,54,y+5,BH+46,GRAPH,1.4)
+        + shape(on(PY(y+5.1), [[22,BH+21],[50,BH+21],[50,BH+44],[22,BH+44]]), GRAPH.d, .6)
+        + shape(on(PY(y+5.15), ellUV(29,BH+32,6,6,22)), YEL.l, 1) + shape(on(PY(y+5.15), ellUV(43,BH+32,6,6,22)), YEL.l, 1)
+        + shape(on(PY(y+5.2), ellUV(29,BH+32,1.6,1.6,10)), INK, 0) + shape(on(PY(y+5.2), ellUV(43,BH+32,1.6,1.6,10)), INK, 0);
+      parts.push({ box:[[18,y,BH+18],[54,y+5,BH+46]], svg: card }); }
+    parts.push({ box:[[9,8,BH+50],[61,88,BH+52]], svg: bx(9,86,BH+50,61,88,BH+52,STONE,1) + bx(9,8,BH+50,61,10,BH+52,STONE,1) });
+    return s + byDepth(parts); } },
+
+  /* Elections: a ballot box with a paper going into the slot, a yellow band on the front. */
+  election: { size:[68, 84, 74], board:[0,0,68,84], scene(){
+    let s = castShadow(pts8(12,12,BH,56,72,BH+66), BH, boardTop(0,0,68,84,BH));
+    s += bx(12,12,BH,54,72,BH+44,STONE,2.4);
+    s += bx(10,10,BH+44,56,74,BH+48,GRAPH,1.8);
+    s += shape(on(PZ(BH+48.1), rectUV(31,24,35,60)), '#111', .8);
+    s += shape(on(PX(54.1), rectUV(12,BH+20,72,BH+30)), YEL.l, 1.2);
+    s += shape(on(PX(54.2), ellUV(42,BH+25,3.6,3.6,5)), YEL.d, 0);
+    // ballot half in the slot, tilted toward the viewer
+    const bp = [[33,28,BH+48],[33,56,BH+48],[37,56,BH+70],[37,28,BH+70]];
+    s += shape(bp, PAPER, 1.4) + stroke([[35.5,48,BH+60],[36.3,44,BH+56],[37,36,BH+65]], YEL.m, 1.8);
+    return s; } },
+
+  /* Fallback: a trading desk, two monitors with a yellow line, a keyboard. */
+  desk: { size:[70, 100, 66], board:[0,0,70,100], scene(){
+    let s = castShadow(pts8(8,8,BH,62,92,BH+60), BH, boardTop(0,0,70,100,BH));
+    const legs = [[10,10],[10,88],[58,10],[58,88]].map(([x, y]) => ({ box:[[x,y,BH],[x+3,y+3,BH+28]], svg: bx(x,y,BH,x+3,y+3,BH+28,GRAPH,1.2) }));
+    s += byDepth(legs);
+    s += bx(8,8,BH+28,62,92,BH+31,STONE,2.2);
+    const mon = (y0) => { const m = bx(18,y0,BH+31,24,y0+6,BH+38,GRAPH,1) + bx(20,y0-14,BH+38,23,y0+20,BH+60,GRAPH,1.8)
+      + shape(on(PX(23.1), rectUV(y0-12,BH+40,y0+18,BH+58)), GLASS, .8);
+      const line = [0,1,2,3,4,5,6].map(i => [23.3, y0+16 - i*4.4, BH + 43 + [2,5,4,8,7,11,13][i]]);
+      return m + stroke(line, YEL.l, 1.4); };
+    s += byDepth([{ box:[[18,14,BH+31],[24,48,BH+60]], svg: mon(28) }, { box:[[18,52,BH+31],[24,86,BH+60]], svg: mon(68) }]);
+    s += bx(40,32,BH+31,52,66,BH+33,GRAPH,1.2) + bx(42,74,BH+31,52,80,BH+33,GRAPH,1);
+    return s; } },
+};
+
+const out = [];
+for (const [name, F] of Object.entries(FIGS)){
+  setLight(105);
+  const [W, D, H] = F.size; OX = OY = 0; RC = [W/2, D/2]; RCZ = H/2; setCam(YAW0, PITCH0);
+  const p = []; for (const x of [0,W]) for (const y of [0,D]) for (const z of [0,H]) p.push(P(x,y,z));
+  const xs = p.map(q => q[0]), ys = p.map(q => q[1]), bw = Math.max(...xs)-Math.min(...xs), bh = Math.max(...ys)-Math.min(...ys);
+  const A = .75, vbW = Math.max(bw/.86, bh/.9/A), vbH = vbW*A;
+  OX = (vbW-bw)/2 - Math.min(...xs); OY = (vbH-bh)/2 - Math.min(...ys);
+  INK_K = vbW / INK_REF_VB; _clipN = 0;
+  const [b0,b1,b2,b3] = F.board;
+  const body = inkScale(board(b0,b1,b2,b3,BH,5,PLINTH) + F.scene()).replace(/id="k(\d+)"/g, `id="${name}$1"`).replace(/url\(#k(\d+)\)/g, `url(#${name}$1)`)
+    .replaceAll(SHADOW, '#000000" fill-opacity=".45');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f(vbW)} ${f(vbH)}">${body}</svg>`;
+  out.push(name);
+  document.body.insertAdjacentHTML('beforeend', `<div class="cell">${svg}<div>${name}</div><pre data-name="${name}">${svg.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</pre></div>`);
+}
+</script></body></html>
