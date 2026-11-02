@@ -1,14 +1,5 @@
 import type { CalendarEvent } from "@/features/calendar/types";
 import { wibYmd } from "./date";
-import { shortName } from "./format";
-
-export function deriveSummary(events: CalendarEvent[]): string {
-  const highs = events.filter((e) => e.impact === "high");
-  if (highs.length > 0) {
-    return highs.slice(0, 3).map((e) => shortName(e.title)).join(" + ");
-  }
-  return `${events.length} ${events.length === 1 ? "event" : "events"}`;
-}
 
 export function groupByDay(
   events: CalendarEvent[]

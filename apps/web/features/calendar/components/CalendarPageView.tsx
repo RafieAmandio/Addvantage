@@ -24,9 +24,10 @@ import { groupByDay } from "@/features/calendar/lib/group";
 import { Panel } from "@/components/ui/Panel";
 import { cn } from "@/lib/cn";
 import { formatDayHeader } from "@/features/calendar/lib/format";
-import { IMPACT_DOT, IMPACT_LABEL, IMPACT_TEXT } from "@/features/calendar/lib/style";
+import { IMPACT_LABEL, IMPACT_TEXT } from "@/features/calendar/lib/style";
 import { MonthGrid } from "@/features/calendar/components/MonthGrid";
-import { splitTitle } from "@/features/calendar/components/EventRow";
+import { currencyOf, flagOf, labelOf } from "@/features/calendar/lib/econ";
+import { Countdown, ImpactBars, useNow } from "@/features/calendar/components/EventBits";
 import { CalendarToolbar } from "@/features/calendar/components/CalendarToolbar";
 import { CalendarFilterBar } from "@/features/calendar/components/CalendarFilterBar";
 import { CalendarEmptyState } from "@/features/calendar/components/CalendarEmptyState";
@@ -54,7 +55,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   );
 
   useUrlSyncedState({
-    view: view !== "day" ? view : null,
+    view: view !== "week" ? view : null,
     d: anchor !== TODAY_YMD ? anchor : null,
     impact: impactFilter !== "all" ? impactFilter : null,
     region: regionFilter !== "all" ? regionFilter : null,
@@ -148,30 +149,57 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
     };
   }, [events, anchor]);
 
+  // Minute clock for the now line and dimming; countdowns tick on their own.
+  const now = useNow(30_000);
   const nextHigh = useMemo(() => {
-    const now = new Date().toISOString();
+    const iso = new Date(now).toISOString();
     return events
-      .filter((e) => e.impact === "high" && e.ts >= now)
+      .filter((e) => e.impact === "high" && e.ts > iso)
       .sort((a, b) => a.ts.localeCompare(b.ts))
-      .slice(0, 5);
-  }, [events]);
+      .slice(0, 6);
+  }, [events, now]);
+  const up = nextHigh[0];
+  const upLabel = up && labelOf(up);
 
   return (
     <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-4">
+        {up && upLabel && (
+          <Link
+            href={`/app/calendar/${up.id}`}
+            className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-2xl bg-panel px-5 py-4 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+          >
+            <span className="min-w-0">
+              <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                <ImpactBars impact="high" />
+                Next high impact
+              </span>
+              <span className="mt-1.5 flex min-w-0 items-center gap-2">
+                <span aria-hidden className="text-[18px] leading-none">{upLabel.flag}</span>
+                <span className="line-clamp-2 text-[16px] font-medium leading-[21px] text-white group-hover:text-brand">{upLabel.name}</span>
+              </span>
+              <span className="mt-0.5 block text-[13px] text-white/40">
+                {upLabel.cur} · {formatDayHeader(wibYmd(up.ts)).replace(/^(\w{3})\w*/, "$1")},{" "}
+                {new Date(up.ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })} WIB
+                {(up.forecast ?? up.consensus) && <span className="whitespace-nowrap"> · F {up.forecast ?? up.consensus}</span>}
+              </span>
+            </span>
+            <Countdown ts={up.ts} className="whitespace-nowrap font-num text-[22px] font-semibold leading-7 text-brand sm:text-[34px] sm:leading-9" />
+          </Link>
+        )}
         <Panel
-          title={rangeLabel(view, anchor)}
-          sub={`${filtered.length} ${filtered.length === 1 ? "event" : "events"} · times in WIB (UTC+7)`}
+          title="Economic calendar"
+          sub={`${filtered.length} ${filtered.length === 1 ? "release" : "releases"} · times in WIB (UTC+7)`}
         >
           <CalendarToolbar
             view={view}
             anchor={anchor}
-            eventCount={filtered.length}
+            label={rangeLabel(view, anchor)}
             onViewChange={setView}
             onAnchorChange={setAnchor}
           />
           <CalendarFilterBar
-            className="mt-3 border-b border-white/[0.07] pb-4"
+            className="mt-3"
             impactFilter={impactFilter}
             regionFilter={regionFilter}
             filtersActive={filtersActive}
@@ -180,7 +208,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
             onReset={resetFilters}
           />
 
-          <div className="mt-5">
+          <div className="mt-2 -mx-2">
             {view === "month" && (
               <div className="relative">
                 <MonthGrid
@@ -213,7 +241,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
 
             {view !== "month" && (
               <CalendarDayWeekTable
-                view={view}
+                now={now}
                 groups={groups}
                 emptyState={
                   <CalendarEmptyState
@@ -251,7 +279,10 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
                 <div className={cn("font-num text-[32px] font-semibold leading-8", lvl === "high" ? "text-brand" : "text-white")}>
                   {glance.impact[lvl]}
                 </div>
-                <div className={cn("mt-0.5 text-[12px]", IMPACT_TEXT[lvl])}>{IMPACT_LABEL[lvl]}</div>
+                <div className={cn("mt-1 flex items-center gap-1.5 text-[12px]", IMPACT_TEXT[lvl])}>
+                  <ImpactBars impact={lvl} />
+                  {IMPACT_LABEL[lvl]}
+                </div>
               </button>
             ))}
           </div>
@@ -259,7 +290,7 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
           {glance.regions.length > 0 && (
             <>
               <div className="mt-5 flex justify-between text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
-                <span>Region</span>
+                <span>Currency</span>
                 <span>Events · high</span>
               </div>
               <ul className="mt-1 divide-y divide-white/[0.07]">
@@ -271,8 +302,9 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
                       aria-pressed={regionFilter === region}
                       className="flex w-full items-center gap-3 py-2 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                     >
-                      <span className={cn("w-12 text-[14px] font-semibold", regionFilter === region ? "text-brand" : "text-white")}>
-                        {region === "GLOBAL" ? "Other" : region}
+                      <span className={cn("flex w-16 items-center gap-1.5 text-[14px] font-semibold", regionFilter === region ? "text-brand" : "text-white")}>
+                        <span aria-hidden className="text-[14px] leading-none">{flagOf(currencyOf(region, ""))}</span>
+                        {currencyOf(region, "")}
                       </span>
                       <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
                         <span
@@ -309,13 +341,13 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
           )}
         </Panel>
 
-        <Panel title="Next high impact" sub="Upcoming releases, WIB">
-          {nextHigh.length === 0 ? (
+        <Panel title="Coming up" sub="High impact releases after the next one">
+          {nextHigh.length <= 1 ? (
             <p className="py-4 text-[14px] text-white/40">No high impact release scheduled.</p>
           ) : (
             <ul className="-my-1 divide-y divide-white/[0.07]">
-              {nextHigh.map((e) => {
-                const { cur, name } = splitTitle(e);
+              {nextHigh.slice(1).map((e) => {
+                const { cur, flag, name } = labelOf(e);
                 const ymd = wibYmd(e.ts);
                 return (
                   <li key={e.id}>
@@ -323,15 +355,18 @@ export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
                       href={`/app/calendar/${e.id}`}
                       className="group flex items-center gap-3 py-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                     >
-                      <span className={cn("h-2 w-2 shrink-0 rounded-full", IMPACT_DOT.high)} aria-hidden />
+                      <span aria-hidden className="text-[16px] leading-none">{flag}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[14px] text-white group-hover:text-brand">{name}</span>
                         <span className="text-[12px] text-white/40">
                           {cur} · {formatDayHeader(ymd).replace(/^(\w{3})\w*/, "$1")}
                         </span>
                       </span>
-                      <span className="shrink-0 text-[13px] tabular-nums text-white/90">
-                        {new Date(e.ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
+                      <span className="shrink-0 text-right">
+                        <span className="block text-[13px] tabular-nums text-white/90">
+                          {new Date(e.ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
+                        </span>
+                        <Countdown ts={e.ts} className="text-[12px] text-white/40" />
                       </span>
                     </Link>
                   </li>
