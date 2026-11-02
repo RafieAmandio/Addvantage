@@ -318,6 +318,30 @@ html {
   pointer-events: none;
 }
 
+/* Home desk motion. Everything starts from the final layout: transform, opacity and clip only. */
+:root { --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); }
+/* Panels arrive in reading order: 5 steps of 30ms plus 260ms stays under 400ms. */
+.enter { animation: rise 260ms var(--ease-out-quint) both; animation-delay: calc(var(--i, 0) * 30ms); }
+/* Rows inside a panel follow once the panel has landed. */
+.enter-row { animation: rise 240ms var(--ease-out-quint) both; animation-delay: calc(80ms + var(--i, 0) * 30ms); }
+/* Bars grow from their left edge to the value (reuses the morning scan nudge). */
+.grow-x { transform-origin: left center; animation: nudge 600ms var(--ease-out-quint) both; animation-delay: calc(120ms + var(--i, 0) * 40ms); }
+/* Chart lines draw left to right. */
+@keyframes wipeIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.draw-in { animation: wipeIn 700ms var(--ease-out-quint) both; }
+/* Market switch: the next market slides in from the side it came from. */
+@keyframes swapIn { from { opacity: 0; transform: translateX(var(--dx, 12px)); } to { opacity: 1; transform: none; } }
+.swap-in { animation: swapIn 280ms var(--ease-out-quint) both; }
+/* A refreshed value flashes the direction it moved. */
+@keyframes flashUp { from { background-color: rgb(0 221 148 / 0.28); } to { background-color: rgb(0 221 148 / 0); } }
+@keyframes flashDown { from { background-color: rgb(255 69 77 / 0.28); } to { background-color: rgb(255 69 77 / 0); } }
+.flash-up, .flash-down { border-radius: 4px; animation: flashUp 900ms ease-out; }
+.flash-down { animation-name: flashDown; }
+/* Rows that open something lift a pixel on hover and settle on press. */
+.lift { transition: transform 150ms var(--ease-out-quint), background-color 150ms; }
+@media (hover: hover) { .lift:hover { transform: translateY(-1px); } }
+.lift:active { transform: translateY(0) scale(0.995); transition-duration: 80ms; }
+
 /* Reduced motion: disable all custom animations and transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -326,4 +350,6 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* Staggered entrances must not wait out their delay with nothing on screen. */
+  .enter, .enter-row, .grow-x, .draw-in, .swap-in { animation-delay: 0s !important; }
 }
