@@ -17,7 +17,10 @@ export function TopBar() {
     setSearchOpen,
     operatorName,
   } = useAppState();
-  const { title, tagline } = routeMeta(usePathname());
+  const pathname = usePathname();
+  const { title, tagline } = routeMeta(pathname);
+  // Home opens straight on the greeting row, so it carries no page title.
+  const showTitle = pathname !== "/app";
   const toast = useToast();
   const paid = isPaid(tier);
   const [isMac, setIsMac] = useState(false);
@@ -54,10 +57,10 @@ export function TopBar() {
               <path d="M2 4.5h14M2 9h14M2 13.5h14" strokeLinecap="round" />
             </svg>
           </button>
-          <div className="min-w-0">
+          {showTitle && <div className="min-w-0">
             <div className="truncate font-num text-[24px] font-semibold leading-[26px] tracking-[-0.01em] text-white">{title}</div>
             <p className="hidden truncate text-[13px] leading-[18px] text-white/55 sm:block">{tagline}</p>
-          </div>
+          </div>}
         </div>
 
         {/* Right */}
