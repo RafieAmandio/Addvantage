@@ -18,12 +18,14 @@ export function NewsPanel({
   seen,
   title = "Latest news",
   limit = 6,
+  className,
   children,
 }: {
   news: NewsListItem[];
   seen: Set<string>;
   title?: string;
   limit?: number;
+  className?: string;
   children?: React.ReactNode;
 }) {
   const rows = news.slice(0, limit);
@@ -35,19 +37,20 @@ export function NewsPanel({
       title={title}
       sub={staleDays >= 2 ? <span className="text-down">No new items in {staleDays} days</span> : "Market-moving, with what it means for price"}
       action={<PanelLink href="/app/news">All news</PanelLink>}
+      className={className}
     >
       {children}
       {rows.length === 0 ? (
         <p className="py-6 text-[14px] text-white/40">No news yet.</p>
       ) : (
         <ul className="-my-1 divide-y divide-white/[0.07]">
-          {rows.map((n) => {
+          {rows.map((n, i) => {
             const at = n.publishedAt ?? n.fetchedAt;
             return (
-              <li key={n.id}>
+              <li key={n.id} className="enter-row" style={{ "--i": i } as React.CSSProperties}>
                 <Link
                   href={`/app/news/${n.id}`}
-                  className="group flex gap-4 py-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                  className="lift group flex gap-4 py-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">

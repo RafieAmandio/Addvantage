@@ -5,6 +5,7 @@ import { getPredictionHistory, listPredictions } from "@/features/predictions/qu
 import { listBulletins } from "@/features/bulletin/queries/bulletins";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";
 import { timelineEventToCalendarEvent } from "@/features/calendar/lib/fromTimeline";
+import { getMacro } from "@/features/macro/queries";
 import { apiGet } from "@/lib/api/client-server";
 import { getProfile } from "@/lib/auth/session";
 import type { AtrScannerData } from "@/features/atr/types";
@@ -28,7 +29,7 @@ export default async function HomePage() {
   const canSeeBulletin = !!profile && (profile.tier === "vip" || profile.isAdmin);
   const now = Date.now();
 
-  const [news, plans, predictions, bulletins, atr, macro] = await Promise.all([
+  const [news, plans, predictions, bulletins, atr, macroEvents, macro] = await Promise.all([
     listApprovedNews(),
     listPublishedPlans({ limit: 20 }),
     listPredictions().catch((err) => {
@@ -43,6 +44,8 @@ export default async function HomePage() {
       to: new Date(now + 48 * 3600_000).toISOString(),
       limit: 200,
     }).catch(() => []),
+    // Rates and gauges from /app/macro, shown beside each consensus market.
+    getMacro(),
   ]);
 
   // Live markets first; history for the top two outcomes of each.
@@ -59,7 +62,7 @@ export default async function HomePage() {
     })),
   );
 
-  const calendar = macro
+  const calendar = macroEvents
     .map(timelineEventToCalendarEvent)
     .filter((e) => e.impact !== "low" && new Date(e.ts).getTime() >= now - 2 * 3600_000)
     .sort((a, b) => a.ts.localeCompare(b.ts))
@@ -73,6 +76,7 @@ export default async function HomePage() {
       consensus={consensus}
       atr={atr}
       calendar={calendar}
+      macro={macro}
     />
   );
 }

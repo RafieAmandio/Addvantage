@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { AnimatedFigure, AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { statsFor, themeOf } from "@/features/dashboard/lib/consensusTheme";
+import type { MacroData } from "@/features/macro/types";
+import type { AtrPair } from "@/features/atr/types";
 import { StepChart, type StepSeries } from "@/components/ui/StepChart";
 import { formatVolume } from "@/features/predictions/lib/format";
 import type { PredictionCardData } from "@/features/predictions/types";
@@ -29,8 +34,9 @@ function endsLabel(fetchedAt: string, stale: boolean) {
 }
 
 /** Kalshi-style hero: one market at a time, inline legend, step chart, range tabs. */
-export function ConsensusHero({ markets }: { markets: ConsensusMarket[] }) {
+export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMarket[]; macro: MacroData; pairs: AtrPair[] }) {
   const [i, setI] = useState(0);
+  const [dir, setDir] = useState(1);
   const [range, setRange] = useState<(typeof RANGES)[number]["id"]>("1M");
   const m = markets[i];
 
@@ -57,12 +63,19 @@ export function ConsensusHero({ markets }: { markets: ConsensusMarket[] }) {
   }
 
   const { tracked, outcomes, volume, fetchedAt, stale } = m.card;
-  const go = (d: number) => setI((v) => (v + d + markets.length) % markets.length);
+  const go = (d: number) => {
+    setDir(d);
+    setI((v) => (v + d + markets.length) % markets.length);
+  };
+  const about = `${tracked.category} ${tracked.label} ${tracked.eventTitle}`;
+  const theme = themeOf(about);
+  const stats = statsFor(theme, about, macro, pairs);
+  const slide = { "--dx": `${dir * 12}px` } as React.CSSProperties;
 
   return (
     <section aria-label="Market consensus" className="flex min-w-0 flex-col gap-4 rounded-2xl bg-panel p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
+        <div key={i} className="swap-in min-w-0" style={slide}>
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">
             {tracked.category}
             <span className="px-1.5 text-white/30">/</span>
@@ -80,7 +93,7 @@ export function ConsensusHero({ markets }: { markets: ConsensusMarket[] }) {
                 type="button"
                 onClick={() => go(d)}
                 aria-label={d < 0 ? "Previous market" : "Next market"}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.14] text-white/70 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.14] text-white/70 transition-[background-color,color,transform] duration-150 hover:bg-raised active:scale-95 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
               >
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
                   <path d={d < 0 ? "M8.5 3L4.5 7l4 4" : "M5.5 3l4 4-4 4"} strokeLinecap="round" strokeLinejoin="round" />
@@ -91,22 +104,60 @@ export function ConsensusHero({ markets }: { markets: ConsensusMarket[] }) {
         )}
       </div>
 
-      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[14px] text-white/55">
-        {outcomes.slice(0, 2).map((o, k) => (
-          <span key={o.label} className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full" style={{ background: COLORS[k] }} aria-hidden />
-            {o.label}
-            <b className="font-semibold text-white">{toPct(o.probability).toFixed(toPct(o.probability) < 1 ? 1 : 0)}%</b>
-            {o.weekChange !== null && o.weekChange !== 0 && (
-              <span className={cn("text-[12px] font-medium", o.weekChange > 0 ? "text-up" : "text-down")}>
-                {o.weekChange > 0 ? "▲" : "▼"} {Math.abs(toPct(o.weekChange)).toFixed(1)}
-              </span>
-            )}
-          </span>
-        ))}
-      </div>
+      <div key={i} className="swap-in grid gap-5 md:grid-cols-[188px_minmax(0,1fr)]" style={slide}>
+        <aside className="flex items-center gap-4 md:flex-col md:items-stretch md:gap-3">
+          <Image
+            src={`/consensus/${theme}.svg`}
+            alt=""
+            width={188}
+            height={141}
+            unoptimized
+            className="h-auto w-[44%] max-w-[188px] shrink-0 md:w-full"
+          />
+          {stats.length > 0 && (
+            <dl className="grid min-w-0 flex-1 gap-3 md:border-t md:border-white/[0.07] md:pt-3">
+              {stats.map((st) => (
+                <div key={st.label} className="min-w-0">
+                  <dt className="text-[12px] text-white/55">{st.label}</dt>
+                  <dd className="font-num text-[20px] font-semibold leading-6 text-white">
+                    <AnimatedFigure text={st.value} fromRatio={0.9} />
+                  </dd>
+                  {st.sub && (
+                    <dd className={cn("text-[12px]", st.tone === "up" ? "text-up" : st.tone === "down" ? "text-down" : "text-white/40")}>{st.sub}</dd>
+                  )}
+                </div>
+              ))}
+            </dl>
+          )}
+        </aside>
 
-      <StepChart series={series} height={230} />
+        <div className="flex min-w-0 flex-col gap-3">
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-[14px] text-white/55">
+            {outcomes.slice(0, 2).map((o, k) => (
+              <span key={o.label} className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ background: COLORS[k] }} aria-hidden />
+                {o.label}
+                <b className="font-semibold text-white">
+                  <AnimatedNumber
+                    value={toPct(o.probability)}
+                    from={0}
+                    format={(v) => `${v.toFixed(toPct(o.probability) < 1 ? 1 : 0)}%`}
+                  />
+                </b>
+                {o.weekChange !== null && o.weekChange !== 0 && (
+                  <span className={cn("text-[12px] font-medium", o.weekChange > 0 ? "text-up" : "text-down")}>
+                    {o.weekChange > 0 ? "▲" : "▼"} {Math.abs(toPct(o.weekChange)).toFixed(1)}
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+
+          <div key={range} className="draw-in">
+            <StepChart series={series} height={220} />
+          </div>
+        </div>
+      </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-[13px]">
         <div className="flex items-center gap-3">
@@ -120,7 +171,7 @@ export function ConsensusHero({ markets }: { markets: ConsensusMarket[] }) {
           {markets.length > 1 && (
             <div className="flex gap-1.5" aria-hidden>
               {markets.map((_, k) => (
-                <span key={k} className={cn("h-1.5 rounded-full transition-all", k === i ? "w-5 bg-white/80" : "w-1.5 bg-white/25")} />
+                <span key={k} className={cn("h-1.5 rounded-full transition-[width,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]", k === i ? "w-5 bg-white/80" : "w-1.5 bg-white/25")} />
               ))}
             </div>
           )}

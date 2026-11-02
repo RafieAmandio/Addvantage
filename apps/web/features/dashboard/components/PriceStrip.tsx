@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import type { AtrPair } from "@/features/atr/types";
 
 export function fmtPrice(n: number) {
@@ -38,10 +39,10 @@ export function PriceStrip({ pairs, updatedAt }: { pairs: AtrPair[]; updatedAt: 
             <Link
               key={p.symbol}
               href={`/app/instrument/${encodeURIComponent(sym)}`}
-              className="flex shrink-0 items-baseline gap-2 rounded-full border border-white/[0.14] px-3.5 py-2 text-[14px] transition-colors hover:border-white/30 hover:bg-panel focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+              className="lift flex shrink-0 items-baseline gap-2 rounded-full border border-white/[0.14] px-3.5 py-2 text-[14px] transition-colors hover:border-white/30 hover:bg-panel focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
             >
               <span className="font-semibold text-white">{sym}</span>
-              <span className="text-white/90">{fmtPrice(p.price ?? p.dailyClose)}</span>
+              <AnimatedNumber value={p.price ?? p.dailyClose} from={p.dailyOpen || undefined} format={fmtPrice} className="text-white/90" />
               <span className={cn("text-[12px] font-medium", ch >= 0 ? "text-up" : "text-down")}>
                 {ch >= 0 ? "▲" : "▼"} {Math.abs(ch).toFixed(2)}%
               </span>

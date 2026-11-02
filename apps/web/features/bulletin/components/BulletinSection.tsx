@@ -11,12 +11,12 @@ export function BulletinSection({ bulletins }: { bulletins: Bulletin[] }) {
   const rows = [...bulletins].sort((a, b) => Number(a.status !== "active") - Number(b.status !== "active"));
 
   return (
-    <Panel title="Desk board" sub="Structure by timeframe and what the desk is waiting for">
+    <Panel title="Bulletin" sub="Structure by timeframe and what the desk is waiting for">
       <ul className="-my-1 divide-y divide-white/[0.07]">
-        {rows.map((b) => {
+        {rows.map((b, i) => {
           const sym = b.symbol.replace("/", "");
           return (
-            <li key={b.id} className="grid gap-4 py-4 md:grid-cols-[minmax(0,1fr)_264px]">
+            <li key={b.id} className="enter-row grid gap-4 py-4 md:grid-cols-[minmax(0,1fr)_264px]" style={{ "--i": i } as React.CSSProperties}>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <Link href={`/app/instrument/${encodeURIComponent(sym)}`} className="font-num text-[24px] font-semibold leading-6 text-white hover:text-brand">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Panel, PanelLink } from "@/components/ui/Panel";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import type { AtrPair } from "@/features/atr/types";
 import type { WatchArchiveEntry } from "@/features/dashboard/types";
@@ -66,7 +67,7 @@ export function WatchlistSection({
                 </Link>
                 {p ? (
                   <div className="text-right">
-                    <div className="font-num text-[20px] font-semibold leading-5 text-white">{fmtPrice(p.price ?? p.dailyClose)}</div>
+                    <div className="font-num text-[20px] font-semibold leading-5 text-white"><AnimatedNumber value={p.price ?? p.dailyClose} from={p.dailyOpen || undefined} format={fmtPrice} /></div>
                     <div className={cn("text-[12px] font-medium", ch! >= 0 ? "text-up" : "text-down")}>
                       {ch! >= 0 ? "▲" : "▼"} {Math.abs(ch!).toFixed(2)}%
                     </div>

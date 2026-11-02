@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AnimatedFigure } from "@/components/ui/AnimatedNumber";
 import type { TradingPlan } from "@/features/plan/types";
 
 function age(date: string) {
@@ -13,7 +14,7 @@ export function PlanCard({ plan, paid }: { plan: TradingPlan | null; paid: boole
   const published = plan ? age(plan.date) : null;
 
   return (
-    <section aria-label="Active trading plan" className="flex min-w-0 flex-col rounded-2xl bg-brand p-5 text-black sm:p-6">
+    <section aria-label="Active trading plan" className="flex min-w-0 flex-1 flex-col rounded-2xl bg-brand p-5 text-black sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/60">
           Active plan{plan ? <span className="px-1.5 text-black/30">/</span> : null}
@@ -48,7 +49,7 @@ export function PlanCard({ plan, paid }: { plan: TradingPlan | null; paid: boole
             ].map(([k, v]) => (
               <div key={k} className="min-w-0">
                 <dt className="text-black/55">{k}</dt>
-                <dd className="truncate font-num text-[20px] font-semibold leading-6">{v}</dd>
+                <dd className="truncate font-num text-[20px] font-semibold leading-6"><AnimatedFigure text={v} fromRatio={0.98} /></dd>
               </div>
             ))}
           </dl>
@@ -59,14 +60,14 @@ export function PlanCard({ plan, paid }: { plan: TradingPlan | null; paid: boole
       <div className="mt-auto flex gap-2">
         <Link
           href={plan ? `/app/plan/${plan.id}` : "/app/plan"}
-          className="flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-black text-[14px] font-semibold text-white transition-colors hover:bg-black-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
+          className="lift flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-black text-[14px] font-semibold text-white transition-colors hover:bg-black-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
         >
           {plan && !paid ? "Unlock plan" : "Open plan"}
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M3 9l6-6M4.5 3H9v4.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </Link>
         <Link
           href="/app/plan/archive"
-          className="flex h-11 items-center rounded-full border border-black/20 px-4 text-[14px] font-semibold transition-colors hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
+          className="lift flex h-11 items-center rounded-full border border-black/20 px-4 text-[14px] font-semibold transition-colors hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/40"
         >
           Archive
         </Link>
