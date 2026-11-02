@@ -36,12 +36,19 @@ export interface PlanData {
   over: { risk: string; rules: Rule[]; refusal: string };
   ok: { risk: string; rules: Rule[]; saved: string };
 }
+/** The hero desk: the candles up to a real hourly rejection of a board level, plus three markets' last closes. */
+export interface HeroData {
+  sym: string; side: Level["side"]; level: number; bars: Bar[];
+  fmt: { level: string; extreme: string; close: string; time: string };
+  towers: { sym: string; val: string; chg: string; moved: boolean }[];
+}
 export interface KillData { sym: string; side: Level["side"]; risk: number; losses: { at: string; lost: string; blocks: Rule[] }[] }
 
 /** One "tap the level" round for the hero card: a real drill cut at the retest, graded in the browser by the app's gradeLevel. */
 export interface LevelRound { sym: string; bars: Bar[]; thrust: number; level: Level; daily: DailyRead }
 
 export interface LandingData {
+  hero: HeroData;
   asOf: string; markets: number; ticker: TickerRow[]; board: BoardLine[]; rounds: LevelRound[];
   read: ReadData; practice: PracticeData; scan: ScanData; plan: PlanData; kill: KillData;
 }
@@ -54,6 +61,44 @@ function ticker(rows: BoardRow[]): TickerRow[] {
       const chg = ((r.close! - prev) / prev) * 100;
       return { sym: sym(r.symbol), val: p(r.close!), chg: `${chg >= 0 ? "+" : ""}${chg.toFixed(2)}%`, dir: chg >= 0 ? "up" : "down" };
     });
+}
+
+/** Brand price format: the instrument's decimals, no thousands separator, never rounded further. */
+export const exact = (n: number) => n.toFixed(n >= 1000 ? 2 : n >= 10 ? 3 : 5);
+
+function hero(rows: BoardRow[]): HeroData {
+  // The cleanest real retest rejection in the saved history: a fresh level as the app first drew it, then a
+  // candle whose wick went through it while the body stayed on its side. Cleanest = the most candles before it
+  // that stayed clear (five to seven) times how deep the wick went for its size. Gold first on a tie.
+  let best: { symbol: string; l: Level; h: Candle[]; i: number; run: number; score: number } | null = null;
+  for (const symbol of rows.map((r) => r.symbol).sort((a, b) => Number(b.startsWith("XAU")) - Number(a.startsWith("XAU")))) {
+    const { hourly: h, daily } = candles(symbol);
+    if (h.length < 240) continue;
+    for (const { level: l, cut } of buildDrills(h, daily)) {
+      const sell = l.side === "sell";
+      for (let i = cut; i < Math.min(h.length, cut + 24); i++) {
+        const k = h[i]!;
+        let run = 0;
+        while (run < 7 && i - run - 1 >= 0 && (sell ? h[i - run - 1]!.high < l.price : h[i - run - 1]!.low > l.price)) run++;
+        const hit = run >= 5 && (sell ? k.high > l.price && Math.max(k.open, k.close) < l.price : k.low < l.price && Math.min(k.open, k.close) > l.price);
+        // A resistance rejection draws best (its wick has open sky above the desk), so it counts double.
+        const score = hit ? ((sell ? k.high - l.price : l.price - k.low) / (k.high - k.low || 1)) * run * (sell ? 2 : 1) : 0;
+        if (score > (best?.score ?? 0)) best = { symbol, l, h, i, run, score };
+        if (sell ? k.high > l.price : k.low < l.price) break; // only the first touch counts as the retest
+      }
+    }
+  }
+  if (best) {
+    const { symbol, l, h, i, run } = best as NonNullable<typeof best>;
+    const k = h[i]!;
+    const moved = ticker(rows).sort((a, b) => Math.abs(parseFloat(b.chg)) - Math.abs(parseFloat(a.chg)));
+    return {
+      sym: sym(symbol), side: l.side, level: l.price, bars: h.slice(i - run, i + 1).map(bar),
+      fmt: { level: exact(l.price), extreme: exact(l.side === "sell" ? k.high : k.low), close: exact(k.close), time: wibStamp(k.time) },
+      towers: moved.slice(0, 3).map((t, j) => ({ sym: t.sym, val: t.val.replace(/,/g, ""), chg: t.chg, moved: j === 0 })),
+    };
+  }
+  throw new Error("No level was rejected in the saved candles");
 }
 
 function read(): ReadData {
@@ -173,6 +218,7 @@ export function landingData(): LandingData {
   const pl = plan();
   const last = Math.max(...rows.map((r) => (r.asOf ? Date.parse(r.asOf) : 0)));
   return {
+    hero: hero(rows),
     asOf: new Date(last).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).toUpperCase(),
     markets: rows.length,
     ticker: ticker(rows),

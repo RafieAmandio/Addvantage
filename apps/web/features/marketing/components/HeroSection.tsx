@@ -1,16 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { HeroDots } from "@/features/marketing/components/HeroDots";
+import type { HeroData } from "@/features/marketing/lib/landing";
+import { HeroDesk } from "@/features/marketing/components/HeroDesk";
+import { Magnet } from "@/features/marketing/components/Magnet";
+import { Roll } from "@/features/marketing/components/Roll";
 
-/** A button label that rolls up on hover. */
-export function Roll({ label }: { label: string }) {
-  return (
-    <span className="lv-roll" data-label={label}>
-      <span>{label}</span>
-    </span>
-  );
-}
 
 const LINKS = [
   ["Lab", "#method"],
@@ -19,68 +12,79 @@ const LINKS = [
   ["FAQ", "#faq"],
 ];
 
-/** Slim floating pill bar, Raycast's shape in our type. */
+/** Clear over the hero, Paper with a hairline once the page moves; tucks away reading down. */
 export function MarketingNav() {
   return (
-    <header className="lv-header fixed inset-x-0 top-0 z-50 px-3 pt-3 md:px-6 md:pt-4">
-      <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between rounded-2xl border border-white/10 bg-[#0a0a0a]/80 px-4 backdrop-blur-xl md:h-[64px] md:px-6">
-        <Link href="/" className="flex items-center" aria-label="+vantage home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-vantage.png" alt="+vantage" width={319} height={73} className="h-6 w-auto md:h-7" />
-        </Link>
-        <nav className="hidden items-center gap-8 font-mono text-sm text-white/60 md:flex">
-          {LINKS.map(([l, h]) => (
-            <a key={l} href={h} className="transition-colors hover:text-brand">
-              {l}
-            </a>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3 md:gap-5">
-          <Link href="/login" className="font-mono text-sm font-bold text-white hover:text-brand">
-            <Roll label="Log in" />
+    <header className="lv-header fixed inset-x-0 top-0 z-50">
+      <div className="px-4 md:px-8">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between md:h-[72px]">
+          <Link href="/" className="flex items-center" aria-label="TradeVantage home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
           </Link>
-          <Link href="/signup" className="btn-pixel rounded-[8px] bg-brand px-3 py-1.5 font-mono text-sm font-bold text-black">
-            <Roll label="Request access" />
-          </Link>
+          <nav aria-label="Sections" className="hidden items-center gap-8 text-[15px] text-tv-ink md:flex">
+            {LINKS.map(([l, h]) => (
+              <a key={l} href={h} className="tv-link py-1">
+                {l}
+              </a>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link href="/login" className="tv-btn tv-btn-sm px-3 text-tv-ink">
+              <Roll label="Log in" />
+            </Link>
+            <Link href="/signup" className="tv-btn tv-btn-sm tv-btn-ink">
+              <Roll label="Request access" />
+            </Link>
+          </div>
         </div>
       </div>
     </header>
   );
 }
 
-export function HeroSection() {
+export function HeroSection({ hero }: { hero: HeroData }) {
   return (
-    <section className="relative z-10 flex min-h-[100svh] flex-col items-center overflow-hidden bg-black px-4 text-center">
-      <HeroDots className="absolute inset-0 h-full w-full" />
-      <div className="relative flex flex-1 flex-col items-center justify-center pt-24">
-        <h1 className="font-sans text-[clamp(2.2rem,7vw,6.25rem)] uppercase leading-[0.98] tracking-[-0.02em] text-white [text-shadow:0_2px_18px_rgba(0,0,0,.45)]">
-          <span className="block font-normal">Read the market.</span>
-          <span className="block font-bold">
-            Not the noise<span className="text-brand">.</span>
-          </span>
-        </h1>
-        <p className="relative isolate mt-7 max-w-[44rem] font-mono text-[13px] leading-[1.6] text-white [text-shadow:0_0_4px_#000] md:text-base">
-          <span aria-hidden className="absolute -inset-x-10 -inset-y-6 -z-10 bg-[radial-gradient(closest-side,rgba(0,0,0,.92)_55%,transparent)]" />
-          Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
-        </p>
-      </div>
-      <div className="relative flex w-full flex-col items-center gap-5 pb-10 pt-10 md:pb-14">
-        <div className="flex w-full max-w-[460px] flex-col gap-3 sm:flex-row sm:gap-5">
-          <Link href="/signup" className="btn-pixel flex-1 rounded-[10px] bg-brand px-6 py-4 text-center font-mono text-base font-bold text-gray-2">
-            <Roll label="Request access" />
-          </Link>
-          <Link href="/login" className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-6 py-4 text-center font-mono text-base font-bold text-brand">
-            <Roll label="Log in" />
-          </Link>
+    <section className="relative z-10 overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-28">
+      <div className="mx-auto grid max-w-[1240px] items-center gap-y-6 px-4 sm:px-6 md:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] md:gap-x-4 md:px-8 md:pb-16">
+        <div className="relative z-10 flex flex-col items-start md:py-10">
+          <p className="tv-eyebrow text-tv-mute">TradeVantage / daily desk</p>
+          <h1 className="mt-5 text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            <span className="block">Read the market.</span>
+            <span className="block">Not the noise.</span>
+          </h1>
+          <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
+            Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
+          </p>
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Magnet>
+              <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
+                <Roll label="Request access" />
+                <span aria-hidden className="tv-arrow">
+                  →
+                </span>
+              </Link>
+            </Magnet>
+            <Link href="/login" className="tv-btn tv-btn-line">
+              <Roll label="Log in" />
+            </Link>
+          </div>
+          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.08em] text-tv-mute">
+            Free tier, no card · 2% max risk built in<span className="hidden sm:inline"> · </span>
+            <br className="sm:hidden" />
+            No signals to copy
+          </p>
+          <a href="#method" className="tv-link mt-6 text-[15px] font-medium">
+            See the lab <span aria-hidden className="tv-arrow">↓</span>
+          </a>
         </div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-white/50">
-          Free tier, no card · 2% max risk built in<span className="hidden sm:inline"> · </span>
-          <br className="sm:hidden" />
-          No signals to copy
-        </p>
-        <a href="#method" className="mt-1 rounded-full border border-white/20 px-4 py-2 font-mono text-xs text-white/80 transition-colors hover:border-brand hover:text-brand">
-          See the lab <span aria-hidden>→</span>
-        </a>
+
+        <figure className="relative -mx-2 md:-mr-24 md:ml-0">
+          <HeroDesk d={hero} />
+          <figcaption className="mt-2 px-2 font-mono text-[11px] leading-relaxed text-tv-mute md:pl-10">
+            {hero.sym} 1H, {hero.fmt.time}. {hero.side === "sell" ? "High" : "Low"} {hero.fmt.extreme}, through the key level at {hero.fmt.level}, closed back at {hero.fmt.close}. Real candles from the saved snapshot.
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
