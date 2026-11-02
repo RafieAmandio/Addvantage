@@ -8,7 +8,10 @@ import { Panel } from "@/components/ui/Panel";
 import { TextTabs } from "@/components/ui/TextTabs";
 import { GROUP_LABELS, GROUPS_ORDERED, ZONE_CONFIG, ZONES_ORDERED } from "@/features/heatmap/lib/zones";
 import { useRsiData, useRsiTableData } from "@/features/heatmap/hooks/useRsiData";
-import { RsiRanked, RsiTable } from "@/features/heatmap/components/RsiTable";
+import { RsiTable } from "@/features/heatmap/components/RsiTable";
+import { ScatterTip, ZoneScatter } from "@/components/ui/ZoneScatter";
+import { instrumentHref } from "@/features/atr/components/FilterControls";
+import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { ChipToggles, StateLine, ZoneToggles, flip } from "@/features/atr/components/FilterControls";
 
 const TIMEFRAMES = [
@@ -29,6 +32,22 @@ export default function HeatmapClient() {
     if (!chartData.data) return [];
     return chartData.data.pairs.filter((p) => activeZones.has(p.zone) && activeGroups.has(p.group as ForexGroup));
   }, [chartData.data, activeZones, activeGroups]);
+
+  const points = useMemo(
+    () =>
+      [...filteredPairs]
+        .sort((a, b) => a.symbol.localeCompare(b.symbol))
+        .map((p) => ({
+          id: p.symbol,
+          label: p.symbol.replace("/", ""),
+          value: p.rsi,
+          color: ZONE_CONFIG[p.zone].color,
+          group: p.group,
+          href: instrumentHref(p.symbol),
+        })),
+    [filteredPairs],
+  );
+  const shownAvg = filteredPairs.length ? filteredPairs.reduce((s, p) => s + p.rsi, 0) / filteredPairs.length : null;
 
   const all = chartData.data?.pairs ?? [];
   const avg = all.length ? all.reduce((s, p) => s + p.rsi, 0) / all.length : null;
@@ -51,13 +70,13 @@ export default function HeatmapClient() {
           title={`RSI ${tf}`}
           sub={
             <>
-              14-period RSI, most overbought first.
+              14-period RSI per instrument, grouped by market.
               {chartData.data?.updatedAt && <span className="text-white/30"> Updated {formatWibTime(chartData.data.updatedAt)} WIB</span>}
             </>
           }
           action={<TextTabs options={TIMEFRAMES} value={interval} onChange={setChartInterval} label="Timeframe" />}
         >
-          {chartData.loading ? (
+          {chartData.loading && !chartData.data ? (
             <StateLine>Scanning {tf} RSI</StateLine>
           ) : chartData.error ? (
             <StateLine>{chartData.error}</StateLine>
@@ -67,16 +86,41 @@ export default function HeatmapClient() {
             </StateLine>
           ) : (
             <>
-              <RsiRanked pairs={filteredPairs} />
-              <p className="mt-3 text-[12px] text-white/30">
-                {filteredPairs.length} of {all.length} pairs. Each dot is 5 RSI points, the tinted ends mark 30 and 70.
+              <ZoneScatter
+                ariaLabel={`RSI ${tf} by instrument`}
+                points={points}
+                groups={GROUPS_ORDERED.map((g) => ({ id: g, label: GROUP_LABELS[g] ?? g }))}
+                bands={ZONES_ORDERED.map((z) => ({ id: z, ...ZONE_CONFIG[z] }))}
+                yMin={0}
+                yMax={100}
+                ticks={[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
+                refLines={shownAvg === null ? [] : [{ value: shownAvg, label: `Avg ${shownAvg.toFixed(1)}`, color: "#FFD400", dashed: true }]}
+                renderTip={(id) => {
+                  const p = filteredPairs.find((x) => x.symbol === id)!;
+                  const c = ZONE_CONFIG[p.zone];
+                  return (
+                    <ScatterTip
+                      title={p.symbol.replace("/", "")}
+                      color={c.color}
+                      href={instrumentHref(p.symbol)}
+                      rows={[
+                        [`RSI ${tf}`, p.rsi.toFixed(1)],
+                        ["Price", p.price !== null ? fmtPrice(p.price) : "n/a"],
+                        ["Zone", <span key="z" className="font-sans text-[12px]" style={{ color: c.color }}>{c.label}</span>],
+                      ]}
+                    />
+                  );
+                }}
+              />
+              <p className="mt-3 text-[12px] text-white/40">
+                {filteredPairs.length} of {all.length} pairs. Hover or tap a dot for details.<span className="sm:hidden"> Swipe the chart sideways for every group.</span> The dashed yellow line is the average of the pairs shown.
               </p>
             </>
           )}
         </Panel>
 
         {tableData.data && tableData.data.pairs.length > 0 && (
-          <Panel title="All timeframes" sub="1H, 4H and 1D side by side. Sort by any column.">
+          <Panel title="All timeframes" sub="1H, 4H and 1D side by side, each cell tinted by zone. Sort by any column.">
             <RsiTable pairs={tableData.data.pairs} />
           </Panel>
         )}

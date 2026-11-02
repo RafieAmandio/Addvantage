@@ -19,13 +19,13 @@ export const GROUPS_ORDERED: ForexGroup[] = ["major", "cross", "commodity", "ind
 
 export const ZONE_CONFIG: Record<
   RsiZoneId,
-  { label: string; color: string; bg: string; min: number; max: number }
+  { label: string; color: string; bg: string; cell: string; min: number; max: number }
 > = {
-  overbought: { label: "Overbought", color: "#FF454D", bg: "rgba(255,69,77,0.08)", min: 70, max: 100 },
-  strong:     { label: "Strong",     color: "rgba(255,69,77,0.65)", bg: "rgba(255,69,77,0.04)", min: 60, max: 70 },
-  neutral:    { label: "Neutral",    color: "rgba(255,255,255,0.55)", bg: "transparent", min: 40, max: 60 },
-  weak:       { label: "Weak",       color: "rgba(0,221,148,0.65)", bg: "rgba(0,221,148,0.04)", min: 30, max: 40 },
-  oversold:   { label: "Oversold",   color: "#00DD94", bg: "rgba(0,221,148,0.08)", min: 0,  max: 30 },
+  overbought: { label: "Overbought", color: "#FF454D", bg: "rgba(255,69,77,0.08)", cell: "rgba(255,69,77,0.30)", min: 70, max: 100 },
+  strong:     { label: "Strong",     color: "rgba(255,69,77,0.65)", bg: "rgba(255,69,77,0.04)", cell: "rgba(255,69,77,0.13)", min: 60, max: 70 },
+  neutral:    { label: "Neutral",    color: "rgba(255,255,255,0.55)", bg: "transparent", cell: "rgba(255,255,255,0.03)", min: 40, max: 60 },
+  weak:       { label: "Weak",       color: "rgba(0,221,148,0.65)", bg: "rgba(0,221,148,0.04)", cell: "rgba(0,221,148,0.13)", min: 30, max: 40 },
+  oversold:   { label: "Oversold",   color: "#00DD94", bg: "rgba(0,221,148,0.08)", cell: "rgba(0,221,148,0.30)", min: 0,  max: 30 },
 };
 
 export const ZONES_ORDERED: RsiZoneId[] = ["overbought", "strong", "neutral", "weak", "oversold"];
