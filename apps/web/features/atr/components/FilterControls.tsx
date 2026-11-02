@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 
 /** Instrument page for a pair, slash dropped (EUR/USD -> EURUSD). */
@@ -149,3 +150,50 @@ export const flip = <T,>(v: T) => (prev: Set<T>) => {
   else next.add(v);
   return next;
 };
+
+export const PAGE_SIZE = 12;
+
+/**
+ * Slice rows into pages. Jumps back to page 1 when `resetKey` changes (a new sort
+ * or filter), not on the 5-minute data refresh, so the reader keeps their place.
+ */
+export function usePage<T>(rows: T[], resetKey: string, size = PAGE_SIZE) {
+  const [page, setPage] = useState(0);
+  const pages = Math.max(1, Math.ceil(rows.length / size));
+  useEffect(() => setPage(0), [resetKey]);
+  const at = Math.min(page, pages - 1);
+  return { rows: rows.slice(at * size, at * size + size), page: at, pages, total: rows.length, size, setPage };
+}
+
+export function Pager({ page, pages, total, size, setPage }: { page: number; pages: number; total: number; size: number; setPage: (p: number) => void }) {
+  if (pages <= 1) return null;
+  const from = page * size + 1;
+  const to = Math.min(total, from + size - 1);
+  const btn = "h-8 min-w-8 rounded-full px-2.5 text-[13px] font-medium transition-colors disabled:opacity-30 motion-safe:active:scale-[0.96]";
+  return (
+    <nav className="mt-3 flex items-center justify-between gap-3 border-t border-white/[0.07] pt-3" aria-label="Pages">
+      <span className="font-num text-[13px] text-white/40">
+        {from} to {to} of {total}
+      </span>
+      <div className="flex items-center gap-1">
+        <button type="button" className={cn(btn, "text-white/60 hover:bg-raised hover:text-white")} disabled={page === 0} onClick={() => setPage(page - 1)} aria-label="Previous page">
+          ←
+        </button>
+        {Array.from({ length: pages }, (_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setPage(i)}
+            aria-current={i === page ? "page" : undefined}
+            className={cn(btn, "font-num", i === page ? "bg-white text-black" : "text-white/55 hover:bg-raised hover:text-white")}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button type="button" className={cn(btn, "text-white/60 hover:bg-raised hover:text-white")} disabled={page === pages - 1} onClick={() => setPage(page + 1)} aria-label="Next page">
+          →
+        </button>
+      </div>
+    </nav>
+  );
+}

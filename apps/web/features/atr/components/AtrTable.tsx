@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import type { AtrPair } from "../types";
 import { GROUP_LABELS } from "../lib/zones";
-import { PairLink, SortTh, nextSort, sortRows } from "./FilterControls";
+import { Pager, PairLink, SortTh, usePage, nextSort, sortRows } from "./FilterControls";
 
 type SortKey = "symbol" | "price" | "exhaustionPct" | "atr" | "direction";
 
@@ -20,8 +20,10 @@ export function AtrTable({ pairs }: { pairs: AtrPair[] }) {
     setSortDir(dir);
   };
   const th = { sortKey, dir: sortDir, onSort: sort };
+  const pg = usePage(sorted, `${sortKey}:${sortDir}:${pairs.map((r) => r.symbol).sort().join(",")}`);
 
   return (
+    <>
     <table className="w-full table-fixed text-left">
       <thead className="border-b border-white/[0.07]">
         <tr>
@@ -37,7 +39,7 @@ export function AtrTable({ pairs }: { pairs: AtrPair[] }) {
         </tr>
       </thead>
       <tbody className="divide-y divide-white/[0.07]">
-        {sorted.map((p) => {
+        {pg.rows.map((p) => {
           const bull = p.direction === "bullish";
           return (
             <tr key={p.symbol} className="hover:bg-raised">
@@ -66,5 +68,7 @@ export function AtrTable({ pairs }: { pairs: AtrPair[] }) {
         })}
       </tbody>
     </table>
+    <Pager {...pg} />
+    </>
   );
 }

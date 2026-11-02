@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
-import { PairLink, SortTh, nextSort, sortRows } from "@/features/atr/components/FilterControls";
+import { Pager, PairLink, SortTh, usePage, nextSort, sortRows } from "@/features/atr/components/FilterControls";
 import type { RsiTableRow, RsiZoneId } from "../types";
 import { ZONE_CONFIG, GROUP_LABELS } from "../lib/zones";
 
@@ -36,8 +36,10 @@ export function RsiTable({ pairs }: { pairs: RsiTableRow[] }) {
     setSortDir(dir);
   };
   const th = { sortKey, dir: sortDir, onSort: sort };
+  const pg = usePage(sorted, `${sortKey}:${sortDir}:${pairs.map((r) => r.symbol).sort().join(",")}`);
 
   return (
+    <>
     <table className="w-full table-fixed text-left">
       <thead className="border-b border-white/[0.07]">
         <tr>
@@ -49,7 +51,7 @@ export function RsiTable({ pairs }: { pairs: RsiTableRow[] }) {
         </tr>
       </thead>
       <tbody>
-        {sorted.map((r) => (
+        {pg.rows.map((r) => (
           <tr key={r.symbol} className="hover:bg-raised">
             <td className="py-1 pr-3">
               <PairLink symbol={r.symbol} sub={GROUP_LABELS[r.group] ?? r.group} />
@@ -64,5 +66,7 @@ export function RsiTable({ pairs }: { pairs: RsiTableRow[] }) {
         ))}
       </tbody>
     </table>
+    <Pager {...pg} />
+    </>
   );
 }
