@@ -4,7 +4,7 @@ import type { TimelineEvent } from "@/features/timeline/types";
 import type { Bulletin, BulletinLevel } from "@/features/bulletin/types";
 import { news as mockNews } from "@/features/news/mock";
 import { tradingPlans as mockPlans } from "@/features/plan/mock";
-import { calendar as mockCalendar } from "@/features/calendar/mock";
+import { calendar as mockCalendar, releaseHistory } from "@/features/calendar/mock";
 
 function deriveSourceCode(author: string): string {
   return author.slice(0, 4).toUpperCase();
@@ -118,7 +118,7 @@ function macroEvents(): TimelineEvent[] {
       bias: null,
       impact: e.impact,
       newsItemId: e.relatedNewsId ?? null,
-      metadata: { actual: e.actual, forecast: e.forecast, previous: e.previous, consensus: e.consensus },
+      metadata: { actual: e.actual, forecast: e.forecast, previous: e.previous, consensus: e.consensus, history: releaseHistory(e) },
     })
   );
 }

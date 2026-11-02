@@ -89,3 +89,36 @@ export function calendar(): CalendarEvent[] {
     return { ...e, ts: new Date(at).toISOString(), ...(actual && at < now ? { actual } : {}) };
   });
 }
+
+export type Release = { ts: string; actual: string; forecast: string };
+
+/**
+ * Demo only: eight plausible past releases before `e`, the latest one ending on `e.previous`.
+ * Seeded by id so a page shows the same history on every load.
+ */
+export function releaseHistory(e: CalendarEvent): Release[] {
+  const m = e.previous?.match(/^([^\d-]*)(-?\d+(?:\.(\d+))?)(.*)$/);
+  if (!m) return [];
+  const [, pre, n, dec = "", suf] = m;
+  const decimals = dec.length;
+  const fmt = (v: number) => `${pre}${v.toFixed(decimals)}${suf}`;
+  let seed = [...e.id].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32) * 2 - 1;
+  const policy = /rate decision|interest rate|cash rate|deposit facility|bi rate|fomc/i.test(e.title);
+  const step = /claims|inventories/i.test(e.title) ? 7 : policy ? 42 : /\bQ[1-4]\b|GDP|productivity/i.test(e.title) ? 91 : 30;
+  const unit = 10 ** -decimals;
+  const vol = Math.max(Math.abs(Number(n)) * 0.04, unit * 3);
+  const out: Release[] = [];
+  let actual = Number(n);
+  for (let k = 1; k <= 8; k++) {
+    const forecast = policy ? actual : actual - rnd() * vol * 0.8;
+    // Monthly and quarterly series step by calendar month; releases land on weekdays.
+    const d = new Date(e.ts);
+    if (step >= 30) d.setUTCMonth(d.getUTCMonth() - k * (step === 91 ? 3 : 1));
+    else d.setUTCDate(d.getUTCDate() - k * step);
+    while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() + 1);
+    out.push({ ts: d.toISOString(), actual: fmt(actual), forecast: fmt(forecast) });
+    actual = policy ? (rnd() > 0.7 ? actual + 0.25 : actual) : actual + rnd() * vol;
+  }
+  return out.reverse();
+}

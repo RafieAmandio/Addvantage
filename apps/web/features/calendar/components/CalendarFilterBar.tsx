@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
-import { TextTabs } from "@/components/ui/TextTabs";
 import { REGIONS, type ImpactFilter, type RegionFilter } from "@/features/calendar/types";
+import { currencyOf, flagOf } from "@/features/calendar/lib/econ";
+import { ImpactBars } from "@/features/calendar/components/EventBits";
 
 type Props = {
   impactFilter: ImpactFilter;
@@ -12,39 +13,52 @@ type Props = {
   className?: string;
 };
 
-const IMPACTS = [
-  { id: "all", label: "All impact" },
-  { id: "high", label: "High" },
-  { id: "medium", label: "Medium" },
-  { id: "low", label: "Low" },
-] as const;
-
-const REGION_OPTS = [
-  { id: "all" as RegionFilter, label: "All regions" },
-  ...REGIONS.map((r) => ({ id: r as RegionFilter, label: r === "GLOBAL" ? "Other" : r })),
-];
-
-export function CalendarFilterBar({
-  impactFilter,
-  regionFilter,
-  filtersActive,
-  onImpactChange,
-  onRegionChange,
-  onReset,
-  className,
-}: Props) {
+export function Chip({ on, onClick, children, className }: { on: boolean; onClick: () => void; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("flex flex-wrap items-center gap-x-6 gap-y-2", className)}>
-      <TextTabs options={IMPACTS} value={impactFilter} onChange={onImpactChange} label="Filter by impact" />
-      <span className="hidden h-3 w-px bg-white/10 sm:block" aria-hidden />
-      <TextTabs options={REGION_OPTS} value={regionFilter} onChange={onRegionChange} label="Filter by region" />
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+        className,
+        on ? "border-white/50 bg-white/[0.08] text-white" : "border-white/[0.12] text-white/60 hover:border-white/25 hover:text-white",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+const IMPACTS = ["high", "medium", "low"] as const;
+
+/** Impact and currency chips. Tapping the active chip clears it. On a phone the row scrolls sideways. */
+export function CalendarFilterBar({ impactFilter, regionFilter, filtersActive, onImpactChange, onRegionChange, onReset, className }: Props) {
+  return (
+    <div className={cn("-mx-5 flex items-center gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0", className)}>
+      {IMPACTS.map((i) => (
+        <Chip key={i} on={impactFilter === i} onClick={() => onImpactChange(impactFilter === i ? "all" : i)}>
+          <ImpactBars impact={i} />
+          <span className="capitalize">{i}</span>
+        </Chip>
+      ))}
+      <span className="mx-1.5 h-4 w-px shrink-0 bg-white/10" aria-hidden />
+      {REGIONS.map((r) => {
+        const cur = currencyOf(r, "");
+        return (
+          <Chip key={r} on={regionFilter === r} onClick={() => onRegionChange(regionFilter === r ? "all" : r)}>
+            <span aria-hidden className="text-[14px] leading-none">{flagOf(cur)}</span>
+            {cur}
+          </Chip>
+        );
+      })}
       {filtersActive && (
         <button
           type="button"
           onClick={onReset}
-          className="ml-auto text-[13px] font-medium text-white/40 transition-colors hover:text-down focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+          className="ml-1 shrink-0 text-[13px] font-medium text-white/40 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
         >
-          Reset filters
+          Clear
         </button>
       )}
     </div>
