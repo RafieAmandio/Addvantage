@@ -79,7 +79,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
           </a>
         </div>
 
-        <figure className="relative -mx-2 md:-mr-24 md:ml-0">
+        <figure className="relative md:-ml-10 md:-mr-24">
           <HeroDesk d={hero} />
           <figcaption className="mt-2 px-2 font-mono text-[11px] leading-relaxed text-tv-mute md:pl-10">
             {hero.sym} 1H, {hero.fmt.time}. {hero.side === "sell" ? "High" : "Low"} {hero.fmt.extreme}, through the key level at {hero.fmt.level}, closed back at {hero.fmt.close}. Real candles from the saved snapshot.

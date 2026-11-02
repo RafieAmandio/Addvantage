@@ -90,6 +90,12 @@ html:has(.tv-landing) ::selection {
   }
 }
 
+@media (max-width: 767px) {
+  .tv-wide {
+    display: none;
+  }
+}
+
 /* Digit columns: each digit is a column of 0 to 9 that rolls to its value. */
 .tv-digit {
   display: inline-block;
@@ -119,6 +125,9 @@ html:has(.tv-landing) ::selection {
   grid-area: 1 / 1;
   transition: opacity var(--tv-base) var(--tv-ease-out), transform var(--tv-base) var(--tv-ease-out);
 }
+.tv-label.-translate-x-full .tv-copy {
+  justify-items: end;
+}
 .tv-copy > .tv-copy-done {
   opacity: 0;
   transform: translateY(4px);
@@ -135,9 +144,7 @@ html:has(.tv-landing) ::selection {
 @media (hover: hover) {
   .tv-copy:hover > .tv-copy-value {
     color: #111214;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
+    background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
   }
 }
 
@@ -260,6 +267,9 @@ html[data-scrolled] .lv-header > div {
   list-style: none;
   cursor: pointer;
   touch-action: manipulation;
+}
+.tv-acc > summary:focus-visible {
+  outline-offset: -3px;
 }
 .tv-acc > summary::-webkit-details-marker {
   display: none;

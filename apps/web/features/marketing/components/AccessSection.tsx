@@ -51,12 +51,12 @@ export function AccessSection() {
             </p>
           </div>
           <p className="text-tv-mute">Per year · Annual commitment</p>
-          <div className="grid items-center gap-6 sm:grid-cols-[1fr_minmax(0,220px)]">
+          <div className="grid items-center gap-6 sm:grid-cols-[1fr_minmax(0,280px)]">
             <List items={VIP} />
             <Build className="tv-card-obj order-first sm:order-none">
               <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at="150">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full max-w-[260px]" loading="lazy" />
+                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full max-w-[300px]" loading="lazy" />
               </div>
             </Build>
           </div>

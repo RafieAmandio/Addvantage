@@ -17,6 +17,7 @@ function Meta({ r }: { r: Read }) {
       <span>Request access</span>
       <span className="flex items-center gap-2 tabular-nums" aria-live="off">
         <span
+          data-loop
           className={cn(
             "h-2 w-2 rounded-full bg-tv-ink",
             r && r.sessions.some((s) => s.open) && "lv-live",

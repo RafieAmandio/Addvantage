@@ -166,7 +166,7 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
 
   // Spec labels: key level to the left column, the rejection to the right, towers above.
   const live = 1.2; // the live candle sits at the back of the row
-  const colL = P(0, 13.6, 0, U)[0];
+  const colL = P(0.6, 12.0, 0, U)[0];
   const lvl = leader([0.6, 11.9, zL + 0.04], U, { dy: -46, col: colL });
   // Kit rule: leaders never cross a block face. A resistance wick has open sky above it, so its tip
   // carries the label; under a support the row is in the way, so the label hangs off the body's top edge.
@@ -177,7 +177,7 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
     : leader([CX + CW, live + CW / 2, z(Math.max(lb[1], lb[4]))], U, { dy: -86, col: colR });
   const towerL = TOWERS.map(([x, y, h]) => leader([x + 0.35, y + 0.3, h], U, { dy: -50, dx: 40 }));
 
-  const vb = viewBox([desk, ...items.map((i) => i.b)], U, [70, 190, 30, 290]);
+  const vb = viewBox([desk, ...items.map((i) => i.b)], U, [70, 250, 30, 380]);
   const pos = (x: number, y: number) => ({ left: `${((x - vb.x) / vb.w) * 100}%`, top: `${((y - vb.y) / vb.h) * 100}%` });
   const floor = flat([[0.6, 0.6], [19.7, 0.6], [19.7, 13.8], [0.6, 13.8]], -0.35, U);
 
@@ -193,7 +193,7 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
         <Leader {...lvl} cue={LIVE_AT - 200} />
         <Leader {...rej} cue={LIVE_AT + 1500} />
         {towerL.map((t, j) => (
-          <g key={j} className="max-md:hidden">
+          <g key={j} className="tv-wide">
             <Leader {...t} cue={900 + j * 120} />
           </g>
         ))}
@@ -215,7 +215,7 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
         </span>
       </div>
       {d.towers.map((t, j) => (
-        <div key={t.sym} data-cue={900 + j * 120} className="tv-label absolute pl-2 max-md:hidden" style={pos(towerL[j]!.ex, towerL[j]!.ey)}>
+        <div key={t.sym} data-cue={900 + j * 120} className="tv-label tv-wide absolute pl-2" style={pos(towerL[j]!.ex, towerL[j]!.ey)}>
           <span className="tv-label-main">{t.sym}</span>
           <span className="tv-label-sub">
             <Ticker value={t.val} />
