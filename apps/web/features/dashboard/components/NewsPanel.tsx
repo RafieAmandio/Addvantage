@@ -4,13 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Panel, PanelLink } from "@/components/ui/Panel";
 import type { NewsListItem } from "@/features/news/queries/news";
-
-function ago(iso: string) {
-  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-  if (m < 60) return `${Math.max(1, m)}m`;
-  const h = Math.round(m / 60);
-  return h < 48 ? `${h}h` : `${Math.round(h / 24)}d`;
-}
+import { Ago } from "./Ago";
 
 /** Latest news as Kalshi-style rows: eyebrow, headline, affected pairs, bias at the end. */
 export function NewsPanel({
@@ -37,7 +31,7 @@ export function NewsPanel({
       title={title}
       sub={staleDays >= 2 ? <span className="text-down">No new items in {staleDays} days</span> : "Market-moving, with what it means for price"}
       action={<PanelLink href="/app/news">All news</PanelLink>}
-      className={className}
+      className={cn("surface-hover", className)}
     >
       {children}
       {rows.length === 0 ? (
@@ -47,7 +41,8 @@ export function NewsPanel({
           {rows.map((n, i) => {
             const at = n.publishedAt ?? n.fetchedAt;
             return (
-              <li key={n.id} className="enter-row" style={{ "--i": i } as React.CSSProperties}>
+              <li key={n.id} className="enter-row relative" style={{ "--i": i } as React.CSSProperties}>
+                {n.impact === "high" && <span className="impact-bar" aria-hidden />}
                 <Link
                   href={`/app/news/${n.id}`}
                   className="lift group flex gap-4 py-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
@@ -56,7 +51,7 @@ export function NewsPanel({
                     <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
                       {n.sourceCode}
                       <span className="px-1.5 text-white/20">/</span>
-                      {ago(at)} ago
+                      <Ago iso={at} every={30_000} />
                       {n.impact === "high" && <span className="ml-2 text-brand">High impact</span>}
                     </p>
                     <p className={cn("mt-0.5 line-clamp-2 text-[15px] leading-[22px] transition-colors group-hover:text-white", seen.has(n.id) ? "text-white/55" : "text-white")}>

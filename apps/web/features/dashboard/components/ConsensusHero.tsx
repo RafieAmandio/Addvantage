@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
 import { AnimatedFigure, AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { statsFor, themeOf } from "@/features/dashboard/lib/consensusTheme";
+import { useActive } from "@/features/dashboard/hooks/useLive";
+import { ConsensusFigure } from "./ConsensusFigure";
 import type { MacroData } from "@/features/macro/types";
 import type { AtrPair } from "@/features/atr/types";
 import { StepChart, type StepSeries } from "@/components/ui/StepChart";
@@ -38,6 +39,16 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
   const [range, setRange] = useState<(typeof RANGES)[number]["id"]>("1M");
+  const live = useActive<HTMLElement>();
+  // Beside the figure (md and up) the chart runs as tall as the plan card; stacked on a phone it stays short.
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
   const m = markets[i];
 
   const series: StepSeries[] = useMemo(() => {
@@ -55,7 +66,7 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
 
   if (!m) {
     return (
-      <div className="flex h-full min-h-[320px] flex-col justify-center rounded-2xl bg-panel p-6">
+      <div className="surface flex h-full min-h-[320px] flex-col justify-center rounded-2xl bg-panel p-6">
         <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">Market consensus</p>
         <p className="mt-2 max-w-sm text-[15px] text-white/55">No tracked prediction markets right now. Add them in Admin to show crowd odds here.</p>
       </div>
@@ -70,10 +81,15 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
   const about = `${tracked.category} ${tracked.label} ${tracked.eventTitle}`;
   const theme = themeOf(about);
   const stats = statsFor(theme, about, macro, pairs);
-  const slide = { "--dx": `${dir * 12}px` } as React.CSSProperties;
+  const slide = { "--dx": `${dir * 16}px` } as React.CSSProperties;
+  // The figure reads the market: the rate dial points at the top outcome, gold glints faster on a bigger weekly move.
+  const lead = outcomes[0];
+  const needle = lead ? toPct(lead.probability) / 100 : null;
+  const move = Math.abs(lead?.weekChange ? toPct(lead.weekChange) : 0);
+  const glint = Math.min(3.6, Math.max(1.2, 3.6 - move * 0.3));
 
   return (
-    <section aria-label="Market consensus" className="flex min-w-0 flex-col gap-4 rounded-2xl bg-panel p-5 sm:p-6">
+    <section ref={live} aria-label="Market consensus" className="surface surface-hover flex min-w-0 flex-1 flex-col gap-4 rounded-2xl bg-panel p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div key={i} className="swap-in min-w-0" style={slide}>
           <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">
@@ -104,18 +120,13 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
         )}
       </div>
 
-      <div key={i} className="swap-in grid gap-5 md:grid-cols-[188px_minmax(0,1fr)]" style={slide}>
-        <aside className="flex items-center gap-4 md:flex-col md:items-stretch md:gap-3">
-          <Image
-            src={`/consensus/${theme}.svg`}
-            alt=""
-            width={188}
-            height={141}
-            unoptimized
-            className="h-auto w-[44%] max-w-[188px] shrink-0 md:w-full"
-          />
+      <div className="grid gap-5 md:grid-cols-[264px_minmax(0,1fr)]">
+        <aside className="flex items-center gap-4 md:flex-col md:items-stretch md:gap-2">
+          <div className="w-[54%] max-w-[264px] shrink-0 md:-mx-3 md:-mt-3 md:w-auto md:max-w-none">
+            <ConsensusFigure id={i} theme={theme} needle={needle} glint={glint} />
+          </div>
           {stats.length > 0 && (
-            <dl className="grid min-w-0 flex-1 gap-3 md:border-t md:border-white/[0.07] md:pt-3">
+            <dl key={i} className="swap-in grid min-w-0 flex-1 gap-3 md:border-t md:border-white/[0.07] md:pt-3" style={slide}>
               {stats.map((st) => (
                 <div key={st.label} className="min-w-0">
                   <dt className="text-[12px] text-white/55">{st.label}</dt>
@@ -131,7 +142,7 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
           )}
         </aside>
 
-        <div className="flex min-w-0 flex-col gap-3">
+        <div key={i} className="swap-in flex min-w-0 flex-col gap-3" style={slide}>
           <div className="flex flex-wrap gap-x-5 gap-y-1 text-[14px] text-white/55">
             {outcomes.slice(0, 2).map((o, k) => (
               <span key={o.label} className="flex items-center gap-2">
@@ -153,16 +164,17 @@ export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMar
             ))}
           </div>
 
-          <div key={range} className="draw-in">
-            <StepChart series={series} height={220} />
+          <div key={range}>
+            <StepChart series={series} height={wide ? 384 : 250} />
           </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[13px]">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 text-[13px]">
         <div className="flex items-center gap-3">
           <span className="text-white/90">{formatVolume(volume)} vol</span>
-          <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]", stale ? "bg-down/15 text-down" : "bg-up/15 text-up")}>
+          <span className={cn("flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]", stale ? "bg-down/15 text-down" : "bg-up/15 text-up")}>
+            {!stale && <span className="live-dot" aria-hidden />}
             {endsLabel(fetchedAt, stale)}
           </span>
           <span className="text-white/30">Polymarket</span>

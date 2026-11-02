@@ -128,11 +128,12 @@ export function StepChart({ series, height = 300 }: { series: StepSeries[]; heig
         const end = past.at(-1);
         return (
           <g key={s.label}>
-            <path d={stepPath(past)} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
+            <path d={stepPath(past)} pathLength={1} className="line-draw" fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
             {hoverT !== null && future.length > 1 && (
               <path d={stepPath(future)} fill="none" stroke={s.color} strokeWidth={2} opacity={0.3} />
             )}
-            {end && <circle cx={x(cutT)} cy={y(valueAt(s.points, cutT))} r={5} fill={s.color} />}
+            {end && hoverT === null && <circle className="dot-ping" cx={x(cutT)} cy={y(valueAt(s.points, cutT))} r={5} fill={s.color} />}
+            {end && <circle className="dot-pop" cx={x(cutT)} cy={y(valueAt(s.points, cutT))} r={5} fill={s.color} />}
           </g>
         );
       })}

@@ -11,7 +11,7 @@ export function BulletinSection({ bulletins }: { bulletins: Bulletin[] }) {
   const rows = [...bulletins].sort((a, b) => Number(a.status !== "active") - Number(b.status !== "active"));
 
   return (
-    <Panel title="Bulletin" sub="Structure by timeframe and what the desk is waiting for">
+    <Panel title="Bulletin" sub="Structure by timeframe and what the desk is waiting for" className="surface-hover">
       <ul className="-my-1 divide-y divide-white/[0.07]">
         {rows.map((b, i) => {
           const sym = b.symbol.replace("/", "");
@@ -49,7 +49,7 @@ export function BulletinSection({ bulletins }: { bulletins: Bulletin[] }) {
                 )}
                 {b.note && <p className="mt-2 whitespace-pre-wrap text-[13px] text-white/40">{b.note}</p>}
               </div>
-              <StructureStrip levels={b.levels} size={26} />
+              <StructureStrip levels={b.levels} size={26} animate={180 + i * 160} />
             </li>
           );
         })}

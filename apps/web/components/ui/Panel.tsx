@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-/** Bento panel used across the revamped app: raised surface, title row, optional action. */
+/** Bento panel used across the revamped app: raised dot-screen surface, title row, optional action. */
 export function Panel({
   title,
   sub,
@@ -20,7 +20,7 @@ export function Panel({
   as?: "section" | "div";
 }) {
   return (
-    <Tag className={cn("flex min-w-0 flex-col rounded-2xl bg-panel p-5", className)}>
+    <Tag className={cn("surface flex min-w-0 flex-col rounded-2xl bg-panel p-5", className)}>
       {(title || action) && (
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="min-w-0">

@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
+import { apiGet } from "@/lib/api/client";
+import { cn } from "@/lib/cn";
+import { useActive, useEvery } from "@/features/dashboard/hooks/useLive";
 import { dbPlanToTradingPlan } from "@/features/plan/lib/adapt";
 import { useAppState, isPaid } from "@/lib/state";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
@@ -36,7 +39,24 @@ interface Props {
   macro: MacroData;
 }
 
-export function DashboardClient({ news, plans, bulletins, consensus, atr, calendar, macro }: Props) {
+/** A panel slot that holds its entrance and loops until it scrolls into view, and pauses them on a hidden tab. */
+function Live({ className, children }: { className?: string; children: React.ReactNode }) {
+  const ref = useActive<HTMLDivElement>();
+  return (
+    <div ref={ref} className={cn("flex min-w-0 flex-col", className)}>
+      {children}
+    </div>
+  );
+}
+
+export function DashboardClient({ news, plans, bulletins, consensus, atr: atrInitial, calendar, macro }: Props) {
+  // Prices refresh in place every minute (not a page refresh); a moved price flashes its direction.
+  const [atr, setAtr] = useState(atrInitial);
+  useEvery(60_000, () => {
+    apiGet<AtrScannerData>("/atr/scanner")
+      .then((d) => d?.pairs?.length && setAtr(d))
+      .catch(() => {});
+  });
   const { tier, operatorName } = useAppState();
   const paid = isPaid(tier);
   const { ids: seenNewsIds, hydrated: seenHydrated } = useSeenNews();
@@ -103,7 +123,7 @@ export function DashboardClient({ news, plans, bulletins, consensus, atr, calend
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="enter min-w-0 lg:col-span-2" style={{ "--i": 2 } as React.CSSProperties}>
+        <div className="enter flex min-w-0 flex-col lg:col-span-2" style={{ "--i": 2 } as React.CSSProperties}>
           <ConsensusHero markets={consensus} macro={macro} pairs={atr.pairs} />
         </div>
         <div className="enter flex min-w-0 flex-col" style={{ "--i": 3 } as React.CSSProperties}>
@@ -114,17 +134,27 @@ export function DashboardClient({ news, plans, bulletins, consensus, atr, calend
       {/* Two columns that stack on phones in reading order. News runs longer when there is no bulletin so the left column keeps pace with the right. */}
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="enter flex min-w-0 flex-col gap-4 lg:col-span-2" style={{ "--i": 4 } as React.CSSProperties}>
-          <BulletinSection bulletins={bulletins} />
-          <NewsPanel
-            news={news}
-            seen={seenHydrated ? new Set(seenNewsIds) : new Set()}
-            limit={bulletins.length > 0 ? 10 : 14}
-            className="flex-1"
-          />
+          {bulletins.length > 0 && (
+            <Live>
+              <BulletinSection bulletins={bulletins} />
+            </Live>
+          )}
+          <Live className="flex-1">
+            <NewsPanel
+              news={news}
+              seen={seenHydrated ? new Set(seenNewsIds) : new Set()}
+              limit={bulletins.length > 0 ? 10 : 14}
+              className="flex-1"
+            />
+          </Live>
         </div>
         <div className="enter flex min-w-0 flex-col gap-4" style={{ "--i": 5 } as React.CSSProperties}>
-          <CalendarPanel events={calendar} />
-          <RangePanel pairs={atr.pairs} />
+          <Live>
+            <CalendarPanel events={calendar} />
+          </Live>
+          <Live>
+            <RangePanel pairs={atr.pairs} />
+          </Live>
           <WatchlistSection
             tickers={tickers}
             pairs={atr.pairs}

@@ -164,10 +164,10 @@ function weekendGap(p: (typeof FOREX_PAIRS)[number], h: Candle[]): GapPair | nul
   return null;
 }
 
-// One scan per process every 5 minutes; Yahoo responses are fetch-cached under that too.
+// One scan per process a minute (the home desk refreshes prices that often); Yahoo hourly bars are cached as long.
 let memo: { at: number; data: Promise<DemoSnapshot[]> } | null = null;
 export function demoMarket(): Promise<DemoSnapshot[]> {
-  if (!memo || Date.now() - memo.at > 300_000) {
+  if (!memo || Date.now() - memo.at > 60_000) {
     memo = { at: Date.now(), data: Promise.all(FOREX_PAIRS.map(snapshot)) };
   }
   return memo.data;
