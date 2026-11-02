@@ -7,16 +7,20 @@ export const shortName = (l: Level) => (l.type === "inverse" ? levelName(l) : l.
 
 export type Layer = "atr" | "fib" | "liquidity" | "signals" | "levels" | "sameway" | "passed" | "map" | "gap";
 
-export const LAYERS: { key: Layer; label: string }[] = [
-  { key: "levels", label: "LHPB / LLPB" },
-  { key: "sameway", label: "Same-way" },
-  { key: "passed", label: "Passed levels" },
-  { key: "signals", label: "Daily signals" },
-  { key: "map", label: "Weekly & daily map" },
-  { key: "gap", label: "Weekend gap" },
-  { key: "atr", label: "ATR band" },
-  { key: "fib", label: "Fib" },
-  { key: "liquidity", label: "Equal highs/lows" },
+export const DEFAULT_LAYERS: Layer[] = ["levels", "sameway", "signals", "atr"];
+
+export const LAYER_GROUPS = ["Levels", "Signals", "Context"] as const;
+
+export const LAYERS: { key: Layer; label: string; desc: string; group: (typeof LAYER_GROUPS)[number] }[] = [
+  { key: "levels", label: "LHPB / LLPB", desc: "Break and retest levels, the main setups", group: "Levels" },
+  { key: "sameway", label: "Same-way", desc: "Old support and resistance, need an SFP", group: "Levels" },
+  { key: "passed", label: "Passed", desc: "Levels the rules ruled out", group: "Levels" },
+  { key: "signals", label: "Daily signals", desc: "Hammers, engulfs, IDFs on the 1D chart", group: "Signals" },
+  { key: "liquidity", label: "Equal highs/lows", desc: "Daily highs or lows that match, stops sit there", group: "Signals" },
+  { key: "map", label: "Weekly & daily map", desc: "Unbroken weekly and daily swings", group: "Context" },
+  { key: "gap", label: "Weekend gap", desc: "Friday close to Monday open, on 1H", group: "Context" },
+  { key: "atr", label: "ATR band", desc: "How far today can still travel", group: "Context" },
+  { key: "fib", label: "Fib", desc: "38.2, 50 and 61.8 of the last daily swing", group: "Context" },
 ];
 
 export interface Line {
@@ -61,8 +65,8 @@ export function indexer(bars: Candle[]) {
   };
 }
 
-export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: DailyRead; levels: Level[]; layers: Set<Layer>; pick: Pick; step: number; map?: MarketMap; gap?: Gap | null }): Overlays {
-  const { tf, bars, daily: d, levels, layers, pick, step, map, gap } = opts;
+export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: DailyRead; levels: Level[]; layers: Set<Layer>; pick: Pick; map?: MarketMap; gap?: Gap | null }): Overlays {
+  const { tf, bars, daily: d, levels, layers, pick, map, gap } = opts;
   const out: Overlays = { boxes: [], lines: [], marks: [], focus: null };
   const last = bars.length - 1;
   if (last < 0) return out;
@@ -141,23 +145,21 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
     const l = pick.level;
     const buy = l.side === "buy";
     out.focus = l.touches[0] ? at(l.touches[0]) : null;
+    // Everything for the picked level at once: touches, thrust, zone, trade box, Fib.
     if (l.type === "inverse") {
-      // 0 touches, 1 thrust, 2 level, 3 naked/tested, 4 trade, 5 confluence
       l.touches.forEach((t, k) => out.marks.push({ time: t, text: `${k + 1}`, above: buy, color: "rgba(255,255,255,.8)" }));
-      if (step === 0) out.boxes.push({ i0: Math.max(0, at(l.touches[0]!)), i1: Math.max(0, at(l.touches.at(-1)!)), top: Math.max(...l.touches.map((t) => touchPrice(l, t))) + tol, bottom: Math.min(...l.touches.map((t) => touchPrice(l, t))) - tol, fill: "rgba(255,255,255,.1)", stroke: "rgba(255,255,255,.5)", label: `${l.touches.length} touches` });
-      if (step >= 1 && l.thrust) {
+      if (l.thrust) {
         const ti = at(l.thrust.time);
         out.boxes.push({ i0: ti - 1, i1: ti + 1, top: l.thrust.high, bottom: l.thrust.low, fill: rgba(sideColor(buy), 0.2), stroke: sideColor(buy) });
         out.marks.push({ time: l.thrust.time, text: "Thrust", above: !buy, color: sideColor(buy) });
       }
-      if (step >= 2) zone(l, true);
-      if (step === 3 && l.thrust) out.boxes.push({ i0: at(l.thrust.time) + 1, i1: last, top: l.price + tol, bottom: l.price - tol, fill: rgba(l.naked ? BRAND : "#FFFFFF", 0.25), label: l.naked ? "Naked since the break" : "Tested", labelColor: l.naked ? BRAND : "rgba(255,255,255,.7)" });
-      if (step >= 4) tradeBox(l);
-      if (step === 5 && l.confluence.fib !== null) out.lines.push({ price: l.confluence.fib, color: BRAND, style: "dotted", label: "Fib", width: 2 });
+      zone(l, true);
+      tradeBox(l);
+      if (l.confluence.fib !== null) out.lines.push({ price: l.confluence.fib, color: BRAND, style: "dotted", label: "Fib", width: 2 });
     } else {
       l.touches.forEach((t, k) => out.marks.push({ time: t, text: k === 0 ? "Swing" : `Visit ${k}`, above: !buy, color: "rgba(255,255,255,.8)" }));
-      if (step >= 1) zone(l, true);
-      if (step >= 3) tradeBox(l);
+      zone(l, true);
+      tradeBox(l);
     }
     return out;
   }
@@ -180,7 +182,7 @@ export function buildOverlays(opts: { tf: "1H" | "1D"; bars: Candle[]; daily: Da
       const sw = bars[refs[0]]!;
       out.lines.push({ price: bull ? sw.low : sw.high, color: "rgba(255,255,255,.6)", style: "dashed", label: "Swing" });
     }
-    if (step >= 1 && !s.shallow) out.lines.push({ price: s.entry, color: BRAND, style: "solid", label: "Entry", width: 2 });
+    if (!s.shallow) out.lines.push({ price: s.entry, color: BRAND, style: "solid", label: "Entry", width: 2 });
     return out;
   }
 
