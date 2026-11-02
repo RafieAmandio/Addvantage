@@ -7,8 +7,9 @@
 /* Source for apps/web/public/consensus/*.svg. Built on the colorfigures engine: copy
    ~/.claude/skills/colorfigures/assets/core.js next to this file, open it in Chrome, and each figure's
    SVG is in a <pre data-name> block (dump with --dump-dom, unescape, write to public/consensus/{name}.svg).
-   Ten isometric figures for the consensus panel, one per macro theme. Static renders at the default view
-   (front-left-top), exported as SVG. Every figure stands on a dark plinth and carries one #FFD400 part. */
+   Ten isometric figures for the consensus panel, one per macro theme, rendered at the default view
+   (front-left-top) and exported as SVG. Every figure stands on a dark plinth, carries one #FFD400 part, and has one
+   working part on a small SMIL idle loop (see "Working parts" below). */
 const YEL   = { l:'#FFD400', m:'#d9b400', d:'#7a6500' };
 const STONE = { l:'#ecebe6', m:'#c4c1b9', d:'#85827b' };
 const GRAPH = { l:'#5c5c5c', m:'#3e3e3e', d:'#262626' };
@@ -41,9 +42,30 @@ const stroke = (pts, col, w) => `<path d="${pd(pts,false)}" fill="none" stroke="
 const cord = (pts, col, w) => stroke(pts, INK, w + 1.6) + stroke(pts, col, w);
 const pts8 = (x0,y0,z0,x1,y1,z1) => [[x0,y0,z0],[x1,y0,z0],[x0,y1,z0],[x1,y1,z0],[x0,y0,z1],[x1,y0,z1],[x0,y1,z1],[x1,y1,z1]];
 
+/* Working parts. Every idle loop is SMIL inside the SVG, so it plays in a plain <img> too. The app inlines the
+   SVG, pauses it with svg.pauseAnimations() off screen, on a hidden tab or under reduced motion (frame 0 is the
+   resting figure), and sets two hooks: [data-needle] gets rotate(angle) from the top outcome, [data-glint] gets
+   a dur from the size of the move. */
+const add3 = (a,b) => [a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+// a group whose local (u,v) coordinates lie in a 3D plane: origin o, unit vectors du (u, viewer-right) and dv (v, up).
+// Parts drawn in it are flat on that face, so a rotate() inside turns them in the face, not on the screen.
+const plane = (o, du, dv, inner) => { const e = P(...o), a = P(...add3(o,du)), b = P(...add3(o,dv));
+  return `<g transform="matrix(${[a[0]-e[0],a[1]-e[1],b[0]-e[0],b[1]-e[1],e[0],e[1]].map(v => v.toFixed(3)).join(' ')})">${inner}</g>`; };
+const lp = pts => 'M' + pts.map(p => f(p[0])+' '+f(p[1])).join('L');
+const lshape = (pts, c, w) => `<path d="${lp(pts)}Z" fill="${c}"${w ? ` stroke="${INK}" stroke-width="${w}" stroke-linejoin="round"` : ''}/>`;
+const lline = (pts, col, w) => `<path d="${lp(pts)}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const ldisc = (r, c, w) => `<circle r="${r}" fill="${c}"${w ? ` stroke="${INK}" stroke-width="${w}"` : ''}/>`;
+const lticks = (n, a0, a1, r0, r1, col, w) => Array.from({length:n}, (_, i) => { const a = (a0 + (a1-a0)*i/(n-1 || 1))*Math.PI/180;
+  return lline([[r0*Math.cos(a), r0*Math.sin(a)],[r1*Math.cos(a), r1*Math.sin(a)]], col, w); }).join('');
+const SPL = '.45 0 .55 1';
+const splines = n => Array(n).fill(SPL).join(';');
+const spin = (dur, extra='') => `<animateTransform attributeName="transform" type="rotate" from="0" to="-360" dur="${dur}s" repeatCount="indefinite"${extra}/>`;
+const swing = (values, dur, extra='') => { const n = values.split(';').length - 1;
+  return `<animateTransform attributeName="transform" type="rotate" values="${values}" dur="${dur}s" calcMode="spline" keySplines="${splines(n)}" repeatCount="indefinite"${extra}/>`; };
+
 const FIGS = {
   /* Central bank: portico on a stepped base, five columns, pediment with a yellow rate dial, a yellow roof. */
-  bank: { size:[70, 92, 72], board:[0,0,70,92], scene(){
+  bank: { size:[70, 92, 84], board:[0,0,70,92], scene(){
     let s = castShadow(pts8(6,6,BH,64,86,BH+58), BH, boardTop(0,0,70,92,BH));
     s += frustum(6,6,64,86,BH,BH+4,1.5,STONE) + frustum(9,9,61,83,BH+4,BH+8,1.5,STONE);
     s += bx(14,16,BH+8,44,76,BH+40,STONE);
@@ -53,8 +75,18 @@ const FIGS = {
     s += bx(10,12,BH+40,59,80,BH+46,STONE,1.8);
     s += prismX([[12,BH+46],[80,BH+46],[46,BH+60]], 10, 59, YEL, 2.2);
     // rate dial on the pediment front
-    s += shape(on(PX(59.2), ellUV(46,BH+51.5,4.4,4.4,24)), GRAPH.d, 1.2);
-    s += stroke([[59.4,46,BH+51.5],[59.4,43,BH+54]], YEL.l, 1.4);
+    s += shape(on(PX(59.2), ellUV(46,BH+52,5.2,5.2,28)), GRAPH.d, 1.2);
+    // the needle sweeps the top half: 180 deg = 0%, 0 deg = 100%; it ticks a few degrees either side of its reading
+    s += plane([59.4,46,BH+52], [0,-1,0], [0,0,1], lticks(5, 0, 180, 3.5, 4.5, STONE.l, .6)
+      + `<g data-needle="1" transform="rotate(90)"><g>${lline([[-1,0],[4.2,0]], YEL.l, 1.5)}`
+      + `<animateTransform attributeName="transform" type="rotate" values="0;0;8;8;-5;-5;3;3;0" keyTimes="0;.2;.24;.45;.49;.7;.74;.95;1" dur="3.4s" repeatCount="indefinite"/></g></g>`
+      + ldisc(.9, YEL.l, 0));
+    // a white flag on the apex, its cloth rippling in the wind
+    s += rod([34.5,46,BH+59.5],[34.5,46,BH+79], .5, STONE, tone, .7);
+    const cloth = k => { const pts = []; for (let i = 0; i <= 6; i++){ const u = i*2.2, w = Math.sin(i*.9 + k)*.9*(i/6); pts.push([u, w]); }
+      for (let i = 6; i >= 0; i--){ const u = i*2.2, w = Math.sin(i*.9 + k)*.9*(i/6); pts.push([u, w - 7.5 - (i/6)*.5]); } return lp(pts) + 'Z'; };
+    s += plane([34.5,46,BH+79], [0,-1,0], [0,0,1], `<path d="${cloth(0)}" fill="${PAPER}" stroke="${INK}" stroke-width="1" stroke-linejoin="round">`
+      + `<animate attributeName="d" values="${[0,1.6,3.2,4.8,0].map(cloth).join(';')}" dur="1.6s" repeatCount="indefinite"/></path>`);
     return s; } },
 
   /* Inflation: a wire shopping basket with groceries and a big yellow price tag. */
@@ -74,9 +106,11 @@ const FIGS = {
     const h = []; for (let i = 0; i <= 16; i++){ const a = Math.PI*i/16; h.push([33, 10 + 64*(1-Math.cos(a))/2 + 0, BH+26 + 22*Math.sin(a)]); }
     s += cord(h, STONE.d, 2.6);
     // price tag leaning on the front wall
-    const tag = [[0,0],[0,16],[18,16],[24,8],[18,0]].map(([u,v]) => [58, 60 - u, BH + 6 + v]);
-    s += shape(tag, YEL.l, 1.6) + shape(on(PX(58.2), ellUV(41,BH+14,1.6,1.6,12)), PLINTH.d, .8);
-    s += stroke([[58.3,56,BH+18],[58.3,48,BH+18]], YEL.d, 1.4) + stroke([[58.3,56,BH+12],[58.3,50,BH+12]], YEL.d, 1.4);
+    // it hangs on a string from the rim by the hole at its point and swings in the face of the basket
+    s += stroke([[58.2,41,BH+14],[56,41,BH+26]], INK, .8);
+    const tag = [[0,0],[0,16],[18,16],[24,8],[18,0]].map(([u,v]) => [u - 19, v - 8]);
+    s += plane([58.2,41,BH+14], [0,-1,0], [0,0,1], `<g>${lshape(tag, YEL.l, 1.6)}${ldisc(1.6, PLINTH.d, .8)}`
+      + lline([[-15,4],[-7,4]], YEL.d, 1.4) + lline([[-15,-2],[-9,-2]], YEL.d, 1.4) + swing('-7;7;-7', 3.6) + '</g>');
     return s; } },
 
   /* Jobs: a punch clock on the wall post with a card in the slot, and a yellow hard hat beside it. */
@@ -84,7 +118,9 @@ const FIGS = {
     let s = castShadow([...pts8(10,50,BH,46,82,BH+62), ...pts8(16,8,BH,58,44,BH+16)], BH, boardTop(0,0,70,92,BH));
     const clock = bx(10,50,BH,46,82,BH+62,GRAPH,2.2)
       + shape(on(PX(46.1), ellUV(66,BH+44,11,11,32)), PAPER, 1.4)
-      + stroke([[46.3,66,BH+44],[46.3,66,BH+51]], INK, 1.6) + stroke([[46.3,66,BH+44],[46.3,71,BH+44]], INK, 1.6)
+      + plane([46.3,66,BH+44], [0,-1,0], [0,0,1], lticks(12, 0, 330, 9, 10.2, INK, .7)
+        + `<g>${lline([[0,-1],[0,5.6]], INK, 1.7)}${spin(96)}</g><g>${lline([[0,-1.6],[0,8.6]], INK, 1.1)}${spin(8)}</g>`
+        + ldisc(1.1, YEL.l, .6))
       + shape(on(PX(46.1), rectUV(56,BH+20,76,BH+24)), '#111', 1)
       + bx(30,58,BH+8,46.5,74,BH+22,{ l:PAPER, m:'#dcd9d0', d:'#a9a59a' },1.2)
       + stroke([[46.7,61,BH+18],[46.7,71,BH+18]], YEL.d, 1) + stroke([[46.7,61,BH+14],[46.7,68,BH+14]], INK, .8);
@@ -99,7 +135,7 @@ const FIGS = {
     return s; } },
 
   /* Growth / recession: a sawtooth factory with a chimney and a yellow output gauge on the front. */
-  growth: { size:[72, 96, 80], board:[0,0,72,96], scene(){
+  growth: { size:[72, 96, 86], board:[0,0,72,96], scene(){
     let s = castShadow([...pts8(10,10,BH,60,86,BH+30), ...pts8(16,66,BH,26,76,BH+70)], BH, boardTop(0,0,72,96,BH));
     s += cy(21,71,BH+20,BH+70,5,STONE,1.6) + shape(on(PZ(BH+70.1), ellUV(21,71,3.2,3.2,20)), '#111', .8);
     s += bx(10,10,BH,60,86,BH+24,STONE,2.2);
@@ -111,7 +147,17 @@ const FIGS = {
     s += shape(on(PX(60.1), rectUV(58, BH, 76, BH+16)), GRAPH.m, 1.2);
     for (let k = 1; k < 5; k++) s += stroke([[60.2,58,BH+k*3.2],[60.2,76,BH+k*3.2]], INK, .6);
     // gauge on the left side wall
-    s += shape(on(PY(86.1), ellUV(35,BH+14,7,7,28)), YEL.l, 1.4) + stroke([[35,86.3,BH+14],[30.5,86.3,BH+10]], INK, 1.6);
+    s += shape(on(PY(86.1), ellUV(35,BH+14,7,7,28)), YEL.l, 1.4);
+    s += plane([35,86.3,BH+14], [1,0,0], [0,0,1], lticks(5, 0, 180, 4.6, 5.9, INK, .7)
+      + `<g transform="rotate(62)"><g>${lline([[-1.2,0],[5.4,0]], INK, 1.6)}${swing('0;-16;5;-10;2;0', 4.2)}</g></g>` + ldisc(1.1, INK, 0));
+    // smoke: three puffs leave the chimney in turn, swell, drift with the wind and thin out
+    const [cx0, cy0] = P(21,71,BH+71.5);
+    for (const b of [0, 1.3, 2.6]){
+      const a = (attr, values, extra='') => `<animate attributeName="${attr}" values="${values}" dur="3.9s" begin="-${b}s" repeatCount="indefinite"${extra}/>`;
+      s += `<circle cx="${f(cx0)}" cy="${f(cy0)}" r="2" fill="#e4e2dc" stroke="${INK}" stroke-width=".7" opacity="0">`
+        + a('cy', `${f(cy0)};${f(cy0 - 14)}`, ` calcMode="spline" keyTimes="0;1" keySplines=".2 .6 .4 1"`)
+        + a('cx', `${f(cx0)};${f(cx0 - 9)}`) + a('r', '1.6;6.2') + a('opacity', '0;.95;.85;0', ` keyTimes="0;.15;.6;1"`) + '</circle>';
+    }
     return s; } },
 
   /* Gold: a pyramid of six bars. */
@@ -123,8 +169,14 @@ const FIGS = {
     for (const [x, y] of [[10,12],[10,44],[27,12],[27,44],[44,12],[44,44]]) parts.push({ box:[[x,y,BH],[x+16,y+30,BH+9]], svg: bar(x, y, BH) });
     for (const [x, y] of [[18.5,28],[35.5,28]]) parts.push({ box:[[x,y,BH+9],[x+16,y+30,BH+18]], svg: bar(x, y, BH+9) });
     parts.push({ box:[[27,28,BH+18],[43,58,BH+27]], svg: bar(27, 28, BH+18) });
-    // bars run along y here; turn them: x span 16, y span 30
-    return s + byDepth(parts); } },
+    // glint: a light band sweeps across the stack, clipped to the bars; the app scales its dur with the move
+    const outl = parts.map(({ box:[[x0,y0,z0],[x1,y1,z1]] }) => hull([...on(PZ(z0), rectUV(x0,y0,x1,y1)), ...on(PZ(z1), rectUV(x0+2.4,y0+2.4,x1-2.4,y1-2.4))].map(q => P(...q))));
+    const all = outl.flat(), gx0 = Math.min(...all.map(q => q[0])), gx1 = Math.max(...all.map(q => q[0])), gy0 = Math.min(...all.map(q => q[1])), gy1 = Math.max(...all.map(q => q[1]));
+    const band = (w, k) => sp([[-w-k, gy1],[w-k, gy1],[w+k, gy0],[-w+k, gy0]]), lean = (gy1-gy0)*.45, from = gx0 - 12 - lean, to = gx1 + 12 + lean;
+    const glint = `<clipPath id="gold-glint">${outl.map(h => `<path d="${sp(h)}"/>`).join('')}</clipPath>`
+      + `<g clip-path="url(#gold-glint)"><g transform="translate(${f(from)} 0)"><path d="${band(4.5, lean)}" fill="#fff" fill-opacity=".6"/><path d="${band(1.4, lean)}" transform="translate(9 0)" fill="#fff" fill-opacity=".4"/>`
+      + `<animateTransform data-glint="1" attributeName="transform" type="translate" values="${f(from)} 0;${f(to)} 0;${f(to)} 0" keyTimes="0;.42;1" calcMode="spline" keySplines=".5 0 .3 1;0 0 1 1" dur="3.2s" repeatCount="indefinite"/></g></g>`;
+    return s + byDepth(parts) + glint; } },
 
   /* Oil: two drums, one dark, one yellow, with rolling hoops and bungs. */
   oil: { size:[72, 88, 60], board:[0,0,72,88], scene(){
@@ -133,12 +185,19 @@ const FIGS = {
       for (const z of [h*.36, h*.68]){ d += stroke(on(PZ(BH + z), arcUV(x, y, 17.2, YAW - 90, YAW + 90, 24)), INK, 1.4); }
       d += ink(pd(on(PZ(BH + h + .1), ellUV(x, y, 14.5, 14.5, 32))), .8) + cy(x - 7, y + 4, BH + h, BH + h + 1.6, 2.4, STONE, .8);
       return d; };
-    s += byDepth([{ box:[[10,40,BH],[44,74,BH+52]], svg: drum(27, 57, 52, GRAPH) }, { box:[[30,6,BH],[64,40,BH+46]], svg: drum(47, 23, 46, YEL) }]);
+    // a tap on the dark drum's side wall with a yellow valve handle; oil gathers at its lip, drops and rings the puddle
+    const tap = rod([27,73.4,BH+13],[27,78.4,BH+13], 1.3, STONE, tone, .9) + bx(26.2,75.4,BH+14.2,27.8,76.6,BH+16.4,YEL,.7);
+    s += byDepth([{ box:[[10,40,BH],[44,74,BH+52]], svg: drum(27, 57, 52, GRAPH) + tap }, { box:[[30,6,BH],[64,40,BH+46]], svg: drum(47, 23, 46, YEL) }]);
+    const [dx0, dy0] = P(27,78.6,BH+11.4), [, dy1] = P(27,78.6,BH+.4), drop = (attr, values, keyTimes) => `<animate attributeName="${attr}" values="${values}" keyTimes="${keyTimes}" dur="2.8s" repeatCount="indefinite"/>`;
+    s += plane([27,80,BH+.05], [1,0,0], [0,1,0], `<ellipse rx="3.2" ry="2.4" fill="#141414" stroke="${INK}" stroke-width=".6"/>`
+      + `<ellipse rx="1" ry=".75" fill="none" stroke="#6b6b6b" stroke-width=".5" opacity="0">${drop('rx', '1;1;5.2', '0;.7;1')}${drop('ry', '.75;.75;3.9', '0;.7;1')}${drop('opacity', '0;0;.9;0', '0;.69;.7;1')}</ellipse>`);
+    s += `<g transform="translate(${f(dx0)} ${f(dy0)})"><ellipse rx=".9" ry=".2" fill="#141414" stroke="${INK}" stroke-width=".4">`
+      + drop('ry', '.2;1.25;1.25;1.25', '0;.5;.7;1') + drop('cy', `0;.6;${f(dy1 - dy0)};${f(dy1 - dy0)}`, '0;.5;.7;1') + drop('opacity', '1;1;1;0;0', '0;.5;.69;.7;1') + '</ellipse></g>';
     return s; } },
 
   /* FX: an exchange booth, glass front, yellow awning, a rate board on the roof. */
-  fx: { size:[72, 84, 84], board:[0,0,72,84], scene(){
-    let s = castShadow(pts8(12,12,BH,58,72,BH+78), BH, boardTop(0,0,72,84,BH));
+  fx: { size:[72, 84, 90], board:[0,0,72,84], scene(){
+    let s = castShadow(pts8(12,12,BH,58,72,BH+84), BH, boardTop(0,0,72,84,BH));
     s += bx(12,12,BH,54,72,BH+56,STONE,2.2);
     s += shape(on(PX(54.1), rectUV(18,BH+22,66,BH+46)), GLASS, 1.4);
     s += stroke([[54.3,24,BH+42],[54.3,30,BH+36]], '#ffffff', 1.1) + stroke([[54.3,42,BH+44],[54.3,50,BH+36]], '#ffffff', .8);
@@ -149,8 +208,15 @@ const FIGS = {
     s += prismY([[54,BH+56],[54,BH+50],[66,BH+46],[66,BH+48]], 10, 74, YEL, 2);
     for (let y = 16; y <= 68; y += 9) s += stroke([[54.5,y,BH+55],[65.6,y,BH+47.6]], YEL.d, .9);
     // rate board on the roof
-    s += bx(30,22,BH+56,34,62,BH+76,GRAPH,1.8);
-    for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) s += shape(on(PX(34.1), rectUV(26 + c*9, BH+69 - r*5, 32 + c*9, BH+71.5 - r*5)), c === 3 ? YEL.l : '#8a8a8a', 0);
+    s += bx(28,15,BH+56,32,69,BH+83,GRAPH,1.8);
+    // split-flap rate board: six cells flip in turn and show the next quote
+    const RATES = [['1.08','1.09'],['157','158'],['16.4','16.5'],['.652','.649'],['1.27','1.26'],['3946','3951']];
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++){ const k = r*3 + c, [qa, qb] = RATES[k], col = c === 2 ? YEL.l : '#d8d6cf';
+      const txt = (q, vals) => `<g transform="scale(1 -1)"><text x="0" y="1.8" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="700" font-size="5" fill="${col}">${q}<animate attributeName="opacity" values="${vals}" keyTimes="0;.425;.925" calcMode="discrete" dur="9s" begin="-${(k*1.3).toFixed(1)}s" repeatCount="indefinite"/></text></g>`;
+      s += plane([32.15, 58.5 - c*16, BH+76 - r*11], [0,-1,0], [0,0,1], `<g>${lshape([[-7.2,-4.6],[7.2,-4.6],[7.2,4.6],[-7.2,4.6]], '#121212', 0)}`
+        + txt(qa, '1;0;1') + txt(qb, '0;1;0') + lline([[-7.2,0],[7.2,0]], '#2b2b2b', .4)
+        + `<animateTransform attributeName="transform" type="scale" values="1 1;1 1;1 .06;1 1;1 1;1 .06;1 1" keyTimes="0;.4;.425;.45;.9;.925;.95" dur="9s" begin="-${(k*1.3).toFixed(1)}s" repeatCount="indefinite"/></g>`);
+    }
     return s; } },
 
   /* Crypto: an open-frame mining rig, four cards with yellow fans, a PSU on the shelf below. */
@@ -164,14 +230,15 @@ const FIGS = {
     for (let i = 0; i < 4; i++){ const y = 16 + i*17;
       const card = bx(18,y,BH+18,54,y+5,BH+46,GRAPH,1.4)
         + shape(on(PY(y+5.1), [[22,BH+21],[50,BH+21],[50,BH+44],[22,BH+44]]), GRAPH.d, .6)
-        + shape(on(PY(y+5.15), ellUV(29,BH+32,6,6,22)), YEL.l, 1) + shape(on(PY(y+5.15), ellUV(43,BH+32,6,6,22)), YEL.l, 1)
-        + shape(on(PY(y+5.2), ellUV(29,BH+32,1.6,1.6,10)), INK, 0) + shape(on(PY(y+5.2), ellUV(43,BH+32,1.6,1.6,10)), INK, 0);
+        + [29, 43].map((u, j) => plane([u, y+5.2, BH+32], [1,0,0], [0,0,1], ldisc(6, YEL.l, 1)
+          + `<g>${[0,72,144,216,288].map(a => `<g transform="rotate(${a})">${lshape([[1.3,-.7],[5.2,-2],[5.4,.9],[1.5,.7]], YEL.d, .35)}</g>`).join('')}${spin(0.9 + ((i + j) % 3)*.17)}</g>`
+          + ldisc(1.6, INK, 0))).join('');
       parts.push({ box:[[18,y,BH+18],[54,y+5,BH+46]], svg: card }); }
     parts.push({ box:[[9,8,BH+50],[61,88,BH+52]], svg: bx(9,86,BH+50,61,88,BH+52,STONE,1) + bx(9,8,BH+50,61,10,BH+52,STONE,1) });
     return s + byDepth(parts); } },
 
   /* Elections: a ballot box with a paper going into the slot, a yellow band on the front. */
-  election: { size:[68, 84, 74], board:[0,0,68,84], scene(){
+  election: { size:[68, 84, 80], board:[0,0,68,84], scene(){
     let s = castShadow(pts8(12,12,BH,56,72,BH+66), BH, boardTop(0,0,68,84,BH));
     s += bx(12,12,BH,54,72,BH+44,STONE,2.4);
     s += bx(10,10,BH+44,56,74,BH+48,GRAPH,1.8);
@@ -179,8 +246,14 @@ const FIGS = {
     s += shape(on(PX(54.1), rectUV(12,BH+20,72,BH+30)), YEL.l, 1.2);
     s += shape(on(PX(54.2), ellUV(42,BH+25,3.6,3.6,5)), YEL.d, 0);
     // ballot half in the slot, tilted toward the viewer
+    // every few seconds it slides down into the box and a new one drops into the slot from above
     const bp = [[33,28,BH+48],[33,56,BH+48],[37,56,BH+70],[37,28,BH+70]];
-    s += shape(bp, PAPER, 1.4) + stroke([[35.5,48,BH+60],[36.3,44,BH+56],[37,36,BH+65]], YEL.m, 1.8);
+    const slot = [[33,26,BH+48],[33,58,BH+48],[33+4*2.4,58,BH+48+22*2.4],[33+4*2.4,26,BH+48+22*2.4]];
+    const [o0, o1] = [P(33,28,BH+48), P(29,28,BH+26)], D2 = [o1[0]-o0[0], o1[1]-o0[1]], at = k => `${f(D2[0]*k)} ${f(D2[1]*k)}`;
+    s += `<clipPath id="election-slot"><path d="${pd(slot)}"/></clipPath><g clip-path="url(#election-slot)"><g>`
+      + shape(bp, PAPER, 1.4) + stroke([[35.5,48,BH+60],[36.3,44,BH+56],[37,36,BH+65]], YEL.m, 1.8)
+      + `<animateTransform attributeName="transform" type="translate" values="0 0;0 0;${at(1)};${at(-.4)};0 0;0 0" keyTimes="0;.4;.6;.62;.8;1" calcMode="spline" keySplines="0 0 1 1;.55 0 .9 .5;0 0 1 1;.3 0 .2 1;0 0 1 1" dur="4.6s" repeatCount="indefinite"/>`
+      + `<animate attributeName="opacity" values="1;1;0;0;1;1" keyTimes="0;.59;.6;.62;.7;1" dur="4.6s" repeatCount="indefinite"/></g></g>`;
     return s; } },
 
   /* Fallback: a trading desk, two monitors with a yellow line, a keyboard. */
@@ -192,7 +265,12 @@ const FIGS = {
     const mon = (y0) => { const m = bx(18,y0,BH+31,24,y0+6,BH+38,GRAPH,1) + bx(20,y0-14,BH+38,23,y0+20,BH+60,GRAPH,1.8)
       + shape(on(PX(23.1), rectUV(y0-12,BH+40,y0+18,BH+58)), GLASS, .8);
       const line = [0,1,2,3,4,5,6].map(i => [23.3, y0+16 - i*4.4, BH + 43 + [2,5,4,8,7,11,13][i]]);
-      return m + stroke(line, YEL.l, 1.4); };
+      // the chart line draws itself, holds, fades and draws again; the second screen runs out of step
+      const b = y0 > 40 ? '-2.1s' : '0s', a = (attr, values, keyTimes) => `<animate attributeName="${attr}" values="${values}" keyTimes="${keyTimes}" dur="4.4s" begin="${b}" repeatCount="indefinite"/>`;
+      const [ex, ey] = P(...line[6]);
+      return m + `<path d="${pd(line, false)}" pathLength="1" stroke-dasharray="1 1" fill="none" stroke="${YEL.l}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">`
+        + a('stroke-dashoffset', '0;0;1;0;0', '0;.38;.4;.8;1') + a('opacity', '1;1;0;1;1', '0;.3;.38;.4;1') + '</path>'
+        + `<circle cx="${f(ex)}" cy="${f(ey)}" r="1.3" fill="${YEL.l}">${a('opacity', '1;1;0;0;1;1', '0;.3;.38;.8;.82;1')}${a('r', '1.3;1.3;1.3;1.3;2.2;1.3', '0;.3;.38;.8;.86;1')}</circle>`; };
     s += byDepth([{ box:[[18,14,BH+31],[24,48,BH+60]], svg: mon(28) }, { box:[[18,52,BH+31],[24,86,BH+60]], svg: mon(68) }]);
     s += bx(40,32,BH+31,52,66,BH+33,GRAPH,1.2) + bx(42,74,BH+31,52,80,BH+33,GRAPH,1);
     return s; } },
