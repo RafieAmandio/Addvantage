@@ -5,11 +5,16 @@ import { Panel, PanelLink } from "@/components/ui/Panel";
 import type { AtrPair } from "@/features/atr/types";
 import { dayChange, fmtPrice } from "./PriceStrip";
 
-/** Pairs that have used the most of their daily ATR: Celsis "today's movers" with ATR context. */
+/**
+ * Pairs that have used the most of their daily ATR: Celsis "today's movers" with ATR context. Bars share one scale with
+ * a tick at 100%; whatever a pair travelled past its ATR is the yellow overrun.
+ */
 export function RangePanel({ pairs }: { pairs: AtrPair[] }) {
   const rows = [...pairs].sort((a, b) => b.exhaustionPct - a.exhaustionPct).slice(0, 6);
+  const scale = Math.max(100, ...rows.map((p) => p.exhaustionPct));
+  const at = (v: number) => `${(v / scale) * 100}%`;
   return (
-    <Panel title="Range used" sub="Share of the daily ATR already travelled" action={<PanelLink href="/app/atr">ATR</PanelLink>}>
+    <Panel title="Range used" sub="Share of the daily ATR already travelled" action={<PanelLink href="/app/atr">ATR</PanelLink>} className="surface-hover">
       {rows.length === 0 ? (
         <p className="py-6 text-[14px] text-white/40">ATR data isn&apos;t available right now.</p>
       ) : (
@@ -29,11 +34,12 @@ export function RangePanel({ pairs }: { pairs: AtrPair[] }) {
                     <div className="text-[12px] text-white/40">{fmtPrice(p.price ?? p.dailyClose)}</div>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
-                      <div
-                        className={cn("grow-x h-full rounded-full", used >= 100 ? "bg-brand" : "bg-white/50")}
-                        style={{ width: `${Math.min(100, used)}%`, "--i": i } as React.CSSProperties}
-                      />
+                    <div className="relative h-1.5 rounded-full bg-white/[0.08]">
+                      <div className="grow-x flex h-full overflow-hidden rounded-full" style={{ width: at(Math.max(0, used)), "--i": i } as React.CSSProperties}>
+                        <div className={cn("h-full", used > 100 ? "bg-white/60" : "flex-1 bg-white/50")} style={used > 100 ? { width: `${(100 / used) * 100}%` } : undefined} />
+                        {used > 100 && <div className="overrun h-full flex-1" />}
+                      </div>
+                      {scale > 100 && <span className="absolute -bottom-1 -top-1 w-px bg-white/35" style={{ left: at(100) }} aria-hidden />}
                     </div>
                   </div>
                   <div className="w-16 shrink-0 text-right">

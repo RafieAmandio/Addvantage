@@ -318,29 +318,97 @@ html {
   pointer-events: none;
 }
 
-/* Home desk motion. Everything starts from the final layout: transform, opacity and clip only. */
-:root { --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); }
-/* Panels arrive in reading order: 5 steps of 30ms plus 260ms stays under 400ms. */
-.enter { animation: rise 260ms var(--ease-out-quint) both; animation-delay: calc(var(--i, 0) * 30ms); }
-/* Rows inside a panel follow once the panel has landed. */
-.enter-row { animation: rise 240ms var(--ease-out-quint) both; animation-delay: calc(80ms + var(--i, 0) * 30ms); }
+/* Home desk motion. Everything starts from the final layout: transform, opacity, filter and clip only. */
+:root { --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); }
+/* Panels arrive in reading order out of a slight blur: 5 steps of 55ms plus 620ms, about 0.9s for the desk. */
+@keyframes enterUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.enter { animation: enterUp 620ms var(--ease-out-quint) both; animation-delay: calc(var(--i, 0) * 55ms); }
+/* Rows inside a panel follow once the panel is landing; long lists stop staggering after the seventh row. */
+@keyframes rowIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.enter-row { animation: rowIn 420ms var(--ease-out-quint) both; animation-delay: calc(200ms + min(var(--i, 0), 6) * 40ms); }
 /* Bars grow from their left edge to the value (reuses the morning scan nudge). */
-.grow-x { transform-origin: left center; animation: nudge 600ms var(--ease-out-quint) both; animation-delay: calc(120ms + var(--i, 0) * 40ms); }
-/* Chart lines draw left to right. */
-@keyframes wipeIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.draw-in { animation: wipeIn 700ms var(--ease-out-quint) both; }
+.grow-x { transform-origin: left center; animation: nudge 900ms var(--ease-out-expo) both; animation-delay: calc(260ms + var(--i, 0) * 60ms); }
 /* Market switch: the next market slides in from the side it came from. */
 @keyframes swapIn { from { opacity: 0; transform: translateX(var(--dx, 12px)); } to { opacity: 1; transform: none; } }
-.swap-in { animation: swapIn 280ms var(--ease-out-quint) both; }
+.swap-in { animation: swapIn 380ms var(--ease-out-quint) both; }
 /* A refreshed value flashes the direction it moved. */
-@keyframes flashUp { from { background-color: rgb(0 221 148 / 0.28); } to { background-color: rgb(0 221 148 / 0); } }
-@keyframes flashDown { from { background-color: rgb(255 69 77 / 0.28); } to { background-color: rgb(255 69 77 / 0); } }
-.flash-up, .flash-down { border-radius: 4px; animation: flashUp 900ms ease-out; }
+@keyframes flashUp { from { background-color: rgb(0 221 148 / 0.32); } to { background-color: rgb(0 221 148 / 0); } }
+@keyframes flashDown { from { background-color: rgb(255 69 77 / 0.32); } to { background-color: rgb(255 69 77 / 0); } }
+.flash-up, .flash-down { border-radius: 4px; animation: flashUp 1400ms ease-out; }
 .flash-down { animation-name: flashDown; }
 /* Rows that open something lift a pixel on hover and settle on press. */
 .lift { transition: transform 150ms var(--ease-out-quint), background-color 150ms; }
 @media (hover: hover) { .lift:hover { transform: translateY(-1px); } }
 .lift:active { transform: translateY(0) scale(0.995); transition-duration: 80ms; }
+
+/* Off screen or on a hidden tab, loops (and entrances not yet seen) wait. Set by useActive. */
+.paused, .paused * { animation-play-state: paused !important; }
+
+/* Panel surface: a dot screen that fades down from a lit top edge. Interactive panels warm to the brand on hover. */
+.surface { position: relative; isolation: isolate; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07); }
+.surface::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 0.75px, transparent 1.1px);
+  background-size: 6px 6px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 75%);
+  mask-image: linear-gradient(to bottom, #000, transparent 75%);
+}
+.surface-hover { transition: box-shadow 300ms var(--ease-out-quint); }
+@media (hover: hover) {
+  .surface-hover:hover { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 0 0 1px rgb(255 212 0 / 0.2), 0 0 28px -10px rgb(255 212 0 / 0.4); }
+}
+
+/* Live markers. */
+@keyframes ping { 0% { transform: scale(1); opacity: 0.55; } 80%, 100% { transform: scale(2.8); opacity: 0; } }
+.live-dot { position: relative; display: inline-block; width: 6px; height: 6px; border-radius: 9999px; background: currentColor; }
+.live-dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; animation: ping 1.8s var(--ease-out-quint) infinite; }
+@keyframes softPulse { 0%, 100% { background-color: rgb(255 212 0 / 0); box-shadow: 0 0 0 8px rgb(255 212 0 / 0); } 50% { background-color: rgb(255 212 0 / 0.08); box-shadow: 0 0 0 8px rgb(255 212 0 / 0.08); } }
+.soon { animation: softPulse 2.4s ease-in-out infinite; border-radius: 4px; }
+/* A high-impact headline carries a short bar in the gutter with light travelling down it. */
+@keyframes barLight { from { background-position: 0 -100%; } to { background-position: 0 200%; } }
+.impact-bar {
+  position: absolute; left: -12px; top: 14px; bottom: 14px; width: 2px; border-radius: 2px;
+  background: linear-gradient(to bottom, rgb(255 212 0 / 0.35), #FFD400 50%, rgb(255 212 0 / 0.35)) 0 0 / 100% 50% no-repeat, rgb(255 212 0 / 0.35);
+  animation: barLight 2.6s ease-in-out infinite;
+}
+/* Range used: the part past 100% of the ATR shimmers. */
+@keyframes shimmer { from { background-position: -120% 0; } to { background-position: 220% 0; } }
+.overrun {
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%) 0 0 / 60% 100% no-repeat, #FFD400;
+  animation: shimmer 2.2s ease-in-out 1.1s infinite;
+}
+/* Bulletin dot glyphs light up cell by cell. */
+@keyframes dotOn { from { opacity: 0.12; } to { opacity: 1; } }
+.dot-seq { animation: dotOn 360ms var(--ease-out-quint) both; animation-delay: calc(320ms + var(--d, 0) * 1ms); }
+
+/* Consensus chart: lines draw in, then the current value breathes. */
+@keyframes lineDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.line-draw { stroke-dasharray: 1 1; animation: lineDraw 1100ms var(--ease-out-quint) both; }
+@keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+.dot-pop { transform-box: fill-box; transform-origin: center; animation: popIn 360ms var(--ease-out-quint) 900ms both; }
+.dot-ping { transform-box: fill-box; transform-origin: center; animation: ping 2.2s var(--ease-out-quint) 1.2s infinite both; }
+
+/* Consensus figure: tilts toward the pointer; on a switch the old one lifts away and the next drops onto its floor. */
+.fig { position: absolute; inset: 0; }
+.fig-art { transform: perspective(800px) rotateX(calc(var(--ty, 0) * -9deg)) rotateY(calc(var(--tx, 0) * 12deg)) translate(calc(var(--tx, 0) * -5px), calc(var(--ty, 0) * -4px)); transition: transform 600ms var(--ease-out-quint); will-change: transform; }
+.fig-floor { position: absolute; left: 22%; right: 22%; bottom: 8%; height: 12%; border-radius: 50%; background: rgb(0 0 0 / 0.55); filter: blur(10px); transform: translateX(calc(var(--tx, 0) * 6px)); transition: transform 600ms var(--ease-out-quint); }
+@keyframes figDrop { 0% { opacity: 0; transform: translateY(-34px); } 30% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+@keyframes floorIn { from { opacity: 0; scale: 0.45; } to { opacity: 1; scale: 1; } }
+@keyframes figLeave { to { opacity: 0; transform: translateY(-14px) scale(0.96); filter: blur(4px); } }
+.fig-drop .fig-fall, .fig-drop .fig-floor { opacity: 0; }
+.fig-drop[data-ready] .fig-fall { opacity: 1; animation: figDrop 640ms var(--ease-out-expo) both; }
+.fig-drop[data-ready] .fig-floor { opacity: 1; animation: floorIn 640ms var(--ease-out-expo) both; }
+.fig-leave { animation: figLeave 260ms var(--ease-out-quint) both; pointer-events: none; }
+
+/* Plan card: candles fill in left to right, then the price pill and the progress dot travel from the entry to now. */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.plan-candles > g { animation: fadeIn 320ms ease-out both; animation-delay: calc(320ms + var(--i, 0) * 11ms); }
+.plan-now { transition: top 1200ms var(--ease-out-expo); }
+.plan-progress { transition: left 1200ms var(--ease-out-expo), width 1200ms var(--ease-out-expo); }
+.plan-progress-dot { transition: left 1200ms var(--ease-out-expo); }
 
 /* Reduced motion: disable all custom animations and transitions */
 @media (prefers-reduced-motion: reduce) {
@@ -350,6 +418,7 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  /* Staggered entrances must not wait out their delay with nothing on screen. */
-  .enter, .enter-row, .grow-x, .draw-in, .swap-in { animation-delay: 0s !important; }
+  /* Staggered entrances must not wait out their delay with nothing on screen; loops rest on their final frame. */
+  .enter, .enter-row, .grow-x, .swap-in, .dot-seq, .plan-candles > g, .line-draw, .dot-pop, .fig-drop .fig-fall, .fig-drop .fig-floor { animation-delay: 0s !important; }
+  .dot-ping, .live-dot::after, .impact-bar, .overrun, .soon { animation: none !important; }
 }

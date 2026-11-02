@@ -113,8 +113,9 @@ const GLYPH = {
   neutral: [".....", ".....", "#####", ".....", "....."],
 } as const;
 
-/** Market structure for one timeframe as a 5x5 dot arrow. */
-export function StructureGlyph({ bias, size = 30 }: { bias: keyof typeof GLYPH | null; size?: number }) {
+/** Market structure for one timeframe as a 5x5 dot arrow. `seq` (ms) lights its dots one by one from that delay. */
+export function StructureGlyph({ bias, size = 30, seq }: { bias: keyof typeof GLYPH | null; size?: number; seq?: number }) {
+  let lit = 0;
   const g = bias ? GLYPH[bias] : null;
   const color = bias === "bullish" ? UP : bias === "bearish" ? DOWN : "rgba(255,255,255,.55)";
   return (
@@ -122,7 +123,20 @@ export function StructureGlyph({ bias, size = 30 }: { bias: keyof typeof GLYPH |
       {Array.from({ length: 25 }, (_, i) => {
         const r = Math.floor(i / 5);
         const c = i % 5;
-        return <rect key={i} x={c * P} y={r * P} width={D} height={D} fill={g?.[r]?.[c] === "#" ? color : OFF} />;
+        const on = g?.[r]?.[c] === "#";
+        const d = on && seq !== undefined ? seq + 45 * lit++ : undefined;
+        return (
+          <rect
+            key={i}
+            x={c * P}
+            y={r * P}
+            width={D}
+            height={D}
+            fill={on ? color : OFF}
+            className={d !== undefined ? "dot-seq" : undefined}
+            style={d !== undefined ? ({ "--d": d } as React.CSSProperties) : undefined}
+          />
+        );
       })}
     </svg>
   );
