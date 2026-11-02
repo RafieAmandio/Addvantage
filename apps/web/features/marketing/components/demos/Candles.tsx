@@ -41,8 +41,8 @@ export function Candles({
   candleClass,
   children,
   label,
-  up: upColor = "#00DD94",
-  down: downColor = "#FF454D",
+  up: upColor = "#4E9F6E",
+  down: downColor = "#E06A5E",
 }: {
   bars: Bar[];
   slots?: number;

@@ -7,7 +7,7 @@ export const Panel = forwardRef<HTMLDivElement, { title: string; meta?: React.Re
   ref,
 ) {
   return (
-    <div ref={ref} className={cn("relative flex min-w-0 flex-col overflow-hidden rounded-[10px] border border-white/15 bg-panel text-white", className)}>
+    <div ref={ref} className={cn("relative flex min-w-0 flex-col overflow-hidden rounded-[10px] border border-tv-line bg-tv-panel text-white", className)}>
       <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] text-white/70">
         <span className="flex items-center gap-2 truncate">
           <span className="flex gap-1" aria-hidden>

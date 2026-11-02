@@ -44,13 +44,13 @@ export function FilterDemo({ onLoop }: { onLoop?: () => void }) {
                       <>
                         <span className={cn("rounded-[3px] px-1.5 py-0.5", x.tag.impact === "HIGH" ? "bg-brand text-black" : "border border-brand text-brand")}>{x.tag.impact} impact</span>
                         {x.tag.moves.map(([c, d]) => (
-                          <span key={c} className={d === "up" ? "text-up" : "text-down"}>
+                          <span key={c} className={d === "up" ? "text-tv-up" : "text-tv-down"}>
                             {c} {d === "up" ? "▲ up" : "▼ down"}
                           </span>
                         ))}
                       </>
                     ) : (
-                      <span className="text-blood-bright">Noise, cut</span>
+                      <span className="text-tv-down">Noise, cut</span>
                     )}
                   </span>
                 )}

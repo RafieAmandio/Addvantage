@@ -52,8 +52,8 @@ export function ReadDemo({ d, onLoop }: { d: ReadData; onLoop?: () => void }) {
                   className="lv-fade"
                   style={{ opacity: step >= 1 ? 1 : 0 }}
                 />
-                {box(d.stop, "rgba(255,69,77,.32)", step >= 3)}
-                {box(d.target, "rgba(0,221,148,.26)", step >= 4)}
+                {box(d.stop, "rgba(224,106,94,.32)", step >= 3)}
+                {box(d.target, "rgba(78,159,110,.3)", step >= 4)}
                 <path
                   d={`M${s.x(d.touch)} ${yL} H${W - 6}`}
                   pathLength={1}
@@ -99,10 +99,10 @@ function Labels({ d, step }: { d: ReadData; step: number }) {
       <span className={cn(tag, "bg-brand text-black")} style={{ top: top(d.price), opacity: step >= 2 ? 1 : 0 }}>
         {d.side === "buy" ? "LHPB" : "LLPB"} {d.fmt.price}
       </span>
-      <span className={cn(tag, "bg-down text-black")} style={{ top: top(d.stop), opacity: step >= 3 ? 1 : 0 }}>
+      <span className={cn(tag, "bg-tv-down text-black")} style={{ top: top(d.stop), opacity: step >= 3 ? 1 : 0 }}>
         Stop {d.fmt.stop}
       </span>
-      <span className={cn(tag, "bg-up text-black")} style={{ top: top(d.target), opacity: step >= 4 ? 1 : 0 }}>
+      <span className={cn(tag, "bg-tv-up text-black")} style={{ top: top(d.target), opacity: step >= 4 ? 1 : 0 }}>
         Target {d.fmt.target}
       </span>
       {step >= 5 && (

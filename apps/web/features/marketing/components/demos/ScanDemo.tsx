@@ -39,7 +39,7 @@ export function ScanDemo({ d }: { d: ScanData }) {
                       key={`${o}-${hit ? "hit" : "no"}`}
                       className={cn(
                         "rounded-full border px-2.5 py-1 font-mono text-[11px] transition-colors duration-200",
-                        hit ? (hit.ok ? "lv-flash border-up bg-up text-black" : "lv-shake border-blood-bright bg-blood-bright text-white") : tried ? "border-blood-bright/50 text-white/40 line-through" : "border-white/20 text-white/75",
+                        hit ? (hit.ok ? "lv-flash border-tv-up bg-tv-up text-black" : "lv-shake border-tv-down bg-tv-down text-white") : tried ? "border-tv-down/50 text-white/40 line-through" : "border-white/20 text-white/75",
                       )}
                     >
                       {o}
@@ -48,7 +48,7 @@ export function ScanDemo({ d }: { d: ScanData }) {
                 })}
               </span>
               {last && (
-                <span key={last.pick} className={cn("lv-flash font-mono text-[11px] leading-snug", last.ok ? "text-up" : "text-blood-text")}>
+                <span key={last.pick} className={cn("lv-flash font-mono text-[11px] leading-snug", last.ok ? "text-tv-up" : "text-tv-down")}>
                   {last.text}
                 </span>
               )}

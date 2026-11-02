@@ -25,7 +25,7 @@ export function PlanDemo({ d, onLoop }: { d: PlanData; onLoop?: () => void }) {
         </div>
         <div className={field}>
           <span className={lab}>Side</span>
-          <span className={cn(val, d.side === "buy" ? "text-up" : "text-down")}>{d.side.toUpperCase()}</span>
+          <span className={cn(val, d.side === "buy" ? "text-tv-up" : "text-tv-down")}>{d.side.toUpperCase()}</span>
         </div>
         <div className={field}>
           <span className={lab}>Entry</span>
@@ -39,7 +39,7 @@ export function PlanDemo({ d, onLoop }: { d: PlanData; onLoop?: () => void }) {
           <span className={lab}>Target</span>
           <span className={val}>{d.target}</span>
         </div>
-        <div className={cn(field, "transition-colors duration-300", step >= 1 && step <= 2 && "border-blood-bright bg-blood/20", step >= 3 && "border-up/60")}>
+        <div className={cn(field, "transition-colors duration-300", step >= 1 && step <= 2 && "border-tv-down bg-blood/20", step >= 3 && "border-tv-up/60")}>
           <span className={lab}>Risk %</span>
           <span className={val}>
             {risk}
@@ -53,11 +53,11 @@ export function PlanDemo({ d, onLoop }: { d: PlanData; onLoop?: () => void }) {
           const met = state ? r.met : null;
           return (
             <li key={r.rule} className={cn("grid grid-cols-[1.25rem_1fr] gap-x-2 rounded-[6px] px-2 py-1.5 font-mono text-[12px] leading-snug transition-colors duration-300", met === false && "bg-blood/25")}>
-              <span key={`${step}-${met}`} className={cn("lv-in font-bold", met === true ? "text-up" : met === false ? "text-blood-bright" : "text-white/30")} style={{ ["--i" as string]: i }}>
+              <span key={`${step}-${met}`} className={cn("lv-in font-bold", met === true ? "text-tv-up" : met === false ? "text-tv-down" : "text-white/30")} style={{ ["--i" as string]: i }}>
                 {met === true ? "✓" : met === false ? "✕" : "·"}
               </span>
               <span>
-                <span className={met === false ? "text-blood-text" : "text-white"}>{r.rule}</span>
+                <span className={met === false ? "text-tv-down" : "text-white"}>{r.rule}</span>
                 <span className="block text-white/50">{state ? r.evidence : "Not checked yet"}</span>
               </span>
             </li>
@@ -73,12 +73,12 @@ export function PlanDemo({ d, onLoop }: { d: PlanData; onLoop?: () => void }) {
           key={step === 2 ? "shake" : "still"}
           className={cn(
             "w-full rounded-[8px] px-4 py-3 font-mono text-sm font-bold transition-colors duration-300",
-            step === 2 ? "lv-shake bg-blood-bright text-white" : step >= 4 ? "bg-up text-black" : "bg-brand text-black",
+            step === 2 ? "lv-shake bg-tv-down text-white" : step >= 4 ? "bg-tv-up text-black" : "bg-brand text-black",
           )}
         >
           {step === 2 ? "Refused" : step >= 4 ? "Saved" : "Save as open"}
         </button>
-        <p className={cn("min-h-[2.6em] font-mono text-[12px] leading-snug", step === 2 ? "text-blood-text" : "text-up")} aria-live="off">
+        <p className={cn("min-h-[2.6em] font-mono text-[12px] leading-snug", step === 2 ? "text-tv-down" : "text-tv-up")} aria-live="off">
           {step === 2 ? d.over.refusal : step >= 4 ? d.ok.saved : ""}
         </p>
         <Pointer x={step === 2 || step >= 4 ? 70 : 88} y={step === 2 || step >= 4 ? 30 : 75} show={step === 2 || step >= 4} tap={step === 2 || step >= 4} />

@@ -1,35 +1,41 @@
-import { cn } from "@/lib/cn";
 import { pillars } from "@/features/marketing/lib/data";
 import { Frame } from "@/features/marketing/components/Frame";
 import { Scramble } from "@/features/marketing/components/ScrambleReveal";
+
+// Kit spot icons (icons/48), one per pillar.
+const ICON = ["news", "calendar", "todays-brief", "consultation", "education", "macro"];
 
 /** The six pillars from the old page, copy unchanged. VIP+ ones arrive redacted and declassify as they land. */
 export function TransmissionsSection() {
   return (
     <Frame id="transmissions" label="Transmissions" num="02" flip>
-      <div className="grid grid-cols-1 bg-white/[0.03] md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-px bg-tv-stone md:grid-cols-3">
         {pillars.map((p, i) => (
           <article
             key={p.code}
             data-reveal
             style={{ ["--i" as string]: i }}
-            className={cn("group flex flex-col gap-5 p-6 md:gap-8 md:p-12", i > 0 && "border-t border-white/10", i % 3 === 1 && "md:border-x md:border-white/20", i < 3 && "md:border-t-0", i >= 3 && "md:border-t md:border-white/20")}
+            className="tv-card flex flex-col gap-5 bg-tv-paper p-6 md:gap-6 md:p-10"
           >
-            <div className="flex items-center justify-between font-mono text-base">
-              <Scramble text={p.code} delay={100 + i * 90} className="font-light" />
-              {p.locked ? (
-                <span className="flex items-center gap-1.5 rounded-[3px] bg-brand px-2 py-0.5 text-[12px] font-bold text-black">
-                  <svg viewBox="0 0 12 14" className="h-3 w-3" aria-hidden fill="currentColor">
-                    <path d="M3 6V4a3 3 0 1 1 6 0v2h1a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
-                  </svg>
-                  VIP+
-                </span>
-              ) : (
-                <span className="font-bold text-brand">Free</span>
-              )}
+            <div className="flex items-start justify-between">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/brand/icons/${ICON[i]}.svg`} alt="" width={56} height={56} className="tv-card-obj h-14 w-14" loading="lazy" />
+              <span className="flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.08em]">
+                <Scramble text={p.code} delay={100 + i * 90} className="text-tv-mute" />
+                {p.locked ? (
+                  <span className="flex items-center gap-1.5 rounded-[3px] bg-tv-ink px-1.5 py-0.5 font-medium text-tv-paper">
+                    <svg viewBox="0 0 12 14" className="h-2.5 w-2.5" aria-hidden fill="currentColor">
+                      <path d="M3 6V4a3 3 0 1 1 6 0v2h1a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h1Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
+                    </svg>
+                    VIP+
+                  </span>
+                ) : (
+                  <span className="rounded-[3px] border border-tv-ink px-1.5 py-0.5 font-medium">Free</span>
+                )}
+              </span>
             </div>
-            <h3 className="font-mono text-2xl font-bold">{p.title}</h3>
-            <p className="font-mono text-base font-light leading-[1.5] text-white/85">
+            <h3 className="text-[22px] font-semibold leading-[1.2] tracking-[-0.015em]">{p.title}</h3>
+            <p className="text-[16px] leading-[1.55] text-tv-graphite">
               <span className={p.locked ? "lv-redact" : undefined}>{p.desc}</span>
             </p>
           </article>

@@ -30,7 +30,7 @@ export function PracticeDemo({ d }: { d: PracticeData }) {
       <p className="min-h-[3.2em] px-4 pt-3 font-mono text-[13px] leading-snug text-white">
         {step >= 2 ? (
           <span key="right" className="lv-flash block">
-            <b className="mr-1 text-up">Right.</b>
+            <b className="mr-1 text-tv-up">Right.</b>
             <span className="text-white/75">{d.feedback}</span>
           </span>
         ) : (
@@ -56,17 +56,17 @@ export function PracticeDemo({ d }: { d: PracticeData }) {
                 <>
                   <rect x={x0 - s.w * 0.9} width={s.w * 1.8} y={s.y(t[2]) - 5} height={s.y(t[3]) - s.y(t[2]) + 10} fill="none" stroke="#FFD400" strokeWidth={2} vectorEffect="non-scaling-stroke" className="lv-fade" style={{ opacity: step >= 2 ? 1 : 0 }} />
                   {line(d.price, "#FFD400")}
-                  {line(d.stop, "#FF454D")}
-                  {line(d.target, "#00DD94")}
+                  {line(d.stop, "#E06A5E")}
+                  {line(d.target, "#4E9F6E")}
                   {/* The future, covered until asked for, then wiped open left to right. */}
-                  <rect x={cut} width={W - cut} y={0} height={H} fill="#121212" className="lv-grow" style={{ transformOrigin: "right", transform: step >= 4 ? "scaleX(0)" : "scaleX(1)" }} />
+                  <rect x={cut} width={W - cut} y={0} height={H} fill="#16171A" className="lv-grow" style={{ transformOrigin: "right", transform: step >= 4 ? "scaleX(0)" : "scaleX(1)" }} />
                   <line x1={cut} x2={cut} y1={0} y2={H} stroke="rgba(255,255,255,.25)" strokeDasharray="2 4" vectorEffect="non-scaling-stroke" />
                 </>
               );
             }}
           </Candles>
           {step >= 5 && (
-            <span className={cn("lv-stamp absolute right-3 top-3 rounded-[4px] border-2 bg-black/85 px-3 py-1 font-mono text-xl font-bold", win ? "border-up text-up" : "border-down text-down")}>
+            <span className={cn("lv-stamp absolute right-3 top-3 rounded-[4px] border-2 bg-black/85 px-3 py-1 font-mono text-xl font-bold", win ? "border-tv-up text-tv-up" : "border-tv-down text-tv-down")}>
               {win ? "Win" : "Loss"} {d.r}
             </span>
           )}
