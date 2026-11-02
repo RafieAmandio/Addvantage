@@ -21,7 +21,7 @@ export type Group = "here" | Verdict;
 export const groupOf = (r: BoardRow): Group => (here(r) ? "here" : r.call);
 export const GROUPS: [Group, string][] = [
   ["here", "At level now"],
-  ["order", "Meets every rule"],
+  ["order", "Order ready"],
   ["watch", "Needs confirmation"],
   ["pass", "Doesn't qualify"],
 ];

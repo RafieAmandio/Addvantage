@@ -21,7 +21,7 @@ export const wib = (iso: string, withTime = true) =>
 export const levelName = (l: Level) => (l.type === "inverse" ? (l.side === "buy" ? "LHPB" : "LLPB") : l.side === "buy" ? "Old support" : "Old resistance");
 
 export const VERDICT: Record<Verdict, { label: string; cls: string }> = {
-  order: { label: "Meets every rule", cls: "text-brand" },
+  order: { label: "Order ready", cls: "text-brand" },
   watch: { label: "Needs confirmation", cls: "text-white" },
   pass: { label: "Doesn't qualify", cls: "text-white/40" },
 };

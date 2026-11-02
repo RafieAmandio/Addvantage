@@ -77,7 +77,7 @@ function List({ rows, symbol, onPick }: { rows: BoardRow[]; symbol: string; onPi
           className="h-10 w-full rounded-lg bg-black/40 px-3 text-[15px] text-white outline-none ring-1 ring-white/10 placeholder:text-white/35 focus:ring-white/30"
         />
         <p className="mt-2 text-[12px] text-white/45">
-          <span className="font-num font-semibold text-brand">{count("here")}</span> at level now · <span className="font-num font-semibold text-white">{count("order")}</span> meet every rule ·{" "}
+          <span className="font-num font-semibold text-brand">{count("here")}</span> at level now · <span className="font-num font-semibold text-white">{count("order")}</span> order ready ·{" "}
           <span className="font-num font-semibold text-white">{count("watch")}</span> need confirmation · <span className="font-num">{count("pass")}</span> don&apos;t qualify
           {asOf && <span className="block text-white/30">Daily read from the {wib(asOf, false)} close · hourly levels refresh every hour</span>}
         </p>

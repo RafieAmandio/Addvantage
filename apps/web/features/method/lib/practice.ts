@@ -12,7 +12,7 @@ export const QUESTIONS: { key: Question; ask: (l: Level) => string; tap?: "candl
   { key: "level", ask: (l) => `Tap the price of the ${l.side === "buy" ? "LHPB, the last high" : "LLPB, the last low"} before that break.`, tap: "price" },
   { key: "stop", ask: (l) => `If you ${l.side === "buy" ? "buy" : "sell"} the retest, tap where the stop goes.`, tap: "price" },
   { key: "naked", ask: () => "Has price come back to the level since the break?" },
-  { key: "qualifies", ask: () => "Does this level meet every rule for a limit order?" },
+  { key: "qualifies", ask: () => "Does this level qualify for a limit order?" },
 ];
 
 export interface Answer {
@@ -92,7 +92,7 @@ export function gradeQualifies(l: Level, says: boolean, failing: string[]): Answ
     choice: says,
     // Lowercase the rule names mid-sentence, except "R" which is a unit.
     feedback: does
-      ? "It does. Every rule holds, so a limit order is allowed. Sizing is still your call."
+      ? "It does. The setup qualifies, so a limit order is allowed. Sizing is still your call."
       : `It does not. Failing: ${failing.map((r) => (r.startsWith("R ") ? r : r[0]!.toLowerCase() + r.slice(1))).join(", ")}.`,
   };
 }
