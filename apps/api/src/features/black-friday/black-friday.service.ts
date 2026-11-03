@@ -2,7 +2,6 @@ import { AppError } from "@/core/errors/index.js";
 import { logger } from "@/config/logger.js";
 import {
   bfPrice,
-  lossToUsd,
   type BlackFridayApplicationInput,
   type BlackFridayDraftInput,
 } from "@tradevantage/shared/schema";
@@ -53,9 +52,7 @@ export const blackFridayService = {
         name: input.name,
         contact: input.contact,
         answers: input.answers,
-        biggestLossAmount: input.biggestLossAmount,
-        biggestLossCurrency: input.biggestLossCurrency,
-        biggestLossUsd: lossToUsd(input.biggestLossAmount, input.biggestLossCurrency),
+        biggestLossBucket: input.biggestLossBucket,
         bingxUid: input.bingxUid,
         bingxProofPath: input.bingxProofPath,
         plan: input.plan,

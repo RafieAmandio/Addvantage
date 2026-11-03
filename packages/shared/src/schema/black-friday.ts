@@ -13,12 +13,6 @@ export type BfPlan = (typeof BF_PLANS)[number];
 export const BF_STATUSES = ["draft", "submitted", "approved", "rejected", "provisioned"] as const;
 export type BfStatus = (typeof BF_STATUSES)[number];
 
-export const BF_LOSS_CURRENCIES = ["USD", "IDR"] as const;
-export type BfLossCurrency = (typeof BF_LOSS_CURRENCIES)[number];
-
-// ponytail: fixed IDR per USD for normalising the loss answer; swap for a live FX rate if the buckets need precision.
-export const BF_IDR_PER_USD = 16_000;
-
 export const BF_FULL_PRICE_USD = 500;
 
 // ponytail: set the IDR price to offer BCA transfer for Full access. null hides BCA entirely.
@@ -32,25 +26,16 @@ export function bfPrice(method: "usdt" | "bca"): { amount: number; currency: str
   return BF_BCA_PRICE_IDR == null ? null : { amount: BF_BCA_PRICE_IDR, currency: "IDR" };
 }
 
-/** Biggest-loss answer in USD, rounded to cents. */
-export function lossToUsd(amount: number, currency: BfLossCurrency): number {
-  const usd = currency === "IDR" ? amount / BF_IDR_PER_USD : amount;
-  return Math.round(usd * 100) / 100;
-}
-
-// Admin grouping by biggest loss in USD. `max` is exclusive.
+// The biggest-loss answer is one of these buckets; the admin groups by it directly.
 export const BF_LOSS_BUCKETS = [
-  { key: "lt1k", label: "Under $1k", min: 0, max: 1_000 },
-  { key: "1k-10k", label: "$1k to $10k", min: 1_000, max: 10_000 },
-  { key: "10k-50k", label: "$10k to $50k", min: 10_000, max: 50_000 },
-  { key: "50k-100k", label: "$50k to $100k", min: 50_000, max: 100_000 },
-  { key: "100k+", label: "$100k+", min: 100_000, max: Infinity },
+  { key: "lt1k", label: "Under $1,000" },
+  { key: "1k-10k", label: "$1,000 to $10,000" },
+  { key: "10k-50k", label: "$10,000 to $50,000" },
+  { key: "50k-100k", label: "$50,000 to $100,000" },
+  { key: "100k+", label: "Over $100,000" },
 ] as const;
-export type BfBucketKey = (typeof BF_LOSS_BUCKETS)[number]["key"];
-
-export function lossBucket(usd: number): BfBucketKey {
-  return BF_LOSS_BUCKETS.find((b) => usd < b.max)?.key ?? "100k+";
-}
+export const BF_LOSS_BUCKET_KEYS = ["lt1k", "1k-10k", "10k-50k", "50k-100k", "100k+"] as const;
+export type BfBucketKey = (typeof BF_LOSS_BUCKET_KEYS)[number];
 
 // Profiling questions. Apply asks none beyond identity, so these are the spec's three.
 export const BF_EXPERIENCE = ["lt1", "1-3", "3-5", "5+"] as const;
@@ -84,20 +69,27 @@ export const BlackFridayApplicationSchema = z
     name,
     contact,
     answers: BlackFridayAnswersSchema,
-    biggestLossAmount: z.number().finite().min(0, "Enter 0 or more").max(1e12),
-    biggestLossCurrency: z.enum(BF_LOSS_CURRENCIES),
+    biggestLossBucket: z.enum(BF_LOSS_BUCKET_KEYS),
     bingxUid: bingxUidField,
     bingxProofPath: proofKey("Upload your BingX screenshot"),
     plan: z.enum(BF_PLANS),
     paymentMethod: z.enum(["usdt", "bca"]).optional(),
     paymentProofPath: proofKey("Upload your transfer receipt").optional(),
     signedName: legalName,
-    acknowledgements: waiverAcknowledgements,
+    // Apply's four waiver acknowledgements plus the promo's own terms; `dinner` is required for Full.
+    acknowledgements: waiverAcknowledgements.extend({
+      review: z.literal(true),
+      scope: z.literal(true),
+      dinner: z.literal(true).optional(),
+    }),
     // Honeypot: real users never fill this; bots do.
     website: z.string().max(0).optional(),
   })
   .superRefine((v, ctx) => {
     if (v.plan !== "full") return;
+    if (!v.acknowledgements.dinner) {
+      ctx.addIssue({ code: "custom", path: ["acknowledgements", "dinner"], message: "Acknowledge the dinner terms" });
+    }
     if (!v.paymentMethod || !bfPrice(v.paymentMethod)) {
       ctx.addIssue({ code: "custom", path: ["paymentMethod"], message: "Choose a payment method" });
     }
@@ -116,14 +108,19 @@ const isApproved = (status: string) => (BF_APPROVED as readonly string[]).includ
 export interface BfSummaryRow {
   plan: string | null;
   status: string;
-  biggestLossUsd: number;
+  biggestLossBucket: string | null;
   dinnerInvitedAt: Date | string | null;
+  createdAt: Date | string;
 }
 
-/** The admin view: loss buckets (count, per plan, rows by loss desc) and the totals strip. */
+// Inside a loss group: pending review first, then newest.
+const byReview = (a: BfSummaryRow, z: BfSummaryRow) =>
+  Number(z.status === "submitted") - Number(a.status === "submitted") || new Date(z.createdAt).getTime() - new Date(a.createdAt).getTime();
+
+/** The admin view: loss buckets (count, per plan, pending first then newest) and the totals strip. */
 export function summariseBlackFriday<T extends BfSummaryRow>(rows: T[], drafts = 0) {
   const groups = BF_LOSS_BUCKETS.map((b) => {
-    const items = rows.filter((r) => lossBucket(r.biggestLossUsd) === b.key).sort((a, z) => z.biggestLossUsd - a.biggestLossUsd);
+    const items = rows.filter((r) => r.biggestLossBucket === b.key).sort(byReview);
     return {
       key: b.key,
       label: b.label,

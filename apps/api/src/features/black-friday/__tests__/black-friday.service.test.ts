@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { canOpenRoute, lossBucket, lossToUsd, BF_IDR_PER_USD } from "@tradevantage/shared";
+import { canOpenRoute } from "@tradevantage/shared";
 
 const repo = vi.hoisted(() => ({
   findByEmail: vi.fn(),
@@ -38,60 +38,53 @@ const input = {
   name: "Ada Lovelace",
   contact: "@ada",
   answers: { experience: "1-3" as const, markets: ["crypto" as const], positionSize: "lt1k" as const },
-  biggestLossAmount: 32_000_000,
-  biggestLossCurrency: "IDR" as const,
+  biggestLossBucket: "1k-10k" as const,
   bingxUid: "123456789",
   bingxProofPath: "black-friday/x.png",
   plan: "full" as const,
   paymentMethod: "usdt" as const,
   paymentProofPath: "black-friday/y.png",
   signedName: "Ada Lovelace",
-  acknowledgements: { risk: true as const, ownResearch: true as const, noGuarantee: true as const, terms: true as const },
+  acknowledgements: {
+    risk: true as const,
+    ownResearch: true as const,
+    noGuarantee: true as const,
+    terms: true as const,
+    review: true as const,
+    scope: true as const,
+    dinner: true as const,
+  },
 };
 
 const row = (o: Partial<AdminRow>): AdminRow =>
-  ({ id: "x", plan: "free", status: "submitted", biggestLossUsd: 0, dinnerInvitedAt: null, ...o }) as AdminRow;
+  ({ id: "x", plan: "free", status: "submitted", biggestLossBucket: "lt1k", dinnerInvitedAt: null, createdAt: new Date("2026-11-01"), ...o }) as AdminRow;
 
 beforeEach(() => {
   vi.clearAllMocks();
   repo.update.mockImplementation(async (id: string, data: Record<string, unknown>) => ({ id, ...data }));
 });
 
-describe("USD normalisation and buckets", () => {
-  it("converts IDR at the fixed rate and leaves USD alone", () => {
-    expect(lossToUsd(BF_IDR_PER_USD * 250, "IDR")).toBe(250);
-    expect(lossToUsd(1234.567, "USD")).toBe(1234.57);
-    expect(lossToUsd(1_000, "IDR")).toBe(0.06);
-  });
-
-  it("puts each boundary in the upper bucket", () => {
-    expect(lossBucket(0)).toBe("lt1k");
-    expect(lossBucket(999.99)).toBe("lt1k");
-    expect(lossBucket(1_000)).toBe("1k-10k");
-    expect(lossBucket(10_000)).toBe("10k-50k");
-    expect(lossBucket(50_000)).toBe("50k-100k");
-    expect(lossBucket(100_000)).toBe("100k+");
-    expect(lossBucket(9e9)).toBe("100k+");
-  });
-
-  it("groups rows, counts per plan, sorts by loss desc and totals paid Full", () => {
+describe("loss buckets", () => {
+  it("groups by bucket, counts per plan, lists pending first then newest, totals paid Full", () => {
+    const d = (n: number) => new Date(`2026-11-${String(n).padStart(2, "0")}`);
     const { groups, totals } = summarise(
       [
-        row({ id: "a", biggestLossUsd: 200, plan: "free" }),
-        row({ id: "b", biggestLossUsd: 900, plan: "full", status: "provisioned" }),
-        row({ id: "c", biggestLossUsd: 5_000, plan: "full", status: "approved" }),
-        row({ id: "d", biggestLossUsd: 250_000, plan: "full", status: "rejected" }),
-        row({ id: "e", biggestLossUsd: 120_000, plan: "free" }),
+        row({ id: "a", plan: "free", status: "provisioned", createdAt: d(20) }),
+        row({ id: "b", plan: "full", status: "submitted", createdAt: d(2) }),
+        row({ id: "c", plan: "full", status: "submitted", createdAt: d(9) }),
+        row({ id: "d", plan: "full", status: "approved", biggestLossBucket: "1k-10k" }),
+        row({ id: "e", plan: "full", status: "rejected", biggestLossBucket: "100k+" }),
+        row({ id: "f", plan: "free", biggestLossBucket: "100k+" }),
       ],
       3,
     );
     const lt1k = groups.find((g) => g.key === "lt1k")!;
-    expect(lt1k.count).toBe(2);
-    expect(lt1k.byPlan).toEqual({ free: 1, full: 1 });
-    expect(lt1k.items.map((r) => r.id)).toEqual(["b", "a"]);
-    expect(groups.find((g) => g.key === "100k+")!.items.map((r) => r.id)).toEqual(["d", "e"]);
-    expect(groups.map((g) => g.count)).toEqual([2, 1, 0, 0, 2]);
-    expect(totals).toMatchObject({ applications: 5, drafts: 3, free: 2, full: 3, pending: 2, approved: 2, approvedFull: 2, paidUsd: 1000 });
+    expect(lt1k.count).toBe(3);
+    expect(lt1k.byPlan).toEqual({ free: 1, full: 2 });
+    expect(lt1k.items.map((r) => r.id)).toEqual(["c", "b", "a"]);
+    expect(groups.map((g) => g.key)).toEqual(["lt1k", "1k-10k", "10k-50k", "50k-100k", "100k+"]);
+    expect(groups.map((g) => g.count)).toEqual([3, 1, 0, 0, 2]);
+    expect(totals).toMatchObject({ applications: 6, drafts: 3, free: 2, full: 4, pending: 3, approved: 2, approvedFull: 1, paidUsd: 500 });
   });
 });
 
@@ -102,7 +95,7 @@ describe("blackFridayService", () => {
     repo.finalize.mockResolvedValue({ id: "app-1" });
     await expect(blackFridayService.submit(input)).resolves.toEqual({ id: "app-1" });
     expect(repo.finalize).toHaveBeenCalledWith(
-      expect.objectContaining({ biggestLossUsd: 2000, paymentAmount: 500, paymentCurrency: "USDT", plan: "full" }),
+      expect.objectContaining({ biggestLossBucket: "1k-10k", paymentAmount: 500, paymentCurrency: "USDT", plan: "full" }),
     );
   });
 
@@ -270,5 +263,13 @@ describe("BlackFridayApplicationSchema", () => {
       BlackFridayApplicationSchema.safeParse({ ...input, plan: "free", paymentMethod: undefined, paymentProofPath: undefined }).success,
     ).toBe(true);
     expect(BlackFridayApplicationSchema.safeParse({ ...input, bingxUid: "12ab" }).success).toBe(false);
+    expect(BlackFridayApplicationSchema.safeParse({ ...input, biggestLossBucket: "5k" }).success).toBe(false);
+    // Full must accept the dinner terms; Free doesn't see them.
+    const { dinner: _d, ...noDinner } = input.acknowledgements;
+    expect(BlackFridayApplicationSchema.safeParse({ ...input, acknowledgements: noDinner }).success).toBe(false);
+    expect(
+      BlackFridayApplicationSchema.safeParse({ ...input, plan: "free", paymentMethod: undefined, paymentProofPath: undefined, acknowledgements: noDinner }).success,
+    ).toBe(true);
+    expect(BlackFridayApplicationSchema.safeParse({ ...input, acknowledgements: { ...input.acknowledgements, review: false } }).success).toBe(false);
   });
 });

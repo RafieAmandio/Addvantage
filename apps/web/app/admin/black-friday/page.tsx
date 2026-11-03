@@ -10,9 +10,7 @@ interface Row {
   email: string;
   name: string;
   contact: string;
-  biggestLossAmount: number | null;
-  biggestLossCurrency: string | null;
-  biggestLossUsd: number;
+  biggestLossBucket: string | null;
   bingxUid: string | null;
   hasBingxProof: boolean;
   plan: string | null;
@@ -74,8 +72,9 @@ const STATUS_STYLES: Record<string, string> = {
   rejected: "text-down",
 };
 const usd = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-const raw = (r: Row) =>
-  r.biggestLossAmount == null ? "n/a" : `${r.biggestLossCurrency === "USD" ? "$" : "IDR "}${r.biggestLossAmount.toLocaleString("en-US")}`;
+const applied = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+// Fixed columns so UID, plan and actions line up across every row and group.
+const COLS = "lg:grid-cols-[minmax(0,1fr)_9rem_10rem_28rem]";
 const smallBtn =
   "inline-flex h-8 items-center rounded-full px-3.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand disabled:opacity-40";
 const lineBtn = cn(smallBtn, "border border-white/[0.14] text-white hover:bg-raised");
@@ -232,7 +231,7 @@ export default function AdminBlackFridayPage() {
 
       <Panel
         title="Black Friday applications"
-        sub="Grouped by biggest single loss in USD. Approve provisions the account: Full gets VIP+ for 365 days, Free gets the crypto tier."
+        sub="Grouped by biggest single loss, pending first then newest. Approve provisions the account: Full gets VIP+ for 365 days, Free gets the crypto tier."
       >
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <label className="sr-only" htmlFor="bf-plan">Plan</label>
@@ -287,11 +286,17 @@ export default function AdminBlackFridayPage() {
                     <p className="pb-4 text-[13px] text-white/30">No applications in this range</p>
                   ) : (
                     <div className="divide-y divide-white/[0.05] pb-2">
+                      <div className={cn("hidden pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 lg:grid lg:gap-4", COLS)}>
+                        <span>Applicant</span>
+                        <span>BingX UID</span>
+                        <span>Plan and status</span>
+                        <span className="text-right">Action</span>
+                      </div>
                       {g.items.map((r) => {
                         const approved = APPROVED.has(r.status);
                         const invited = !!r.dinnerInvitedAt;
                         return (
-                          <div key={r.id} className="grid gap-2 py-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] lg:items-center lg:gap-4">
+                          <div key={r.id} className={cn("grid gap-2 py-3 lg:items-center lg:gap-4", COLS)}>
                             <div className="min-w-0">
                               <div className="truncate text-[14px] font-medium text-white">{r.name}</div>
                               <div className="truncate text-[13px] text-white/55">
@@ -299,9 +304,8 @@ export default function AdminBlackFridayPage() {
                               </div>
                             </div>
                             <div className="min-w-0 text-[13px]">
-                              <span className="font-num text-[16px] font-semibold text-white">{usd(r.biggestLossUsd)}</span>{" "}
-                              {r.biggestLossCurrency !== "USD" && <span className="text-white/40">{raw(r)}</span>}
-                              <div className="text-white/40">UID {r.bingxUid}</div>
+                              <div className="font-num text-[16px] font-semibold tabular-nums text-white">{r.bingxUid}</div>
+                              <div className="text-white/40">Applied {applied(r.createdAt)}</div>
                             </div>
                             <div className="text-[13px]">
                               <span className={cn("font-medium", r.plan === "full" ? "text-white" : "text-white/55")}>{r.plan === "full" ? "Full $500" : "Free"}</span>{" "}

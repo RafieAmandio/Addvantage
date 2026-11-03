@@ -335,16 +335,14 @@ model EarlyAccessApplication {
 }
 
 // Black Friday intake (blackfriday.tradevantage.gg). Draft keyed by email like early access;
-// bingx_uid is unique across applications. Loss is kept raw plus a USD-normalised copy for grouping.
+// bingx_uid is unique across applications. The biggest loss is one of five buckets (shared BF_LOSS_BUCKETS).
 model BlackFridayApplication {
   id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email               String    @unique
   name                String
   contact             String
   answers             Json?
-  biggestLossAmount   Decimal?  @map("biggest_loss_amount") @db.Decimal
-  biggestLossCurrency String?   @map("biggest_loss_currency")
-  biggestLossUsd      Decimal?  @map("biggest_loss_usd") @db.Decimal
+  biggestLossBucket   String?   @map("biggest_loss_bucket")
   bingxUid            String?   @unique @map("bingx_uid")
   bingxProofPath      String?   @map("bingx_proof_path")
   plan                String?

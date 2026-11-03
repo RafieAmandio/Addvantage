@@ -3,8 +3,8 @@
 import {
   BF_DINNER_SEATS,
   bfPrice,
-  lossToUsd,
   summariseBlackFriday,
+  type BfBucketKey,
   type BlackFridayApplicationInput,
 } from "@tradevantage/shared/schema";
 
@@ -14,9 +14,7 @@ interface DemoRow {
   name: string;
   contact: string;
   answers: unknown;
-  biggestLossAmount: number | null;
-  biggestLossCurrency: string | null;
-  biggestLossUsd: number;
+  biggestLossBucket: string | null;
   bingxUid: string | null;
   hasBingxProof: boolean;
   plan: string | null;
@@ -35,32 +33,32 @@ interface DemoRow {
 const UID_TAKEN = "This BingX UID is already registered with another application.";
 const fail = (status: number, apiMessage: string) => Object.assign(new Error(`API ${status}`), { status, apiMessage });
 
-// [name, loss, currency, plan, status, invited]
-const SEED: [string, number, "USD" | "IDR", "free" | "full", string, boolean][] = [
-  ["Rina Hartono", 450, "USD", "free", "submitted", false],
-  ["Bagus Prasetyo", 9_600_000, "IDR", "free", "provisioned", false],
-  ["Kevin Tan", 800, "USD", "full", "provisioned", true],
-  ["Sari Wulandari", 3_200, "USD", "full", "provisioned", true],
-  ["Dimas Saputra", 84_000_000, "IDR", "full", "submitted", false],
-  ["Andre Gunawan", 7_500, "USD", "free", "rejected", false],
-  ["Michael Lim", 18_000, "USD", "full", "provisioned", true],
-  ["Putri Ananda", 400_000_000, "IDR", "full", "approved", true],
-  ["Yusuf Hakim", 42_000, "USD", "free", "submitted", false],
-  ["Jonathan Wijaya", 31_000, "USD", "full", "provisioned", false],
-  ["Fajar Nugroho", 61_000, "USD", "full", "provisioned", true],
-  ["Lestari Dewi", 1_400_000_000, "IDR", "full", "provisioned", true],
-  ["Hendra Kusuma", 72_500, "USD", "free", "approved", false],
-  ["Steven Halim", 250_000, "USD", "full", "provisioned", true],
-  ["Agus Salim", 130_000, "USD", "full", "provisioned", true],
-  ["Nadia Putri", 2_100_000_000, "IDR", "full", "provisioned", false],
-  ["Rizky Ramadhan", 180_000, "USD", "full", "submitted", false],
-  ["Tommy Santoso", 1_200_000, "USD", "full", "provisioned", false],
-  ["Citra Maharani", 15_000, "USD", "free", "submitted", false],
+// [name, loss bucket, plan, status, invited]
+const SEED: [string, BfBucketKey, "free" | "full", string, boolean][] = [
+  ["Rina Hartono", "lt1k", "free", "submitted", false],
+  ["Bagus Prasetyo", "lt1k", "free", "provisioned", false],
+  ["Kevin Tan", "lt1k", "full", "provisioned", true],
+  ["Sari Wulandari", "1k-10k", "full", "provisioned", true],
+  ["Dimas Saputra", "1k-10k", "full", "submitted", false],
+  ["Andre Gunawan", "1k-10k", "free", "rejected", false],
+  ["Michael Lim", "10k-50k", "full", "provisioned", true],
+  ["Putri Ananda", "10k-50k", "full", "approved", true],
+  ["Yusuf Hakim", "10k-50k", "free", "submitted", false],
+  ["Jonathan Wijaya", "10k-50k", "full", "provisioned", false],
+  ["Fajar Nugroho", "50k-100k", "full", "provisioned", true],
+  ["Lestari Dewi", "50k-100k", "full", "provisioned", true],
+  ["Hendra Kusuma", "50k-100k", "free", "approved", false],
+  ["Steven Halim", "100k+", "full", "provisioned", true],
+  ["Agus Salim", "100k+", "full", "provisioned", true],
+  ["Nadia Putri", "100k+", "full", "provisioned", false],
+  ["Rizky Ramadhan", "100k+", "full", "submitted", false],
+  ["Tommy Santoso", "100k+", "full", "provisioned", false],
+  ["Citra Maharani", "10k-50k", "free", "submitted", false],
 ];
 
 function seed(): DemoRow[] {
   const day = 24 * 3600 * 1000;
-  return SEED.map(([name, loss, cur, plan, status, invited], i) => {
+  return SEED.map(([name, bucket, plan, status, invited], i) => {
     const full = plan === "full";
     return {
       id: `bf-demo-${String(i + 1).padStart(2, "0")}`,
@@ -68,9 +66,7 @@ function seed(): DemoRow[] {
       name,
       contact: i % 2 ? `+62 812 5550 ${String(1000 + i * 37).slice(-4)}` : `@${name.split(" ")[0]!.toLowerCase()}trades`,
       answers: { experience: ["lt1", "1-3", "3-5", "5+"][i % 4], markets: ["crypto", "forex"], positionSize: "1k-10k" },
-      biggestLossAmount: loss,
-      biggestLossCurrency: cur,
-      biggestLossUsd: lossToUsd(loss, cur),
+      biggestLossBucket: bucket,
       bingxUid: String(48_201_337 + i * 7_919),
       hasBingxProof: true,
       plan,
@@ -123,9 +119,7 @@ export function demoBlackFriday(method: string, p: string, body: unknown): unkno
       name: v.name,
       contact: v.contact,
       answers: v.answers,
-      biggestLossAmount: v.biggestLossAmount,
-      biggestLossCurrency: v.biggestLossCurrency,
-      biggestLossUsd: lossToUsd(v.biggestLossAmount, v.biggestLossCurrency),
+      biggestLossBucket: v.biggestLossBucket,
       bingxUid: v.bingxUid,
       hasBingxProof: true,
       plan: v.plan,
