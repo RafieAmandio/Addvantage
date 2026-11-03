@@ -32,6 +32,7 @@ function VerifyContent() {
 
   return (
     <PaperAuthShell
+      scene="verify"
       eyebrow="Verification"
       title={
         <>

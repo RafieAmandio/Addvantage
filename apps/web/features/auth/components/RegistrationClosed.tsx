@@ -7,6 +7,7 @@ import { Roll } from "@/features/marketing/components/Roll";
 export function RegistrationClosed() {
   return (
     <PaperAuthShell
+      scene="signup"
       eyebrow="Registration / Invite only"
       title={
         <>

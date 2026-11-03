@@ -86,7 +86,7 @@ export function SignupWizard() {
   return (
     <PaperAuthShell
       eyebrow="Sign up"
-      figure={false}
+      scene="signup"
       title={
         <>
           This is a filter,
@@ -96,7 +96,7 @@ export function SignupWizard() {
       }
       copy="Three steps, then a liability waiver. If you can't get through it, this isn't for you."
       aside={
-        <ol className="mt-8 hidden border-t border-tv-ink md:block" aria-label="Sign-up steps">
+        <ol className="mb-10 hidden border-t border-tv-stone md:block" aria-label="Sign-up steps">
           {STEPS.map((s, i) => {
             const st = i < step ? "done" : i === step ? "now" : "next";
             return (
@@ -114,10 +114,10 @@ export function SignupWizard() {
         </ol>
       }
     >
-      {/* The one Signal on this screen: progress, as a hairline. */}
+      {/* Progress, as an ink hairline over the top rule (the plate carries the Signal). */}
       <div
         aria-hidden
-        className="absolute inset-x-0 -top-px h-[2px] origin-left bg-tv-signal motion-safe:transition-transform motion-safe:duration-[640ms]"
+        className="absolute inset-x-0 -top-px h-[2px] origin-left bg-tv-ink motion-safe:transition-transform motion-safe:duration-[640ms]"
         style={{ transform: `scaleX(${(step + 1) / 3})` }}
       />
       <div className="flex items-baseline justify-between gap-4">

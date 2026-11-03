@@ -6,8 +6,6 @@ import { useFormStatus } from "react-dom";
 import "@/features/marketing/landing.css";
 import { cn } from "@/lib/cn";
 import { tvFonts } from "@/features/marketing/lib/fonts";
-import { Build } from "@/features/marketing/components/iso/Build";
-import { Tilt } from "@/features/marketing/components/iso/Inspect";
 import { Roll } from "@/features/marketing/components/Roll";
 
 /** Field classes, the same as the Black Friday form. */
@@ -17,62 +15,77 @@ export const paperLabel = "block text-[15px] font-medium text-tv-ink";
 export const paperHint = "mt-1.5 text-[13px] leading-[1.45] text-tv-mute";
 export const paperErr = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
 
+type Scene = "login" | "signup" | "verify" | "waiver";
+
+/** One plate per auth page, each carrying the screen's one Signal (the flag, the lamp, the lit window). */
+const PLATES: Record<Scene, { src: string; alt: string; caption: string }> = {
+  login: { src: "/auth/terrain.webp", alt: "A terrain block whose ridgeline traces a price chart, a yellow flag on the highest swing", caption: "Plate 01 / Market structure" },
+  signup: { src: "/auth/desk-night.webp", alt: "A trader's desk drawn in hairlines, two charts on screen, the lamp in yellow", caption: "Plate 02 / The desk at night" },
+  verify: { src: "/auth/night-floor.webp", alt: "A city grid at night seen from a high window, one window lit yellow", caption: "Plate 03 / One light on" },
+  waiver: { src: "/auth/night-floor.webp", alt: "A city grid at night seen from a high window, one window lit yellow", caption: "Plate 03 / One light on" },
+};
+
 /**
- * The auth pages on Paper: lockup header, then the Black Friday split. Left is the pitch
- * (eyebrow, headline, one line, the VIP card off the landing, whose chip is the screen's one
- * Signal), right is the form. On a phone
- * the form comes first and the pitch follows it, without the card.
+ * The auth pages: a full-height Desk plate on the left with the headline set at its foot (the
+ * composition of the old auth pages), the form on Paper on the right. The plate wipes up on load
+ * and drifts slowly; reduced motion holds it still. On a phone the plate is a strip under the
+ * lockup, the headline follows it, then the form.
  */
 export function PaperAuthShell({
   eyebrow,
   title,
   copy,
   aside,
-  figure = true,
+  scene = "login",
   children,
 }: {
   eyebrow: React.ReactNode;
   title: React.ReactNode;
   copy: React.ReactNode;
+  /** Shown above the form on desktop (the sign-up steps). */
   aside?: React.ReactNode;
-  figure?: boolean;
+  scene?: Scene;
   children: React.ReactNode;
 }) {
+  const plate = PLATES[scene];
   return (
-    <main className={`tv-landing min-h-screen bg-tv-paper text-tv-ink ${tvFonts}`}>
-      <noscript>
-        <style>{".tv-figure [data-build]{opacity:1!important}"}</style>
-      </noscript>
-      <header className="px-4 md:px-8">
-        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between md:h-[72px]">
+    <main className={`tv-landing min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-2 ${tvFonts}`}>
+      <aside className="tv-on-desk relative isolate flex flex-col overflow-hidden bg-tv-desk px-4 pb-8 pt-4 text-tv-paper sm:px-6 md:sticky md:top-0 md:h-svh md:min-h-[640px] md:px-10 md:pb-8 md:pt-7">
+        <header className="flex h-10 items-center justify-between">
           <Link href="/" className="flex items-center" aria-label="TradeVantage home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
+            <img src="/brand/lockup-desk.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
           </Link>
-          <Link href="/" className="tv-link py-1 text-[15px] text-tv-graphite">
+          <Link href="/" className="tv-link py-1 text-[15px] text-tv-mutedesk hover:text-tv-paper">
             <span aria-hidden>←</span> Back to the site
           </Link>
+        </header>
+        <div className="tv-plate relative -mx-4 mt-4 h-[210px] sm:-mx-6 md:absolute md:inset-0 md:-z-10 md:m-0 md:h-auto">
+          <div className="tv-plate-frame h-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={plate.src} alt={plate.alt} width={1440} height={2160} fetchPriority="high" className="tv-plate-img h-full w-full object-cover object-[50%_72%]" />
+          </div>
         </div>
-      </header>
-      <div className="mx-auto grid w-full max-w-[1240px] gap-y-14 px-4 pb-20 pt-4 sm:px-6 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-x-20 md:px-10 md:pt-10">
-        <aside className="order-2 md:order-1 md:sticky md:top-10 md:self-start">
-          <div className="tv-eyebrow flex items-center gap-2.5 text-tv-mute">{eyebrow}</div>
-          <h1 className="mt-4 text-[clamp(2rem,4.4vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.035em] md:mt-5">{title}</h1>
-          <p className="mt-4 max-w-[30rem] text-[17px] leading-[1.55] text-tv-graphite md:mt-5">{copy}</p>
-          {figure && (
-            <Build immediate className="mt-8 hidden max-w-[320px] md:block">
-              <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at="250">
-                <Tilt>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full" />
-                </Tilt>
-              </div>
-            </Build>
-          )}
+        <div className="mt-6 md:mt-auto">
+          <p className="tv-eyebrow lv-in flex items-center gap-3 text-tv-mutedesk">
+            <span aria-hidden className="tv-rule h-px w-8 bg-tv-mutedesk" />
+            {eyebrow}
+          </p>
+          <h1 className="lv-in mt-4 text-[clamp(2.75rem,6.2vw,5.75rem)] font-semibold leading-[0.92] tracking-[-0.045em] [--i:1] md:mt-5">{title}</h1>
+          <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-mutedesk [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
+        </div>
+        <p className="tv-eyebrow hidden items-center gap-3 pt-8 text-tv-mutedesk md:flex">
+          {plate.caption}
+          <span aria-hidden className="h-px flex-1 bg-tv-line" />
+          TradeVantage
+        </p>
+      </aside>
+      <section className="flex min-w-0 items-center justify-center px-4 py-12 sm:px-6 md:px-12 md:py-16">
+        <div className="relative w-full max-w-[440px]">
           {aside}
-        </aside>
-        <section className="relative order-1 min-w-0 border-t border-tv-ink pt-6 md:order-2 md:max-w-[520px]">{children}</section>
-      </div>
+          {children}
+        </div>
+      </section>
     </main>
   );
 }

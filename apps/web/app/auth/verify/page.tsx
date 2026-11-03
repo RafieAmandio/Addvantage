@@ -24,6 +24,7 @@ export default function VerifyEmailPage() {
 
   return (
     <PaperAuthShell
+      scene="verify"
       eyebrow="Verification"
       title={
         <>
