@@ -16,10 +16,17 @@ const GRAIN =
 
 /** Paper grain as a pattern; every figure passes its own id so two SVGs never fight over one. */
 export const GrainDefs = ({ id }: { id: string }) => (
-  <pattern id={id} width={160} height={160} patternUnits="userSpaceOnUse">
-    <image href={GRAIN} width={160} height={160} />
-  </pattern>
+  <>
+    <pattern id={id} width={160} height={160} patternUnits="userSpaceOnUse">
+      <image href={GRAIN} width={160} height={160} />
+    </pattern>
+    {/* Hatching for the dark sides: fine diagonal hairlines a step lighter than the face. */}
+    <pattern id={`${id}-h`} width={6} height={6} patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
+      <path d="M0 1H6" stroke="#55575C" strokeWidth={1.3} />
+    </pattern>
+  </>
 );
+export const GRAIN_URL = GRAIN;
 
 const line = { stroke: INK, strokeWidth: 0.9, strokeLinejoin: "round" as const, vectorEffect: "non-scaling-stroke" as const };
 
@@ -38,6 +45,7 @@ export function Block({ b, u, face = "white", grain, view }: { b: B; u: number; 
           <g key={k}>
             <polygon points={p} fill={f.top ? s.top : mix(s.left, s.right, f.shade)} />
             {s.grain && grain && <polygon points={p} fill={`url(#${grain})`} opacity={0.14} />}
+            {grain && !f.top && s.right === "#1B1C1E" && f.shade > 0.5 && <polygon points={p} fill={`url(#${grain}-h)`} opacity={Math.min(1, (f.shade - 0.5) * 2)} />}
             <polygon points={p} fill="none" {...line} />
           </g>
         );

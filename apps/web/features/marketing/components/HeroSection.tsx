@@ -3,6 +3,8 @@ import type { HeroData } from "@/features/marketing/lib/landing";
 import { HeroDesk } from "@/features/marketing/components/HeroDesk";
 import { Magnet } from "@/features/marketing/components/Magnet";
 import { Roll } from "@/features/marketing/components/Roll";
+import { Jitter } from "@/features/marketing/components/ScrambleReveal";
+import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
 
 
 const LINKS = [
@@ -45,13 +47,15 @@ export function MarketingNav() {
 
 export function HeroSection({ hero }: { hero: HeroData }) {
   return (
-    <section className="relative z-10 flex flex-1 flex-col justify-center overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-20">
+    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col justify-center overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-20">
       <div className="mx-auto grid w-full max-w-[1240px] items-center gap-y-6 px-4 sm:px-6 md:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] md:gap-x-4 md:px-8 md:pb-16">
         <div className="relative z-10 flex flex-col items-start md:py-10">
           <p className="tv-eyebrow text-tv-mute">TradeVantage / daily desk</p>
           <h1 className="mt-5 text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
             <span className="block">Read the market.</span>
-            <span className="block">Not the noise.</span>
+            <span className="block">
+              Not the <Jitter text="noise" />.
+            </span>
           </h1>
           <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
             Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.

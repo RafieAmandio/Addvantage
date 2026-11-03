@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 /** What a figure says about one of its objects when it is hovered, tapped or focused. */
-export type Info = { main: string; lines?: string[]; aria: string; onPress?: () => void };
+export type Info = { main: string; lines?: string[]; aria: string; onPress?: () => void; onKey?: (e: React.KeyboardEvent) => boolean };
 
 /**
  * Inspect state for a figure: hover (mouse), tap or keyboard focus makes one object active.
@@ -35,6 +35,7 @@ export function useInspect() {
       info.onPress?.();
     },
     onKeyDown: (e: React.KeyboardEvent<SVGGElement>) => {
+      if (info.onKey?.(e)) return;
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         info.onPress?.();

@@ -301,6 +301,32 @@ html[data-scrolled] .lv-header > div {
 .tv-scene[data-dragging] .tv-obj {
   cursor: grabbing;
 }
+.tv-scene {
+  transform-origin: 50% 100%;
+  transform: perspective(1600px) rotateX(calc(var(--exit, 0) * 9deg)) rotateZ(calc(var(--exit, 0) * -1.5deg)) translateY(calc(var(--exit, 0) * -28px));
+}
+.tv-scene [data-level] {
+  cursor: ns-resize;
+  touch-action: none;
+}
+.tv-reset {
+  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: inherit;
+  color: #111214;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+  touch-action: manipulation;
+}
+/* The hero ground: the kit's paper grain, static, barely there. */
+.tv-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--tv-grain);
+  background-size: 160px 160px;
+  opacity: 0.05;
+}
 .tv-scene:focus-visible {
   outline-offset: 6px;
 }

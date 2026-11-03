@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { HeroData } from "@/features/marketing/lib/landing";
-import { P, box, depth, depthSort, hull, leader, silhouette, viewBox, type B, type V3, type View } from "@/features/marketing/lib/iso";
+import { C, P, S, box, depth, depthSort, hull, leader, pts, rot, silhouette, viewBox, type B, type V3, type View } from "@/features/marketing/lib/iso";
 import { Block, Cylinder, GrainDefs, Leader, Rise, Shadow, Slide, flat, type Face } from "./iso/Iso";
 import { Build, playBuild } from "./iso/Build";
 import { CopyPrice } from "./iso/CopyPrice";
@@ -85,7 +85,48 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
   const eat = useRef(false);
   const par = useRef(0);
   const { active, ring, bind, clear } = useInspect();
-  useEffect(() => () => (cancelAnimationFrame(tween.current), cancelAnimationFrame(par.current)), []);
+  // Your key level: null is the real one. Dragged along z, it snaps to the instrument's tick.
+  const [mine, setMine] = useState<number | null>(null);
+  const lvlDrag = useRef<{ id: number; y: number; p: number } | null>(null);
+  const heat = useRef(new Map<string, number>());
+  const heatLayer = useRef<SVGGElement>(null);
+  const heatRaf = useRef(0);
+  const viewRef = useRef<View>({ az: 0, ...PIVOT });
+  useEffect(() => () => (cancelAnimationFrame(tween.current), cancelAnimationFrame(par.current), cancelAnimationFrame(heatRaf.current)), []);
+
+  // A touch that starts on the plate drags the level, not the page (touch-action on SVG is not reliable).
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const hold = (e: TouchEvent) => (e.target as Element).closest?.("[data-level]") && e.preventDefault();
+    el.addEventListener("touchstart", hold, { passive: false });
+    return () => el.removeEventListener("touchstart", hold);
+  }, []);
+
+  // Scroll exit: as the hero leaves, the desk tips back a few degrees and drifts up. Scroll-linked,
+  // transform only; it reads window.scrollY, which Lenis drives, so the two never disagree.
+  useEffect(() => {
+    const el = root.current;
+    if (!el || reduced()) return;
+    let raf = 0;
+    let seen = true;
+    const io = new IntersectionObserver(([e]) => (seen = !!e?.isIntersecting));
+    io.observe(el);
+    const on = () => {
+      if (!seen || raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        el.style.setProperty("--exit", Math.min(1, Math.max(0, scrollY / innerHeight)).toFixed(3));
+      });
+    };
+    addEventListener("scroll", on, { passive: true });
+    on();
+    return () => {
+      io.disconnect();
+      removeEventListener("scroll", on);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const setAz = (a: number) => {
     azRef.current = a;
@@ -108,11 +149,24 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
   const snap = (a: number) => Math.round(a / 90) * 90;
 
   const view: View = { az, ...PIVOT };
+  viewRef.current = view;
+  const grid = Array.from({ length: 49 }, (_, k) => k - 15)
+    .flatMap((k) => [
+      [P(k, -15, -0.35, U, view), P(k, 28, -0.35, U, view)],
+      ...(k <= 28 ? [[P(-15, k, -0.35, U, view), P(34, k, -0.35, U, view)]] : []),
+    ])
+    .map(([a, b]) => `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`)
+    .join("");
   const n = d.bars.length;
   const lo = Math.min(d.level, ...d.bars.map((b) => b[3]));
   const hi = Math.max(d.level, ...d.bars.map((b) => b[2]));
   const z = (p: number) => BASE_Z + 0.3 + ((p - lo) / (hi - lo || 1)) * 6.0;
-  const zL = z(d.level);
+  const dec = d.fmt.level.split(".")[1]?.length ?? 0;
+  const tick = 10 ** -dec;
+  const lvlP = mine ?? d.level;
+  const zL = z(lvlP);
+  const lvlText = mine === null ? d.fmt.level : mine.toFixed(dec);
+  const crossed = mine === null ? [] : d.bars.map((b) => b[3] <= mine && mine <= b[2]);
   const sell = d.side === "sell";
   const LIVE_AT = 300 + (n - 1) * 150;
   const hour = Number(d.fmt.time.slice(-9, -7)) + Number(d.fmt.time.slice(-6, -4)) / 60;
@@ -140,7 +194,18 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
   items.push({
     id: "level",
     b: plate,
-    info: { main: "Key level", aria: `Key level ${d.sym} ${d.fmt.level}` },
+    info: {
+      main: "Key level",
+      aria: `Key level ${d.sym} ${lvlText}. Drag it, or use the up and down arrows, to move it one tick`,
+      onKey: (e) => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return false;
+        e.preventDefault();
+        e.stopPropagation();
+        const step = (e.key === "ArrowUp" ? 1 : -1) * (e.shiftKey ? 10 : 1);
+        setMine(clampP(lvlP + step * tick));
+        return true;
+      },
+    },
     el: (v) => (
       <Slide v={[0, 5, 0]} u={U} at={700} view={v}>
         <Block b={plate} u={U} face="ink" view={v} />
@@ -191,6 +256,7 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
           <Block b={body} u={U} face={face} grain={G} view={v} />
           {upW && <Block b={upW} u={U} face="ink" view={v} />}
           {sell && extEl(v)}
+          {crossed[i] && <polygon points={silhouette(body, U, v)} fill="none" stroke="#111214" strokeWidth={1.6} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" />}
         </Rise>
       ),
     });
@@ -345,22 +411,82 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
       root.current?.style.setProperty("--px", x.toFixed(3));
       root.current?.style.setProperty("--py", y.toFixed(3));
     });
+  // Your level: the price per world unit is the desk's own scale, snapped to the tick, kept on the chart.
+  function clampP(p: number) {
+    return Math.min(hi, Math.max(lo, Math.round(p / tick) * tick));
+  }
+  const levelDown = (e: React.PointerEvent<SVGGElement>) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    // Captured on the scene, not the plate: the plate's node moves in the depth order while it drags.
+    root.current?.setPointerCapture(e.pointerId);
+    lvlDrag.current = { id: e.pointerId, y: e.clientY, p: lvlP };
+  };
+  const levelMove = (e: React.PointerEvent) => {
+    const g = lvlDrag.current;
+    if (!g || g.id !== e.pointerId) return;
+    const px = (root.current?.clientWidth ?? vb.w) / vb.w; // screen px per user unit
+    const dz = -(e.clientY - g.y) / (px * U);
+    setMine(clampP(g.p + (dz * (hi - lo)) / 6));
+  };
+  const levelUp = (e: React.PointerEvent) => {
+    if (lvlDrag.current?.id === e.pointerId) lvlDrag.current = null;
+  };
+
+  // The pressure map: floor cells near the pointer ink in, then fade. One rAF loop, only while warm.
+  const paintHeat = () => {
+    const g = heatLayer.current;
+    if (!g) return;
+    const v = viewRef.current;
+    let out = "";
+    for (const [k, h] of heat.current) {
+      const nh = h * 0.93;
+      if (nh < 0.03) heat.current.delete(k);
+      else heat.current.set(k, nh);
+      const [i, j] = k.split(",").map(Number) as [number, number];
+      const zz = i >= 0 && i < 19 && j >= 0 && j < 13 ? 0 : -0.35;
+      out += `<polygon points="${pts([[i, j, zz], [i + 1, j, zz], [i + 1, j + 1, zz], [i, j + 1, zz]], U, v)}" fill-opacity="${(nh * 0.14).toFixed(3)}"/>`;
+    }
+    g.innerHTML = out;
+    heatRaf.current = heat.current.size ? requestAnimationFrame(paintHeat) : 0;
+  };
+  const warm = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const sx = vb.x + ((e.clientX - r.left) / r.width) * vb.w;
+    const sy = vb.y + ((e.clientY - r.top) / r.height) * vb.h;
+    // Screen to floor: on the desk top first, the floor below if that point is off the desk.
+    const at = (zz: number) => {
+      const a = sx / (C * U);
+      const b = (sy + zz * U) / (S * U);
+      return rot((a + b) / 2, (b - a) / 2, { az: -az, ...PIVOT });
+    };
+    let [x, y] = at(0);
+    if (x < 0 || x > 19 || y < 0 || y > 13) [x, y] = at(-0.35);
+    for (let i = Math.floor(x - 2); i <= x + 2; i++)
+      for (let j = Math.floor(y - 2); j <= y + 2; j++) {
+        const dd = Math.hypot(i + 0.5 - x, j + 0.5 - y);
+        if (dd < 1.8) heat.current.set(`${i},${j}`, Math.max(heat.current.get(`${i},${j}`) ?? 0, 1 - dd / 1.8));
+      }
+    if (!heatRaf.current) heatRaf.current = requestAnimationFrame(paintHeat);
+  };
+
   const fine = () => matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
   const perPx = () => 90 / Math.max(180, (root.current?.clientWidth ?? 600) * 0.38);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    if ((e.target as Element).closest("button")) return;
+    if ((e.target as Element).closest("button, [data-level]")) return;
     cancelAnimationFrame(tween.current);
     drag.current = { x: e.clientX, az: azRef.current, id: e.pointerId, on: false, last: e.clientX, t: e.timeStamp, v: 0 };
   };
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (lvlDrag.current) return levelMove(e);
     const g = drag.current;
     if (!g || g.id !== e.pointerId) {
       if (e.pointerType !== "mouse" || !fine()) return;
       const r = e.currentTarget.getBoundingClientRect();
       const x = ((e.clientX - r.left) / r.width) * 2 - 1;
       const y = ((e.clientY - r.top) / r.height) * 2 - 1;
+      warm(e);
       return lean(x, y);
     }
     const dx = e.clientX - g.x;
@@ -412,8 +538,8 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
         data-inspecting={active ?? undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
-        onPointerUp={(e) => end(e, false)}
-        onPointerCancel={(e) => end(e, true)}
+        onPointerUp={(e) => (levelUp(e), end(e, false))}
+        onPointerCancel={(e) => (levelUp(e), end(e, true))}
         onPointerLeave={(e) => e.pointerType === "mouse" && !drag.current && lean(0, 0)}
         onClickCapture={(e) => {
           if (eat.current) e.stopPropagation();
@@ -425,13 +551,27 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
           <defs>
             <GrainDefs id={G} />
           </defs>
+          {/* The floor: a faint grid in the same projection, turning with the desk, fading out to the edges. */}
+          <radialGradient id="hx-fade-g">
+            <stop offset="0.3" stopColor="#fff" />
+            <stop offset="0.75" stopColor="#000" />
+          </radialGradient>
+          <mask id="hx-fade" maskContentUnits="objectBoundingBox">
+            <rect width={1} height={1} fill="url(#hx-fade-g)" />
+          </mask>
+          <path d={grid} mask="url(#hx-fade)" fill="none" stroke="#111214" strokeOpacity={0.08} strokeWidth={0.6} vectorEffect="non-scaling-stroke" />
           <Shadow b={DESK} u={U} z={-0.35} off={0.65} view={view} />
           <Block b={DESK} u={U} grain={G} view={view} />
+          <g ref={heatLayer} fill="#111214" />
         </svg>
         <div ref={front} className="tv-par-front absolute inset-0">
           <svg viewBox={`${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`} className="absolute inset-0 h-full w-full overflow-visible">
             {sorted.map((it) =>
-              it.info ? (
+              it.id === "level" ? (
+                <g key={it.id} {...bind(it.id, it.info!)} data-level="" onPointerDown={levelDown}>
+                  {it.el(view)}
+                </g>
+              ) : it.info ? (
                 <g key={it.id} {...bind(it.id, it.info)}>
                   {it.el(view)}
                 </g>
@@ -465,9 +605,17 @@ export function HeroDesk({ d, className }: { d: HeroData; className?: string }) 
           <div className="pointer-events-none absolute inset-0" style={{ opacity: show }}>
           <div data-cue={LIVE_AT - 200} className={cn("tv-label absolute", labelAt(lvl, quarter === 0), hide("level"))} style={{ ...pos(lvl.ex, lvl.ey), ...tx(lvl) }}>
             <span className="tv-label-main">Key level</span>
-            <CopyPrice text={`${d.sym} ${d.fmt.level}`} className="tv-label-sub">
-              {d.sym} <Ticker value={d.fmt.level} />
+            <CopyPrice text={`${d.sym} ${lvlText}`} className="tv-label-sub">
+              {d.sym} {mine === null ? <Ticker value={d.fmt.level} /> : lvlText}
             </CopyPrice>
+            {mine !== null && (
+              <span className="tv-label-sub">
+                <span className="hidden sm:inline">{crossed.filter(Boolean).length}/{n} wicks through </span>
+                <button type="button" className="tv-reset" onClick={() => setMine(null)}>
+                  Reset
+                </button>
+              </span>
+            )}
           </div>
           <div data-cue={LIVE_AT + 1500} className={cn("tv-label absolute", labelAt(rej, quarter === 0), hide())} style={{ ...pos(rej.ex, rej.ey), ...tx(rej) }}>
             <span className="tv-label-main">Rejection H1</span>

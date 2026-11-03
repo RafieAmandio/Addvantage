@@ -78,3 +78,35 @@ export function Scramble({ text, delay = 0, duration = 700, className }: { text:
     </span>
   );
 }
+
+/** A word that jitters briefly when the pointer passes over it: every letter flickers, then they settle left to right. */
+export function Jitter({ text, className }: { text: string; className?: string }) {
+  const [display, setDisplay] = useState(text);
+  const id = useRef<ReturnType<typeof setInterval>>();
+  useEffect(() => () => clearInterval(id.current), []);
+  return (
+    <span
+      className={className}
+      aria-label={text}
+      onPointerEnter={(e) => {
+        if (e.pointerType !== "mouse" || calm() || id.current) return;
+        let f = 0;
+        id.current = setInterval(() => {
+          f++;
+          setDisplay(text.split("").map((ch, i) => (f > 3 + i * 1.5 ? ch : CHARS[Math.floor(Math.random() * 26)]!.toLowerCase())).join(""));
+          if (f > 4 + text.length * 1.5) {
+            clearInterval(id.current);
+            id.current = undefined;
+            setDisplay(text);
+          }
+        }, 40);
+      }}
+    >
+      {/* The real word sets the width, so nothing reflows while it jitters. */}
+      <span aria-hidden className="relative inline-block">
+        <span className="invisible">{text}</span>
+        <span className="absolute inset-0">{display}</span>
+      </span>
+    </span>
+  );
+}
