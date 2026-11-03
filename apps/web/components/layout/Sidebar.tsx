@@ -4,7 +4,8 @@ import { isMockMode } from "@/lib/config/public";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useAppState, isPaid } from "@/lib/state";
+import { canOpenRoute } from "@tradevantage/shared";
+import { useAppState, isPaid, type Tier } from "@/lib/state";
 import { apiGet } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import { LogoutButton } from "@/features/auth/components/LogoutButton";
@@ -24,7 +25,6 @@ interface NavEntry {
   href: string;
   group: string;
   icon: string;
-  locked?: boolean;
   /** Shown with a SOON tag; the route renders a coming-soon page. */
   soon?: boolean;
   /** One-line header tagline for the route. */
@@ -37,8 +37,8 @@ const nav: NavEntry[] = [
   { label: "News", href: "/app/news", group: "main", icon: "news", tagline: "Market-moving news with what it means for price." },
   { label: "Calendar", href: "/app/calendar", group: "main", icon: "calendar", tagline: "Scheduled events, forecasts and their last reactions." },
   { label: "Channel", href: "/app/channel", group: "main", icon: "channel", tagline: "Desk notes and threads from the analysts." },
-  { label: "Trading Plan", href: "/app/plan", group: "tools", locked: true, icon: "plan", tagline: "Entries, stops and targets with the thesis behind them." },
-  { label: "Consultation", href: "/app/consult", group: "tools", locked: true, icon: "consult", tagline: "Ask the desk about a setup, one to one." },
+  { label: "Trading Plan", href: "/app/plan", group: "tools", icon: "plan", tagline: "Entries, stops and targets with the thesis behind them." },
+  { label: "Consultation", href: "/app/consult", group: "tools", icon: "consult", tagline: "Ask the desk about a setup, one to one." },
   { label: "Education", href: "/app/education", group: "tools", icon: "education", tagline: "Primers and video modules for the method." },
   { label: "Hashtags", href: "/app/tags", group: "tools", icon: "tags", tagline: "Every item filed by theme." },
   { label: "RSI Heatmap", href: "/app/heatmap", group: "tools-forex", icon: "heatmap", tagline: "Overbought and oversold across pairs and timeframes." },
@@ -47,8 +47,8 @@ const nav: NavEntry[] = [
   { label: "Morning Scan", href: "/app/lab/scan", group: "tools-forex", icon: "scan", tagline: "Read every market after the daily close, then rank today's plan." },
   { label: "Chart Lab", href: "/app/lab", group: "tools-forex", icon: "method", soon: !isMockMode(), tagline: "Key levels, breakouts and setups drawn on the chart for every market." },
   { label: "Gap Scanner", href: "/app/gap-screener", group: "tools-forex", icon: "gap", tagline: "Weekend gaps and whether they filled." },
-  { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", locked: true, icon: "unlocks", tagline: "Supply shocks from upcoming unlocks, top 200 only." },
-  { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", locked: true, icon: "radar", tagline: "Network upgrades and launches that move price." },
+  { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", icon: "unlocks", tagline: "Supply shocks from upcoming unlocks, top 200 only." },
+  { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", icon: "radar", tagline: "Network upgrades and launches that move price." },
   { label: "Intel Map", href: "/app/intel", group: "tools", icon: "intel", tagline: "Where the news is coming from." },
   { label: "Watchlist", href: "/app/watchlist", group: "tools", icon: "watchlist", tagline: "The instruments you follow." },
   { label: "Journal", href: "/app/journal", group: "tools", icon: "journal", tagline: "Check a plan before you trade, log it, and see what links your winners." },
@@ -224,7 +224,7 @@ export function Sidebar() {
         {!rail && (
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-medium text-white">{operatorName}</span>
-            <span className="block text-xs text-white/55">{paid ? "VIP+ Trader" : "Free"}</span>
+            <span className="block text-xs text-white/55">{paid ? "VIP+ Trader" : tier === "crypto" ? "Crypto" : "Free"}</span>
           </span>
         )}
       </Link>
@@ -232,16 +232,16 @@ export function Sidebar() {
       {/* Navigation */}
       <nav aria-label="Main" className="-mx-1 flex-1 overflow-y-auto px-1 pb-4">
         <NavGroup label="Main" rail={rail}>
-          {group("main").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} paid={paid} rail={rail} />)}
+          {group("main").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} tier={tier} rail={rail} />)}
         </NavGroup>
         <NavGroup label="Tools" rail={rail}>
-          {group("tools").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} paid={paid} rail={rail} />)}
+          {group("tools").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} tier={tier} rail={rail} />)}
         </NavGroup>
         <NavGroup label="Forex" rail={rail}>
-          {group("tools-forex").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} paid={paid} rail={rail} />)}
+          {group("tools-forex").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} tier={tier} rail={rail} />)}
         </NavGroup>
         <NavGroup label="Crypto" rail={rail}>
-          {group("tools-crypto").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} paid={paid} rail={rail} />)}
+          {group("tools-crypto").map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} tier={tier} rail={rail} />)}
         </NavGroup>
         {!rail && partners.length > 0 && (
           <div className="mt-3">
@@ -277,8 +277,8 @@ export function Sidebar() {
           </div>
         )}
         <NavGroup label="Account" rail={rail}>
-          {group(["self", "account"]).map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} paid={paid} rail={rail} />)}
-          {isAdmin && group("admin").map((n) => <NavItem key={n.href} {...n} active={pathname.startsWith("/admin")} paid={paid} rail={rail} />)}
+          {group(["self", "account"]).map((n) => <NavItem key={n.href} {...n} active={isActive(pathname, n.href)} tier={tier} rail={rail} />)}
+          {isAdmin && group("admin").map((n) => <NavItem key={n.href} {...n} active={pathname.startsWith("/admin")} tier={tier} rail={rail} />)}
           <LogoutButton
             className={cn(
               "flex h-8 w-full items-center gap-3 rounded-xl text-[14px] font-medium text-white/55 transition-colors hover:bg-panel/60 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
@@ -366,12 +366,13 @@ function NavGroup({ label, rail, children }: { label: string; rail: boolean; chi
 }
 
 function NavItem({
-  label, href, icon, active, locked, soon, paid, rail,
+  label, href, icon, active, soon, tier, rail,
 }: {
   label: string; href: string; icon: string;
-  active?: boolean; locked?: boolean; soon?: boolean; paid: boolean; rail: boolean;
+  active?: boolean; soon?: boolean; tier: Tier; rail: boolean;
 }) {
-  const isLocked = locked && !paid;
+  // Same rule as the page guards: shared canOpenRoute. Admin console isn't an /app route.
+  const isLocked = href.startsWith("/app") && !canOpenRoute(tier, href);
   return (
     <Link
       href={href}

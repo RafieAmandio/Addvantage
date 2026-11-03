@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canOpenRoute } from "@tradevantage/shared";
 import { getProfile } from "@/lib/auth/session";
 import { getTokenUnlocks } from "@/features/unlocks/queries/unlocks";
 import { UnlocksView, UnlocksShell } from "@/features/unlocks/components/UnlocksView";
@@ -10,7 +11,7 @@ export const revalidate = 0;
 
 export default async function UnlocksPage() {
   const profile = await getProfile();
-  const hasAccess = !!profile && (profile.tier === "vip" || profile.isAdmin);
+  const hasAccess = !!profile && (canOpenRoute(profile.tier, "/app/unlocks") || profile.isAdmin);
 
   if (!hasAccess) return <UnlocksLocked />;
 
