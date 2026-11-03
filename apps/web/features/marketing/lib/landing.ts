@@ -26,6 +26,8 @@ export interface ReadData {
 }
 export interface PracticeData {
   sym: string; bars: Bar[]; after: Bar[]; thrust: number; prompt: string; feedback: string;
+  /** The app's own feedback for a wrong tap: one candle early or late, or further off either way. */
+  wrong: { early1: string; late1: string; early: string; late: string };
   price: number; stop: number; target: number; kind: "win" | "loss"; r: string;
   fmt: { price: string; stop: string; target: string };
 }
@@ -132,6 +134,12 @@ function practice(): PracticeData {
   return {
     sym: sym(row.symbol), bars: bars.map(bar), after: after.map(bar), thrust: t - start, prompt: ask,
     feedback: gradeThrust(l, bars, l.thrust!.time).feedback,
+    wrong: {
+      early1: gradeThrust(l, bars, bars[Math.max(0, t - start - 1)]!.time).feedback,
+      late1: gradeThrust(l, bars, bars[Math.min(bars.length - 1, t - start + 1)]!.time).feedback,
+      early: gradeThrust(l, bars, bars[0]!.time).feedback,
+      late: gradeThrust(l, bars, bars.at(-1)!.time).feedback,
+    },
     price: l.price, stop: l.stop!, target: l.target!, kind: drill.outcome.kind as "win" | "loss",
     r: drill.outcome.kind === "win" ? `+${(drill.outcome.r ?? 0).toFixed(2)}R` : "-1R",
     fmt: { price: p(l.price), stop: p(l.stop!), target: p(l.target!) },

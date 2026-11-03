@@ -6,8 +6,8 @@ import { cn } from "@/lib/cn";
 export type TrainTab = { label: string; title: string; body: string; demo: React.ReactNode };
 
 /**
- * The three training tools in one stage: a segmented control picks the tool, its copy sits beside
- * the switch and its demo plays in the stage. Only the picked demo is mounted, so the other two
+ * The three training tools in one stage: plain mono tabs pick the tool, its copy sits under them
+ * and its sheet lies in the stage. Only the picked demo is mounted, so the other two
  * do not run their loops unseen. Arrow keys move between tabs.
  */
 export function TrainTabs({ tabs }: { tabs: TrainTab[] }) {
@@ -18,12 +18,12 @@ export function TrainTabs({ tabs }: { tabs: TrainTab[] }) {
     document.getElementById(`train-tab-${i}`)?.focus();
   };
   return (
-    <div className="grid items-center gap-8 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-12">
+    <div className="grid items-start gap-6 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-12">
       <div className="flex flex-col">
         <div
           role="tablist"
           aria-label="Training tools"
-          className="grid grid-cols-3 border border-tv-ink"
+          className="flex gap-6 font-mono text-[12px] uppercase tracking-[0.08em]"
           onKeyDown={(e) => {
             if (e.key === "ArrowRight") pick((on + 1) % tabs.length);
             else if (e.key === "ArrowLeft") pick((on + tabs.length - 1) % tabs.length);
@@ -39,18 +39,18 @@ export function TrainTabs({ tabs }: { tabs: TrainTab[] }) {
               aria-controls="train-stage"
               tabIndex={on === i ? 0 : -1}
               onClick={() => setOn(i)}
-              className={cn("tv-seg font-mono text-[11px] uppercase tracking-[0.08em] sm:text-[12px]", on === i && "tv-seg-on", i > 0 && "border-l border-tv-ink")}
+              className={cn("tv-tab py-1", on === i ? "text-tv-ink" : "text-tv-mute")}
             >
               {x.label}
             </button>
           ))}
         </div>
-        <div key={on} className="lv-in mt-6 max-w-[52ch]">
+        <div key={on} className="lv-in mt-5 max-w-[44ch]">
           <h3 className="text-2xl font-semibold tracking-[-0.02em] md:text-[28px]">{t.title}</h3>
           <p className="mt-2 text-[16px] leading-relaxed text-tv-graphite">{t.body}</p>
         </div>
       </div>
-      <div id="train-stage" role="tabpanel" aria-labelledby={`train-tab-${on}`} className="md:min-h-[440px]">
+      <div id="train-stage" role="tabpanel" aria-labelledby={`train-tab-${on}`}>
         <div key={on} className="lv-in">
           {t.demo}
         </div>

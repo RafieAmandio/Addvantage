@@ -1,36 +1,22 @@
-import { barText, exact, type KillData, type PracticeData, type ScanData } from "@/features/marketing/lib/landing";
-import { CandlesFigure } from "@/features/marketing/components/iso/Figures";
-import { Scramble } from "@/features/marketing/components/ScrambleReveal";
+import type { KillData, PracticeData, ScanData } from "@/features/marketing/lib/landing";
 import { TrainTabs } from "./TrainTabs";
 import { KillDemo } from "./demos/KillDemo";
 import { PracticeDemo } from "./demos/PracticeDemo";
 import { ScanDemo } from "./demos/ScanDemo";
 
-/** The training tools, each one running by itself on real candles, one at a time in a single stage. */
+/** The training tools on real candles, one sheet at a time on the desk. The practice drill is played for real. */
 export function TrainSection({ practice, scan, kill }: { practice: PracticeData; scan: ScanData; kill: KillData }) {
   return (
     <section id="train" className="relative z-10 flex flex-col justify-center overflow-hidden bg-tv-paper py-16 text-tv-ink md:min-h-[100svh] md:py-[clamp(2.5rem,6svh,4rem)]">
       <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-6 md:px-10">
-        <div className="grid items-end gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-8">
-          <div>
-            <p data-reveal className="tv-eyebrow text-tv-mute">Training</p>
-            <h2 data-reveal className="mt-5 text-[clamp(2.4rem,min(5.6vw,8svh),4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
-              <Scramble text="Train your eye." />
-            </h2>
-            <p data-reveal style={{ ["--i" as string]: 1 }} className="mt-5 max-w-[42ch] text-[17px] leading-relaxed text-tv-graphite">
-              Reading a chart is a skill, so it gets practised like one. Real past markets, graded by the same rules the app trades on.
-            </p>
-          </div>
-          <CandlesFigure
-            sym={practice.sym}
-            bars={practice.bars.slice(-3)}
-            text={practice.bars.slice(-3).map(barText)}
-            high={exact(practice.bars.at(-1)![2])}
-            className="mx-auto w-full max-w-[min(300px,28svh)] md:mr-0"
-          />
+        <div className="grid items-end gap-x-12 gap-y-4 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
+          <h2 className="text-[clamp(2.4rem,min(5vw,8svh),4.25rem)] font-semibold leading-[0.98] tracking-[-0.035em]">Train your eye.</h2>
+          <p className="max-w-[48ch] text-[17px] leading-relaxed text-tv-graphite">
+            Reading a chart is a skill, so it gets practised like one. Real past markets, graded by the same rules the app trades on.
+          </p>
         </div>
 
-        <div data-reveal="card" className="mt-10 md:mt-[clamp(1.5rem,5svh,3.5rem)]">
+        <div className="mt-8 border-t border-tv-ink pt-6 md:mt-[clamp(1.5rem,4svh,2.5rem)]">
           <TrainTabs
             tabs={[
               {
