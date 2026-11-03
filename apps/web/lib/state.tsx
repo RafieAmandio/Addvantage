@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiGet } from "@/lib/api/client";
-export type Tier = "visitor" | "free" | "vip";
+import { isMockMode } from "@/lib/config/public";
+export type Tier = "visitor" | "free" | "crypto" | "vip";
 
 interface TraderProfile {
   tradingLength: string;
@@ -72,9 +73,15 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   // Sync tier + display name from backend so localStorage reflects real values.
   useEffect(() => {
     if (!hydrated) return;
+    // Demo mode has no API: the demo operator is VIP+ so every page is open.
+    // `?as=crypto` previews the Black Friday free tier instead (demo only).
+    if (isMockMode()) {
+      setTierState(new URLSearchParams(window.location.search).get("as") === "crypto" ? "crypto" : "vip");
+      return;
+    }
     apiGet<{ tier: string; email?: string; handle?: string }>("/users/me")
       .then((data) => {
-        const backendTier: Tier = data?.tier === "vip" ? "vip" : "free";
+        const backendTier: Tier = data?.tier === "vip" || data?.tier === "crypto" ? data.tier : "free";
         setTierState(backendTier);
         // Display name in the sidebar/topbar = the email's local part (drop the
         // "@domain"), e.g. "jane.doe@gmail.com" → "jane.doe". Fall back to the

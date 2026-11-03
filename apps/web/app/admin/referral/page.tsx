@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
 
 interface ReferralPartner {
@@ -151,272 +152,233 @@ export default function AdminReferralPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          ● Loading Referral Partners
-        </div>
+      <div className="flex min-h-[40vh] items-center justify-center text-[13px] text-white/40">
+        Loading referral partners
       </div>
     );
   }
 
+  const label = "mb-2 block text-[13px] font-medium text-white/70";
+  const input =
+    "h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+  const smallBtn =
+    "inline-flex h-8 items-center rounded-full border border-white/[0.14] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+  const newBtn = (
+    <button
+      onClick={() => { resetForm(); setShowForm(true); }}
+      className="inline-flex h-8 items-center rounded-full bg-brand px-3.5 text-[13px] font-semibold text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+    >
+      New partner
+    </button>
+  );
+
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            Affiliate · Trading Platforms
-          </span>
-          <h1 className="mt-2 font-mono text-2xl font-bold text-white">
-            Referral Partners
-          </h1>
-          <p className="mt-2 max-w-2xl font-mono text-sm font-light text-white/50">
-            Manage trading platform referral links displayed in the app sidebar.
-          </p>
-        </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-        >
-          + New Partner
-        </button>
-      </div>
-
-      <div className="mt-8 h-px bg-white/20" />
-
-      {showForm && (
-        <div className="mt-6 border border-brand/40 bg-black p-6">
-          <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            {editId ? "Edit Partner" : "New Partner"}
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <Panel
+        title="Referral partners"
+        sub="Trading platform referral links shown in the app sidebar."
+        action={newBtn}
+        className={cn(!showForm && "lg:col-span-2")}
+      >
+        {partners.length === 0 ? (
+          <div className="py-10 text-center">
+            <p className="text-[15px] font-medium text-white">No partners yet</p>
+            <p className="mt-1 text-[13px] text-white/55">Add your first referral partner.</p>
           </div>
-
-          {saveError && (
-            <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-              {saveError}
+        ) : (
+          <>
+            <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_3rem_auto] gap-4 border-b border-white/[0.07] pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 md:grid">
+              <span>Partner</span>
+              <span>Tagline and link</span>
+              <span className="text-right">Order</span>
+              <span className="w-[210px] text-right">Actions</span>
             </div>
-          )}
-
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Name
-              </span>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Bitget"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Category
-              </span>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-              >
-                <option value="crypto_exchange">Crypto Exchange</option>
-                <option value="broker">Broker</option>
-              </select>
-            </label>
-          </div>
-
-          <label className="mb-4 block">
-            <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-              Referral URL
-            </span>
-            <input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.bitget.com/referral/..."
-              className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-            />
-          </label>
-
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Tagline
-              </span>
-              <input
-                value={tagline}
-                onChange={(e) => setTagline(e.target.value)}
-                placeholder="Cashback fees 20%"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
-            <div className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Icon
-              </span>
-              <div className="flex items-center gap-3">
-                {iconUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={iconUrl} alt="" width={32} height={32} className="shrink-0 rounded border border-gray-3" />
-                )}
-                <label className="flex cursor-pointer items-center gap-2 border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand">
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp,image/gif"
-                    className="hidden"
-                    disabled={uploading}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setUploading(true);
-                      setSaveError(null);
-                      try {
-                        const url = await uploadIcon(file);
-                        setIconUrl(url);
-                      } catch (err) {
-                        setSaveError(err instanceof Error ? err.message : "Upload failed");
-                      } finally {
-                        setUploading(false);
-                        e.target.value = "";
-                      }
-                    }}
-                  />
-                  {uploading ? "Uploading..." : "Upload"}
-                </label>
-                <span className="font-mono text-[9px] text-white/30">or</span>
-                <input
-                  value={iconUrl}
-                  onChange={(e) => setIconUrl(e.target.value)}
-                  placeholder="Paste URL"
-                  className="min-w-0 flex-1 border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30 transition-colors focus-visible:border-brand focus-visible:outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-4 grid grid-cols-2 gap-4">
-            <label className="block">
-              <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                Sort Order
-              </span>
-              <input
-                type="number"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(Number(e.target.value))}
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-sm text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
-              />
-            </label>
-            <label className="flex items-center gap-2 self-end pb-2">
-              <input
-                type="checkbox"
-                checked={active}
-                onChange={(e) => setActive(e.target.checked)}
-                className="accent-brand"
-              />
-              <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/60">
-                Active (visible in sidebar)
-              </span>
-            </label>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onSubmit}
-              disabled={saving || !name.trim() || !url.trim()}
-              className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              {saving ? "Saving..." : editId ? "Update" : "Create"}
-            </button>
-            <button
-              onClick={resetForm}
-              className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {partners.length === 0 && !showForm && (
-        <div className="py-20 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            No partners registered
-          </div>
-          <div className="mt-4 font-mono text-xl font-bold text-white">
-            Add your first referral partner.
-          </div>
-        </div>
-      )}
-
-      <div className="mt-6 space-y-px bg-gray-3">
-        {partners.map((p) => (
-          <div
-            key={p.id}
-            className={cn(
-              "grid grid-cols-12 gap-4 bg-black p-5 transition-colors hover:bg-gray-2",
-              !p.active && "opacity-50"
-            )}
-          >
-            <div className="col-span-12 md:col-span-3">
-              <div className="flex items-center gap-3">
-                {p.iconUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.iconUrl} alt="" width={24} height={24} className="shrink-0 rounded" />
-                ) : (
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-white/10 text-[10px] font-bold text-white/60">
-                    {p.name.charAt(0)}
-                  </span>
-                )}
-                <div>
-                  <div className="font-display text-lg text-white">{p.name}</div>
-                  <div className={cn(
-                    "mt-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                    p.active ? "text-moss" : "text-white/40"
-                  )}>
-                    {p.active ? "● ACTIVE" : "○ INACTIVE"}
+            <div className="divide-y divide-white/[0.07]">
+              {partners.map((p) => (
+                <div
+                  key={p.id}
+                  className={cn(
+                    "grid gap-2 py-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_3rem_auto] md:items-center md:gap-4",
+                    !p.active && "opacity-50"
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    {p.iconUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.iconUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-lg" />
+                    ) : (
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-raised text-[12px] font-semibold text-white/60">
+                        {p.name.charAt(0)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <div className="truncate text-[14px] font-medium text-white">{p.name}</div>
+                      <div className="text-[12px]">
+                        <span className={p.active ? "text-up" : "text-white/40"}>{p.active ? "Active" : "Inactive"}</span>
+                        <span className="text-white/40"> · {p.category === "crypto_exchange" ? "Crypto exchange" : "Broker"}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[13px] text-white/70">{p.tagline || "No tagline"}</div>
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block truncate text-[12px] text-white/40 transition-colors hover:text-white"
+                    >
+                      {p.url}
+                    </a>
+                  </div>
+                  <div className="text-[13px] text-white/55 md:text-right">
+                    <span className="md:hidden">Order </span>
+                    <span className="font-num text-[16px] font-semibold text-white">{p.sortOrder}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 md:w-[210px] md:justify-end">
+                    <button onClick={() => toggleActive(p)} className={smallBtn}>
+                      {p.active ? "Disable" : "Enable"}
+                    </button>
+                    <button onClick={() => startEdit(p)} className={smallBtn}>
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => onDelete(p.id)}
+                      className="inline-flex h-8 items-center rounded-full px-3 text-[13px] font-medium text-down transition-colors hover:bg-down/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </>
+        )}
+      </Panel>
+
+      {showForm && (
+        <aside className="order-first lg:sticky lg:top-4 lg:order-none lg:self-start">
+          <Panel title={editId ? "Edit partner" : "New partner"}>
+            {saveError && (
+              <p role="alert" className="mb-4 text-[13px] text-down">
+                {saveError}
+              </p>
+            )}
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className={label}>Name</span>
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Bitget" className={input} />
+                </label>
+                <label className="block">
+                  <span className={label}>Category</span>
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} className={input}>
+                    <option value="crypto_exchange">Crypto Exchange</option>
+                    <option value="broker">Broker</option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="block">
+                <span className={label}>Referral URL</span>
+                <input
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://www.bitget.com/referral/..."
+                  className={input}
+                />
+              </label>
+
+              <label className="block">
+                <span className={label}>Tagline</span>
+                <input
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder="Cashback fees 20%"
+                  className={input}
+                />
+              </label>
+
+              <div>
+                <span className={label}>Icon</span>
+                <div className="flex items-center gap-2">
+                  {iconUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={iconUrl} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-lg" />
+                  )}
+                  <label className="inline-flex h-11 shrink-0 cursor-pointer items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-within:ring-1 focus-within:ring-brand">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/gif"
+                      className="sr-only"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploading(true);
+                        setSaveError(null);
+                        try {
+                          const url = await uploadIcon(file);
+                          setIconUrl(url);
+                        } catch (err) {
+                          setSaveError(err instanceof Error ? err.message : "Upload failed");
+                        } finally {
+                          setUploading(false);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    {uploading ? "Uploading" : "Upload"}
+                  </label>
+                  <input
+                    value={iconUrl}
+                    onChange={(e) => setIconUrl(e.target.value)}
+                    placeholder="or paste URL"
+                    className={cn(input, "min-w-0 flex-1")}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 items-end gap-3">
+                <label className="block">
+                  <span className={label}>Sort order</span>
+                  <input
+                    type="number"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(Number(e.target.value))}
+                    className={cn(input, "font-num text-[17px]")}
+                  />
+                </label>
+                <label className="flex h-11 items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={active}
+                    onChange={(e) => setActive(e.target.checked)}
+                    className="h-4 w-4 accent-brand"
+                  />
+                  <span className="text-[13px] text-white/70">Active in sidebar</span>
+                </label>
               </div>
             </div>
-            <div className="col-span-12 md:col-span-5">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                {p.category === "crypto_exchange" ? "Crypto Exchange" : "Broker"}
-              </div>
-              <div className="mt-1 text-sm text-white/70">{p.tagline || "—"}</div>
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block font-mono text-[9px] uppercase tracking-widest2 text-white/30 transition-colors hover:text-brand"
-              >
-                {p.url.length > 50 ? p.url.slice(0, 47) + "..." : p.url}
-              </a>
-            </div>
-            <div className="col-span-12 md:col-span-1">
-              <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                Order
-              </div>
-              <div className="mt-1 font-mono text-sm text-white/70">{p.sortOrder}</div>
-            </div>
-            <div className="col-span-12 flex items-center gap-2 md:col-span-3 md:justify-end">
+
+            <div className="mt-6 flex items-center gap-2">
               <button
-                onClick={() => toggleActive(p)}
-                className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                onClick={onSubmit}
+                disabled={saving || !name.trim() || !url.trim()}
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-brand px-6 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
               >
-                {p.active ? "Disable" : "Enable"}
+                {saving ? "Saving" : editId ? "Update" : "Create"}
               </button>
               <button
-                onClick={() => startEdit(p)}
-                className="border border-gray-3 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                onClick={resetForm}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-white/[0.14] px-6 text-[14px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
               >
-                Edit
-              </button>
-              <button
-                onClick={() => onDelete(p.id)}
-                className="border border-blood/40 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright/60 transition-colors hover:bg-blood hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                Delete
+                Cancel
               </button>
             </div>
-          </div>
-        ))}
-      </div>
+          </Panel>
+        </aside>
+      )}
     </div>
   );
 }

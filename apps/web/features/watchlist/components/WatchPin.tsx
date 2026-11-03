@@ -36,11 +36,9 @@ export function WatchPin({
       aria-label={pinned ? `Unpin ${ticker}` : `Pin ${ticker}`}
       aria-pressed={pinned}
       className={cn(
-        "inline-flex items-center justify-center border transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-        size === "sm" ? "h-5 w-5 text-[10px]" : "h-6 w-6 text-xs",
-        pinned
-          ? "border-brand bg-brand/10 text-brand hover:border-blood hover:bg-blood/10 hover:text-blood-bright"
-          : "border-white/20 text-white/40 hover:border-brand hover:text-brand",
+        "inline-flex shrink-0 items-center justify-center rounded-full leading-none transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+        size === "sm" ? "h-6 w-6 text-[13px]" : "h-7 w-7 text-[15px]",
+        pinned ? "text-brand hover:text-white/55" : "text-white/30 hover:text-white",
         className
       )}
     >

@@ -4,7 +4,7 @@ import { upgradeRadarFixture } from "@/features/upgrades/mock";
 import { apiGet } from "@/lib/api/client-server";
 
 export async function getUpgradeRadar(): Promise<UpgradeRadarData | null> {
-  if (isMockMode()) return upgradeRadarFixture;
+  if (isMockMode()) return upgradeRadarFixture();
   try {
     return await apiGet<UpgradeRadarData>("/upgrade-radar");
   } catch {

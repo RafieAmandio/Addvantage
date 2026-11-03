@@ -3,7 +3,8 @@
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
-import { SectionNumber } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { useToast } from "@/lib/toast";
@@ -26,6 +27,14 @@ import { PlanArchiveStatsStrip } from "@/features/plan/components/PlanArchiveSta
 import { PlanArchiveHorizonPanel } from "@/features/plan/components/PlanArchiveHorizonPanel";
 import { PlanArchiveEmpty } from "@/features/plan/components/PlanArchiveEmpty";
 import { PlanArchiveMonthGroup } from "@/features/plan/components/PlanArchiveMonthGroup";
+import { PlanArchiveTableHead } from "@/features/plan/components/PlanArchiveRow";
+
+const HORIZONS = [
+  { id: "all", label: "All" },
+  { id: "intraday", label: "Intraday" },
+  { id: "swing", label: "Swing" },
+  { id: "weekly", label: "Weekly" },
+] as const;
 
 interface PlanArchiveViewProps {
   allPlans: TradingPlan[];
@@ -36,11 +45,8 @@ export function PlanArchiveView(props: PlanArchiveViewProps) {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <span className="led" aria-hidden />
-            DECODING ARCHIVE
-          </div>
+        <div className="flex min-h-[40vh] items-center justify-center text-[13px] text-white/40">
+          Loading archive
         </div>
       }
     >
@@ -102,15 +108,73 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
   };
 
   return (
-    <div className="stagger bg-grid-fine">
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <BackToTop />
-      <PlanArchiveHeader onExportDigest={exportDigest} />
+      <div className="min-w-0 space-y-4">
+        <PageSearchInput
+          value={query}
+          onChange={setQuery}
+          placeholder="Search plans, instruments, tags"
+          ariaLabel="Search archive"
+          matchLabel={
+            query
+              ? `${plans.length} ${plans.length === 1 ? "match" : "matches"} for "${query}"`
+              : null
+          }
+        />
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {latest && (
-          <PlanArchiveRBar allClosed={allClosed} latest={latest} />
-        )}
+        <Panel
+          title={
+            horizonFilter === "all"
+              ? `${plans.length} ${plans.length === 1 ? "plan" : "plans"}`
+              : `${plans.length} ${horizonFilter} plan${plans.length === 1 ? "" : "s"}`
+          }
+          sub={`${groups.length} ${groups.length === 1 ? "month" : "months"} · read-only, never edited after publication`}
+          action={
+            <TextTabs
+              options={HORIZONS}
+              value={horizonFilter}
+              onChange={setHorizonFilter}
+              label="Horizon"
+              className="hidden sm:flex"
+            />
+          }
+        >
+          <TextTabs
+            options={HORIZONS}
+            value={horizonFilter}
+            onChange={setHorizonFilter}
+            label="Horizon"
+            className="-mt-1 mb-2 sm:hidden"
+          />
+          {plans.length === 0 ? (
+            <PlanArchiveEmpty
+              horizonFilter={horizonFilter}
+              onClear={() => {
+                setHorizonFilter("all");
+                setQuery("");
+              }}
+            />
+          ) : (
+            <>
+              <PlanArchiveTableHead />
+              <div className="-mt-2">
+                {groups.map((group) => (
+                  <PlanArchiveMonthGroup
+                    key={group.ym}
+                    group={group}
+                    latestId={latestId ?? ""}
+                    query={query}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </Panel>
+      </div>
 
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <PlanArchiveHeader onExportDigest={exportDigest} />
         {latest && (
           <PlanArchiveStatsStrip
             plansCount={plans.length}
@@ -119,21 +183,7 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
             latest={latest}
           />
         )}
-
-        <div className="mb-6">
-          <PageSearchInput
-            value={query}
-            onChange={setQuery}
-            placeholder="Search thesis, setups, instruments, tags…   (press s to focus, esc to blur)"
-            ariaLabel="Search archive"
-            matchLabel={
-              query
-                ? `${plans.length} ${plans.length === 1 ? "MATCH" : "MATCHES"} for "${query}"`
-                : null
-            }
-          />
-        </div>
-
+        {latest && <PlanArchiveRBar allClosed={allClosed} latest={latest} />}
         <PlanArchiveHorizonPanel
           horizonFilter={horizonFilter}
           setHorizonFilter={setHorizonFilter}
@@ -141,40 +191,10 @@ function PlanArchiveViewInner({ allPlans, latest }: PlanArchiveViewProps) {
           allClosedCount={allClosed.length}
           horizonR={horizonR}
         />
-
-        <SectionNumber
-          n="—"
-          label={
-            horizonFilter === "all"
-              ? `${plans.length} PLANS · ${groups.length} ${groups.length === 1 ? "MONTH" : "MONTHS"}`
-              : `${plans.length} ${horizonFilter.toUpperCase()} PLAN${plans.length === 1 ? "" : "S"}`
-          }
-        />
-
-        {plans.length === 0 && (
-          <PlanArchiveEmpty
-            horizonFilter={horizonFilter}
-            onClear={() => setHorizonFilter("all")}
-          />
-        )}
-
-        <div className="mt-6 space-y-10">
-          {groups.map((group) => (
-            <PlanArchiveMonthGroup
-              key={group.ym}
-              group={group}
-              latestId={latestId ?? ""}
-              query={query}
-            />
-          ))}
-        </div>
-
-        <div className="mt-10 border border-gray-3 bg-gray-2/30 p-5 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-          ● Plan archive is read-only. Historical plans are never edited after
-          publication. If a plan closed outside its stated invalidation, the
-          next plan&apos;s risks section cites it by ID.
-        </div>
-      </div>
+        <p className="px-1 text-[12px] leading-[18px] text-white/30">
+          If a plan closed outside its stated invalidation, the next plan&apos;s risks section cites it by ID.
+        </p>
+      </aside>
     </div>
   );
 }

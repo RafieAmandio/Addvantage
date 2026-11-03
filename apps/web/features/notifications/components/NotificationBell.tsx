@@ -91,14 +91,14 @@ export function NotificationBell({ notifications = EMPTY, className }: Notificat
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={open}
         className={cn(
-          "relative border bg-gray-2 px-2.5 py-1.5 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-          open ? "border-brand text-brand" : "border-gray-3"
+          "relative flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-panel hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+          open ? "bg-panel text-white" : "text-white/55"
         )}
       >
         <BellIcon />
         {unreadCount > 0 && (
           <span
-            className="absolute -right-1 -top-1 flex h-4 min-w-[16px] animate-pulse-once items-center justify-center bg-blood px-1 font-mono text-[9px] font-semibold leading-none text-white shadow-[0_0_10px_rgba(220,38,38,0.6)]"
+            className="absolute right-0.5 top-0.5 flex h-4 min-w-[16px] animate-pulse-once items-center justify-center rounded-full bg-down px-1 text-[10px] font-semibold leading-none text-white"
             aria-hidden
           >
             {unreadCount > 9 ? "9+" : unreadCount}

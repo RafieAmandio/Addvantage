@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100";
+import { isMockMode } from "@/lib/config/public";
+
+// Demo has no API: the same paths are answered by app/api/demo (lib/mock/api.ts).
+const API_BASE = isMockMode() ? "/api/demo" : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3100");
 
 export function getAccessToken(): string | null {
   if (typeof document === "undefined") return null;

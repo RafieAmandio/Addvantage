@@ -2,7 +2,7 @@ import { memo } from "react";
 import Link from "next/link";
 import { cn, formatDate } from "@/lib/cn";
 import type { TradingPlan } from "@/features/plan/types";
-import { computePlanOutcome } from "@/features/plan/lib/detail-helpers";
+import { computePlanOutcome, rTone } from "@/features/plan/lib/detail-helpers";
 import { Highlight } from "@/components/ui/Highlight";
 import { flattenText } from "@/components/ui/ProseText";
 
@@ -12,92 +12,75 @@ type Props = {
   query: string;
 };
 
+/** Shared column template so the header in PlanArchiveTableHead lines up with every row. */
+export const ARCHIVE_COLS =
+  "grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 sm:grid-cols-[132px_minmax(0,1fr)_72px_76px]";
+
 function PlanArchiveRowImpl({ plan, isLatest, query }: Props) {
-  const longs = plan.setups.filter((s) => s.direction === "long").length;
-  const shorts = plan.setups.filter((s) => s.direction === "short").length;
   const outcome = computePlanOutcome(plan);
 
   return (
     <Link
       href={`/app/plan/${plan.id}`}
-      className="group grid grid-cols-12 gap-6 bg-black p-6 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+      className={cn(
+        ARCHIVE_COLS,
+        "group -mx-2 items-center rounded-lg px-2 py-3 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+      )}
     >
-      <div className="col-span-12 lg:col-span-3">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            <Highlight text={plan.id} query={query} />
-          </span>
-          {isLatest && (
-            <span className="border border-brand bg-brand/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-widest2 text-brand">
-              ● LATEST
-            </span>
-          )}
-        </div>
-        <div className="mt-2 font-display text-2xl text-white">
-          {formatDate(plan.date)}
-        </div>
-        <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          {plan.horizon} · by {plan.authoredBy}
-        </div>
-        <div className="mt-3 flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest2">
-          <span className="text-moss">▲ {longs} long</span>
-          <span className="text-white/30">·</span>
-          <span className="text-brand">▼ {shorts} short</span>
-        </div>
-        {outcome && !isLatest && (
-          <div className="mt-3 flex items-baseline gap-3 border-t border-gray-3 pt-3">
-            <div
-              className={cn(
-                "font-display text-2xl",
-                outcome.totalR > 0
-                  ? "text-moss"
-                  : outcome.totalR < 0
-                  ? "text-blood-bright"
-                  : "text-white/70"
-              )}
-            >
-              {outcome.totalRLabel}
-            </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-              {outcome.wins}W · {outcome.losses}L
-              {outcome.flat > 0 && ` · ${outcome.flat}F`}
-              {outcome.skipped > 0 && ` · ${outcome.skipped}S`}
-            </div>
-          </div>
-        )}
-        {isLatest && (
-          <div className="mt-3 border-t border-gray-3 pt-3 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            ● LIVE · no outcome yet
-          </div>
-        )}
+      <div className="min-w-0">
+        <p className="text-[15px] font-semibold leading-[22px] text-white">{formatDate(plan.date)}</p>
+        <p className="text-[12px] text-white/40">
+          <Highlight text={plan.id} query={query} /> · {plan.horizon}
+        </p>
       </div>
 
-      <div className="col-span-12 lg:col-span-9">
-        <p
-          className="line-clamp-3 font-display text-lg leading-relaxed text-white/85 transition-colors group-hover:text-white"
-          title={plan.thesis}
-        >
-          <Highlight text={flattenText(plan.thesis)} query={query} />
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
+      <div className="order-last col-span-2 mt-2 min-w-0 sm:order-none sm:col-span-1 sm:mt-0">
+        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] font-medium">
           {plan.setups.map((s) => (
-            <span
-              key={s.id}
-              className={cn(
-                "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-                s.direction === "long"
-                  ? "border-moss/50 text-moss"
-                  : "border-brand/50 text-brand"
-              )}
-            >
-              {s.direction === "long" ? "▲" : "▼"}{" "}
-              <Highlight text={s.instrument} query={query} />
+            <span key={s.id} className={s.direction === "long" ? "text-up" : "text-down"}>
+              {s.direction === "long" ? "▲" : "▼"} <Highlight text={s.instrument} query={query} />
             </span>
           ))}
         </div>
+        <p className="mt-0.5 truncate text-[13px] text-white/55" title={flattenText(plan.thesis)}>
+          <Highlight text={flattenText(plan.thesis)} query={query} />
+        </p>
       </div>
+
+      <p className="hidden text-right text-[13px] text-white/55 sm:block">
+        {outcome && !isLatest ? `${outcome.wins}W ${outcome.losses}L` : ""}
+      </p>
+
+      <p className="text-right">
+        {isLatest ? (
+          <span className="text-[12px] font-semibold uppercase tracking-[0.06em] text-brand">Live</span>
+        ) : outcome ? (
+          <span className={cn("font-num text-[24px] font-semibold leading-7", rTone(outcome.totalR))}>
+            {outcome.totalRLabel}
+          </span>
+        ) : (
+          <span className="text-[12px] text-white/30">Open</span>
+        )}
+      </p>
     </Link>
   );
 }
 
 export const PlanArchiveRow = memo(PlanArchiveRowImpl);
+
+/** Column labels for the archive table; hidden on phones where rows stack. */
+export function PlanArchiveTableHead() {
+  return (
+    <div
+      className={cn(
+        ARCHIVE_COLS,
+        "hidden border-b border-white/[0.07] pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/30 sm:grid",
+      )}
+    >
+      <span>Plan</span>
+      <span>Setups and thesis</span>
+      <span className="text-right">Result</span>
+      <span className="text-right">Realised</span>
+    </div>
+  );
+}

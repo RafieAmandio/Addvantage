@@ -1,10 +1,7 @@
 import { cn } from "@/lib/cn";
-import {
-  REGIONS,
-  type ImpactFilter,
-  type RegionFilter,
-} from "@/features/calendar/types";
-import { FilterChips } from "@/features/calendar/components/FilterChips";
+import { REGIONS, type ImpactFilter, type RegionFilter } from "@/features/calendar/types";
+import { currencyOf, flagOf } from "@/features/calendar/lib/econ";
+import { ImpactBars } from "@/features/calendar/components/EventBits";
 
 type Props = {
   impactFilter: ImpactFilter;
@@ -16,62 +13,54 @@ type Props = {
   className?: string;
 };
 
-export function CalendarFilterBar({
-  impactFilter,
-  regionFilter,
-  filtersActive,
-  onImpactChange,
-  onRegionChange,
-  onReset,
-  className,
-}: Props) {
+export function Chip({ on, onClick, children, className }: { on: boolean; onClick: () => void; children: React.ReactNode; className?: string }) {
   return (
-    <div
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
       className={cn(
-        "mb-6 grid grid-cols-1 gap-3 lg:grid-cols-[auto_1fr_auto] lg:items-center",
-        className
+        "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+        className,
+        on ? "border-white/50 bg-white/[0.08] text-white" : "border-white/[0.12] text-white/60 hover:border-white/25 hover:text-white",
       )}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Impact
-        </span>
-        <FilterChips
-          options={[
-            { value: "all", label: "All" },
-            { value: "high", label: "High" },
-            { value: "medium", label: "Mid" },
-            { value: "low", label: "Low" },
-          ]}
-          value={impactFilter}
-          onChange={(v) => onImpactChange(v as ImpactFilter)}
-        />
-      </div>
+      {children}
+    </button>
+  );
+}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Region
-        </span>
-        <FilterChips
-          options={[
-            { value: "all", label: "All" },
-            ...REGIONS.map((r) => ({ value: r, label: r === "GLOBAL" ? "OTHER" : r })),
-          ]}
-          value={regionFilter}
-          onChange={(v) => onRegionChange(v as RegionFilter)}
-        />
-      </div>
+const IMPACTS = ["high", "medium", "low"] as const;
 
-      <div className="flex justify-end">
-        {filtersActive && (
-          <button
-            onClick={onReset}
-            className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ✕ Reset filters
-          </button>
-        )}
-      </div>
+/** Impact and currency chips. Tapping the active chip clears it. On a phone the row scrolls sideways. */
+export function CalendarFilterBar({ impactFilter, regionFilter, filtersActive, onImpactChange, onRegionChange, onReset, className }: Props) {
+  return (
+    <div className={cn("-mx-5 flex items-center gap-1.5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0", className)}>
+      {IMPACTS.map((i) => (
+        <Chip key={i} on={impactFilter === i} onClick={() => onImpactChange(impactFilter === i ? "all" : i)}>
+          <ImpactBars impact={i} />
+          <span className="capitalize">{i}</span>
+        </Chip>
+      ))}
+      <span className="mx-1.5 h-4 w-px shrink-0 bg-white/10" aria-hidden />
+      {REGIONS.map((r) => {
+        const cur = currencyOf(r, "");
+        return (
+          <Chip key={r} on={regionFilter === r} onClick={() => onRegionChange(regionFilter === r ? "all" : r)}>
+            <span aria-hidden className="text-[14px] leading-none">{flagOf(cur)}</span>
+            {cur}
+          </Chip>
+        );
+      })}
+      {filtersActive && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="ml-1 shrink-0 text-[13px] font-medium text-white/40 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+        >
+          Clear
+        </button>
+      )}
     </div>
   );
 }

@@ -35,6 +35,9 @@ model Profile {
   telegramAdmins    TelegramAdmin[]
   timelineEvents    TimelineEvent[]  @relation("TimelineCreator")
   tradingPlans      TradingPlan[]
+  journalTrades     JournalTrade[]
+  dailyPlans        DailyPlan[]
+  traderSettings    TraderSettings?
 
   @@map("profiles")
 }
@@ -331,6 +334,38 @@ model EarlyAccessApplication {
   @@map("early_access_applications")
 }
 
+// Black Friday intake (blackfriday.tradevantage.gg). Draft keyed by email like early access;
+// bingx_uid is unique across applications. The biggest loss is one of five buckets (shared BF_LOSS_BUCKETS).
+model BlackFridayApplication {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email               String    @unique
+  name                String
+  contact             String
+  answers             Json?
+  biggestLossBucket   String?   @map("biggest_loss_bucket")
+  bingxUid            String?   @unique @map("bingx_uid")
+  bingxProofPath      String?   @map("bingx_proof_path")
+  plan                String?
+  paymentMethod       String?   @map("payment_method")
+  paymentAmount       Decimal?  @map("payment_amount") @db.Decimal
+  paymentCurrency     String?   @map("payment_currency")
+  paymentProofPath    String?   @map("payment_proof_path")
+  signedName          String?   @map("signed_name")
+  signedAt            DateTime? @map("signed_at") @db.Timestamptz(6)
+  acknowledgements    Json?
+  status              String    @default("draft")
+  reviewedAt          DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  reviewNote          String?   @map("review_note")
+  dinnerInvitedAt     DateTime? @map("dinner_invited_at") @db.Timestamptz(6)
+  accountId           String?   @map("account_id") @db.Uuid
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("black_friday_applications")
+}
+
 model EmailLog {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId         String?   @map("profile_id") @db.Uuid
@@ -599,4 +634,70 @@ model UpgradeEventsMeta {
   syncedAt      DateTime @map("synced_at") @db.Timestamptz(6)
 
   @@map("upgrade_events_meta")
+}
+
+/// Latest macro snapshot (policy rates, yields, risk gauges, rate-decision odds).
+/// Single row, overwritten by the worker's macro sync.
+model MacroSnapshot {
+  id       Int      @id @default(1)
+  data     Json
+  syncedAt DateTime @map("synced_at") @db.Timestamptz(6)
+
+  @@map("macro_snapshot")
+}
+
+/// Trade journal: one row per trade the member plans, opens or closes. Prices are never rounded.
+model JournalTrade {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  symbol        String
+  side          String
+  setup         String
+  timeframe     String    @default("1H")
+  status        String    @default("planned")
+  entry         Decimal   @db.Decimal
+  stop          Decimal   @db.Decimal
+  target        Decimal?  @db.Decimal
+  exit          Decimal?  @db.Decimal
+  size          Decimal?  @db.Decimal
+  riskPct       Decimal   @map("risk_pct") @db.Decimal
+  openedAt      DateTime  @default(now()) @map("opened_at") @db.Timestamptz(6)
+  closedAt      DateTime? @map("closed_at") @db.Timestamptz(6)
+  followedPlan  Boolean?  @map("followed_plan")
+  mistakes      String[]  @default([])
+  notes         String    @default("")
+  screenshotUrl String?   @map("screenshot_url")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user          Profile   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId, openedAt(sort: Desc)], map: "journal_trades_user_idx")
+  @@map("journal_trades")
+}
+
+/// Morning scan: the markets a member picked for the day and their answers to the prep questions.
+model DailyPlan {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  date      DateTime @db.Date
+  picks     Json     @default("[]")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, date], map: "daily_plans_user_date_key")
+  @@map("daily_plans")
+}
+
+/// Account equity and risk defaults for the journal's position sizing. One row per member.
+model TraderSettings {
+  userId    String   @id @map("user_id") @db.Uuid
+  equity    Decimal  @default(10000) @db.Decimal
+  currency  String   @default("USD")
+  riskTier  Decimal  @default(1.5) @map("risk_tier") @db.Decimal
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("trader_settings")
 }

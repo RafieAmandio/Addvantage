@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Panel } from "@/components/ui/Panel";
 
 export function generateMetadata({
   params,
@@ -98,66 +99,45 @@ export default async function ChartPage({
   }));
 
   return (
-    <div className="stagger mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between">
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            INSTRUMENT · TIMELINE
-          </div>
-          <h1 className="mt-1 font-display text-4xl text-white sm:text-5xl">
-            {symbol} <span className="italic text-brand">chart</span>
-          </h1>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            {usingMock ? "mock OHLC" : `real OHLC · ${interval}`} · {bars.length} bars · {events.length} events
-          </div>
-        </div>
-        <div className="flex flex-col gap-2 sm:items-end">
-          <SymbolNav
-            symbols={SUPPORTED_SYMBOLS}
-            current={symbol}
-            className="flex-wrap"
-          />
-          <SymbolSearch symbols={SUPPORTED_SYMBOLS} current={symbol} />
-          <IntervalPicker
-            current={interval}
-            hrefFor={(i) =>
-              i === DEFAULT_INTERVAL
-                ? `/app/chart/${symbol}`
-                : `/app/chart/${symbol}?interval=${i}`
-            }
-            className="flex-wrap"
-          />
-        </div>
-      </div>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <Panel
+        title={<span className="font-num text-[28px] font-semibold leading-8">{symbol}</span>}
+        sub={
+          usingMock
+            ? `Sample bars, nothing stored for ${symbol} yet · ${events.length} events`
+            : `${interval} candles · ${bars.length} bars · ${events.length} events`
+        }
+        action={<SymbolSearch symbols={SUPPORTED_SYMBOLS} current={symbol} />}
+      >
+        <ChartInteractive
+          bars={bars}
+          events={events}
+          markers={markers}
+          symbol={symbol}
+          seriesType="candlestick"
+          height={520}
+          toolbar={
+            <>
+              <SymbolNav symbols={SUPPORTED_SYMBOLS} current={symbol} />
+              <IntervalPicker
+                current={interval}
+                hrefFor={(i) => (i === DEFAULT_INTERVAL ? `/app/chart/${symbol}` : `/app/chart/${symbol}?interval=${i}`)}
+              />
+            </>
+          }
+        />
+      </Panel>
 
-      <div className="grid grid-cols-12 gap-4 sm:gap-6">
-        <div className="col-span-12 lg:col-span-8">
-          {usingMock && (
-            <div className="mb-3 border border-brand/40 bg-brand/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-              [mock data — instrument_bars empty]
-            </div>
-          )}
-          <ChartInteractive
-            bars={bars}
-            events={events}
-            markers={markers}
-            symbol={symbol}
-            seriesType="candlestick"
-            height={520}
-          />
-        </div>
-
-        <aside className="col-span-12 lg:col-span-4">
-          <LiveEventFeed
-            initialEvents={events}
-            symbols={[symbol]}
-            from={from.toISOString()}
-            to={to.toISOString()}
-            headingPrefix="Timeline"
-            emptyMessage={`No events for ${symbol} in window.`}
-          />
-        </aside>
-      </div>
+      <aside className="min-w-0 lg:sticky lg:top-4 lg:self-start">
+        <LiveEventFeed
+          initialEvents={events}
+          symbols={[symbol]}
+          from={from.toISOString()}
+          to={to.toISOString()}
+          headingPrefix="Timeline"
+          emptyMessage={`No events for ${symbol} in this window.`}
+        />
+      </aside>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { EventDetailView } from "@/features/calendar/components/EventDetailView";
 import { listNewsForEvent } from "@/features/calendar/queries/correlation";
+import { eventContext } from "@/features/calendar/queries/context";
 import { getTimelineEventById } from "@/features/timeline/queries/timeline";
 
 export const dynamic = "force-dynamic";
@@ -16,5 +17,6 @@ export default async function CalendarEventDetailPage({
     listNewsForEvent(params.id),
   ]);
   if (!event) return notFound();
-  return <EventDetailView event={event} news={news} />;
+  const context = await eventContext(event);
+  return <EventDetailView event={event} news={news} {...context} />;
 }

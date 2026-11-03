@@ -1,0 +1,52 @@
+import Link from "next/link";
+import { cn } from "@/lib/cn";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import type { AtrPair } from "@/features/atr/types";
+import { Ago } from "./Ago";
+
+export function fmtPrice(n: number) {
+  const d = n >= 1000 ? 2 : n >= 10 ? 3 : 5;
+  return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+
+export function dayChange(p: AtrPair) {
+  const last = p.price ?? p.dailyClose;
+  return p.dailyOpen ? ((last - p.dailyOpen) / p.dailyOpen) * 100 : 0;
+}
+
+/** Kalshi "weekly forecasts" strip, fed by the ATR scanner's last price vs daily open. The page refreshes it every
+ * minute; a price that moved flashes its direction. */
+export function PriceStrip({ pairs, updatedAt }: { pairs: AtrPair[]; updatedAt: string | null }) {
+  const rows = [...pairs].sort((a, b) => (a.tier === b.tier ? 0 : a.tier === "primary" ? -1 : 1)).slice(0, 16);
+  if (rows.length === 0) return null;
+  return (
+    <div className="flex items-center gap-3">
+      <div className="hidden shrink-0 flex-col sm:flex">
+        <span className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">
+          <span className="live-dot text-up" aria-hidden />
+          Prices
+        </span>
+        {updatedAt && <Ago iso={updatedAt} className="text-[11px] text-white/30" />}
+      </div>
+      <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        {rows.map((p) => {
+          const ch = dayChange(p);
+          const sym = p.symbol.replace("/", "");
+          return (
+            <Link
+              key={p.symbol}
+              href={`/app/instrument/${encodeURIComponent(sym)}`}
+              className="lift flex shrink-0 items-baseline gap-2 rounded-full border border-white/[0.14] px-3.5 py-2 text-[14px] transition-colors hover:border-white/30 hover:bg-panel focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+            >
+              <span className="font-semibold text-white">{sym}</span>
+              <AnimatedNumber value={p.price ?? p.dailyClose} from={p.dailyOpen || undefined} format={fmtPrice} className="text-white/90" />
+              <span className={cn("text-[12px] font-medium", ch >= 0 ? "text-up" : "text-down")}>
+                {ch >= 0 ? "▲" : "▼"} {Math.abs(ch).toFixed(2)}%
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

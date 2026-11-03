@@ -1,5 +1,7 @@
 import type { TradingPlan } from "@/features/plan/types";
 import { cn, formatDate } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { rTone } from "@/features/plan/lib/detail-helpers";
 
 type Props = {
   plansCount: number;
@@ -9,64 +11,25 @@ type Props = {
   className?: string;
 };
 
-export function PlanArchiveStatsStrip({
-  plansCount,
-  closedCount,
-  aggregateR,
-  latest,
-  className,
-}: Props) {
+const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
+
+export function PlanArchiveStatsStrip({ plansCount, closedCount, aggregateR, latest, className }: Props) {
   return (
-    <div
-      className={cn(
-        "mb-6 grid grid-cols-1 gap-px bg-gray-3 sm:grid-cols-4",
-        className
-      )}
-    >
-      <div className="bg-black p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Plans on record
+    <Panel title="Performance" sub={`Latest ${latest.id} · ${formatDate(latest.date)}`} className={className}>
+      <p className={EYEBROW}>Realised R · closed</p>
+      <p className={cn("font-num text-[52px] font-semibold leading-[56px]", closedCount ? rTone(aggregateR) : "text-white/30")}>
+        {closedCount ? `${aggregateR >= 0 ? "+" : ""}${aggregateR.toFixed(1)}R` : "n/a"}
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-4">
+        <div>
+          <p className={EYEBROW}>Plans</p>
+          <p className="font-num text-[28px] font-semibold leading-8 text-white">{plansCount}</p>
         </div>
-        <div className="mt-1 font-display text-3xl text-white">
-          {plansCount}
-        </div>
-      </div>
-      <div className="bg-black p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Latest
-        </div>
-        <div className="mt-1 font-display text-3xl text-brand">
-          {latest.id.replace(/^TP-/, "")}
-        </div>
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          {formatDate(latest.date)}
+        <div>
+          <p className={EYEBROW}>Closed</p>
+          <p className="font-num text-[28px] font-semibold leading-8 text-white">{closedCount}</p>
         </div>
       </div>
-      <div className="bg-black p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Closed plans
-        </div>
-        <div className="mt-1 font-display text-3xl text-white">
-          {closedCount}
-        </div>
-      </div>
-      <div className="bg-black p-5">
-        <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-          Aggregate R · closed
-        </div>
-        <div
-          className={cn(
-            "mt-1 font-display text-3xl",
-            aggregateR > 0
-              ? "text-moss"
-              : aggregateR < 0
-              ? "text-blood-bright"
-              : "text-white"
-          )}
-        >
-          {(aggregateR >= 0 ? "+" : "") + aggregateR.toFixed(1)}R
-        </div>
-      </div>
-    </div>
+    </Panel>
   );
 }

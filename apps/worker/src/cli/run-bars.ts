@@ -13,11 +13,10 @@
  *
  * Window: last 30 days up to now().
  */
-import { prisma, Prisma } from "@tradevantage/db";
-import { config } from "../lib/config";
 import { logger } from "../lib/logger";
 import { singleflight } from "../lib/singleflight";
-import { getBarsAdapter, type Bar, type Interval } from "../adapters/bars";
+import type { Bar, Interval } from "../adapters/bars";
+import { adapterFor, upsertBars } from "../bars/sync-bars";
 
 const VALID_INTERVALS: readonly Interval[] = ["1m", "5m", "1h", "1d"];
 
@@ -48,18 +47,10 @@ async function main() {
   }
   const interval: Interval = intervalArg;
 
-  if (!config.MARKET_DATA_PROVIDER) {
-    console.error(
-      "MARKET_DATA_PROVIDER is not set. Configure MARKET_DATA_PROVIDER and " +
-        "MARKET_DATA_API_KEY in apps/worker/.env (see apps/worker/.env.example)."
-    );
-    process.exit(1);
-  }
-
   const to = new Date();
   const from = new Date(to.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const adapter = getBarsAdapter(config.MARKET_DATA_PROVIDER);
+  const adapter = adapterFor(symbol);
 
   logger.info(
     {
@@ -91,22 +82,8 @@ async function main() {
     process.exit(0);
   }
 
-  const values = bars.map(
-    (b) =>
-      Prisma.sql`(${symbol}, ${interval}, ${new Date(b.ts)}::timestamptz, ${b.open}::numeric, ${b.high}::numeric, ${b.low}::numeric, ${b.close}::numeric, ${b.volume !== null ? b.volume : null}::numeric)`
-  );
+  await upsertBars(symbol, interval, bars);
 
-  await prisma.$executeRaw`
-    INSERT INTO instrument_bars (symbol, interval, ts, open, high, low, close, volume)
-    VALUES ${Prisma.join(values)}
-    ON CONFLICT (symbol, interval, ts)
-    DO UPDATE SET
-      open    = EXCLUDED.open,
-      high    = EXCLUDED.high,
-      low     = EXCLUDED.low,
-      close   = EXCLUDED.close,
-      volume  = EXCLUDED.volume
-  `;
 
   logger.info(
     { symbol, interval, upserted: bars.length },

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useAppState, isPaid } from "@/lib/state";
-import { SectionNumber } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
 import { PaywallOverlay } from "@/components/ui/Paywall";
 import { ProseText } from "@/components/ui/ProseText";
 import { formatDate } from "@/lib/cn";
@@ -36,20 +36,8 @@ export function PlanDetail({
         const el = document.getElementById(hash);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
-          el.classList.add(
-            "ring-2",
-            "ring-brand",
-            "ring-offset-2",
-            "ring-offset-black"
-          );
-          setTimeout(() => {
-            el.classList.remove(
-              "ring-2",
-              "ring-brand",
-              "ring-offset-2",
-              "ring-offset-black"
-            );
-          }, 2400);
+          el.classList.add("ring-1", "ring-brand");
+          setTimeout(() => el.classList.remove("ring-1", "ring-brand"), 2400);
         }
       }, 200);
     };
@@ -59,84 +47,83 @@ export function PlanDetail({
     return () => window.removeEventListener("popstate", scrollToHash);
   }, [plan.id]);
 
-  const showOutcome = outcome && !isLatest;
+  const showOutcome = !!outcome && !isLatest;
+  const longs = plan.setups.filter((s) => s.direction === "long").length;
+  const shorts = plan.setups.length - longs;
 
   return (
-    <div className="stagger bg-grid-fine">
-      <PlanDetailHeader
-        plan={plan}
-        paid={paid}
-        isLatest={isLatest}
-        headerExtra={headerExtra}
-        breadcrumbs={breadcrumbs}
-      />
+    <div className="space-y-4">
+      {breadcrumbs}
+      <PlanDetailHeader plan={plan} paid={paid} isLatest={isLatest} headerExtra={headerExtra} />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="relative">
         {!paid && (
+          <div className="absolute inset-x-0 top-40 z-20">
           <PaywallOverlay
             surface="Trading Plan"
             reason="The daily / weekly directional plan is restricted to VIP+ Trader. Upgrade to read the thesis, the setups, and the invalidation levels."
           />
+          </div>
         )}
 
         <div
-          className={!paid ? "pointer-events-none select-none blur-sm" : ""}
+          className={
+            "grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]" +
+            (!paid ? " pointer-events-none select-none blur-sm" : "")
+          }
         >
-          <section>
-            <SectionNumber n="01 /" label="MARKET THESIS" />
-            <div className="mt-4 border-l-4 border-brand bg-gray-2/40 p-6">
+          <div className="min-w-0 space-y-4">
+            <Panel title="Thesis">
               <ProseText
                 text={plan.thesis}
-                paragraphClassName="font-display text-xl leading-relaxed text-white"
+                className="space-y-3"
+                paragraphClassName="text-[17px] leading-[26px] text-white/90"
               />
-            </div>
-            {plan.imageUrl && (
-              <a
-                href={plan.imageUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 block"
-              >
-                <img
-                  src={plan.imageUrl}
-                  alt={`Chart for ${plan.setups[0]?.instrument ?? "plan"}`}
-                  className="max-h-[600px] w-full rounded border border-gray-3 object-contain"
-                />
-              </a>
-            )}
-          </section>
+              {plan.imageUrl && (
+                <a href={plan.imageUrl} target="_blank" rel="noopener noreferrer" className="mt-4 block">
+                  <img
+                    src={plan.imageUrl}
+                    alt={`Chart for ${plan.setups[0]?.instrument ?? "plan"}`}
+                    className="max-h-[600px] w-full rounded-xl bg-raised object-contain"
+                  />
+                </a>
+              )}
+            </Panel>
 
-          {showOutcome && outcome && (
-            <PlanDetailOutcomeSummary outcome={outcome} plan={plan} />
-          )}
-
-          <section className="mt-12">
-            <SectionNumber
-              n="02 /"
-              label={`SETUPS · ${plan.setups.length} ${isLatest ? "LIVE" : "ON RECORD"}`}
-            />
-            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-              {plan.setups.map((s) => (
-                <PlanDetailSetupCard
-                  key={s.id}
-                  setup={s}
-                  planId={plan.id}
-                  isLatest={isLatest}
-                />
-              ))}
-            </div>
-          </section>
-
-          <PlanDetailRisks
-            risks={plan.risks}
-            sectionNumber="03 /"
-          />
-
-          <div className="mt-12 border-t border-gray-3 pt-6 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            Plan revision · v1 · Authored {formatDate(plan.date)} by{" "}
-            {plan.authoredBy} · Reviewed by Desk · Distributed via DOMAIN /
-            Telegram
+            <Panel
+              title={`Setups · ${plan.setups.length}`}
+              sub={isLatest ? "Live in the current plan" : "On record"}
+            >
+              <div className="divide-y divide-white/[0.07]">
+                {plan.setups.map((s) => (
+                  <PlanDetailSetupCard key={s.id} setup={s} planId={plan.id} isLatest={isLatest} />
+                ))}
+              </div>
+            </Panel>
           </div>
+
+          <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+            {showOutcome && outcome ? (
+              <PlanDetailOutcomeSummary outcome={outcome} plan={plan} />
+            ) : (
+              <Panel title="Outcome" sub={isLatest ? "Live plan, no outcome yet" : "No setups closed yet"}>
+                <div className="flex gap-6">
+                  <div>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Long</p>
+                    <p className="font-num text-[36px] font-semibold leading-10 text-up">{longs}</p>
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Short</p>
+                    <p className="font-num text-[36px] font-semibold leading-10 text-down">{shorts}</p>
+                  </div>
+                </div>
+              </Panel>
+            )}
+            <PlanDetailRisks risks={plan.risks} sectionNumber="" />
+            <p className="px-1 text-[12px] leading-[18px] text-white/30">
+              Authored {formatDate(plan.date)} by {plan.authoredBy}. Reviewed by the desk, distributed via TradeVantage and Telegram.
+            </p>
+          </aside>
         </div>
       </div>
     </div>

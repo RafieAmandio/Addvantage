@@ -15,7 +15,12 @@ vi.mock("../consult.repository.js", () => ({
     listAllSessions: vi.fn(),
     getSessionStats: vi.fn(),
     getLatestMessage: vi.fn(),
+    getAllowMention: vi.fn().mockResolvedValue(true),
   },
+}));
+
+vi.mock("@/integrations/whatsapp/notify.js", () => ({
+  notifyConsultWhatsApp: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("@/integrations/telegram/notify.js", () => ({
@@ -24,6 +29,7 @@ vi.mock("@/integrations/telegram/notify.js", () => ({
 
 import { consultService } from "../consult.service.js";
 import { consultRepository } from "../consult.repository.js";
+import { notifyConsultWhatsApp } from "@/integrations/whatsapp/notify.js";
 
 const repo = vi.mocked(consultRepository);
 
@@ -100,10 +106,28 @@ describe("consultService", () => {
         content: "hello",
       });
 
-      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
-        unreadAdmin: true,
-        status: "awaiting_reply",
-      });
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith(
+        "session-1",
+        { unreadAdmin: true, status: "awaiting_reply", updatedAt: expect.any(Date) },
+      );
+    });
+    it.each([
+      [true, false],
+      [false, true],
+    ])("WhatsApp alert: allowMention %s sends private %s", async (allowMention, isPrivate) => {
+      repo.findSessionById.mockResolvedValue(mockSession({ userId: "user-1" }) as never);
+      repo.createMessage.mockResolvedValue({ id: "m-1" } as never);
+      repo.touchSession.mockResolvedValue(undefined as never);
+      repo.updateSessionFlags.mockResolvedValue(undefined as never);
+      repo.getAllowMention.mockResolvedValue(allowMention as never);
+
+      await consultService.appendMessage("user-1", "session-1", { role: "user", content: "hello" }, "member@test.com");
+      await vi.waitFor(() => expect(notifyConsultWhatsApp).toHaveBeenCalled());
+
+      expect(repo.getAllowMention).toHaveBeenCalledWith("user-1");
+      expect(notifyConsultWhatsApp).toHaveBeenCalledWith(
+        expect.objectContaining({ sessionId: "session-1", messagePreview: "hello", private: isPrivate }),
+      );
     });
   });
 
@@ -149,10 +173,10 @@ describe("consultService", () => {
       expect(repo.createMessage).toHaveBeenCalledWith(
         expect.objectContaining({ role: "admin", userId: "admin-1" }),
       );
-      expect(repo.updateSessionFlags).toHaveBeenCalledWith("session-1", {
-        unreadUser: true,
-        status: "open",
-      });
+      expect(repo.updateSessionFlags).toHaveBeenCalledWith(
+        "session-1",
+        { unreadUser: true, status: "open", updatedAt: expect.any(Date) },
+      );
     });
 
     it("throws NotFoundError for missing session", async () => {

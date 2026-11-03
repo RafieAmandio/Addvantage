@@ -14,7 +14,8 @@
     "run:bars": "tsx src/cli/run-bars.ts",
     "kobeissi:login": "tsx src/adapters/kobeissi/login.ts",
     "run:calendar": "tsx src/cli/run-calendar.ts",
-    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo"
+    "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo",
+    "run:macro": "tsx src/cli/run-macro.ts"
   },
   "dependencies": {
     "@logtail/pino": "^0.5.8",

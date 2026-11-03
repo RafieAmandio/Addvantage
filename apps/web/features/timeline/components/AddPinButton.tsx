@@ -33,9 +33,9 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="border border-brand bg-brand px-5 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+      className="rounded-full bg-brand px-5 py-2 text-[14px] font-medium text-black transition-colors hover:bg-brand/90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
     >
-      {pending ? "Pinning…" : "Pin event →"}
+      {pending ? "Pinning…" : "Pin event"}
     </button>
   );
 }
@@ -98,7 +98,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+        className="rounded-full border border-white/[0.14] px-3 py-1 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
       >
         + Pin event
       </button>
@@ -106,7 +106,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
       {flash ? (
         <div
           role="status"
-          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 border border-brand bg-gray-2 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand shadow-[0_0_40px_rgba(255,212,0,0.25)]"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-full bg-raised px-4 py-2 text-[13px] font-medium text-white"
         >
           {flash}
         </div>
@@ -121,22 +121,21 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
         >
           <div
             onClick={close}
-            className="absolute inset-0 bg-black/85 backdrop-blur-md"
+            className="absolute inset-0 bg-black/80"
             aria-hidden
           />
-          <div className="relative w-full max-w-lg border border-brand bg-gray-2 shadow-[0_0_60px_rgba(255,212,0,0.18)]">
-            <div className="classification-stripe absolute -top-1 left-0 right-0 h-1" />
-            <div className="border-b border-gray-3 p-5">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                ● PIN EVENT · {symbol}
+          <div className="relative w-full max-w-lg rounded-2xl bg-panel">
+            <div className="p-5 pb-0">
+              <div className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                Pin event · {symbol}
               </div>
               <h3
                 id="add-pin-title"
-                className="mt-2 font-display text-2xl leading-tight text-white"
+                className="mt-1 text-[20px] font-semibold leading-tight text-white"
               >
                 Mark a moment on the chart
               </h3>
-              <p className="mt-2 text-sm text-white/60">
+              <p className="mt-1 text-[14px] text-white/55">
                 Only you will see this pin. It renders as a grey marker below
                 the price candles.
               </p>
@@ -148,7 +147,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
               <div>
                 <label
                   htmlFor="pin-title"
-                  className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
+                  className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40"
                 >
                   Title *
                 </label>
@@ -159,14 +158,14 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="text"
                   required
                   maxLength={200}
-                  className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
+                  className="mt-2 w-full rounded-lg border border-white/[0.12] bg-black px-3 py-2 text-[14px] text-white outline-none transition-colors focus-visible:border-brand"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="pin-body"
-                  className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
+                  className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40"
                 >
                   Notes <span className="text-white/30">(optional)</span>
                 </label>
@@ -175,23 +174,23 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   name="body"
                   rows={4}
                   maxLength={2000}
-                  className="mt-2 w-full resize-none border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
+                  className="mt-2 w-full resize-none rounded-lg border border-white/[0.12] bg-black px-3 py-2 text-[14px] text-white outline-none transition-colors focus-visible:border-brand"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40">
+                  <label className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
                     Symbol
                   </label>
-                  <div className="mt-2 border border-gray-3 bg-black/60 px-3 py-2 font-mono text-sm text-white/70">
+                  <div className="mt-2 rounded-lg border border-white/[0.08] px-3 py-2 text-[14px] text-white/70">
                     {symbol}
                   </div>
                 </div>
                 <div>
                   <label
                     htmlFor="pin-occurred-at"
-                    className="block font-mono text-[10px] uppercase tracking-widest2 text-white/40"
+                    className="block text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40"
                   >
                     Occurred at *
                   </label>
@@ -201,7 +200,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                     required
                     value={localDt}
                     onChange={(e) => setLocalDt(e.currentTarget.value)}
-                    className="mt-2 w-full border border-gray-3 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors focus-visible:border-brand"
+                    className="mt-2 w-full rounded-lg border border-white/[0.12] bg-black px-3 py-2 text-[14px] text-white outline-none transition-colors focus-visible:border-brand"
                   />
                   <input type="hidden" name="occurredAt" value={occurredAtIso} />
                 </div>
@@ -210,7 +209,7 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
               {state.error ? (
                 <div
                   role="alert"
-                  className="border border-blood/60 bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-text"
+                  className="rounded-lg bg-down/10 px-3 py-2 text-[13px] text-down"
                 >
                   {ERROR_MESSAGES[state.error] ?? state.error}
                 </div>
@@ -221,11 +220,11 @@ export function AddPinButton({ symbol }: AddPinButtonProps) {
                   type="button"
                   onClick={close}
                   className={cn(
-                    "border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60",
-                    "transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+                    "rounded-full border border-white/[0.14] px-4 py-2 text-[14px] font-medium text-white",
+                    "transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
                   )}
                 >
-                  Cancel · esc
+                  Cancel
                 </button>
                 <SubmitButton />
               </div>

@@ -42,7 +42,7 @@ export default function VerifyEmailPage() {
         {status === "success" && (
           <div className="space-y-6">
             <div className="font-display text-2xl text-white">
-              Email <span className="text-moss">verified</span>.
+              Email <span className="text-[#65A30D]">verified</span>.
             </div>
             <p className="font-mono text-[11px] uppercase tracking-widest2 text-white/60">
               Your account is now active. You can log in.

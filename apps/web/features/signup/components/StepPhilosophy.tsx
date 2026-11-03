@@ -19,7 +19,7 @@ export function StepPhilosophy({ form, setForm }: Props) {
       <div className="border border-brand/40 bg-brand/5 p-6">
         <p className="font-mono text-[11px] uppercase tracking-widest2 text-white/80">
           If analyst Vantage gives trade ideas and you take the same trade and
-          lose — whose fault is it?
+          lose, whose fault is it?
         </p>
       </div>
       <p className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">

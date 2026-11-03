@@ -23,6 +23,9 @@ export function ReviewActions({ id, status }: { id: string; status: string }) {
     }
   };
 
+  const base =
+    "inline-flex h-8 items-center rounded-full px-3 text-[12px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand disabled:cursor-wait";
+
   return (
     <div className="flex items-center gap-1.5" onClick={(e) => e.preventDefault()}>
       <button
@@ -30,28 +33,18 @@ export function ReviewActions({ id, status }: { id: string; status: string }) {
         disabled={pending !== null}
         title="Approve"
         aria-label="Approve"
-        className={cn(
-          "flex h-8 w-8 items-center justify-center border font-mono text-sm transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-          pending === "approve"
-            ? "border-moss/60 bg-moss/20 text-moss animate-pulse"
-            : "border-moss/40 text-moss/60 hover:bg-moss/10 hover:text-moss"
-        )}
+        className={cn(base, "bg-up text-black hover:opacity-90", pending === "approve" && "opacity-60", pending === "reject" && "opacity-40")}
       >
-        ✓
+        {pending === "approve" ? "Approving" : "Approve"}
       </button>
       <button
         onClick={(e) => act("reject", e)}
         disabled={pending !== null}
         title="Reject"
         aria-label="Reject"
-        className={cn(
-          "flex h-8 w-8 items-center justify-center border font-mono text-sm transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-          pending === "reject"
-            ? "border-blood/60 bg-blood/20 text-blood-bright animate-pulse"
-            : "border-blood/40 text-blood-bright/60 hover:bg-blood/10 hover:text-blood-bright"
-        )}
+        className={cn(base, "border border-down/40 text-down hover:bg-down/10", pending === "reject" && "opacity-60", pending === "approve" && "opacity-40")}
       >
-        ✕
+        {pending === "reject" ? "Rejecting" : "Reject"}
       </button>
     </div>
   );

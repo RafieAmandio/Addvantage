@@ -54,7 +54,7 @@ export function rangeLabel(view: ViewMode, anchorYmd: string): string {
           day: "numeric",
           timeZone: "UTC",
         });
-    return `${left} — ${right}`;
+    return `${left} to ${right}`;
   }
   return ymdToDate(anchorYmd).toLocaleDateString("en-US", {
     month: "long",
@@ -64,7 +64,7 @@ export function rangeLabel(view: ViewMode, anchorYmd: string): string {
 }
 
 export function parseViewMode(v: string | null): ViewMode {
-  return v === "week" || v === "month" ? v : "day";
+  return v === "day" || v === "month" ? v : "week";
 }
 
 export function parseImpact(v: string | null): ImpactFilter {

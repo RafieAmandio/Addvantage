@@ -37,7 +37,7 @@ export function PlanSiblingKeys({
         e.preventDefault();
         const wrapped = olderId === null;
         if (wrapped) {
-          setHint("⟲ WRAPPED TO FIRST");
+          setHint("Wrapped to the newest plan");
           if (timer) clearTimeout(timer);
           timer = setTimeout(() => setHint(null), 1200);
         }
@@ -46,7 +46,7 @@ export function PlanSiblingKeys({
         e.preventDefault();
         const wrapped = newerId === null;
         if (wrapped) {
-          setHint("⟲ WRAPPED TO LAST");
+          setHint("Wrapped to the oldest plan");
           if (timer) clearTimeout(timer);
           timer = setTimeout(() => setHint(null), 1200);
         }
@@ -62,7 +62,7 @@ export function PlanSiblingKeys({
 
   if (!hint) return null;
   return (
-    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 border border-brand bg-gray-2 px-4 py-2 font-mono text-[11px] uppercase tracking-widest2 text-brand shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+    <div className="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-raised px-4 py-2 text-[13px] font-medium text-white">
       {hint}
     </div>
   );

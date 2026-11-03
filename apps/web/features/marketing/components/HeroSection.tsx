@@ -1,190 +1,103 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/cn";
-import { heroTicker } from "@/features/marketing/lib/data";
-import { ScrambleReveal } from "@/features/marketing/components/ScrambleReveal";
-import { TickerItem } from "@/features/marketing/components/TickerItem";
+import type { HeroData } from "@/features/marketing/lib/landing";
+import { HeroDesk } from "@/features/marketing/components/HeroDesk";
+import { Magnet } from "@/features/marketing/components/Magnet";
+import { Roll } from "@/features/marketing/components/Roll";
+import { Jitter } from "@/features/marketing/components/ScrambleReveal";
+import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
 
-function Flicker({
-  children,
-  className,
-  minWait = 2000,
-  maxWait = 4000,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  minWait?: number;
-  maxWait?: number;
-}) {
-  const [opacity, setOpacity] = useState(1);
 
-  useEffect(() => {
-    let cancelled = false;
-    function scheduleFlicker() {
-      const wait = minWait + Math.random() * (maxWait - minWait);
-      const timeout = setTimeout(() => {
-        if (cancelled) return;
-        const flickers = 2 + Math.floor(Math.random() * 3);
-        let i = 0;
-        const id = setInterval(() => {
-          if (cancelled) { clearInterval(id); return; }
-          setOpacity(i % 2 === 0 ? 0.1 + Math.random() * 0.3 : 1);
-          i++;
-          if (i >= flickers * 2) {
-            clearInterval(id);
-            setOpacity(1);
-            scheduleFlicker();
-          }
-        }, 40 + Math.random() * 60);
-      }, wait);
-      return timeout;
-    }
-    const t = scheduleFlicker();
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [minWait, maxWait]);
+const LINKS = [
+  ["Lab", "#method"],
+  ["Journal", "#train"],
+  ["Access", "#access"],
+];
 
+/**
+ * Clear over the hero, Paper with a hairline once the page moves; tucks away reading down.
+ * `home` is "" on the landing (in-page anchors, so Lenis glides) and "/" anywhere else.
+ */
+export function MarketingNav({ home = "" }: { home?: "" | "/" }) {
   return (
-    <span className={className} style={{ opacity }}>
-      {children}
-    </span>
-  );
-}
-
-// The globe in hero.png sits 3.92% left of the image's horizontal center
-// (measured from its apex). Nudge it right so it reads as centered.
-const EARTH_X = "3.92%";
-
-export function HeroSection() {
-  const earthRef = useRef<HTMLImageElement>(null);
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setEntered(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    let ticking = false;
-
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const scrolled = window.scrollY;
-        if (earthRef.current) {
-          const zoom = 1 + Math.min(1, scrolled / window.innerHeight) * 0.4;
-          earthRef.current.style.transform = `translate(${EARTH_X}, ${scrolled * 0.08}px) scale(${zoom})`;
-        }
-        ticking = false;
-      });
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <>
-      {/* Navbar — always on top */}
-      <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-8 md:px-[140px] md:py-10">
-        <Link href="/" className="group flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo-vantage.png"
-            alt="+vantage"
-            width={319}
-            height={73}
-            className="h-8 w-auto transition-transform duration-300 ease-out group-hover:scale-110"
-          />
-        </Link>
-        <Link
-          href="/signup"
-          className="btn-pixel rounded-[10px] bg-brand px-4 py-2 font-mono text-base font-bold text-black"
-        >
-          Join Now!
-        </Link>
-      </nav>
-
-      {/* Hero — fixed behind everything */}
-      <div className="fixed inset-0 z-0 overflow-hidden bg-gray">
-        <div className="relative z-10 mx-auto flex max-w-[1100px] flex-col items-center gap-12 px-6 pt-[120px] text-center md:pt-[160px]">
-          <h1 className="font-sans leading-none text-white">
-            <span
-              className={cn(
-                "block text-[clamp(3rem,10vw,128px)] font-normal transition-all duration-700",
-                entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-              )}
-            >
-              <ScrambleReveal text="WELCOME TO" delay={200} duration={900} />
-            </span>
-            <span
-              className={cn(
-                "block text-[clamp(3rem,10vw,128px)] font-bold transition-all duration-700 delay-300",
-                entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-              )}
-            >
-              <Flicker minWait={3000} maxWait={7000}>
-                <ScrambleReveal text="TRADEVANTAGE" delay={500} duration={900} />
-              </Flicker>
-              <Flicker className="text-brand" minWait={2000} maxWait={4000}>.</Flicker>
-            </span>
-          </h1>
-          <p
-            className={cn(
-              "max-w-2xl font-mono text-base leading-[1.4] text-white transition-all duration-700 delay-700",
-              entered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-            )}
-          >
-            Directional Outlook &amp; Macro Alpha Intelligence — a market
-            radar powered by AI and professionals, built for experienced
-            traders.
-          </p>
-          <div
-            className={cn(
-              "flex w-full max-w-[675px] flex-col gap-4 transition-all duration-700 delay-[900ms] sm:flex-row sm:gap-6",
-              entered ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-            )}
-          >
-            <Link
-              href="/signup"
-              className="btn-pixel flex-1 rounded-[10px] bg-brand px-8 py-4 text-center font-mono text-base font-bold text-gray-2"
-            >
-              Request Access
-            </Link>
-            <Link
-              href="/login"
-              className="btn-pixel flex-1 rounded-[10px] border border-brand bg-black/80 px-8 py-4 text-center font-mono text-base font-bold text-brand backdrop-blur-[9.4px]"
-            >
-              Operator Login
-            </Link>
-          </div>
-        </div>
-
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            ref={earthRef}
-            src="/figma/hero.png"
-            alt=""
-            style={{ transform: `translateX(${EARTH_X})` }}
-            className="absolute inset-x-0 bottom-[-48px] w-full max-w-none origin-bottom select-none will-change-transform"
-          />
-          <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-gray via-gray/60 to-transparent" />
-        </div>
-
-        <div className="absolute inset-x-0 bottom-0 overflow-hidden py-[50px]">
-          <div className="flex w-max animate-ticker gap-[50px] [animation-direction:reverse] will-change-transform">
-            {[...heroTicker, ...heroTicker].map((t, i) => (
-              <TickerItem key={`${t.sym}-${i}`} {...t} />
+    <header className="lv-header fixed inset-x-0 top-0 z-50">
+      <div className="px-4 md:px-8">
+        <div className="mx-auto flex h-16 max-w-[1240px] items-center justify-between md:h-[72px]">
+          <Link href="/" className="flex items-center" aria-label="TradeVantage home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
+          </Link>
+          <nav aria-label="Sections" className="hidden items-center gap-8 text-[15px] text-tv-ink md:flex">
+            {LINKS.map(([l, h]) => (
+              <a key={l} href={`${home}${h}`} className="tv-link py-1">
+                {l}
+              </a>
             ))}
+            <Link href="/faq" className="tv-link py-1">
+              FAQ
+            </Link>
+          </nav>
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link href="/login" className="tv-btn tv-btn-sm px-3 text-tv-ink">
+              <Roll label="Log in" />
+            </Link>
+            <Link href="/signup" className="tv-btn tv-btn-sm tv-btn-ink">
+              <Roll label="Request access" />
+            </Link>
           </div>
         </div>
       </div>
+    </header>
+  );
+}
 
-      {/* Spacer — pushes content below the hero viewport */}
-      <div className="h-screen" />
-    </>
+export function HeroSection({ hero }: { hero: HeroData }) {
+  return (
+    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col justify-center overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-20">
+      <div className="mx-auto grid w-full max-w-[1240px] items-center gap-y-6 px-4 sm:px-6 md:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] md:gap-x-4 md:px-8 md:pb-16">
+        <div className="relative z-10 flex flex-col items-start md:py-10">
+          <p className="tv-eyebrow text-tv-mute">TradeVantage / daily desk</p>
+          <h1 className="mt-5 text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            <span className="block">Read the market.</span>
+            <span className="block">
+              Not the <Jitter text="noise" />.
+            </span>
+          </h1>
+          <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
+            Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
+          </p>
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Magnet>
+              <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
+                <Roll label="Request access" />
+                <span aria-hidden className="tv-arrow">
+                  →
+                </span>
+              </Link>
+            </Magnet>
+            <Link href="/login" className="tv-btn tv-btn-line">
+              <Roll label="Log in" />
+            </Link>
+          </div>
+          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.08em] text-tv-mute">
+            Free tier, no card · 2% max risk built in<span className="hidden sm:inline"> · </span>
+            <br className="sm:hidden" />
+            No signals to copy
+          </p>
+          <a href="#method" className="tv-link mt-6 text-[15px] font-medium">
+            See the lab <span aria-hidden className="tv-arrow">↓</span>
+          </a>
+          {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
+          <p className="mt-10 flex items-center gap-4 border-t border-tv-stone pt-5">
+            <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
+          </p>
+        </div>
+
+        <figure className="relative pb-6 md:-ml-10 md:-mr-24 md:pb-0">
+          <HeroDesk d={hero} />
+        </figure>
+      </div>
+    </section>
   );
 }

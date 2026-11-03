@@ -68,7 +68,7 @@ export default function LoginPage() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-      {/* Left — visual panel */}
+      {/* Left, visual panel */}
       <div className="relative flex flex-col overflow-hidden px-6 pb-12 pt-20 md:px-12 md:pb-16">
         {/* Background image with drift */}
         <div className="absolute inset-0">
@@ -162,7 +162,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right — form panel */}
+      {/* Right, form panel */}
       <div className="flex items-center justify-center bg-white px-6 py-16 md:px-12">
         <LoginForm />
       </div>

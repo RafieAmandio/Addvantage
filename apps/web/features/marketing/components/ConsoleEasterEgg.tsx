@@ -9,7 +9,7 @@ export function ConsoleEasterEgg() {
 
     console.log(
       "%c╔══════════════════════════════════════╗\n" +
-      "║  +VANTAGE // DOMAIN INTELLIGENCE     ║\n" +
+      "║  TRADEVANTAGE // DOMAIN INTELLIGENCE ║\n" +
       "║  CLASSIFICATION: OPERATOR EYES ONLY  ║\n" +
       "╚══════════════════════════════════════╝",
       style

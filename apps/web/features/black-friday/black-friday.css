@@ -1,0 +1,98 @@
+/*
+ * Black Friday flow: the landing's motion vocabulary (landing.css) applied to a form.
+ * Same timings and easings (--tv-fast/base/build, ease-out-quint); transform and opacity only.
+ * Everything that moves is inside prefers-reduced-motion: no-preference, so with motion off
+ * every state is simply there.
+ */
+
+/* Focus hairline under a field: draws in from the left. */
+.bf-line {
+  position: absolute;
+  inset: auto 10px 0 10px; /* inside the 10px corners */
+  height: 1px;
+  background: #111214;
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+.bf-field:focus-within .bf-line {
+  transform: scaleX(1);
+}
+
+/* Valid tick inside a field. */
+.bf-tick path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.bf-tick[data-on] path {
+  stroke-dashoffset: 0;
+}
+
+/* Signature line: grows with the name. */
+.bf-sign {
+  height: 1px;
+  background: #111214;
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+}
+
+/* Yellow progress hairline over the form. */
+.bf-progress {
+  height: 2px;
+  background: #ffd400;
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+}
+
+/* Upload progress: an ink hairline that runs while the file uploads. */
+.bf-upload-bar {
+  height: 1px;
+  background: #111214;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.bf-upload-bar[data-state="busy"] {
+  transform: scaleX(0.85);
+}
+.bf-upload-bar[data-state="done"] {
+  transform: scaleX(1);
+  opacity: 0;
+}
+
+/* Plan card lift: the chosen card rises a hair off the paper, no shadow. */
+.bf-card[aria-checked="true"] {
+  transform: translateY(-3px);
+}
+
+@keyframes bf-from-right {
+  from { opacity: 0; transform: translateX(20px); }
+}
+@keyframes bf-from-left {
+  from { opacity: 0; transform: translateX(-20px); }
+}
+@keyframes bf-snap {
+  from { transform: scale(0.3); }
+}
+@keyframes bf-drop {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bf-step[data-dir="fwd"] { animation: bf-from-right 0.42s var(--tv-ease-out) both; }
+  .bf-step[data-dir="back"] { animation: bf-from-left 0.42s var(--tv-ease-out) both; }
+  .bf-line { transition: transform 0.32s var(--tv-ease-out); }
+  .bf-tick path { transition: stroke-dashoffset 0.32s var(--tv-ease-out); }
+  .bf-sign { transition: transform 0.24s var(--tv-ease-out); }
+  .bf-progress { transition: transform var(--tv-build) var(--tv-ease-out); }
+  .bf-upload-bar { transition: transform 1.6s var(--tv-ease-out), opacity 0.3s 0.25s; }
+  .bf-upload-bar[data-state="done"] { transition: transform 0.2s var(--tv-ease-out), opacity 0.3s 0.35s; }
+  .bf-card { transition: transform var(--tv-base) var(--tv-ease-out), border-color var(--tv-base), background-color var(--tv-base); }
+  /* A chosen option's mark snaps in. */
+  .bf-mark[data-on] { animation: bf-snap 0.24s var(--tv-ease-out); }
+  .bf-drop { animation: bf-drop 0.36s var(--tv-ease-out) both; }
+}
+
+/* Fields show focus with their ink border and the drawn hairline; the landing's 2px offset ring is for links and buttons. */
+.tv-landing .bf-field input:focus-visible {
+  outline: none;
+}

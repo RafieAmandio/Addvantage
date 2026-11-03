@@ -13,13 +13,15 @@ import type { VideoModuleAdmin } from "@/features/videos/admin/queries";
 import { parseVideoRef } from "@/features/videos/lib/youtube";
 import { thumbnailUrl } from "@/features/videos/types";
 import { cn } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
 
 const INITIAL: VideoActionState = { ok: false };
 
 const inputCls =
-  "w-full border border-gray-3 bg-black px-3 py-2 text-sm text-white placeholder:text-white/20 focus:border-brand focus:outline-none";
-const labelCls =
-  "mb-1 block font-mono text-[10px] uppercase tracking-widest2 text-white/40";
+  "h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+const textareaCls =
+  "w-full resize-y rounded-xl bg-raised px-4 py-3 text-[15px] leading-[22px] text-white outline-none ring-1 ring-white/[0.08] placeholder:text-white/25 focus-visible:ring-brand";
+const labelCls = "mb-2 block text-[13px] font-medium text-white/70";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -27,9 +29,10 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="border border-brand bg-brand px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+      aria-busy={pending}
+      className="inline-flex h-11 items-center justify-center rounded-full bg-brand px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
-      {pending ? "…" : label}
+      {pending ? "Saving" : label}
     </button>
   );
 }
@@ -52,8 +55,8 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
   const previewRef = parseVideoRef(videoInput);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-      <form action={formAction} className="border border-brand/40 bg-black p-6">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <form action={formAction} className="min-w-0 rounded-2xl bg-panel p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label htmlFor="v-title" className={labelCls}>
@@ -69,7 +72,7 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
                 if (!slugTouched) setSlug(slugify(e.target.value));
               }}
               className={inputCls}
-              placeholder="London Session Replay — W27"
+              placeholder="London Session Replay, W27"
             />
           </div>
 
@@ -86,7 +89,7 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
                 setSlugTouched(true);
                 setSlug(slugify(e.target.value));
               }}
-              className={cn(inputCls, "font-mono")}
+              className={inputCls}
               placeholder="london-session-w27"
             />
           </div>
@@ -116,7 +119,7 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
               required
               value={videoInput}
               onChange={(e) => setVideoInput(e.target.value)}
-              className={cn(inputCls, "font-mono")}
+              className={inputCls}
               placeholder="https://youtu.be/dQw4w9WgXcQ"
             />
           </div>
@@ -130,7 +133,7 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
               name="duration"
               maxLength={16}
               defaultValue={video?.duration ?? ""}
-              className={cn(inputCls, "font-mono")}
+              className={inputCls}
               placeholder="42:10"
             />
           </div>
@@ -145,7 +148,7 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
               type="number"
               min={0}
               defaultValue={video?.sortOrder ?? 0}
-              className={cn(inputCls, "font-mono")}
+              className={cn(inputCls, "font-num text-[17px]")}
             />
           </div>
 
@@ -159,12 +162,12 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
               rows={4}
               maxLength={4000}
               defaultValue={video?.description ?? ""}
-              className={inputCls}
-              placeholder="What the desk covers in this module…"
+              className={textareaCls}
+              placeholder="What the desk covers in this module"
             />
           </div>
 
-          <label className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 sm:col-span-2">
+          <label className="flex items-center gap-2.5 text-[14px] text-white/90 sm:col-span-2">
             <input
               type="checkbox"
               name="published"
@@ -176,12 +179,12 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
         </div>
 
         {state.error && (
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
+          <p className="mt-4 text-[13px] text-down">
             {state.error}
           </p>
         )}
         {state.ok && (
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-widest2 text-moss">
+          <p className="mt-4 text-[13px] text-up">
             Saved
           </p>
         )}
@@ -190,49 +193,49 @@ export function VideoEditorForm({ video }: { video: VideoModuleAdmin | null }) {
           <SubmitButton label={video ? "Save changes" : "Create video"} />
           <Link
             href="/admin/videos"
-            className="border border-white/[0.1] px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/20 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-11 items-center rounded-full border border-white/[0.14] px-5 text-[14px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
             Cancel
           </Link>
         </div>
       </form>
 
-      <div>
-        <div className={labelCls}>Thumbnail preview</div>
-        <div className="aspect-video border border-white/[0.06] bg-black-2">
-          {previewRef ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={thumbnailUrl(previewRef.provider, previewRef.videoId)}
-              alt="Video thumbnail preview"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-widest2 text-white/20">
-              {videoInput ? "Invalid video link" : "Paste a link to preview"}
-            </div>
-          )}
-        </div>
-        {previewRef && (
-          <div className="mt-2 font-mono text-[10px] text-white/40">
-            {previewRef.provider}: {previewRef.videoId}
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Thumbnail preview">
+          <div className="aspect-video overflow-hidden rounded-xl bg-raised">
+            {previewRef ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={thumbnailUrl(previewRef.provider, previewRef.videoId)}
+                alt="Video thumbnail preview"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-[13px] text-white/30">
+                {videoInput ? "Invalid video link" : "Paste a link to preview"}
+              </div>
+            )}
           </div>
-        )}
+          {previewRef && (
+            <p className="mt-2 text-[13px] text-white/55">
+              <span className="capitalize">{previewRef.provider}</span>: {previewRef.videoId}
+            </p>
+          )}
+        </Panel>
 
         {video && (
-          <form
-            action={deleteVideo.bind(null, video.id)}
-            className="mt-8 border-t border-gray-3 pt-4"
-          >
-            <button
-              type="submit"
-              className="border border-blood-bright/50 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright transition-colors hover:bg-blood-bright hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Delete video
-            </button>
-          </form>
+          <Panel title="Remove video" sub="Deletes the module for every member.">
+            <form action={deleteVideo.bind(null, video.id)}>
+              <button
+                type="submit"
+                className="inline-flex h-11 w-full items-center justify-center rounded-full border border-white/[0.14] text-[14px] font-medium text-down transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+              >
+                Delete video
+              </button>
+            </form>
+          </Panel>
         )}
-      </div>
+      </aside>
     </div>
   );
 }

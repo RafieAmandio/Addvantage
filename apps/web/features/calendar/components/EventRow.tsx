@@ -1,68 +1,81 @@
 import Link from "next/link";
-import { cn } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { CalendarEvent } from "@/features/calendar/types";
-import { formatCalendarTime } from "@/features/calendar/lib/format";
-import { IMPACT_LABEL, IMPACT_STYLE } from "@/features/calendar/lib/style";
+import { labelOf, surpriseTone } from "@/features/calendar/lib/econ";
+import { Countdown, ImpactBars } from "@/features/calendar/components/EventBits";
 
-export function EventRow({
-  event,
-  anchorYmd,
-  showTimeOffset = true,
-}: {
-  event: CalendarEvent;
-  anchorYmd: string;
-  showTimeOffset?: boolean;
-}) {
+/** Shared column template for the day header and the rows (desktop). */
+export const ROW_COLS = "sm:grid-cols-[52px_72px_28px_minmax(0,1fr)_76px_76px_76px]";
+
+const TONE = { up: "text-up", down: "text-down" } as const;
+
+function Fig({ v, tone, className }: { v?: string; tone?: string; className?: string }) {
+  return <span className={cn("text-right font-num text-[17px] font-semibold leading-5", v ? tone : "text-white/15", className)}>{v ?? "-"}</span>;
+}
+
+/**
+ * One release. ForexFactory column order (time, currency, impact, event, actual,
+ * forecast, previous); on a phone it folds into time, name and the one figure that matters.
+ */
+export function EventRow({ event, past, next }: { event: CalendarEvent; past: boolean; next: boolean }) {
+  const { cur, flag, name } = labelOf(event);
+  const fc = event.forecast ?? event.consensus;
+  const tone = surpriseTone(name, event.actual, fc);
+  const actualCls = tone ? TONE[tone] : "text-white";
   return (
-    <div className="group grid grid-cols-[minmax(200px,2fr)_72px_64px_72px_72px_72px] items-center gap-3 border-b border-gray-3 bg-black px-3 py-3 transition-colors hover:bg-gray-2">
-      <div className="min-w-0">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <Link
-            href={`/app/calendar/${event.id}`}
-            className="font-display text-base leading-tight text-white transition-colors group-hover:text-brand hover:text-brand hover:underline focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            {event.title}
-          </Link>
-          {event.relatedNewsId && (
-            <Link
-              href={`/app/news/${event.relatedNewsId}`}
-              className="border border-brand/40 bg-brand/5 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              ↗ NEWS
-            </Link>
-          )}
-        </div>
-        {event.notes && (
-          <div className="mt-1 line-clamp-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            ● {event.notes}
-          </div>
+    <li>
+      <Link
+        href={`/app/calendar/${event.id}`}
+        className={cn(
+          "group grid grid-cols-[44px_minmax(0,1fr)_auto] items-center gap-x-3 px-2 py-3 transition-colors hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand sm:gap-x-2",
+          ROW_COLS,
+          past && !event.actual && "opacity-50",
+          past && event.actual && "[&_.dim]:opacity-60",
+          next && "bg-brand/[0.04]",
         )}
-      </div>
-
-      <div className="text-center font-mono text-xs text-white/70">
-        {formatCalendarTime(event.ts, anchorYmd, showTimeOffset)}
-      </div>
-
-      <div className="flex justify-center">
-        <span
-          className={cn(
-            "border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2",
-            IMPACT_STYLE[event.impact]
-          )}
-        >
-          {IMPACT_LABEL[event.impact]}
+      >
+        {/* time; on a phone the impact meter sits under it */}
+        <span className="dim flex flex-col gap-1.5 text-[13px] tabular-nums text-white/90 sm:block">
+          {formatWibTime(event.ts)}
+          <ImpactBars impact={event.impact} className="sm:hidden" />
         </span>
-      </div>
+        <span className="dim hidden items-center gap-1.5 text-[13px] font-medium text-white/80 sm:flex">
+          <span aria-hidden className="text-[15px] leading-none">{flag}</span>
+          {cur}
+        </span>
+        <span className="hidden sm:block">
+          <ImpactBars impact={event.impact} />
+        </span>
+        <span className="dim min-w-0">
+          <span className={cn("line-clamp-2 text-[15px] leading-[20px] group-hover:text-brand", event.impact === "high" ? "font-medium text-white" : "text-white/85")}>
+            <span aria-hidden className="mr-1.5 sm:hidden">{flag}</span>
+            {name}
+          </span>
+          {/* phone meta line */}
+          <span className="mt-0.5 block truncate text-[12px] text-white/40 sm:hidden">
+            {cur}
+            {event.actual && fc && <> · F {fc}</>}
+            {event.previous && <> · P {event.previous}</>}
+          </span>
+        </span>
 
-      <div className="text-center font-mono text-[11px] text-white/80">
-        {event.actual ?? "—"}
-      </div>
-      <div className="text-center font-mono text-[11px] text-white/50">
-        {event.previous ?? "—"}
-      </div>
-      <div className="text-center font-mono text-[11px] text-white/50">
-        {event.consensus ?? "—"}
-      </div>
-    </div>
+        {/* actual column: the print, a countdown on the next release, or nothing yet */}
+        <span className="text-right">
+          {event.actual ? (
+            <Fig v={event.actual} tone={actualCls} />
+          ) : next ? (
+            <Countdown ts={event.ts} className="text-[13px] font-medium text-brand" />
+          ) : (
+            <>
+              <Fig v={undefined} className="hidden sm:inline" />
+              {fc && <span className="font-num text-[17px] font-semibold text-white/60 sm:hidden">{fc}</span>}
+            </>
+          )}
+          {!event.actual && fc && !next && <span className="block text-[11px] text-white/30 sm:hidden">forecast</span>}
+        </span>
+        <Fig v={fc} tone="text-white/60" className="dim hidden sm:block" />
+        <Fig v={event.previous} tone="text-white/45" className="dim hidden sm:block" />
+      </Link>
+    </li>
   );
 }

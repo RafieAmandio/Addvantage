@@ -1,23 +1,13 @@
 export default function ArchiveLoading() {
   return (
-    <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-7xl animate-pulse">
-        <div className="mb-6 space-y-2">
-          <div className="h-3 w-24 rounded bg-gray-2" />
-          <div className="h-10 w-36 rounded bg-gray-2" />
+    <div className="animate-pulse space-y-3 rounded-2xl bg-panel p-5">
+      <div className="h-4 w-36 rounded bg-raised" />
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="space-y-2 py-2">
+          <div className="h-3 w-28 rounded bg-raised" />
+          <div className="h-4 w-3/4 rounded bg-raised" />
         </div>
-        <div className="space-y-px bg-gray-3">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="bg-black px-4 py-3 grid grid-cols-12 gap-4">
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-              <div className="col-span-5 h-4 rounded bg-gray-2" />
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-              <div className="col-span-1 h-4 rounded bg-gray-2" />
-              <div className="col-span-2 h-4 rounded bg-gray-2" />
-            </div>
-          ))}
-        </div>
-      </div>
+      ))}
     </div>
   );
 }

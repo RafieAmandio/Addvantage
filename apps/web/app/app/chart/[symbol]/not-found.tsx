@@ -2,29 +2,23 @@ import Link from "next/link";
 
 export default function ChartNotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-12 sm:px-6 sm:py-20">
-      <div className="w-full max-w-md text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          ● SYMBOL NOT FOUND
-        </div>
-        <h1 className="mt-4 font-display text-4xl text-white">
-          Unknown <span className="italic text-brand">instrument</span>
-        </h1>
-        <p className="mt-4 font-display text-lg text-white/60">
-          This symbol is not supported. Try SPX, BTC, ETH, DXY, or GOLD.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <div className="px-4 pb-10 sm:px-6">
+      <div className="mx-auto max-w-md rounded-2xl bg-panel p-8 text-center">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Symbol not found</p>
+        <h1 className="mt-2 text-[22px] font-semibold text-white">Unknown instrument</h1>
+        <p className="mt-2 text-[15px] leading-[22px] text-white/55">This symbol has no chart. Try SPX, BTC, ETH, DXY or GOLD.</p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/app/chart/SPX"
-            className="border border-brand/60 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="rounded-full bg-brand px-4 py-2 text-[14px] font-semibold text-black focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
           >
-            ← SPX chart
+            SPX chart
           </Link>
           <Link
             href="/app"
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="rounded-full border border-white/[0.14] px-4 py-2 text-[14px] font-medium text-white hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
-            Dashboard
+            Home
           </Link>
         </div>
       </div>

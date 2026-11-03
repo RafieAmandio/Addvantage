@@ -1,95 +1,63 @@
 "use client";
 
-import { cn } from "@/lib/cn";
-import { DataLabel, BiasBadge } from "@/components/ui/Marker";
+import { BiasBadge } from "@/components/ui/Marker";
 import { formatDate } from "@/lib/cn";
 import { useToast } from "@/lib/toast";
 import type { TradingPlan } from "@/features/plan/types";
 import { planToMarkdown } from "@/features/plan/lib/detail-helpers";
 
+/** Plan meta line plus actions. The TopBar already carries the page title. */
 export function PlanDetailHeader({
   plan,
   paid,
   isLatest,
   headerExtra,
-  breadcrumbs,
 }: {
   plan: TradingPlan;
   paid: boolean;
   isLatest?: boolean;
   headerExtra?: React.ReactNode;
-  breadcrumbs?: React.ReactNode;
 }) {
   const toast = useToast();
 
   const exportPlanMarkdown = async () => {
-    const md = planToMarkdown(plan);
     try {
-      await navigator.clipboard.writeText(md);
+      await navigator.clipboard.writeText(planToMarkdown(plan));
       toast.push({
         tone: "success",
         title: "Plan exported",
         description: `${plan.id} · ${plan.setups.length} setups · markdown on your clipboard, paste anywhere.`,
       });
     } catch {
-      toast.push({
-        tone: "error",
-        title: "Export failed",
-        description: "Browser denied clipboard access.",
-      });
+      toast.push({ tone: "error", title: "Export failed", description: "Browser denied clipboard access." });
     }
   };
 
   return (
-    <div className="border-b border-gray-3 bg-gray-2/30">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        {breadcrumbs && <div className="mb-4">{breadcrumbs}</div>}
-        <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <DataLabel>Trading Plan</DataLabel>
-              {isLatest && (
-                <span className="border border-brand bg-brand/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                  ● LATEST
-                </span>
-              )}
-              {!isLatest && (
-                <span className="border border-gray-3 bg-black px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-                  ARCHIVE
-                </span>
-              )}
-              {plan.bias && <BiasBadge bias={plan.bias} />}
-            </div>
-            <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
-              Trading <span className="italic text-brand">Plan</span>
-            </h1>
-            <p className="mt-2 font-mono text-[11px] uppercase tracking-widest2 text-white/40">
-              Plan ID <span className="text-white">{plan.id}</span> ·{" "}
-              {formatDate(plan.date)} · Authored by{" "}
-              <span className="text-white">{plan.authoredBy}</span>
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className="font-mono text-[10px] uppercase tracking-widest2">
-              <div className={paid ? "text-moss" : "text-blood-bright"}>
-                ● {paid ? "ACCESS GRANTED" : "ACCESS DENIED"}
-              </div>
-              <div className="text-white/40">Horizon · {plan.horizon}</div>
-            </div>
-            <div className="flex items-center gap-2">
-              {paid && (
-                <button
-                  onClick={exportPlanMarkdown}
-                  title="Copy this plan as markdown to your clipboard"
-                  className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                >
-                  ⇩ EXPORT MD
-                </button>
-              )}
-              {headerExtra}
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+          <span className={isLatest ? "text-brand" : undefined}>{isLatest ? "Latest plan" : "Archive"}</span>
+          <span>{plan.id}</span>
+          <span>{plan.horizon}</span>
+          {plan.bias && <BiasBadge bias={plan.bias} />}
+        </p>
+        <p className="mt-1 font-num text-[36px] font-semibold leading-10 text-white sm:text-[44px] sm:leading-[48px]">
+          {formatDate(plan.date)}
+        </p>
+        <p className="text-[13px] text-white/55">by {plan.authoredBy}</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {paid && (
+          <button
+            onClick={exportPlanMarkdown}
+            title="Copy this plan as markdown to your clipboard"
+            className="rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+          >
+            Export markdown
+          </button>
+        )}
+        {headerExtra}
       </div>
     </div>
   );

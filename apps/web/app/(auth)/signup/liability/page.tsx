@@ -26,7 +26,7 @@ export default function LiabilityPage() {
   const signatureError =
     signature.length > 0 && !looksLikeFullName
       ? trimmed.length < 5
-        ? "Too short — type your full legal name."
+        ? "Too short. Type your full legal name."
         : !/\s/.test(trimmed)
           ? "Need first AND last name."
           : "Letters, spaces, and . - ' only."
@@ -41,7 +41,7 @@ export default function LiabilityPage() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-      {/* Left — dark panel */}
+      {/* Left, dark panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -81,7 +81,7 @@ export default function LiabilityPage() {
         </div>
       </div>
 
-      {/* Right — waiver form */}
+      {/* Right, waiver form */}
       <div className="flex flex-col bg-white px-6 py-12 md:overflow-y-auto md:px-12">
         <div className="mx-auto w-full max-w-lg">
           <p className="font-mono text-sm text-black/50">
@@ -183,7 +183,7 @@ export default function LiabilityPage() {
 
           <div className="mt-8">
             <p className="font-mono text-sm font-bold text-black">
-              Signature — type your full legal name
+              Signature, type your full legal name
             </p>
             <input
               type="text"
@@ -195,7 +195,7 @@ export default function LiabilityPage() {
                 signatureError
                   ? "border-blood-bright bg-blood/5 text-blood-bright"
                   : looksLikeFullName
-                    ? "border-moss bg-moss/5 text-black"
+                    ? "border-[#65A30D] bg-[#65A30D]/5 text-black"
                     : "border-gray-3 bg-white-2 text-black placeholder:text-black/30 focus-visible:border-brand"
               )}
             />
@@ -209,7 +209,7 @@ export default function LiabilityPage() {
           <div className="mt-8 flex items-center justify-between">
             <span className="font-mono text-xs text-black/40">
               {canSign ? (
-                <span className="text-moss">● Ready to sign</span>
+                <span className="text-[#65A30D]">● Ready to sign</span>
               ) : (
                 <span className="text-blood-bright">● Incomplete</span>
               )}

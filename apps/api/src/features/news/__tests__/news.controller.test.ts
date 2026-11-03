@@ -21,6 +21,7 @@ vi.mock("../news.service.js", () => ({
     listApproved: mockListApproved,
     getApproved: mockGetApproved,
     listPending: mockListPending,
+    listFiltered: mockListPending,
     listRejected: vi.fn().mockResolvedValue({ content: [], total: 0, page: 1, limit: 20 }),
     getForAdmin: mockGetForAdmin,
     create: mockCreate,

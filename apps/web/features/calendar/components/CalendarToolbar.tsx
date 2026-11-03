@@ -1,94 +1,48 @@
 import { cn } from "@/lib/cn";
 import { TODAY_YMD, type ViewMode } from "@/features/calendar/types";
-import { rangeLabel, stepAnchor } from "@/features/calendar/lib/view";
+import { addDays, startOfWeek } from "@/features/calendar/lib/date";
+import { stepAnchor } from "@/features/calendar/lib/view";
+import { Chip } from "@/features/calendar/components/CalendarFilterBar";
 
 type Props = {
   view: ViewMode;
   anchor: string;
-  eventCount: number;
+  label: string;
   onViewChange: (v: ViewMode) => void;
   onAnchorChange: (ymd: string) => void;
   className?: string;
 };
 
-export function CalendarToolbar({
-  view,
-  anchor,
-  eventCount,
-  onViewChange,
-  onAnchorChange,
-  className,
-}: Props) {
+const arrow =
+  "grid h-8 w-8 place-items-center rounded-full border border-white/[0.12] text-[14px] text-white/80 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+
+/** Range presets (Today, This week, Next week, Month) with step arrows and the range label. */
+export function CalendarToolbar({ view, anchor, label, onViewChange, onAnchorChange, className }: Props) {
+  const week = startOfWeek(anchor);
+  const thisWeek = startOfWeek(TODAY_YMD);
+  const presets = [
+    { id: "today", label: "Today", on: view === "day" && anchor === TODAY_YMD, go: () => { onViewChange("day"); onAnchorChange(TODAY_YMD); } },
+    { id: "week", label: "This week", on: view === "week" && week === thisWeek, go: () => { onViewChange("week"); onAnchorChange(TODAY_YMD); } },
+    { id: "next", label: "Next week", on: view === "week" && week === addDays(thisWeek, 7), go: () => { onViewChange("week"); onAnchorChange(addDays(thisWeek, 7)); } },
+    { id: "month", label: "Month", on: view === "month", go: () => onViewChange("month"), className: "hidden sm:inline-flex" },
+  ];
   return (
-    <div
-      className={cn(
-        "mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center",
-        className
-      )}
-    >
-      <div
-        className="flex gap-px bg-gray-3"
-        role="tablist"
-        aria-label="Calendar view"
-      >
-        {(["day", "week", "month"] as const).map((v) => (
-          <button
-            key={v}
-            onClick={() => onViewChange(v)}
-            role="tab"
-            aria-selected={view === v}
-            className={cn(
-              "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              view === v
-                ? "bg-brand text-black"
-                : "bg-gray-2 text-white/60 hover:bg-gray-2 hover:text-white"
-            )}
-          >
-            {v}
-          </button>
+    <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Date range">
+        {presets.map((p) => (
+          <Chip key={p.id} on={p.on} onClick={p.go} className={"className" in p ? p.className : undefined}>
+            {p.label}
+          </Chip>
         ))}
       </div>
-
-      <div className="flex items-center justify-center gap-2 lg:gap-3">
-        <button
-          onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))}
-          aria-label={`Previous ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-        >
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] font-medium text-white/70">{label}</span>
+        <button type="button" onClick={() => onAnchorChange(stepAnchor(view, anchor, -1))} aria-label={`Previous ${view}`} className={arrow}>
           ←
         </button>
-        <div className="min-w-[180px] border border-brand/40 bg-gray-2/40 px-4 py-2 text-center">
-          <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-            {view === "day" ? "Day" : view === "week" ? "Week" : "Month"}
-          </div>
-          <div className="font-display text-base text-brand">
-            {rangeLabel(view, anchor)}
-          </div>
-        </div>
-        <button
-          onClick={() => onAnchorChange(stepAnchor(view, anchor, 1))}
-          aria-label={`Next ${view}`}
-          className="border border-gray-3 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-        >
+        <button type="button" onClick={() => onAnchorChange(stepAnchor(view, anchor, 1))} aria-label={`Next ${view}`} className={arrow}>
           →
         </button>
-        <button
-          onClick={() => onAnchorChange(TODAY_YMD)}
-          disabled={anchor === TODAY_YMD}
-          className={cn(
-            "ml-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-            anchor === TODAY_YMD
-              ? "cursor-default border-gray-3 text-white/30"
-              : "border-brand/60 text-brand hover:bg-brand hover:text-black"
-          )}
-        >
-          Today
-        </button>
-      </div>
-
-      <div className="flex items-center justify-end gap-3 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-        <span className="text-brand">{eventCount}</span>
-        <span>events in view</span>
       </div>
     </div>
   );

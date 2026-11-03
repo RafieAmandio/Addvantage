@@ -22,70 +22,65 @@ export default function GlobalError({
         style={{
           margin: 0,
           minHeight: "100vh",
-          background: "#111111",
-          color: "#EEEEEE",
+          background: "#0A0A0A",
+          color: "rgba(255,255,255,0.9)",
           fontFamily:
-            "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+            "Geist, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem",
+          padding: "16px",
+          boxSizing: "border-box",
         }}
       >
-        <div style={{ maxWidth: 640 }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 448,
+            background: "#121212",
+            borderRadius: 16,
+            padding: 32,
+            boxSizing: "border-box",
+          }}
+        >
           <div
             style={{
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 10,
+              fontSize: 12,
+              fontWeight: 600,
               textTransform: "uppercase",
-              letterSpacing: "0.2em",
-              color: "#FFD400",
+              letterSpacing: "0.08em",
+              color: "rgba(255,255,255,0.4)",
             }}
           >
-            STATUS · 500 · ROOT FAULT
+            Something went wrong
           </div>
-          <h1
-            style={{
-              marginTop: "0.75rem",
-              fontSize: "2.5rem",
-              lineHeight: 1.05,
-              fontWeight: 500,
-            }}
-          >
-            The DOMAIN is offline.
+          <h1 style={{ margin: "12px 0 0", fontSize: 22, lineHeight: "28px", fontWeight: 600, color: "#fff" }}>
+            TradeVantage could not load
           </h1>
-          <p style={{ marginTop: "1rem", color: "rgba(238,238,238,0.6)" }}>
-            A root-level fault took down the shell. Reload to retry.
+          <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: "21px", color: "rgba(255,255,255,0.55)" }}>
+            A root-level fault took down the app. Reload to try again.
           </p>
+          {error.digest && (
+            <p style={{ margin: "12px 0 0", fontSize: 12, color: "rgba(255,255,255,0.3)" }}>Ref {error.digest}</p>
+          )}
           <button
             onClick={() => reset()}
             style={{
-              marginTop: "1.5rem",
-              padding: "0.75rem 1.25rem",
+              marginTop: 24,
+              height: 44,
+              padding: "0 24px",
               background: "#FFD400",
-              color: "#111111",
+              color: "#000",
               border: 0,
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 12,
-              textTransform: "uppercase",
-              letterSpacing: "0.15em",
+              borderRadius: 9999,
+              fontFamily: "inherit",
+              fontSize: 14,
+              fontWeight: 600,
               cursor: "pointer",
             }}
           >
-            ↻ RETRY
+            Try again
           </button>
-          {error.digest && (
-            <div
-              style={{
-                marginTop: "2rem",
-                fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-                fontSize: 10,
-                color: "rgba(238,238,238,0.4)",
-              }}
-            >
-              DIGEST · {error.digest}
-            </div>
-          )}
         </div>
       </body>
     </html>

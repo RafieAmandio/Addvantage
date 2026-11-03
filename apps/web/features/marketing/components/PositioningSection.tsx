@@ -1,484 +1,110 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/cn";
-import { ModelViewer } from "@/features/marketing/components/ModelViewer";
-import {
-  IconCheckBox,
-  IconCloseSquare,
-} from "@/features/marketing/components/icons";
+import { P, box, type B } from "@/features/marketing/lib/iso";
+import { Block, Slide } from "@/features/marketing/components/iso/Iso";
+import { Figure, type Item } from "@/features/marketing/components/iso/Figures";
 
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
+const FOR = ["Experienced market participants leveling up their edge.", "Traders who need a second-opinion copilot for blind-spot coverage.", "Anyone who wants to activate Six Eyes on the market."];
+const NOT = ["Beginners", "Gamblers", "Hobbyists"];
 
-function useScrambleText(text: string, trigger: boolean, duration = 600) {
-  const [display, setDisplay] = useState(text);
-  const prevTrigger = useRef(false);
+const U = 40;
+const G = "tvg-gate";
+const LANE = box(0, 0, -0.3, 16.2, 4.4, 0.3);
+const GX = 10.2; // the gate's x
+const GATE: B[] = [box(GX, -0.1, 0, 0.45, 0.45, 2.7), box(GX, 4.05, 0, 0.45, 0.45, 2.7), box(GX, -0.1, 2.7, 0.45, 4.6, 0.4)];
+// The queue that stops at the gate, nearest the gate first.
+const STOPPED: B[] = [box(7.3, 1.45, 0, 1.5, 1.5, 1.35), box(4.9, 1.45, 0, 1.5, 1.5, 1.7), box(2.5, 1.45, 0, 1.5, 1.5, 1.15)];
+const PASSED = box(12.9, 1.3, 0, 1.8, 1.8, 2.1);
 
-  useEffect(() => {
-    if (!trigger) {
-      prevTrigger.current = false;
-      return;
-    }
-    if (prevTrigger.current) return;
-    prevTrigger.current = true;
-
-    const steps = 12;
-    const interval = duration / steps;
-    let step = 0;
-
-    setDisplay(text.replace(/\S/g, () => CHARS[Math.floor(Math.random() * CHARS.length)]));
-
-    const id = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const settled = Math.floor(progress * text.length);
-      const result = text
-        .split("")
-        .map((ch, i) => {
-          if (ch === " ") return " ";
-          if (i < settled) return text[i];
-          return CHARS[Math.floor(Math.random() * CHARS.length)];
-        })
-        .join("");
-      setDisplay(result);
-
-      if (step >= steps) {
-        clearInterval(id);
-        setDisplay(text);
-      }
-    }, interval);
-
-    return () => clearInterval(id);
-  }, [trigger, text, duration]);
-
-  return display;
+/** An ink stroke across a block's top face, left corner to right corner: struck. */
+function Strike({ b }: { b: B }) {
+  const [a, c] = [P(b[0] + 0.15, b[3] - 0.15, b[5], U), P(b[1] - 0.15, b[2] + 0.15, b[5], U)];
+  return <path d={`M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${c[0].toFixed(1)} ${c[1].toFixed(1)}`} stroke="#111214" strokeWidth={2.2} strokeLinecap="square" vectorEffect="non-scaling-stroke" />;
 }
 
-function useInView(threshold = 0.2) {
-  const ref = useRef<HTMLElement>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry.isIntersecting);
-      },
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-
-  return { ref, inView };
-}
-
-function ScrambleHeading({
-  text,
-  className,
-  trigger,
-}: {
-  text: string;
-  className: string;
-  trigger: boolean;
-}) {
-  const display = useScrambleText(text, trigger);
-  return <h2 className={className}>{display}</h2>;
-}
-
-function ScrambleH3({
-  text,
-  className,
-  trigger,
-  delay = 0,
-}: {
-  text: string;
-  className: string;
-  trigger: boolean;
-  delay?: number;
-}) {
-  const [go, setGo] = useState(false);
-  useEffect(() => {
-    if (!trigger) {
-      setGo(false);
-      return;
-    }
-    const t = setTimeout(() => setGo(true), delay);
-    return () => clearTimeout(t);
-  }, [trigger, delay]);
-  const display = useScrambleText(text, go);
-  return <h3 className={className}>{display}</h3>;
-}
-
-function RevealItem({
-  children,
-  delay,
-  trigger,
-  direction = "up",
-}: {
-  children: React.ReactNode;
-  delay: number;
-  trigger: boolean;
-  direction?: "up" | "left" | "right";
-}) {
-  const transforms = {
-    up: "translateY(24px)",
-    left: "translateX(-24px)",
-    right: "translateX(24px)",
-  };
-  return (
-    <div
-      className="transition-all duration-600 ease-out"
-      style={{
-        opacity: trigger ? 1 : 0,
-        transform: trigger ? "translate(0)" : transforms[direction],
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function AnimatedCounter({
-  value,
-  trigger,
-  delay = 0,
-}: {
-  value: string;
-  trigger: boolean;
-  delay?: number;
-}) {
-  const [display, setDisplay] = useState("00");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) {
-      setStarted(false);
-      setDisplay("00");
-      return;
-    }
-    const t = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(t);
-  }, [trigger, delay]);
-
-  useEffect(() => {
-    if (!started) return;
-    const steps = 8;
-    let step = 0;
-    const id = setInterval(() => {
-      step++;
-      if (step >= steps) {
-        clearInterval(id);
-        setDisplay(value);
-      } else {
-        setDisplay(
-          String(Math.floor(Math.random() * 10)) +
-            String(Math.floor(Math.random() * 10))
-        );
-      }
-    }, 50);
-    return () => clearInterval(id);
-  }, [started, value]);
-
-  return <span>{display}</span>;
-}
-
-function TypewriterLabel({
-  text,
-  trigger,
-  delay = 0,
-}: {
-  text: string;
-  trigger: boolean;
-  delay?: number;
-}) {
-  const [display, setDisplay] = useState("");
-  const [showCursor, setShowCursor] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) {
-      setDisplay("");
-      setShowCursor(false);
-      return;
-    }
-    const startTimeout = setTimeout(() => {
-      setShowCursor(true);
-      let i = 0;
-      const id = setInterval(() => {
-        i++;
-        setDisplay(text.slice(0, i));
-        if (i >= text.length) {
-          clearInterval(id);
-          setTimeout(() => setShowCursor(false), 1200);
-        }
-      }, 60);
-      return () => clearInterval(id);
-    }, delay);
-    return () => clearTimeout(startTimeout);
-  }, [trigger, text, delay]);
-
-  return (
-    <span>
-      {display}
-      {showCursor && (
-        <span className="animate-blink ml-[1px] inline-block h-[1em] w-[2px] bg-brand align-middle" />
-      )}
-    </span>
-  );
-}
-
-function useMouseTexture(sectionRef: React.RefObject<HTMLElement | null>) {
-  const [pos, setPos] = useState({ x: 0, y: 0, active: false });
-  const raf = useRef(0);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    function onMove(e: MouseEvent) {
-      cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => {
-        const rect = el!.getBoundingClientRect();
-        setPos({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-          active: true,
-        });
-      });
-    }
-    function onLeave() {
-      setPos((p) => ({ ...p, active: false }));
-    }
-
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-      cancelAnimationFrame(raf.current);
-    };
-  }, [sectionRef]);
-
-  return pos;
-}
-
+/**
+ * What this is, who it is for and who it is not for, as one scene: a lane on the desk with a
+ * gate across it. Beginners, gamblers and hobbyists queue at the gate, struck; the experienced
+ * trader is through it, the one Signal block. The lists are the scene's spec labels.
+ */
 export function PositioningSection() {
-  const { ref: sectionRef, inView } = useInView(0.15);
-  const mouse = useMouseTexture(sectionRef as React.RefObject<HTMLElement>);
-
+  const items: Item[] = [
+    { id: "lane", b: LANE, el: (k) => <Block key={k} b={LANE} u={U} grain={G} /> },
+    ...GATE.map((b, i) => ({
+      id: `gate${i}`,
+      b,
+      info: i === 2 ? { main: "Filter", lines: ["Not a funnel"], aria: "The gate: onboarding is a filter, not a funnel" } : undefined,
+      el: (k: number) => (
+        <Slide key={k} v={[0, 0, 1.4]} u={U} at={120 + i * 80}>
+          <Block b={b} u={U} face="ink" />
+        </Slide>
+      ),
+    })),
+    ...STOPPED.map((b, i) => ({
+      id: `no${i}`,
+      b,
+      anchor: [(b[0] + b[1]) / 2, (b[2] + b[3]) / 2, b[5]] as [number, number, number],
+      info: { main: NOT[i]!, lines: ["Stopped at the filter"], aria: `${NOT[i]}: not for them, stopped at the filter` },
+      el: (k: number) => (
+        <Slide key={k} v={[-3 - i * 1.4, 0, 0]} u={U} at={420 + i * 110}>
+          <Block b={b} u={U} grain={G} />
+          <Strike b={b} />
+        </Slide>
+      ),
+    })),
+    {
+      id: "yes",
+      b: PASSED,
+      anchor: [(PASSED[0] + PASSED[1]) / 2, (PASSED[2] + PASSED[3]) / 2, PASSED[5]],
+      info: { main: "Experienced trader", lines: ["Through the filter"], aria: "Experienced trader, through the filter" },
+      el: (k) => (
+        <Slide key={k} v={[-3.6, 0, 0]} u={U} at={900}>
+          <Block b={PASSED} u={U} face="signal" grain={G} />
+        </Slide>
+      ),
+    },
+  ];
+  const mid = STOPPED[1]!;
   return (
-    <section
-      ref={sectionRef as React.RefObject<HTMLElement>}
-      className="relative mt-[80px] md:mt-[140px]"
-    >
-      {/* Cursor-reveal texture overlay */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          backgroundImage:
-            "linear-gradient(to right, rgba(255, 212, 0, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 212, 0, 0.12) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-          WebkitMaskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-        }}
-      />
-      {/* Cursor glow */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          background: `radial-gradient(circle 200px at ${mouse.x}px ${mouse.y}px, rgba(255, 212, 0, 0.06) 0%, transparent 100%)`,
-        }}
-      />
-      {/* Outer frame with vertical borders */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        {/* Header — Positioning left, 01 right */}
-        <div
-          className="flex items-center justify-between px-8 py-4 transition-all duration-700"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? "translateY(0)" : "translateY(20px)",
-          }}
-        >
-          <span className="font-mono text-base font-bold text-white">
-            <TypewriterLabel text="Positioning" trigger={inView} delay={200} />
-          </span>
-          <span className="font-mono text-base font-bold text-brand">
-            <AnimatedCounter value="01" trigger={inView} />
-          </span>
+    <section id="positioning" className="relative z-10 flex flex-col justify-center overflow-hidden bg-tv-paper py-16 text-tv-ink md:min-h-[100svh] md:py-[clamp(3rem,8svh,5rem)]">
+      <div className="mx-auto grid w-full max-w-[1240px] gap-y-8 px-4 sm:px-6 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] md:gap-x-6 md:px-10">
+        <div className="relative z-10 flex flex-col md:pt-6">
+          <h2 className="text-[clamp(2.4rem,4.6vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em]">What this is</h2>
+          <p className="mt-6 max-w-[24ch] text-[clamp(1.25rem,1.9vw,1.6rem)] leading-[1.3] tracking-[-0.01em]">
+            A market radar powered by AI and professionals, created for experienced traders and investors.
+          </p>
+          <p className="mt-8 hidden max-w-[22rem] border-t border-tv-ink pt-4 text-[17px] leading-[1.45] md:mt-auto md:block">
+            We don&apos;t soften this.
+            <br />
+            <span className="font-semibold">Onboarding is a filter, not a funnel.</span>
+          </p>
         </div>
-      </div>
-
-      {/* Top horizontal line — bleeds full width */}
-      <div className="w-full overflow-hidden">
-        <div
-          className={cn(
-            "h-px origin-left bg-white/40 transition-all duration-700 ease-out",
-            inView && "line-pulse"
-          )}
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "200ms",
-          }}
-        />
-      </div>
-
-      {/* 3-column grid inside the frame */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr_1px_1fr]">
-          {/* Col 1 — What this is */}
-          <div
-            className="relative flex min-h-[400px] flex-col gap-3 overflow-hidden bg-white p-6 transition-all duration-700 md:min-h-[560px] md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "300ms",
-            }}
-          >
-            <ScrambleHeading
-              text="What this is"
-              className="font-mono text-2xl font-bold leading-none text-black md:text-[36px]"
-              trigger={inView}
-            />
-            <RevealItem delay={500} trigger={inView}>
-              <p className="font-mono text-base font-light leading-[1.4] text-black">
-                A market radar powered by AI and professionals, created for
-                experienced traders and investors.
-              </p>
-            </RevealItem>
-            {/* Oversized, bottom-cropped 3D model — bleeds past the card's
-                bottom edge (clipped by the card's overflow-hidden). */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
-              <div
-                className="aspect-square w-[96%] transition-all duration-1000"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transform: inView ? "translateY(20%) scale(1)" : "translateY(20%) scale(0.85)",
-                  transitionDelay: "600ms",
-                }}
-              >
-                <ModelViewer
-                  src="/models/what-this-is.glb"
-                  poster="/figma/what-this-is.png"
-                  radius="82%"
-                  idleSpeed={8}
-                  scrollSpin={110}
-                  pointerTrack={7}
-                  basePhi={80}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Animated vertical divider 1 */}
-          <div
-            className="hidden origin-top bg-white/20 transition-all duration-700 ease-out md:block"
-            style={{
-              transform: inView ? "scaleY(1)" : "scaleY(0)",
-              transitionDelay: "400ms",
-            }}
+        <figure className="md:-mr-6 md:mt-4">
+          <Figure
+            id="gate"
+            u={U}
+            items={items}
+            floor={[LANE]}
+            pad={[270, 250, 24, 10]}
+            maxH={76}
+            className="mx-auto w-full"
+            labels={[
+              { anchor: [(mid[0] + mid[1]) / 2, (mid[2] + mid[3]) / 2, mid[5]], main: "Who this is not for", strikes: NOT, dy: -130, dx: 24, cue: 1100 },
+              { anchor: [(PASSED[0] + PASSED[1]) / 2, (PASSED[2] + PASSED[3]) / 2, PASSED[5]], main: "Who this is for", sub: "Experienced trader", note: FOR, dy: -250, dx: 40, cue: 1400 },
+            ]}
           />
-
-          {/* Col 2 — Who this is not for */}
-          <div
-            className="flex flex-col gap-6 p-6 transition-all duration-700 md:gap-9 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "450ms",
-            }}
-          >
-            <ScrambleH3
-              text="Who this is not for"
-              className="font-mono text-2xl font-bold text-white"
-              trigger={inView}
-              delay={400}
-            />
-            <ul className="flex flex-col gap-4">
-              {["Beginners", "Gamblers", "Hobbyists"].map((item, i) => (
-                <RevealItem key={item} delay={600 + i * 200} trigger={inView} direction="left">
-                  <li className="flex items-center gap-2">
-                    <IconCloseSquare className="h-6 w-6 shrink-0 text-blood-bright" />
-                    <span className="font-mono text-base font-light leading-[1.4] text-blood-bright line-through">
-                      {item}
-                    </span>
-                  </li>
-                </RevealItem>
-              ))}
-              <RevealItem delay={1200} trigger={inView}>
-                <li className="font-mono text-base font-light leading-[1.4] text-white">
-                  We don&apos;t soften this.
-                  <br />
-                  Onboarding is a filter, not a funnel.
-                </li>
-              </RevealItem>
-            </ul>
-          </div>
-
-          {/* Animated vertical divider 2 */}
-          <div
-            className="hidden origin-bottom bg-white/20 transition-all duration-700 ease-out md:block"
-            style={{
-              transform: inView ? "scaleY(1)" : "scaleY(0)",
-              transitionDelay: "500ms",
-            }}
-          />
-
-          {/* Col 3 — Who this is for */}
-          <div
-            className="flex flex-col gap-6 p-6 transition-all duration-700 md:gap-9 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "600ms",
-            }}
-          >
-            <ScrambleH3
-              text="Who this is for"
-              className="font-mono text-2xl font-bold text-white"
-              trigger={inView}
-              delay={550}
-            />
-            <ul className="flex flex-col gap-4">
-              {[
-                "Experienced market participants leveling up their edge.",
-                "Traders who need a second-opinion copilot for blind-spot coverage.",
-                null,
-              ].map((item, i) => (
-                <RevealItem key={i} delay={750 + i * 200} trigger={inView} direction="right">
-                  <li className="flex items-start gap-4">
-                    <IconCheckBox className="h-6 w-6 shrink-0 text-brand" />
-                    {item ? (
-                      <span className="font-mono text-base font-light leading-[1.4] text-white">
-                        {item}
-                      </span>
-                    ) : (
-                      <span className="font-mono text-base font-light leading-[1.4] text-white">
-                        Anyone who wants to activate{" "}
-                        <span className="text-brand">Six Eyes</span> on the
-                        market.
-                      </span>
-                    )}
-                  </li>
-                </RevealItem>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom horizontal line — bleeds full width */}
-      <div className="w-full overflow-hidden">
-        <div
-          className="h-px origin-right bg-white/40 transition-all duration-700 ease-out"
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "800ms",
-          }}
-        />
+          {/* On a phone the scene keeps its labels short; who it is for reads as plain lines under it. */}
+          <ul className="mt-4 flex flex-col gap-2 border-t border-tv-stone pt-4 text-[16px] leading-[1.45] md:hidden">
+            {FOR.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </figure>
+        <p className="border-t border-tv-ink pt-4 text-[17px] leading-[1.45] md:hidden">
+          We don&apos;t soften this.
+          <br />
+          <span className="font-semibold">Onboarding is a filter, not a funnel.</span>
+        </p>
       </div>
     </section>
   );

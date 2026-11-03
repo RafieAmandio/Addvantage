@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { listFilteredNews } from "@/features/news/queries/news";
-import { formatDateTime } from "@/lib/cn";
+import { cn, formatDateTime } from "@/lib/cn";
 import { SOURCE_CODES } from "@tradevantage/shared";
 import { IMPACT_LEVELS, BIAS_LEVELS, HASHTAGS } from "@tradevantage/shared";
 import { ReviewActions } from "./ReviewActions";
+import { Panel } from "@/components/ui/Panel";
+import { SegmentedNav } from "@/components/ui/SegmentedNav";
+import { BiasBadge, ImpactPill } from "@/components/ui/Marker";
 
 export const metadata: Metadata = { title: "Review Queue" };
 export const dynamic = "force-dynamic";
@@ -96,216 +99,187 @@ export default async function AdminReviewQueuePage({
     source: undefined, impact: undefined, bias: undefined, tags: undefined, page: "1",
   });
 
+  const pagerClass =
+    "rounded-full border border-white/[0.14] px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand";
+
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            Inbound · Review
-          </span>
-          <h1 className="mt-2 font-mono text-2xl font-bold text-white">
-            Review Queue
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            {total} {status}
-          </span>
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <Panel
+        title="Review queue"
+        className="lg:self-start"
+        sub={`${total} ${status}`}
+        action={
           <Link
             href="/admin/review/new"
-            className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-9 items-center rounded-full bg-brand px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
           >
-            + New item
+            New item
           </Link>
+        }
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SegmentedNav
+            items={STATUSES}
+            current={status as (typeof STATUSES)[number]}
+            hrefFor={(s) => buildUrl({ status: s, page: "1" })}
+            labelFor={(s) => s[0].toUpperCase() + s.slice(1)}
+            ariaLabel="Status"
+          />
+          <SegmentedNav
+            items={["desc", "asc"] as const}
+            current={sort}
+            hrefFor={(s) => buildUrl({ sort: s, page: "1" })}
+            labelFor={(s) => (s === "desc" ? "Newest" : "Oldest")}
+            ariaLabel="Sort"
+          />
         </div>
-      </div>
 
-      {/* Status tabs + Sort */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {STATUSES.map((s) => (
-            <Link
-              key={s}
-              href={buildUrl({ status: s, page: "1" })}
-              className={`border px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
-                status === s
-                  ? "border-brand bg-brand/10 text-brand"
-                  : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-              }`}
-            >
-              {s}
-            </Link>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-            Sort
-          </span>
-          <Chip
-            href={buildUrl({ sort: "desc", page: "1" })}
-            active={sort === "desc"}
-          >
-            Newest
-          </Chip>
-          <Chip
-            href={buildUrl({ sort: "asc", page: "1" })}
-            active={sort === "asc"}
-          >
-            Oldest
-          </Chip>
-        </div>
-      </div>
-
-      {/* Multi-select filters */}
-      <div className="mt-4 space-y-2 border border-white/[0.06] bg-white/[0.01] p-3">
-        <FilterRow label="Source" group="source" current={sources} allValues={[...SOURCE_CODES]} buildToggle={toggleUrl} buildClear={() => buildUrl({ source: undefined, page: "1" })} />
-        <FilterRow label="Impact" group="impact" current={impacts} allValues={[...IMPACT_LEVELS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ impact: undefined, page: "1" })} />
-        <FilterRow label="Bias" group="bias" current={biases} allValues={[...BIAS_LEVELS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ bias: undefined, page: "1" })} />
-        <FilterRow label="Tags" group="tags" current={tags} allValues={[...HASHTAGS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ tags: undefined, page: "1" })} prefix="#" />
-
-        {activeFilterCount > 0 && (
-          <div className="flex items-center gap-2 pt-1">
-            <Link
-              href={clearAllUrl}
-              className="border border-blood-bright/40 px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright transition-colors hover:bg-blood-bright/10 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-            >
-              Clear all filters ({activeFilterCount})
-            </Link>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-4 h-px bg-white/20" />
-
-      {items.length === 0 && (
-        <div className="py-20 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-moss">
-            {activeFilterCount > 0
-              ? "No items match filters"
-              : `● No ${status} items`}
-          </div>
-          <div className="mt-4 font-mono text-xl font-bold text-white">
-            {activeFilterCount > 0
-              ? "Try removing some filters."
-              : status === "pending"
-                ? "No items pending review."
-                : `No ${status} items found.`}
-          </div>
-          {activeFilterCount > 0 && (
-            <div className="mt-8">
+        {items.length === 0 ? (
+          <div className="mt-4 rounded-xl bg-raised px-5 py-12 text-center">
+            <p className="text-[15px] font-medium text-white">
+              {activeFilterCount > 0
+                ? "No items match these filters."
+                : status === "pending"
+                  ? "Nothing waiting for review."
+                  : `No ${status} items.`}
+            </p>
+            <p className="mt-1 text-[13px] text-white/55">
+              {activeFilterCount > 0
+                ? "Remove a filter or clear them all."
+                : "New items from the pipeline land here."}
+            </p>
+            {activeFilterCount > 0 && (
               <Link
                 href={clearAllUrl}
-                className="bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                className="mt-5 inline-flex h-9 items-center rounded-full bg-brand px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90"
               >
                 Clear all filters
               </Link>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="mt-px">
-        {items.map((n, i) => (
-          <Link
-            key={n.id}
-            href={`/admin/review/${n.id}`}
-            className="group relative grid grid-cols-12 gap-4 border-b border-white/[0.08] py-6 transition-all hover:bg-white/[0.02] focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:gap-6"
-          >
-            <div className="col-span-12 lg:col-span-2">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] tabular-nums text-white/20">
-                  {String((page - 1) * PER_PAGE + i + 1).padStart(2, "0")}
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                  [{n.sourceCode}]
-                </span>
-              </div>
-              <div className="mt-2 pl-7 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                {formatDateTime(n.fetchedAt)}
-              </div>
-              <div className="mt-2 flex gap-2 pl-7 font-mono text-[9px] uppercase tracking-widest2">
-                <span className="text-brand">{n.impact}</span>
-                <span className="text-white/20">·</span>
-                <span className="text-white/50">{n.bias}</span>
-              </div>
-              {status !== "pending" && (
-                <div className="mt-2 pl-7 font-mono text-[9px] uppercase tracking-widest2">
-                  <span
-                    className={
-                      n.status === "approved"
-                        ? "text-moss"
-                        : n.status === "rejected"
-                          ? "text-blood-bright"
-                          : "text-white/30"
-                    }
-                  >
-                    ● {n.status}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="col-span-12 lg:col-span-9">
-              <div className="font-mono text-lg font-bold text-white transition-colors group-hover:text-brand">
-                {n.headline}
-              </div>
-              <p className="mt-2 line-clamp-2 font-mono text-sm font-light leading-relaxed text-white/60">
-                {n.analysis}
-              </p>
-              {(n.affects.length > 0 || n.tags.length > 0) && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {n.affects.slice(0, 6).map((a: string) => (
-                    <span
-                      key={a}
-                      className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50"
-                    >
-                      {a}
-                    </span>
-                  ))}
-                  {n.tags.map((t: string) => (
-                    <span
-                      key={t}
-                      className="border border-brand/40 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-brand/70"
-                    >
-                      #{t}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="col-span-12 flex items-center justify-end lg:col-span-1">
-              <ReviewActions id={n.id} status={n.status} />
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-between">
-          <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-            Page {page} of {totalPages} · {total} items
-          </span>
-          <div className="flex items-center gap-2">
-            {page > 1 && (
-              <Link
-                href={buildUrl({ page: String(page - 1) })}
-                className="border border-white/20 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                ← Prev
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link
-                href={buildUrl({ page: String(page + 1) })}
-                className="border border-white/20 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                Next →
-              </Link>
             )}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="mt-4">
+            <div className="hidden grid-cols-[minmax(0,1fr)_96px_72px_72px_204px] gap-4 border-b border-white/[0.07] pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 xl:grid">
+              <span>Headline</span>
+              <span>Impact</span>
+              <span>Bias</span>
+              <span>Status</span>
+              <span className="text-right">Actions</span>
+            </div>
+            <ul className="divide-y divide-white/[0.07]">
+              {items.map((n) => (
+                <li
+                  key={n.id}
+                  className="group relative grid gap-x-4 gap-y-2 py-3.5 xl:grid-cols-[minmax(0,1fr)_96px_72px_72px_204px] xl:items-center"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                      {n.sourceCode}
+                      <span className="px-1.5 text-white/20">/</span>
+                      <span className="font-medium normal-case tracking-normal">
+                        {formatDateTime(n.fetchedAt)}
+                      </span>
+                    </p>
+                    <Link
+                      href={`/admin/review/${n.id}`}
+                      className="mt-0.5 block text-[15px] font-medium leading-[21px] text-white after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand group-hover:text-brand"
+                    >
+                      {n.headline}
+                    </Link>
+                    <p className="mt-0.5 line-clamp-1 text-[13px] leading-[19px] text-white/55">
+                      {n.analysis}
+                    </p>
+                    {(n.affects.length > 0 || n.tags.length > 0) && (
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {n.affects.slice(0, 6).map((a: string) => (
+                          <span
+                            key={a}
+                            className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] font-medium text-white/60"
+                          >
+                            {a}
+                          </span>
+                        ))}
+                        {n.tags.map((t: string) => (
+                          <span key={t} className="px-0.5 py-px text-[11px] text-white/35">
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 xl:contents">
+                    <span><ImpactPill level={n.impact as React.ComponentProps<typeof ImpactPill>["level"]} /></span>
+                    <span><BiasBadge bias={n.bias as React.ComponentProps<typeof BiasBadge>["bias"]} /></span>
+                    <span className={cn("text-[13px] font-medium capitalize", statusColor(n.status))}>
+                      {n.status}
+                    </span>
+                    <div className="relative z-10 ml-auto flex items-center justify-end gap-1.5">
+                      <ReviewActions id={n.id} status={n.status} />
+                      <Link
+                        href={`/admin/review/${n.id}`}
+                        className="inline-flex h-8 items-center rounded-full border border-white/[0.14] px-3 text-[12px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+                      >
+                        Edit
+                      </Link>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/[0.07] pt-4">
+            <span className="text-[13px] text-white/40">
+              Page <span className="font-num text-[15px] font-semibold text-white/70">{page}</span> of{" "}
+              <span className="font-num text-[15px] font-semibold text-white/70">{totalPages}</span>
+            </span>
+            <div className="flex items-center gap-2">
+              {page > 1 && (
+                <Link href={buildUrl({ page: String(page - 1) })} className={pagerClass}>
+                  Previous
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link href={buildUrl({ page: String(page + 1) })} className={pagerClass}>
+                  Next
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </Panel>
+
+      <aside className="lg:sticky lg:top-28 lg:self-start">
+        <Panel
+          title="Filters"
+          sub={activeFilterCount > 0 ? `${activeFilterCount} active` : "Showing everything"}
+          action={
+            activeFilterCount > 0 ? (
+              <Link
+                href={clearAllUrl}
+                className="rounded-full px-2.5 py-1 text-[13px] font-medium text-white/55 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+              >
+                Clear all
+              </Link>
+            ) : undefined
+          }
+        >
+          <div className="space-y-4">
+            <FilterRow label="Source" group="source" current={sources} allValues={[...SOURCE_CODES]} buildToggle={toggleUrl} buildClear={() => buildUrl({ source: undefined, page: "1" })} />
+            <FilterRow label="Impact" group="impact" current={impacts} allValues={[...IMPACT_LEVELS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ impact: undefined, page: "1" })} />
+            <FilterRow label="Bias" group="bias" current={biases} allValues={[...BIAS_LEVELS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ bias: undefined, page: "1" })} />
+            <FilterRow label="Tags" group="tags" current={tags} allValues={[...HASHTAGS]} buildToggle={toggleUrl} buildClear={() => buildUrl({ tags: undefined, page: "1" })} prefix="#" />
+          </div>
+        </Panel>
+      </aside>
     </div>
   );
+}
+
+function statusColor(status: string) {
+  return status === "approved" ? "text-up" : status === "rejected" ? "text-down" : "text-white/55";
 }
 
 function FilterRow({
@@ -326,22 +300,19 @@ function FilterRow({
   prefix?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="w-14 shrink-0 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-        {label}
-      </span>
-      <Chip href={buildClear()} active={current.length === 0}>
-        All
-      </Chip>
-      {allValues.map((v) => (
-        <Chip
-          key={v}
-          href={buildToggle(group, current, v)}
-          active={current.includes(v)}
-        >
-          {prefix ?? ""}{v}
+    <div>
+      <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        <Chip href={buildClear()} active={current.length === 0}>
+          All
         </Chip>
-      ))}
+        {allValues.map((v) => (
+          <Chip key={v} href={buildToggle(group, current, v)} active={current.includes(v)}>
+            {prefix ?? ""}
+            {v}
+          </Chip>
+        ))}
+      </div>
     </div>
   );
 }
@@ -358,11 +329,13 @@ function Chip({
   return (
     <Link
       href={href}
-      className={`border px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none ${
+      aria-current={active ? "true" : undefined}
+      className={cn(
+        "rounded-full border px-2.5 py-0.5 text-[12px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
         active
-          ? "border-brand bg-brand/10 text-brand"
-          : "border-white/10 text-white/40 hover:border-white/30 hover:text-white/60"
-      }`}
+          ? "border-brand bg-brand text-black"
+          : "border-white/[0.12] text-white/60 hover:bg-raised hover:text-white",
+      )}
     >
       {children}
     </Link>

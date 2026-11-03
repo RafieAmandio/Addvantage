@@ -1,381 +1,147 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/cn";
-import { ArrowUpPixel } from "@/features/marketing/components/icons";
+import { Roll } from "@/features/marketing/components/Roll";
+import { Build } from "@/features/marketing/components/iso/Build";
+import { Tilt } from "@/features/marketing/components/iso/Inspect";
 
-function useInView(threshold = 0.2) {
-  const ref = useRef<HTMLElement>(null);
-  const [inView, setInView] = useState(false);
+// Each line of the old two lists, and which tier carries it. VIP+ is everything in Free plus the rest.
+const ROWS: [string, boolean][] = [
+  ["Unfiltered news + impact analysis", true],
+  ["Economic calendar", true],
+  ["My Channel (founder broadcast)", true],
+  ["Public psychology primers", true],
+  ["Daily / weekly Trading Plan", false],
+  ["1v1 Consultation (founders)", false],
+  ["Full Education library", false],
+  ["Hashtag explorer (full)", false],
+  ["All collab channels", false],
+];
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
+/** Included: a filled Ink square. Not included: the hairline square, empty. */
+const Mark = ({ on }: { on: boolean }) => (
+  <span className="flex justify-center">
+    <span aria-hidden className={on ? "h-2.5 w-2.5 bg-tv-ink" : "h-2.5 w-2.5 border border-tv-mute"} />
+    <span className="sr-only">{on ? "Included" : "Not included"}</span>
+  </span>
+);
 
-  return { ref, inView };
-}
-
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
-
-function useScrambleText(text: string, trigger: boolean, duration = 600) {
-  const [display, setDisplay] = useState(text);
-  const prevTrigger = useRef(false);
-
-  useEffect(() => {
-    if (!trigger) { prevTrigger.current = false; return; }
-    if (prevTrigger.current) return;
-    prevTrigger.current = true;
-
-    const steps = 12;
-    const interval = duration / steps;
-    let step = 0;
-
-    setDisplay(text.replace(/\S/g, () => CHARS[Math.floor(Math.random() * CHARS.length)]));
-
-    const id = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const settled = Math.floor(progress * text.length);
-      const result = text
-        .split("")
-        .map((ch, i) => {
-          if (ch === " ") return " ";
-          if (i < settled) return text[i];
-          return CHARS[Math.floor(Math.random() * CHARS.length)];
-        })
-        .join("");
-      setDisplay(result);
-
-      if (step >= steps) {
-        clearInterval(id);
-        setDisplay(text);
-      }
-    }, interval);
-
-    return () => clearInterval(id);
-  }, [trigger, text, duration]);
-
-  return display;
-}
-
-function ScramblePrice({ text, trigger, delay = 0 }: { text: string; trigger: boolean; delay?: number }) {
-  const [go, setGo] = useState(false);
-  useEffect(() => {
-    if (!trigger) { setGo(false); return; }
-    const t = setTimeout(() => setGo(true), delay);
-    return () => clearTimeout(t);
-  }, [trigger, delay]);
-  const display = useScrambleText(text, go, 800);
-  return <span>{display}</span>;
-}
-
-function AnimatedCounter({ value, trigger }: { value: string; trigger: boolean }) {
-  const [display, setDisplay] = useState("00");
-  const [started, setStarted] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) { setStarted(false); setDisplay("00"); return; }
-    setStarted(true);
-  }, [trigger]);
-
-  useEffect(() => {
-    if (!started) return;
-    const steps = 8;
-    let step = 0;
-    const id = setInterval(() => {
-      step++;
-      if (step >= steps) { clearInterval(id); setDisplay(value); }
-      else setDisplay(String(Math.floor(Math.random() * 10)) + String(Math.floor(Math.random() * 10)));
-    }, 50);
-    return () => clearInterval(id);
-  }, [started, value]);
-
-  return <span>{display}</span>;
-}
-
-function TypewriterLabel({ text, trigger, delay = 0 }: { text: string; trigger: boolean; delay?: number }) {
-  const [display, setDisplay] = useState("");
-  const [showCursor, setShowCursor] = useState(false);
-
-  useEffect(() => {
-    if (!trigger) { setDisplay(""); setShowCursor(false); return; }
-    const startTimeout = setTimeout(() => {
-      setShowCursor(true);
-      let i = 0;
-      const id = setInterval(() => {
-        i++;
-        setDisplay(text.slice(0, i));
-        if (i >= text.length) { clearInterval(id); setTimeout(() => setShowCursor(false), 1200); }
-      }, 60);
-      return () => clearInterval(id);
-    }, delay);
-    return () => clearTimeout(startTimeout);
-  }, [trigger, text, delay]);
-
-  return (
-    <span>
-      {display}
-      {showCursor && <span className="animate-blink ml-[1px] inline-block h-[1em] w-[2px] bg-brand align-middle" />}
-    </span>
-  );
-}
-
-function useMouseTexture(sectionRef: React.RefObject<HTMLElement | null>) {
-  const [pos, setPos] = useState({ x: 0, y: 0, active: false });
-  const raf = useRef(0);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    function onMove(e: MouseEvent) {
-      cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => {
-        const rect = el!.getBoundingClientRect();
-        setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top, active: true });
-      });
-    }
-    function onLeave() { setPos((p) => ({ ...p, active: false })); }
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-      cancelAnimationFrame(raf.current);
-    };
-  }, [sectionRef]);
-
-  return pos;
-}
-
+/**
+ * The two tiers as one spec sheet: a comparison you read across, not two pricing cards. VIP+ is
+ * the object on the desk, the kit's isometric member card.
+ */
 export function AccessSection() {
-  const { ref: sectionRef, inView } = useInView(0.1);
-  const mouse = useMouseTexture(sectionRef as React.RefObject<HTMLElement>);
-
+  const cell = "border-b border-tv-stone py-2 md:py-2.5";
   return (
-    <section
-      ref={sectionRef as React.RefObject<HTMLElement>}
-      className="relative mt-[80px] md:mt-[140px]"
-    >
-      {/* Cursor-reveal texture */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          backgroundImage:
-            "linear-gradient(to right, rgba(255, 212, 0, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 212, 0, 0.12) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-          WebkitMaskImage: `radial-gradient(circle 350px at ${mouse.x}px ${mouse.y}px, black 0%, transparent 70%)`,
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
-        style={{
-          opacity: mouse.active ? 1 : 0,
-          background: `radial-gradient(circle 200px at ${mouse.x}px ${mouse.y}px, rgba(255, 212, 0, 0.06) 0%, transparent 100%)`,
-        }}
-      />
-
-      {/* Header */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        <div
-          className="flex items-center justify-between px-8 py-4 transition-all duration-700"
-          style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? "translateY(0)" : "translateY(20px)",
-          }}
-        >
-          <span className="font-mono text-base font-bold text-white">
-            <TypewriterLabel text="Access" trigger={inView} delay={200} />
-          </span>
-          <span className="font-mono text-base font-bold text-brand">
-            <AnimatedCounter value="04" trigger={inView} />
-          </span>
-        </div>
-      </div>
-
-      {/* Top line */}
-      <div className="w-full overflow-hidden">
-        <div
-          className={cn(
-            "h-px origin-left bg-white/40 transition-all duration-700 ease-out",
-            inView && "line-pulse"
-          )}
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "200ms",
-          }}
-        />
-      </div>
-
-      {/* Content grid */}
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]">
-          {/* Tier 00 */}
-          <div
-            className="flex flex-col gap-6 p-6 transition-all duration-700 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "300ms",
-            }}
-          >
-            <div className="flex items-center justify-between font-mono text-base">
-              <span className="font-light text-white">Tier 00</span>
-              <span
-                className="font-bold text-brand transition-all duration-500"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transitionDelay: "500ms",
-                }}
-              >
-                Free
-              </span>
-            </div>
-            <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4] text-white">
-              <ScramblePrice text="IDR 0" trigger={inView} delay={400} />
-            </p>
-            <p
-              className="font-mono text-base font-light leading-[1.4] text-white transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(12px)",
-                transitionDelay: "500ms",
-              }}
-            >
-              No Commitment
-            </p>
-            <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4] text-white">
-              {[
-                "Unfiltered news + impact analysis",
-                "Economic calendar",
-                "My Channel (founder broadcast)",
-                "Public psychology primers",
-              ].map((item, i) => (
-                <li
-                  key={item}
-                  className="transition-all duration-500"
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "translateX(0)" : "translateX(-16px)",
-                    transitionDelay: `${600 + i * 100}ms`,
-                  }}
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+    <section id="access" className="relative z-10 flex flex-col justify-center bg-tv-paper py-12 text-tv-ink md:min-h-[100svh] md:py-[clamp(3rem,7svh,4.5rem)]">
+      <div className="mx-auto grid w-full max-w-[1240px] items-center gap-y-10 px-4 sm:px-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:gap-x-16 md:px-10">
+        <div>
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-[clamp(2.4rem,4.6vw,4rem)] font-semibold leading-[0.98] tracking-[-0.035em]">Access</h2>
+            {/* Phone: the card sits beside the heading instead of taking a screen of its own. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/vip-card.svg" alt="" width={390} height={237} className="-mb-2 h-auto w-[150px] md:hidden" loading="lazy" />
           </div>
-
-          {/* Animated vertical divider */}
-          <div
-            className="hidden origin-top bg-white/20 transition-all duration-700 ease-out md:block"
-            style={{
-              transform: inView ? "scaleY(1)" : "scaleY(0)",
-              transitionDelay: "400ms",
-            }}
-          />
-
-          {/* Tier 01 */}
-          <div
-            className="flex flex-col gap-6 bg-white p-6 text-black transition-all duration-700 md:p-12"
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(50px)",
-              transitionDelay: "450ms",
-            }}
-          >
-            <div className="flex items-center justify-between font-mono text-base">
-              <span className="font-light">Tier 01</span>
-              <span
-                className="font-bold transition-all duration-500"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transitionDelay: "600ms",
-                }}
-              >
-                VIP+ Trader
-              </span>
-            </div>
-            <p className="font-mono text-[clamp(2.5rem,8vw,64px)] font-bold leading-[1.4]">
-              <ScramblePrice text="IDR 18.000.000" trigger={inView} delay={500} />
-            </p>
-            <p
-              className="font-mono text-base font-light leading-[1.4] transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(12px)",
-                transitionDelay: "600ms",
-              }}
-            >
-              Per year · Annual commitment
-            </p>
-            <ul className="ml-6 flex list-disc flex-col gap-1 font-mono text-base font-light leading-[1.4]">
-              {[
-                "Everything in Free",
-                "Daily / weekly Trading Plan",
-                "1v1 Consultation (founders)",
-                "Full Education library",
-                "Hashtag explorer (full)",
-                "All collab channels",
-              ].map((item, i) => (
-                <li
-                  key={item}
-                  className="transition-all duration-500"
-                  style={{
-                    opacity: inView ? 1 : 0,
-                    transform: inView ? "translateX(0)" : "translateX(16px)",
-                    transitionDelay: `${700 + i * 80}ms`,
-                  }}
-                >
-                  {item}
-                </li>
+          <table className="mt-6 w-full border-collapse text-left text-[14px] leading-[1.3] md:mt-8 md:text-[16px] md:leading-[1.35]">
+            <caption className="sr-only">Free and VIP+ Trader compared</caption>
+            <colgroup>
+              <col />
+              <col className="w-[18%] md:w-[24%]" />
+              <col className="w-[38%] md:w-[30%]" />
+            </colgroup>
+            <thead>
+              <tr className="border-y border-tv-ink align-bottom">
+                <th scope="col" className="py-3 pr-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-tv-mute">
+                  Tier
+                </th>
+                <th scope="col" className="px-2 py-3 text-center">
+                  <span className="block font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-tv-mute">00</span>
+                  <span className="mt-1 block font-semibold">Free</span>
+                </th>
+                <th scope="col" className="px-2 py-3 text-center">
+                  <span className="block font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-tv-mute">01</span>
+                  <span className="mt-1 block font-semibold">VIP+ Trader</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="align-top">
+                <th scope="row" className={`${cell} pr-3 font-normal text-tv-graphite`}>
+                  Price
+                </th>
+                <td className={`${cell} px-2 text-center`}>
+                  <span className="block font-mono text-[14px] font-medium tabular-nums md:text-[clamp(1.1rem,1.9vw,1.6rem)]">IDR 0</span>
+                  <span className="mt-1 block text-[12px] text-tv-mute md:text-[13px]">No commitment</span>
+                </td>
+                <td className={`${cell} px-2 text-center`}>
+                  <span className="block whitespace-nowrap font-mono text-[14px] font-medium tabular-nums md:text-[clamp(1.1rem,1.9vw,1.6rem)]">IDR 18.000.000</span>
+                  <span className="mt-1 block text-[12px] text-tv-mute md:text-[13px]">Per year · Annual commitment</span>
+                </td>
+              </tr>
+              {ROWS.map(([x, free]) => (
+                <tr key={x}>
+                  <th scope="row" className={`${cell} pr-3 font-normal`}>
+                    {x}
+                  </th>
+                  <td className={cell}>
+                    <Mark on={free} />
+                  </td>
+                  <td className={cell}>
+                    <Mark on />
+                  </td>
+                </tr>
               ))}
-            </ul>
-            <Link
-              href="/signup"
-              className="btn-pixel flex w-full items-center justify-center gap-4 bg-brand p-4 font-mono text-base font-bold text-black"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(16px)",
-                transitionDelay: "1100ms",
-              }}
-            >
-              Request Access
-              <ArrowUpPixel className="h-4 w-4 rotate-90" />
+              <tr className="hidden md:table-row">
+                <td className="pr-3 pt-4 align-top text-[13px] text-tv-mute">VIP+ carries everything in Free.</td>
+                <td className="px-1 pt-4 align-top">
+                  <Link href="/signup" className="tv-btn tv-btn-line tv-btn-sm w-full">
+                    <Roll label="Start free" />
+                  </Link>
+                </td>
+                <td className="px-1 pt-4 align-top">
+                  <Link href="/signup" className="tv-btn tv-btn-ink tv-btn-sm w-full">
+                    <Roll label="Request access" />
+                    <span aria-hidden className="tv-arrow">
+                      →
+                    </span>
+                  </Link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          {/* Phone: the two asks stacked under the sheet, full width. */}
+          <div className="mt-5 flex flex-col gap-3 md:hidden">
+            <p className="text-[13px] text-tv-mute">VIP+ carries everything in Free.</p>
+            <Link href="/signup" className="tv-btn tv-btn-ink w-full">
+              <Roll label="Request access" />
+              <span aria-hidden className="tv-arrow">
+                →
+              </span>
             </Link>
-            <p
-              className="font-mono text-base font-light leading-[1.4] transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transitionDelay: "1200ms",
-              }}
-            >
+            <Link href="/signup" className="tv-btn tv-btn-line w-full">
+              <Roll label="Start free" />
+            </Link>
+          </div>
+        </div>
+
+        <figure className="flex flex-col">
+          <Build className="mx-auto hidden w-full max-w-[520px] md:block">
+            <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at="150">
+              <Tilt>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full" loading="lazy" />
+              </Tilt>
+            </div>
+          </Build>
+          <figcaption className="flex flex-col gap-4 md:mt-8 border-t border-tv-ink pt-4 text-[15px] leading-[1.45]">
+            <span>
               Liability waiver required at signup.
               <br />
               No exceptions.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom line */}
-      <div className="w-full overflow-hidden">
-        <div
-          className="h-px origin-right bg-white/40 transition-all duration-700 ease-out"
-          style={{
-            transform: inView ? "scaleX(1)" : "scaleX(0)",
-            transitionDelay: "800ms",
-          }}
-        />
+            </span>
+            <Link href="/faq" className="tv-link self-start text-tv-graphite">
+              Questions? Read the FAQ
+            </Link>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

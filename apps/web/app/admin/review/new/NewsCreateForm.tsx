@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import {
   HASHTAGS,
@@ -9,57 +10,55 @@ import {
   SOURCE_CODES,
 } from "@tradevantage/shared";
 import { createNewsItem, type CreateFormState } from "./actions";
+import { Panel } from "@/components/ui/Panel";
+
+const inputClass =
+  "h-11 w-full rounded-xl bg-raised px-4 text-[15px] text-white outline-none ring-1 ring-white/[0.08] transition-shadow placeholder:text-white/25 focus-visible:ring-brand";
+const textareaClass =
+  "w-full rounded-xl bg-raised px-4 py-3 text-[15px] leading-[22px] text-white outline-none ring-1 ring-white/[0.08] transition-shadow placeholder:text-white/25 focus-visible:ring-brand";
 
 const initialState: CreateFormState = { ok: false };
 
 export function NewsCreateForm() {
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction] = useFormState(
     createNewsItem,
     initialState,
   );
   const [tags, setTags] = useState("");
 
   return (
-    <div className="stagger mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/review"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/50 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ← Queue
-          </Link>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            /
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-            NEW ITEM
-          </span>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 text-[13px]">
+        <Link
+          href="/admin/review"
+          className="rounded-full px-2.5 py-1 font-medium text-white/55 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+        >
+          Queue
+        </Link>
+        <span className="text-white/20">/</span>
+        <span className="font-medium text-white">New item</span>
       </div>
 
       {state.error && (
-        <div className="mb-4 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
+        <p role="alert" className="text-[13px] text-down">
           Error: {state.error}
-        </div>
+        </p>
       )}
 
       <form action={formAction}>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="border border-gray-3 bg-gray-2/20 p-4 sm:p-6">
-            <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-              SOURCE & RAW INPUT
-            </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Panel title="Source and raw input" sub="Where it came from, kept for the audit trail" className="lg:self-start">
+            <div className="space-y-4">
 
             <Field label="Source">
               <select
                 name="sourceCode"
                 defaultValue="FRED"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={inputClass}
               >
                 {SOURCE_CODES.map((code) => (
                   <option key={code} value={code}>
-                    [{code}]
+                    {code}
                   </option>
                 ))}
               </select>
@@ -70,32 +69,31 @@ export function NewsCreateForm() {
                 name="sourceUrl"
                 type="url"
                 placeholder="https://..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={inputClass}
               />
             </Field>
 
-            <Field label="Raw text (optional — for audit trail)">
+            <Field label="Raw text (optional, for the audit trail)">
               <textarea
                 name="rawText"
                 rows={8}
                 placeholder="Paste the original text here..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={textareaClass}
               />
             </Field>
-          </div>
-
-          <div className="border border-brand/40 bg-black p-4 sm:p-6">
-            <div className="mb-4 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-              REPHRASED OUTPUT
             </div>
+          </Panel>
+
+          <Panel title="Rephrased output" sub="What subscribers will read once approved">
+            <div className="space-y-4">
 
             <Field label="Headline">
               <input
                 name="headline"
                 required
                 maxLength={240}
-                placeholder="Terse, tactical headline — no clickbait"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-display text-xl text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                placeholder="Terse, tactical headline, no clickbait"
+                className={`${inputClass} h-12 text-[17px] font-medium`}
               />
             </Field>
 
@@ -105,17 +103,17 @@ export function NewsCreateForm() {
                 rows={5}
                 required
                 placeholder="Full rephrase of the source material..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={textareaClass}
               />
             </Field>
 
-            <Field label="Analysis — what it means for price">
+            <Field label="Analysis, what it means for price">
               <textarea
                 name="analysis"
                 rows={4}
                 required
                 placeholder="One paragraph: what this means for price action..."
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 text-sm leading-relaxed text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={textareaClass}
               />
             </Field>
 
@@ -124,7 +122,7 @@ export function NewsCreateForm() {
                 <select
                   name="impact"
                   defaultValue="medium"
-                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                  className={inputClass}
                 >
                   {IMPACT_LEVELS.map((v) => (
                     <option key={v} value={v}>
@@ -137,7 +135,7 @@ export function NewsCreateForm() {
                 <select
                   name="bias"
                   defaultValue="neutral"
-                  className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                  className={inputClass}
                 >
                   {BIAS_LEVELS.map((v) => (
                     <option key={v} value={v}>
@@ -152,7 +150,7 @@ export function NewsCreateForm() {
               <input
                 name="affects"
                 placeholder="SPX, DXY, US10Y"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={inputClass}
               />
             </Field>
 
@@ -162,9 +160,9 @@ export function NewsCreateForm() {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 placeholder="risk-management, mean-reversion"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={inputClass}
               />
-              <div className="mt-1 flex flex-wrap gap-1 font-mono text-[8px] uppercase tracking-widest2 text-white/40">
+              <div className="mt-2 flex flex-wrap gap-1.5">
                 {HASHTAGS.map((h) => (
                   <button
                     key={h}
@@ -177,7 +175,7 @@ export function NewsCreateForm() {
                       if (current.includes(h)) return;
                       setTags([...current, h].join(", "));
                     }}
-                    className="border border-gray-3 px-1.5 py-0.5 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                    className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] font-medium text-white/60 transition-colors hover:bg-raised hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                   >
                     +{h}
                   </button>
@@ -190,26 +188,21 @@ export function NewsCreateForm() {
                 name="author"
                 required
                 defaultValue="DESK"
-                className="w-full border border-gray-3 bg-gray-2 px-3 py-2 font-mono text-xs uppercase tracking-widest2 text-white transition-colors focus-visible:border-brand focus-visible:outline-none"
+                className={inputClass}
               />
             </Field>
-          </div>
+            </div>
+          </Panel>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3">
+        <div className="mt-4 flex items-center justify-end gap-2">
           <Link
             href="/admin/review"
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-brand hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-11 items-center rounded-full border border-white/[0.14] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
             Cancel
           </Link>
-          <button
-            type="submit"
-            disabled={pending}
-            className="border border-brand bg-brand px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-black transition-colors hover:bg-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            {pending ? "Creating…" : "Create → Review queue"}
-          </button>
+          <SubmitButton />
         </div>
       </form>
     </div>
@@ -224,11 +217,24 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="mb-4 block">
-      <span className="mb-1 block font-mono text-[9px] uppercase tracking-widest2 text-white/50">
+    <label className="block">
+      <span className="mb-2 block text-[13px] font-medium text-white/70">
         {label}
       </span>
       {children}
     </label>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex h-11 items-center rounded-full bg-brand px-5 text-[14px] font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+    >
+      {pending ? "Creating" : "Create and send to queue"}
+    </button>
   );
 }

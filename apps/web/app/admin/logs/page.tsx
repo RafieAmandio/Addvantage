@@ -3,6 +3,11 @@ import { apiGet } from "@/lib/api/client-server";
 
 export const metadata: Metadata = { title: "Ingestion Logs" };
 import { cn, formatDateTime } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+
+const th = "pb-2 text-left text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
+const num =
+  "before:block before:text-[11px] before:font-semibold before:uppercase before:tracking-[0.08em] before:text-white/30 before:content-[attr(data-label)] md:py-2.5 md:pr-4 md:text-right md:before:hidden";
 
 interface IngestionRun {
   id: string;
@@ -33,41 +38,21 @@ async function getData(): Promise<{ runs: IngestionRun[]; sources: Source[] }> {
   }
 }
 
-function statusBadge(status: string) {
-  if (status === "ok")
-    return (
-      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
-        <span className="h-1.5 w-1.5 rounded-full bg-moss" />
-        ok
-      </span>
-    );
-  if (status === "error")
-    return (
-      <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-blood-bright">
-        <span className="h-1.5 w-1.5 rounded-full bg-blood-bright" />
-        error
-      </span>
-    );
-  return (
-    <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest2 text-brand">
-      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
-      {status}
-    </span>
-  );
+function statusText(status: string) {
+  const color = status === "ok" ? "text-up" : status === "error" ? "text-down" : "text-brand";
+  return <span className={cn("text-[13px] font-medium", color)}>{status === "ok" ? "OK" : status === "error" ? "Error" : status}</span>;
 }
 
 function countCell(n: number) {
   return (
-    <span
-      className={cn("font-mono text-[10px] tabular-nums", n > 0 ? "text-brand" : "text-white/30")}
-    >
+    <span className={cn("font-num text-[17px] font-semibold", n > 0 ? "text-white" : "text-white/25")}>
       {n}
     </span>
   );
 }
 
 function duration(run: IngestionRun) {
-  if (!run.finishedAt) return "—";
+  if (!run.finishedAt) return "Running";
   const ms =
     new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime();
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
@@ -83,145 +68,91 @@ export default async function IngestionLogsPage() {
   const errors = runs.filter((r) => r.status === "error").length;
 
   return (
-    <div>
-      <div className="mb-8">
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          Pipeline · Ingestion Runs
-        </span>
-        <h1 className="mt-2 font-mono text-2xl font-bold text-white">
-          Ingestion Logs
-        </h1>
-        <p className="mt-2 max-w-2xl font-mono text-sm font-light text-white/50">
-          Per-source pipeline runs, what the adapters fetched, how many the
-          AI rephrased, and any errors.
-        </p>
-      </div>
-
-      <div className="mb-6 grid grid-cols-2 gap-px bg-gray-3 md:grid-cols-4">
-        {[
-          { label: "Runs", value: runs.length },
-          { label: "Fetched", value: totalFetched },
-          { label: "New", value: totalNew },
-          { label: "Rephrased", value: totalRephrased },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-black px-4 py-3">
-            <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-              {label}
-            </div>
-            <div className="mt-1 font-mono text-2xl tabular-nums text-brand">
-              {value}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {errors > 0 && (
-        <div className="mb-6 border border-blood-bright/30 bg-blood-bright/5 px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
-          {errors} run{errors > 1 ? "s" : ""} with errors in last {runs.length} runs
-        </div>
-      )}
-
-      {runs.length === 0 ? (
-        <div className="border border-gray-3 bg-gray-2/30 p-12 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            No pipeline runs yet
-          </div>
-          <div className="mt-2 font-display text-sm text-white/30">
-            Runs appear here after the worker ingests its first source.
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="hidden md:block">
-            <div className="space-y-px bg-gray-3">
-              <div className="grid grid-cols-12 gap-4 bg-black px-4 py-2 font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-                <div className="col-span-2">Source</div>
-                <div className="col-span-1">Status</div>
-                <div className="col-span-2">Started</div>
-                <div className="col-span-1">Duration</div>
-                <div className="col-span-1 text-center">Fetched</div>
-                <div className="col-span-1 text-center">New</div>
-                <div className="col-span-1 text-center">Rephrased</div>
-                <div className="col-span-3">Error</div>
-              </div>
-
-              {runs.map((run) => (
-                <div
-                  key={run.id}
-                  className="grid grid-cols-12 gap-4 bg-black px-4 py-3 transition-colors hover:bg-gray-2"
-                >
-                  <div className="col-span-2 font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    [{run.sourceCode}]
-                    <span className="ml-1 text-white/40">
-                      {sourceNames[run.sourceCode] ?? ""}
-                    </span>
-                  </div>
-                  <div className="col-span-1">{statusBadge(run.status)}</div>
-                  <div className="col-span-2 font-mono text-[10px] uppercase tracking-widest2 text-white/50">
-                    {formatDateTime(run.startedAt)}
-                  </div>
-                  <div className="col-span-1 font-mono text-[10px] tabular-nums text-white/50">
-                    {duration(run)}
-                  </div>
-                  <div className="col-span-1 text-center">
-                    {countCell(run.itemsFetched)}
-                  </div>
-                  <div className="col-span-1 text-center">
-                    {countCell(run.itemsNew)}
-                  </div>
-                  <div className="col-span-1 text-center">
-                    {countCell(run.itemsRephrased)}
-                  </div>
-                  <div className="col-span-3 truncate font-mono text-[10px] text-blood-bright">
-                    {run.error ?? (
-                      <span className="text-white/20">{"—"}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-px bg-gray-3 md:hidden">
-            {runs.map((run) => (
-              <div key={run.id} className="bg-black px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                    [{run.sourceCode}]
-                  </span>
-                  {statusBadge(run.status)}
-                </div>
-                <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                  {formatDateTime(run.startedAt)} · {duration(run)}
-                </div>
-                <div className="mt-2 flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">F</span>
-                    {countCell(run.itemsFetched)}
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">N</span>
-                    {countCell(run.itemsNew)}
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <span className="font-mono text-[8px] uppercase tracking-widest2 text-white/30">R</span>
-                    {countCell(run.itemsRephrased)}
-                  </div>
-                </div>
-                {run.error && (
-                  <div className="mt-2 truncate font-mono text-[9px] text-blood-bright">
-                    {run.error}
-                  </div>
+    <div className="space-y-4">
+      <Panel
+        title="Ingestion logs"
+        sub="Per-source pipeline runs: what the adapters fetched, how many the AI rephrased, and any errors."
+      >
+        <div className="flex flex-wrap gap-x-8 gap-y-3">
+          {[
+            { label: "Runs", value: runs.length },
+            { label: "Fetched", value: totalFetched },
+            { label: "New", value: totalNew },
+            { label: "Rephrased", value: totalRephrased },
+            { label: "Errors", value: errors },
+          ].map(({ label, value }) => (
+            <div key={label}>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">{label}</p>
+              <p
+                className={cn(
+                  "font-num text-[28px] font-semibold leading-8",
+                  label === "Errors" && value > 0 ? "text-down" : "text-white",
                 )}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+              >
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </Panel>
 
-      <div className="mt-4 font-mono text-[9px] uppercase tracking-widest2 text-white/20">
-        Showing last {runs.length} runs
-      </div>
+      <Panel title="Runs" sub={`Last ${runs.length} runs, newest first`}>
+        {runs.length === 0 ? (
+          <div className="rounded-xl bg-raised px-5 py-12 text-center">
+            <p className="text-[15px] font-medium text-white">No pipeline runs yet.</p>
+            <p className="mt-1 text-[13px] text-white/55">
+              Runs appear here after the worker ingests its first source.
+            </p>
+          </div>
+        ) : (
+          <table className="block w-full text-[14px] md:table">
+            <thead className="hidden border-b border-white/[0.07] md:table-header-group">
+              <tr>
+                <th className={th}>Source</th>
+                <th className={th}>Status</th>
+                <th className={th}>Started</th>
+                <th className={cn(th, "text-right")}>Duration</th>
+                <th className={cn(th, "text-right")}>Fetched</th>
+                <th className={cn(th, "text-right")}>New</th>
+                <th className={cn(th, "text-right")}>Rephrased</th>
+                <th className={cn(th, "pl-6")}>Error</th>
+              </tr>
+            </thead>
+            <tbody className="block divide-y divide-white/[0.07] md:table-row-group">
+              {runs.map((run) => (
+                <tr
+                  key={run.id}
+                  className="grid grid-cols-3 gap-x-4 gap-y-1.5 py-3 md:table-row md:py-0"
+                >
+                  <td className="col-span-2 min-w-0 md:py-2.5 md:pr-4">
+                    <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">
+                      {run.sourceCode}
+                    </span>
+                    <span className="ml-2 text-[13px] text-white/35">{sourceNames[run.sourceCode] !== run.sourceCode ? sourceNames[run.sourceCode] ?? "" : ""}</span>
+                  </td>
+                  <td className="text-right md:py-2.5 md:pr-4 md:text-left">{statusText(run.status)}</td>
+                  <td className="col-span-2 text-[13px] text-white/55 md:whitespace-nowrap md:py-2.5 md:pr-4">
+                    {formatDateTime(run.startedAt)}
+                  </td>
+                  <td className="text-right text-[13px] text-white/55 md:py-2.5 md:pr-4">{duration(run)}</td>
+                  <td data-label="Fetched" className={num}>{countCell(run.itemsFetched)}</td>
+                  <td data-label="New" className={num}>{countCell(run.itemsNew)}</td>
+                  <td data-label="Rephrased" className={num}>{countCell(run.itemsRephrased)}</td>
+                  <td
+                    className={cn(
+                      "col-span-3 min-w-0 text-[13px] text-down md:max-w-[320px] md:truncate md:py-2.5 md:pl-6",
+                      !run.error && "hidden md:table-cell",
+                    )}
+                    title={run.error ?? undefined}
+                  >
+                    {run.error ?? <span className="text-white/20">None</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Panel>
     </div>
   );
 }

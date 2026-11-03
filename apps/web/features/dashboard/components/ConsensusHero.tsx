@@ -1,0 +1,207 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/cn";
+import { AnimatedFigure, AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { statsFor, themeOf } from "@/features/dashboard/lib/consensusTheme";
+import { useActive } from "@/features/dashboard/hooks/useLive";
+import { ConsensusFigure } from "./ConsensusFigure";
+import type { MacroData } from "@/features/macro/types";
+import type { AtrPair } from "@/features/atr/types";
+import { StepChart, type StepSeries } from "@/components/ui/StepChart";
+import { formatVolume } from "@/features/predictions/lib/format";
+import type { PredictionCardData } from "@/features/predictions/types";
+
+export interface ConsensusMarket {
+  card: PredictionCardData;
+  /** History for the top outcomes, oldest first, p in 0..1. */
+  series: { label: string; points: { t: number; p: number }[] }[];
+}
+
+const COLORS = ["#FFD400", "rgba(255,255,255,.75)"];
+const RANGES = [
+  { id: "1W", days: 7 },
+  { id: "1M", days: 30 },
+  { id: "ALL", days: Infinity },
+] as const;
+
+/** Card snapshots store probability in percent, history in 0..1. */
+const toPct = (p: number) => (p > 1 ? p : p * 100);
+
+function endsLabel(fetchedAt: string, stale: boolean) {
+  if (!stale) return "Live";
+  const d = new Date(fetchedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  return `Not updated since ${d}`;
+}
+
+/** Kalshi-style hero: one market at a time, inline legend, step chart, range tabs. */
+export function ConsensusHero({ markets, macro, pairs }: { markets: ConsensusMarket[]; macro: MacroData; pairs: AtrPair[] }) {
+  const [i, setI] = useState(0);
+  const [dir, setDir] = useState(1);
+  const [range, setRange] = useState<(typeof RANGES)[number]["id"]>("1M");
+  const live = useActive<HTMLElement>();
+  // Beside the figure (md and up) the chart runs as tall as the plan card; stacked on a phone it stays short.
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  const m = markets[i];
+
+  const series: StepSeries[] = useMemo(() => {
+    if (!m) return [];
+    const days = RANGES.find((r) => r.id === range)!.days;
+    const latest = Math.max(0, ...m.series.flatMap((s) => s.points.map((p) => p.t)));
+    const from = days === Infinity ? 0 : latest - days * 86400;
+    return m.series.map((s, k) => {
+      const pts = s.points.filter((p) => p.t >= from);
+      // Hourly ticks read as noise at this size; ~120 steps matches Kalshi's density.
+      const step = Math.max(1, Math.ceil(pts.length / 120));
+      return { label: s.label, color: COLORS[k] ?? "#888", points: pts.filter((_, j) => j % step === 0 || j === pts.length - 1) };
+    });
+  }, [m, range]);
+
+  if (!m) {
+    return (
+      <div className="surface flex h-full min-h-[320px] flex-col justify-center rounded-2xl bg-panel p-6">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">Market consensus</p>
+        <p className="mt-2 max-w-sm text-[15px] text-white/55">No tracked prediction markets right now. Add them in Admin to show crowd odds here.</p>
+      </div>
+    );
+  }
+
+  const { tracked, outcomes, volume, fetchedAt, stale } = m.card;
+  const go = (d: number) => {
+    setDir(d);
+    setI((v) => (v + d + markets.length) % markets.length);
+  };
+  const about = `${tracked.category} ${tracked.label} ${tracked.eventTitle}`;
+  const theme = themeOf(about);
+  const stats = statsFor(theme, about, macro, pairs);
+  const slide = { "--dx": `${dir * 16}px` } as React.CSSProperties;
+  // The figure reads the market: the rate dial points at the top outcome, gold glints faster on a bigger weekly move.
+  const lead = outcomes[0];
+  const needle = lead ? toPct(lead.probability) / 100 : null;
+  const move = Math.abs(lead?.weekChange ? toPct(lead.weekChange) : 0);
+  const glint = Math.min(3.6, Math.max(1.2, 3.6 - move * 0.3));
+
+  return (
+    <section ref={live} aria-label="Market consensus" className="surface surface-hover flex min-w-0 flex-1 flex-col gap-4 rounded-2xl bg-panel p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div key={i} className="swap-in min-w-0" style={slide}>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/55">
+            {tracked.category}
+            <span className="px-1.5 text-white/30">/</span>
+            Crowd odds
+          </p>
+          <h2 className="mt-1 text-balance font-num text-[30px] font-semibold leading-[32px] tracking-[-0.01em] text-white">
+            {tracked.eventTitle}
+          </h2>
+        </div>
+        {markets.length > 1 && (
+          <div className="flex shrink-0 gap-1.5">
+            {[-1, 1].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => go(d)}
+                aria-label={d < 0 ? "Previous market" : "Next market"}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.14] text-white/70 transition-[background-color,color,transform] duration-150 hover:bg-raised active:scale-95 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+                  <path d={d < 0 ? "M8.5 3L4.5 7l4 4" : "M5.5 3l4 4-4 4"} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-[264px_minmax(0,1fr)]">
+        <aside className="flex items-center gap-4 md:flex-col md:items-stretch md:gap-2">
+          <div className="w-[54%] max-w-[264px] shrink-0 md:-mx-3 md:-mt-3 md:w-auto md:max-w-none">
+            <ConsensusFigure id={i} theme={theme} needle={needle} glint={glint} />
+          </div>
+          {stats.length > 0 && (
+            <dl key={i} className="swap-in grid min-w-0 flex-1 gap-3 md:border-t md:border-white/[0.07] md:pt-3" style={slide}>
+              {stats.map((st) => (
+                <div key={st.label} className="min-w-0">
+                  <dt className="text-[12px] text-white/55">{st.label}</dt>
+                  <dd className="font-num text-[20px] font-semibold leading-6 text-white">
+                    <AnimatedFigure text={st.value} fromRatio={0.9} />
+                  </dd>
+                  {st.sub && (
+                    <dd className={cn("text-[12px]", st.tone === "up" ? "text-up" : st.tone === "down" ? "text-down" : "text-white/40")}>{st.sub}</dd>
+                  )}
+                </div>
+              ))}
+            </dl>
+          )}
+        </aside>
+
+        <div key={i} className="swap-in flex min-w-0 flex-col gap-3" style={slide}>
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-[14px] text-white/55">
+            {outcomes.slice(0, 2).map((o, k) => (
+              <span key={o.label} className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ background: COLORS[k] }} aria-hidden />
+                {o.label}
+                <b className="font-semibold text-white">
+                  <AnimatedNumber
+                    value={toPct(o.probability)}
+                    from={0}
+                    format={(v) => `${v.toFixed(toPct(o.probability) < 1 ? 1 : 0)}%`}
+                  />
+                </b>
+                {o.weekChange !== null && o.weekChange !== 0 && (
+                  <span className={cn("text-[12px] font-medium", o.weekChange > 0 ? "text-up" : "text-down")}>
+                    {o.weekChange > 0 ? "▲" : "▼"} {Math.abs(toPct(o.weekChange)).toFixed(1)}
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+
+          <div key={range}>
+            <StepChart series={series} height={wide ? 384 : 250} />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 text-[13px]">
+        <div className="flex items-center gap-3">
+          <span className="text-white/90">{formatVolume(volume)} vol</span>
+          <span className={cn("flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]", stale ? "bg-down/15 text-down" : "bg-up/15 text-up")}>
+            {!stale && <span className="live-dot" aria-hidden />}
+            {endsLabel(fetchedAt, stale)}
+          </span>
+          <span className="text-white/30">Polymarket</span>
+        </div>
+        <div className="flex items-center gap-5">
+          {markets.length > 1 && (
+            <div className="flex gap-1.5" aria-hidden>
+              {markets.map((_, k) => (
+                <span key={k} className={cn("h-1.5 rounded-full transition-[width,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]", k === i ? "w-5 bg-white/80" : "w-1.5 bg-white/25")} />
+              ))}
+            </div>
+          )}
+          <div className="flex gap-4" role="group" aria-label="Range">
+            {RANGES.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                aria-pressed={range === r.id}
+                onClick={() => setRange(r.id)}
+                className={cn("font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand", range === r.id ? "text-white" : "text-white/30 hover:text-white/60")}
+              >
+                {r.id}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

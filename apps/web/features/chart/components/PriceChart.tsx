@@ -5,6 +5,7 @@ import {
   AreaSeries,
   CandlestickSeries,
   ColorType,
+  LineStyle,
   createChart,
   type IChartApi,
   type ISeriesApi,
@@ -13,6 +14,7 @@ import {
 } from "lightweight-charts";
 
 import { cn } from "@/lib/cn";
+import { BiasBadge, ImpactPill } from "@/components/ui/Marker";
 
 type MarkerPosition = "aboveBar" | "belowBar";
 
@@ -49,19 +51,19 @@ const MARKER_STYLE: Record<
   ChartMarker["kind"],
   { color: string; position: MarkerPosition; glyph: string }
 > = {
-  news: { color: "#4da6ff", position: "aboveBar", glyph: "N" },
-  tweet: { color: "#ff9a3d", position: "aboveBar", glyph: "T" },
-  macro: { color: "#ef5350", position: "aboveBar", glyph: "M" },
-  earnings: { color: "#a78bfa", position: "aboveBar", glyph: "E" },
-  user_pin: { color: "#9ca3af", position: "belowBar", glyph: "•" },
+  news: { color: "#FFFFFF", position: "aboveBar", glyph: "N" },
+  tweet: { color: "rgba(255,255,255,0.6)", position: "aboveBar", glyph: "T" },
+  macro: { color: "#FFD400", position: "aboveBar", glyph: "M" },
+  earnings: { color: "rgba(255,255,255,0.6)", position: "aboveBar", glyph: "E" },
+  user_pin: { color: "rgba(255,255,255,0.4)", position: "belowBar", glyph: "•" },
 };
 
 const KIND_LABEL: Record<ChartMarker["kind"], string> = {
-  news: "NEWS",
-  tweet: "TWEET",
-  macro: "MACRO",
-  earnings: "EARNINGS",
-  user_pin: "PIN",
+  news: "News",
+  tweet: "Tweet",
+  macro: "Macro",
+  earnings: "Earnings",
+  user_pin: "Pin",
 };
 
 function toChartTime(iso: string): Time {
@@ -75,10 +77,12 @@ function toChartTime(iso: string): Time {
   return Math.floor(ms / 1000) as UTCTimestamp;
 }
 
-const BG = "#111111";
-const GRID = "#1F1F1F";
-const TEXT = "#EEEEEE";
+const BG = "#121212";
+const GRID = "rgba(255,255,255,0.12)";
+const TEXT = "rgba(255,255,255,0.55)";
 const ACCENT = "#FFD400";
+const UP = "#00DD94";
+const DOWN = "#FF454D";
 
 interface MarkerLayout {
   id: string;
@@ -109,33 +113,42 @@ export function PriceChart({
       layout: {
         background: { type: ColorType.Solid, color: BG },
         textColor: TEXT,
+        fontFamily: "Geist, sans-serif",
+        fontSize: 12,
+        attributionLogo: false,
       },
       grid: {
-        vertLines: { color: GRID },
-        horzLines: { color: GRID },
+        vertLines: { visible: false },
+        horzLines: { color: GRID, style: LineStyle.SparseDotted },
       },
-      rightPriceScale: { borderColor: GRID },
-      timeScale: { borderColor: GRID, timeVisible: true, secondsVisible: false },
-      crosshair: { mode: 1 },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      crosshair: {
+        mode: 1,
+        vertLine: { color: "rgba(255,255,255,0.3)", labelBackgroundColor: "#1A1A1A" },
+        horzLine: { color: "rgba(255,255,255,0.3)", labelBackgroundColor: "#1A1A1A" },
+      },
     });
 
     let series: ISeriesApi<"Candlestick"> | ISeriesApi<"Area">;
     if (seriesType === "area") {
       series = chart.addSeries(AreaSeries, {
         lineColor: ACCENT,
-        topColor: `${ACCENT}55`,
-        bottomColor: `${ACCENT}00`,
+        lineWidth: 2,
+        topColor: "transparent",
+        bottomColor: "transparent",
       });
       series.setData(
         bars.map((b) => ({ time: toChartTime(b.time), value: b.close }))
       );
     } else {
       series = chart.addSeries(CandlestickSeries, {
-        upColor: ACCENT,
-        downColor: "#ef5350",
+        upColor: UP,
+        downColor: DOWN,
         borderVisible: false,
-        wickUpColor: ACCENT,
-        wickDownColor: "#ef5350",
+        wickUpColor: UP,
+        wickDownColor: DOWN,
+        priceLineColor: "rgba(255,255,255,0.5)",
       });
       series.setData(
         bars.map((b) => ({
@@ -263,7 +276,7 @@ function MarkerHoverCard({
       tabIndex={onClick ? 0 : undefined}
     >
       <span
-        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full font-mono text-[8px] font-bold text-black shadow transition-transform duration-150 group-hover:scale-[1.6]"
+        className="pointer-events-none flex h-3.5 w-3.5 items-center justify-center rounded-full text-[8px] font-bold text-black transition-transform duration-150 group-hover:scale-[1.6]"
         style={{ background: style.color }}
       >
         {style.glyph}
@@ -271,61 +284,24 @@ function MarkerHoverCard({
 
       <div
         className={cn(
-          "pointer-events-none absolute left-1/2 z-30 w-72 -translate-x-1/2 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100",
+          "absolute left-1/2 z-30 hidden w-72 max-w-[calc(100vw-32px)] -translate-x-1/2 group-hover:block",
           cardAbove ? "bottom-full mb-2" : "top-full mt-2"
         )}
       >
-        <div
-          className="border border-gray-3 bg-gray-2 p-3 shadow-lg shadow-black/50"
-          style={{ borderLeft: `2px solid ${style.color}` }}
-        >
-          <div className="mb-1 flex items-center justify-between gap-2 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-            <span style={{ color: style.color }}>
+        <div className="rounded-xl bg-raised p-3 ring-1 ring-white/[0.08]">
+          <div className="mb-1 flex items-center justify-between gap-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+            <span>
               {KIND_LABEL[marker.kind]}
               {marker.sourceCode ? ` · ${marker.sourceCode}` : ""}
             </span>
-            <span>{formatClock(marker.time)}</span>
+            <span className="font-normal normal-case tracking-normal">{formatClock(marker.time)}</span>
           </div>
-          {marker.title && (
-            <div className="font-display text-sm text-white">
-              {marker.title}
-            </div>
-          )}
-          {marker.body && (
-            <div className="mt-1.5 line-clamp-3 text-xs text-white/60">
-              {marker.body}
-            </div>
-          )}
+          {marker.title && <div className="text-[14px] font-semibold leading-5 text-white">{marker.title}</div>}
+          {marker.body && <div className="mt-1 line-clamp-3 text-[13px] leading-[18px] text-white/55">{marker.body}</div>}
           {(marker.impact || marker.bias) && (
-            <div className="mt-2 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest2">
-              {marker.impact && (
-                <span
-                  className={cn(
-                    "border px-1.5 py-0.5",
-                    marker.impact === "high"
-                      ? "border-blood/60 text-blood-bright"
-                      : marker.impact === "medium"
-                      ? "border-brand/60 text-brand"
-                      : "border-gray-3 text-white/50"
-                  )}
-                >
-                  {marker.impact}
-                </span>
-              )}
-              {marker.bias && (
-                <span
-                  className={cn(
-                    "border px-1.5 py-0.5",
-                    marker.bias === "bullish"
-                      ? "border-brand/60 text-brand"
-                      : marker.bias === "bearish"
-                      ? "border-blood/60 text-blood-bright"
-                      : "border-gray-3 text-white/50"
-                  )}
-                >
-                  {marker.bias}
-                </span>
-              )}
+            <div className="mt-2 flex items-center gap-3">
+              {marker.impact && <ImpactPill level={marker.impact} />}
+              {marker.bias && <BiasBadge bias={marker.bias} />}
             </div>
           )}
         </div>

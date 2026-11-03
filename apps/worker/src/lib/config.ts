@@ -93,6 +93,9 @@ const EnvSchema = z.object({
     .preprocess(emptyToUndef, z.enum(["twelvedata"]).optional()),
   MARKET_DATA_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
+  /** Candles for instrument_bars. Yahoo is keyless; spot metals still use TwelveData when MARKET_DATA_API_KEY is set. */
+  BARS_PROVIDER: z.preprocess(emptyToUndef, z.enum(["yahoo", "twelvedata"]).default("yahoo")),
+
   RSI_REFRESH_DELAY_MS: z.coerce.number().int().min(500).max(30000).default(8000),
 
   /** Upstash Redis REST creds for single-flight coalescing. Optional —

@@ -28,13 +28,13 @@ export function MentionPreferenceToggle({ initial }: { initial: boolean }) {
   return (
     <div className="flex max-w-md items-start justify-between gap-4">
       <div>
-        <p className="font-mono text-sm font-bold text-white">Keep my consults private</p>
-        <p className="mt-1 font-mono text-xs text-white/50">
+        <p className="text-[15px] font-medium text-white">Keep my consults private</p>
+        <p className="mt-1 text-[13px] leading-[19px] text-white/55">
           When on, the team is told not to mention you by name if they share your
           question in the group.
         </p>
         {error && (
-          <p className="mt-1 font-mono text-xs text-red-400">Couldn&apos;t save, try again.</p>
+          <p className="mt-1 text-[13px] text-down">Couldn&apos;t save, try again.</p>
         )}
       </div>
       <button
@@ -45,12 +45,12 @@ export function MentionPreferenceToggle({ initial }: { initial: boolean }) {
         onClick={toggle}
         disabled={pending}
         className={`relative mt-1 inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
-          isPrivate ? "bg-brand" : "bg-gray-3"
+          isPrivate ? "bg-brand" : "bg-raised ring-1 ring-white/[0.12]"
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${
-            isPrivate ? "translate-x-6" : "translate-x-1"
+          className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+            isPrivate ? "translate-x-6 bg-black" : "translate-x-1 bg-white/70"
           }`}
         />
       </button>

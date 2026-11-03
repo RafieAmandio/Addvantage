@@ -3,7 +3,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useWatchlist } from "@/features/watchlist/hooks/useWatchlist";
 import { useToast } from "@/lib/toast";
-import { DataLabel } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
+import { formatDate, formatWibTime } from "@/lib/cn";
+import Link from "next/link";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PageSearchInput } from "@/components/ui/PageSearchInput";
 import { rollupTicker } from "@/features/watchlist/lib/rollup";
@@ -14,13 +16,15 @@ import { WatchlistSortBar } from "@/features/watchlist/components/WatchlistSortB
 import type { SortMode } from "@/features/watchlist/types";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { TradingPlan } from "@/features/plan/types";
+import type { AtrPair } from "@/features/atr/types";
 
 interface Props {
   news: NewsListItem[];
   plans: TradingPlan[];
+  pairs: AtrPair[];
 }
 
-export function WatchlistClient({ news, plans }: Props) {
+export function WatchlistClient({ news, plans, pairs }: Props) {
   const { tickers, hydrated, remove, clear } = useWatchlist();
   const toast = useToast();
   const [confirmingClear, setConfirmingClear] = useState(false);
@@ -44,6 +48,16 @@ export function WatchlistClient({ news, plans }: Props) {
     return 0;
   });
 
+  const bySym = useMemo(() => new Map(pairs.map((p) => [p.symbol.replace("/", ""), p])), [pairs]);
+
+  // Every headline that touches a pin, newest first, once.
+  const mentions = useMemo(() => {
+    const seen = new Map<string, NewsListItem>();
+    for (const r of rollupsRaw) for (const n of r.newsItems) seen.set(n.id, n);
+    const ts = (n: NewsListItem) => n.publishedAt ?? n.fetchedAt;
+    return [...seen.values()].sort((a, b) => ts(b).localeCompare(ts(a))).slice(0, 8);
+  }, [rollupsRaw]);
+
   const aggregateR = rollups.reduce((acc, r) => acc + r.totalR, 0);
   const totalNews = rollups.reduce((acc, r) => acc + r.newsItems.length, 0);
   const totalLive = rollups.reduce((acc, r) => acc + r.liveSetups.length, 0);
@@ -63,7 +77,7 @@ export function WatchlistClient({ news, plans }: Props) {
   );
 
   return (
-    <div className="stagger bg-grid-fine">
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <ConfirmDialog
         open={confirmingClear}
         title="Clear watchlist?"
@@ -83,81 +97,83 @@ export function WatchlistClient({ news, plans }: Props) {
         onCancel={() => setConfirmingClear(false)}
       />
 
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-          <div className="flex flex-wrap items-baseline justify-between gap-4">
-            <div>
-              <DataLabel>Operator · Watchlist</DataLabel>
-              <h1 className="mt-2 font-display text-5xl text-white">
-                Your <span className="italic text-brand">pins</span>
-              </h1>
-              <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-                Instruments you've pinned for close monitoring. Every news
-                item, live setup, and historical trade touching these tickers
-                is rolled up here.
-              </p>
-            </div>
-            {tickers.length > 0 && (
-              <button
-                onClick={() => setConfirmingClear(true)}
-                className="border border-gray-3 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-blood hover:text-blood-bright focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-              >
-                ✕ Clear all
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="min-w-0 space-y-4">
         {hydrated && tickers.length === 0 && <WatchlistEmpty />}
 
         {tickers.length > 0 && (
           <>
-            <WatchlistStatsStrip
-              pinnedCount={tickers.length}
-              totalNews={totalNews}
-              totalLive={totalLive}
-              totalClosed={totalClosed}
-              aggregateR={aggregateR}
+            <PageSearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="Filter by ticker (press s)"
+              ariaLabel="Filter watchlist"
+              matchLabel={query ? `${rollups.length} of ${tickers.length} shown` : null}
             />
-
-            <div className="mb-6">
-              <PageSearchInput
-                value={query}
-                onChange={setQuery}
-                placeholder="Filter by ticker…   (press s to focus, esc to blur)"
-                ariaLabel="Filter watchlist"
-                matchLabel={
-                  query
-                    ? `${rollups.length} / ${tickers.length} SHOWN`
-                    : null
-                }
-              />
-            </div>
-
-            <WatchlistSortBar
-              sortMode={sortMode}
-              onSortModeChange={setSortMode}
-              label={
-                query
-                  ? `${rollups.length} / ${tickers.length} PER INSTRUMENT`
-                  : "PER INSTRUMENT"
-              }
-            />
-
-            <div className="space-y-6">
-              {rollups.map((r) => (
-                <TickerCard
-                  key={r.ticker}
-                  rollup={r}
-                  onUnpin={handleUnpin}
-                />
-              ))}
-            </div>
+            <Panel
+              title={query ? `${rollups.length} of ${tickers.length} pinned` : `${tickers.length} pinned`}
+              sub="Prices from the ATR scanner, setups from the plan archive"
+              action={<div className="hidden sm:block"><WatchlistSortBar sortMode={sortMode} onSortModeChange={setSortMode} /></div>}
+            >
+              <div className="-mt-1 mb-2 sm:hidden"><WatchlistSortBar sortMode={sortMode} onSortModeChange={setSortMode} /></div>
+              <ul className="-my-3.5 divide-y divide-white/[0.07]">
+                {rollups.map((r) => (
+                  <TickerCard
+                    key={r.ticker}
+                    rollup={r}
+                    pair={bySym.get(r.ticker.replace("/", "").toUpperCase())}
+                    onUnpin={handleUnpin}
+                  />
+                ))}
+              </ul>
+            </Panel>
           </>
         )}
       </div>
+
+      {tickers.length > 0 && (
+        <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+          <WatchlistStatsStrip
+            pinnedCount={tickers.length}
+            totalNews={totalNews}
+            totalLive={totalLive}
+            totalClosed={totalClosed}
+            aggregateR={aggregateR}
+          />
+          <Panel title="Latest mentions" sub={mentions.length ? undefined : "Nothing on the wire mentions your pins"}>
+            {mentions.length > 0 && (
+              <ul className="-my-2.5 divide-y divide-white/[0.07]">
+                {mentions.map((n) => {
+                  const ts = n.publishedAt ?? n.fetchedAt;
+                  return (
+                    <li key={n.id}>
+                      <Link href={`/app/news/${n.id}`} className="group block py-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand">
+                        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                          {n.sourceCode}
+                          <span className="px-1.5 text-white/20">/</span>
+                          {formatDate(ts)} {formatWibTime(ts)}
+                          {n.impact === "high" && <span className="ml-2 text-brand">High</span>}
+                        </p>
+                        <p className="mt-0.5 line-clamp-2 text-[14px] leading-[21px] text-white/90 group-hover:text-white">{n.headline}</p>
+                        <p className="mt-1 flex flex-wrap gap-1.5">
+                          {n.affects.filter((a) => tickers.includes(a)).map((a) => (
+                            <span key={a} className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] text-white/60">{a}</span>
+                          ))}
+                        </p>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </Panel>
+          <button
+            onClick={() => setConfirmingClear(true)}
+            className="rounded-full border border-white/[0.14] px-4 py-1.5 text-[13px] font-medium text-white/55 transition-colors hover:bg-raised hover:text-down focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+          >
+            Clear watchlist
+          </button>
+        </aside>
+      )}
     </div>
   );
 }

@@ -4,10 +4,10 @@ import Link from "next/link";
 // Shown at /signup when NEXT_PUBLIC_REGISTRATION_OPEN !== "1".
 export function RegistrationClosed() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 text-center text-white">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-white">
       <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.05]" aria-hidden />
       <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#111111] via-transparent to-[#111111]"
         aria-hidden
       />
 

@@ -1,13 +1,14 @@
+import { canOpenRoute } from "@tradevantage/shared";
 import { ForbiddenError } from "@/core/errors/index.js";
 import { upgradeRadarRepository } from "./upgrade-radar.repository.js";
 
 const HORIZON_DAYS = 90;
 
-// Upgrade Radar is VIP-only. The gate lives here so catalyst data never
+// Upgrade Radar is VIP-only, plus the Black Friday `crypto` tier. The gate lives here so catalyst data never
 // reaches free-tier clients (same pattern as the token-unlocks feature).
 async function assertVipAccess(userId: string) {
   const profile = await upgradeRadarRepository.getProfileAccess(userId);
-  if (!profile || (profile.tier !== "vip" && !profile.isAdmin)) {
+  if (!profile || (!canOpenRoute(profile.tier, "/app/upgrades") && !profile.isAdmin)) {
     throw new ForbiddenError("VIP access required");
   }
 }

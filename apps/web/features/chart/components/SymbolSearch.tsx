@@ -82,12 +82,12 @@ export function SymbolSearch({
   return (
     <div
       className={cn(
-        "relative font-mono text-[10px] uppercase tracking-widest2",
+        "relative text-[13px]",
         className,
       )}
     >
-      <div className="flex items-center gap-2 border border-gray-3 bg-gray-2 px-2 py-1">
-        <span aria-hidden className="text-brand">
+      <div className="flex h-8 items-center gap-2 rounded-full bg-raised px-3 ring-1 ring-white/[0.08] focus-within:ring-brand">
+        <span aria-hidden className="text-white/30">
           /
         </span>
         <input
@@ -130,14 +130,14 @@ export function SymbolSearch({
           aria-controls={listboxId}
           aria-expanded={open}
           role="combobox"
-          className="w-24 bg-transparent text-white placeholder:text-white/40 outline-none"
+          className="w-20 bg-transparent uppercase text-white placeholder:text-white/40 outline-none"
         />
       </div>
       {open && filtered.length > 0 && (
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2"
+          className="absolute left-0 right-0 top-full z-20 mt-1 rounded-xl bg-raised py-1 ring-1 ring-white/[0.08]"
         >
           {filtered.map((s, idx) => {
             const active = idx === activeIdx;
@@ -153,12 +153,12 @@ export function SymbolSearch({
                 }}
                 onMouseEnter={() => setActiveIdx(idx)}
                 className={cn(
-                  "cursor-pointer px-2 py-1 transition-colors",
+                  "cursor-pointer px-3 py-1.5 transition-colors",
                   active
-                    ? "bg-brand text-black"
+                    ? "bg-white/[0.08] text-white"
                     : isCurrent
-                      ? "text-brand"
-                      : "text-white/70 hover:text-brand",
+                      ? "text-white"
+                      : "text-white/55",
                 )}
               >
                 {s}
@@ -168,8 +168,8 @@ export function SymbolSearch({
         </ul>
       )}
       {open && filtered.length === 0 && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 border border-gray-3 bg-gray-2 px-2 py-1 text-white/40">
-          no match
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-xl bg-raised px-3 py-1.5 text-white/40 ring-1 ring-white/[0.08]">
+          No match
         </div>
       )}
     </div>

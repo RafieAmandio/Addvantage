@@ -209,7 +209,7 @@ export function EarlyAccessWizard() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 md:h-screen md:grid-cols-[1fr_2fr] md:overflow-hidden">
-      {/* Left — dark branding panel */}
+      {/* Left, dark branding panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -294,7 +294,7 @@ export function EarlyAccessWizard() {
         </div>
       </div>
 
-      {/* Right — white form panel (scrolls independently when content is tall) */}
+      {/* Right, white form panel (scrolls independently when content is tall) */}
       <div className="flex flex-col bg-white px-6 md:h-screen md:overflow-y-auto md:px-12">
         <div className="m-auto w-full max-w-md py-16">
         {done ? (
@@ -486,7 +486,7 @@ export function EarlyAccessWizard() {
                       form.signedName.length > 0 && !nameOk
                         ? "border-blood-bright bg-blood/5 text-blood-bright"
                         : nameOk
-                          ? "border-moss bg-moss/5 text-black"
+                          ? "border-[#65A30D] bg-[#65A30D]/5 text-black"
                           : "border-gray-3 bg-white-2 text-black placeholder:text-black/30 focus-visible:border-brand",
                     )}
                   />
@@ -803,7 +803,7 @@ function ProofUpload({
       <label
         className={cn(
           "mt-2 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center transition-colors",
-          uploaded ? "border-moss bg-moss/5" : "border-gray-3 hover:border-brand hover:bg-black/[0.02]",
+          uploaded ? "border-[#65A30D] bg-[#65A30D]/5" : "border-gray-3 hover:border-brand hover:bg-black/[0.02]",
         )}
       >
         <input

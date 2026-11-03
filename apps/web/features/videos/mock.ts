@@ -2,7 +2,15 @@ import type { VideoModule } from "@/features/videos/types";
 
 // Offline-dev fixtures (NEXT_PUBLIC_MOCK=1). YouTube IDs are stable public
 // videos so thumbnails and the embed player render without the API.
-export const videoModules: VideoModule[] = [
+/** ISO week number of today, so the weekly outlook is always this week's. */
+function isoWeek(): number {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  return Math.ceil(((d.getTime() - Date.UTC(d.getUTCFullYear(), 0, 1)) / 86_400_000 + 1) / 7);
+}
+
+export const videoModules = (): VideoModule[] => [
   {
     slug: "market-structure-deep-dive",
     title: "Market Structure Deep-dive",
@@ -15,8 +23,8 @@ export const videoModules: VideoModule[] = [
     sortOrder: 10,
   },
   {
-    slug: "weekly-outlook-w27",
-    title: "Weekly Outlook — W27",
+    slug: "weekly-outlook",
+    title: `Weekly Outlook, W${isoWeek()}`,
     description:
       "Full macro sweep for the week: DXY posture, index rotation, and the three setups the desk is stalking.",
     category: "analysis",

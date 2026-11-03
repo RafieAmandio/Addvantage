@@ -1,25 +1,20 @@
 export default function ReviewLoading() {
   return (
-    <div className="min-h-screen bg-black px-4 py-10 md:px-6">
-      <div className="mx-auto max-w-7xl animate-pulse">
-        <div className="mb-6 space-y-2">
-          <div className="h-3 w-24 rounded bg-gray-2" />
-          <div className="h-10 w-48 rounded bg-gray-2" />
-        </div>
-        <div className="space-y-px bg-gray-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-black px-4 py-4 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full bg-gray-2 shrink-0" />
-                <div className="h-3 w-16 rounded bg-gray-2" />
-                <div className="h-3 w-24 rounded bg-gray-2" />
-              </div>
-              <div className="h-4 w-3/4 rounded bg-gray-2" />
-              <div className="h-3 w-full rounded bg-gray-2" />
+    <div className="grid animate-pulse gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="rounded-2xl bg-panel p-5">
+        <div className="h-4 w-32 rounded bg-raised" />
+        <div className="mt-2 h-3 w-20 rounded bg-raised" />
+        <div className="mt-6 divide-y divide-white/[0.07]">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="space-y-2 py-4">
+              <div className="h-3 w-28 rounded bg-raised" />
+              <div className="h-4 w-3/4 rounded bg-raised" />
+              <div className="h-3 w-1/2 rounded bg-raised" />
             </div>
           ))}
         </div>
       </div>
+      <div className="hidden h-96 rounded-2xl bg-panel lg:block" />
     </div>
   );
 }

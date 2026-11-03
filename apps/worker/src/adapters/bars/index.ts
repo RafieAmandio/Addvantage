@@ -1,9 +1,11 @@
 import type { BarsAdapter } from "./base";
 import { twelveDataAdapter } from "./twelvedata";
+import { yahooAdapter } from "./yahoo";
 
 /** Registry of all available bars providers, keyed by adapter `code`. */
 export const BARS_ADAPTERS: Record<string, BarsAdapter> = {
   [twelveDataAdapter.code]: twelveDataAdapter,
+  [yahooAdapter.code]: yahooAdapter,
 };
 
 /** Look up an adapter by code, throwing a clear error when unknown. */

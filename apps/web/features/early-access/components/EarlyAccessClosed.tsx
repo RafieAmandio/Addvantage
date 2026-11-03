@@ -4,7 +4,7 @@ import Link from "next/link";
 // is never rendered, so no one can register until enrollment is opened.
 export function EarlyAccessClosed() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-black px-6 text-center text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#111111] px-6 text-center text-white">
       <div className="w-full max-w-lg">
         <Link href="/" className="font-mono text-base font-bold text-white">
           +vantage

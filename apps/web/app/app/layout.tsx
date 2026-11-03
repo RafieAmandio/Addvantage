@@ -7,6 +7,7 @@ import { SearchPalette } from "@/features/search/components/SearchPalette";
 import { VisitTracker } from "@/components/layout/VisitTracker";
 import { DocumentTitle } from "@/components/layout/DocumentTitle";
 import { DemoBanner } from "@/components/layout/DemoBanner";
+import { TierGate } from "@/components/layout/TierGate";
 
 export default function AppLayout({
   children,
@@ -27,7 +28,7 @@ export default function AppLayout({
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col">
             <TopBar />
-            <main id="main-content" className="min-w-0 flex-1">{children}</main>
+            <main id="main-content" className="min-w-0 flex-1"><TierGate>{children}</TierGate></main>
           </div>
           <Shortcuts />
           <SearchPalette />

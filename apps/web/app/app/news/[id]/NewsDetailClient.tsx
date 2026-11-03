@@ -4,16 +4,13 @@ import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSeenNews } from "@/features/news/hooks/useSeenNews";
-import {
-  DataLabel,
-  SectionNumber,
-  ImpactPill,
-  BiasBadge,
-} from "@/components/ui/Marker";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { FOREX_PAIRS } from "@tradevantage/shared";
+import { Panel, PanelLink } from "@/components/ui/Panel";
 import { WatchPin } from "@/features/watchlist/components/WatchPin";
 import { RelatedPlansChips } from "@/features/news/components/RelatedPlansChips";
 import { formatDate, formatWibTime, cn } from "@/lib/cn";
+
+const PAIRS = new Set(FOREX_PAIRS.map((p) => p.symbol.replace("/", "")));
 import type { NewsListItem } from "@/features/news/queries/news";
 
 interface Props {
@@ -81,203 +78,122 @@ export function NewsDetailClient({ item, relatedFeed }: Props) {
   const ts = item.publishedAt ?? item.fetchedAt;
 
   return (
-    <div className="bg-grid-fine stagger">
-      <div className="border-b border-gray-3 bg-gray-2/30">
-        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/app" },
-              { label: "News", href: "/app/news" },
-              { label: `[${item.sourceCode}]` },
-            ]}
-          />
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-              [{item.sourceCode}]
-            </span>
-            <ImpactPill level={item.impact} />
-            <BiasBadge bias={item.bias} />
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              {formatDate(ts)} · {formatWibTime(ts)} WIB
-            </span>
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-              BY {item.author.toUpperCase()}
-            </span>
-          </div>
-
-          <h1 className="mt-4 font-display text-3xl leading-[1.05] text-white sm:text-4xl md:text-5xl">
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <article className="min-w-0 space-y-4">
+        <section className="rounded-2xl bg-panel p-5 sm:p-8">
+          <Link href="/app/news" className="text-[13px] text-white/40 hover:text-white">
+            ← News
+          </Link>
+          <p className="mt-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+            {item.sourceCode}
+            <span className="px-1.5 text-white/20">/</span>
+            {formatDate(ts)} · {formatWibTime(ts)} WIB
+            <span className="px-1.5 text-white/20">/</span>
+            {item.author}
+            {item.impact === "high" && <span className="ml-2 text-brand">High impact</span>}
+          </p>
+          <h1 className="mt-2 text-balance font-num text-[34px] font-semibold leading-[38px] text-white sm:text-[44px] sm:leading-[46px]">
             {item.headline}
           </h1>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-        <SectionNumber n="01 /" label="WHAT THIS MEANS FOR PRICE" />
-        <div className="mt-4 space-y-4 border-l-4 border-brand bg-gray-2/40 p-4 sm:p-6">
-          {item.analysis.split("\n\n").map((para, i) => (
-            <p key={i} className="font-display text-base leading-relaxed text-white/90 sm:text-xl">
-              {para}
+          {item.bias !== "neutral" && (
+            <p className={cn("mt-3 text-[13px] font-semibold uppercase tracking-[0.06em]", item.bias === "bullish" ? "text-up" : "text-down")}>
+              {item.bias === "bullish" ? "▲ Bullish read" : "▼ Bearish read"}
             </p>
-          ))}
-        </div>
+          )}
 
-        <div className="mt-8 grid grid-cols-12 gap-4 sm:mt-12 sm:gap-6">
-          <div className="col-span-12 md:col-span-7">
-            <SectionNumber n="02 /" label="AFFECTS" />
-            <div className="mt-4 flex flex-wrap gap-2">
-              {item.affects.map((a) => (
-                <div
-                  key={a}
-                  className="flex items-center gap-1.5 border border-brand/40 px-3 py-1.5 font-mono text-xs uppercase tracking-widest2 text-brand"
-                >
-                  <span>{a}</span>
-                  <WatchPin ticker={a} />
-                </div>
+          <h2 className="mt-8 text-[12px] font-semibold uppercase tracking-[0.08em] text-brand">What this means for price</h2>
+          <div className="mt-3 max-w-[68ch] space-y-4">
+            {item.analysis.split("\n\n").map((para, i) => (
+              <p key={i} className="text-[17px] leading-[28px] text-white/85">
+                {para}
+              </p>
+            ))}
+          </div>
+        </section>
+
+        {relatedNews.length > 0 && (
+          <Panel title="Related" sub="Shares at least one tag with this item">
+            <ul className="-my-1 divide-y divide-white/[0.07]">
+              {relatedNews.map((n) => (
+                <li key={n.id}>
+                  <Link href={`/app/news/${n.id}`} className="group block py-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                      {n.sourceCode}
+                      <span className="px-1.5 text-white/20">/</span>
+                      {n.tags.filter((t) => item.tags.includes(t)).map((t) => `#${t}`).join(" ")}
+                    </p>
+                    <p className="mt-0.5 text-[15px] leading-[22px] text-white/85 group-hover:text-white">{n.headline}</p>
+                  </Link>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </Panel>
+        )}
 
-          <div className="col-span-12 md:col-span-5">
-            <SectionNumber n="03 /" label="METADATA" />
-            <dl className="mt-4 space-y-2 border border-gray-3 bg-gray-2/30 p-4 font-mono text-xs">
-              <Row label="Source" value={`[${item.sourceCode}]`} />
-              <Row label="Author" value={item.author} />
-              <Row label="Captured" value={`${formatWibTime(ts)} WIB`} />
-              <Row label="Impact" value={item.impact.toUpperCase()} />
-              <Row label="Bias" value={item.bias.toUpperCase()} />
-            </dl>
-          </div>
-        </div>
+        <nav className="grid grid-cols-2 gap-4" aria-label="Newer and older items">
+          {[
+            { to: prev, label: "← Newer", fallback: "Top of feed", right: false },
+            { to: next, label: "Older →", fallback: "Bottom of feed", right: true },
+          ].map((x) => (
+            <Link
+              key={x.label}
+              href={x.to ? `/app/news/${x.to.id}` : "/app/news"}
+              className={cn(
+                "block rounded-2xl bg-panel p-4 transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand",
+                x.right && "text-right",
+                !x.to && "pointer-events-none opacity-30",
+              )}
+            >
+              <span className="text-[12px] text-white/40">
+                {x.label} <kbd className="hidden font-mono sm:inline">{x.right ? "j" : "k"}</kbd>
+              </span>
+              <span className="mt-1 line-clamp-1 block text-[14px] text-white">{x.to?.headline ?? x.fallback}</span>
+            </Link>
+          ))}
+        </nav>
+      </article>
+
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Affects" sub="Pin to your watchlist with the star">
+          <ul className="-my-1 divide-y divide-white/[0.07]">
+            {item.affects.map((a) => (
+              <li key={a} className="flex items-center justify-between gap-3 py-2">
+                {PAIRS.has(a) ? (
+                  <Link href={`/app/instrument/${a}`} className="text-[14px] font-semibold text-white hover:text-brand">
+                    {a} <span className="font-normal text-white/30">→</span>
+                  </Link>
+                ) : (
+                  <span className="text-[14px] font-semibold text-white/75">{a}</span>
+                )}
+                <WatchPin ticker={a} />
+              </li>
+            ))}
+          </ul>
+        </Panel>
 
         {(item.relatedPlanIds ?? []).length > 0 && (
-          <>
-            <div className="mt-8 sm:mt-12">
-              <SectionNumber n="04 /" label="LINKED PLANS" />
-            </div>
-            <RelatedPlansChips
-              planIds={item.relatedPlanIds}
-              className="mt-4"
-            />
-          </>
+          <Panel title="Linked plans">
+            <RelatedPlansChips planIds={item.relatedPlanIds} />
+          </Panel>
         )}
 
         {item.tags.length > 0 && (
-          <div className="mt-8 sm:mt-12">
-            <SectionNumber n="05 /" label="TAGGED" />
-            <div className="mt-4 flex flex-wrap gap-2">
+          <Panel title="Tags" action={<PanelLink href="/app/tags">All</PanelLink>}>
+            <div className="flex flex-wrap gap-1.5">
               {item.tags.map((t) => (
                 <Link
                   key={t}
                   href={`/app/tags/${t}`}
-                  className="border border-brand/40 px-3 py-1 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+                  className="rounded-full border border-white/[0.12] px-2.5 py-0.5 text-[12px] text-white/70 transition-colors hover:border-brand hover:text-brand focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                 >
                   #{t}
                 </Link>
               ))}
             </div>
-          </div>
+          </Panel>
         )}
-
-        {relatedNews.length > 0 && (
-          <div className="mt-8 border-t border-gray-3 pt-8 sm:mt-12 sm:pt-10">
-            <SectionNumber n="06 /" label="RELATED · BY HASHTAG" />
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              Other items in the DOMAIN that share at least one tag with this article.
-            </p>
-
-            <div className="mt-6">
-              <DataLabel>News · {relatedNews.length}</DataLabel>
-              <div className="mt-3 grid grid-cols-1 gap-px bg-gray-3 md:grid-cols-2">
-                {relatedNews.map((n) => (
-                  <Link
-                    key={n.id}
-                    href={`/app/news/${n.id}`}
-                    className="group bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-brand">
-                        [{n.sourceCode}]
-                      </span>
-                      <span className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                        · BY {n.author.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="mt-1 font-display text-lg leading-snug text-white transition-colors group-hover:text-brand">
-                      {n.headline}
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {n.tags.map((t) => (
-                        <span
-                          key={t}
-                          className={cn(
-                            "font-mono text-[9px] uppercase tracking-widest2",
-                            item.tags.includes(t)
-                              ? "text-brand"
-                              : "text-white/30"
-                          )}
-                        >
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-10 text-right font-mono text-[9px] uppercase tracking-widest2 text-white/30 sm:mt-16">
-          <kbd className="hidden sm:inline">j</kbd>
-          <span className="hidden sm:inline"> / </span>
-          <kbd className="hidden sm:inline">k</kbd>
-          <span className="hidden sm:inline"> to navigate</span>
-        </div>
-        <nav className="mt-2 grid grid-cols-2 gap-px border border-gray-3 bg-gray-3">
-          <Link
-            href={prev ? `/app/news/${prev.id}` : "/app/news"}
-            className={cn(
-              "block bg-black p-4 transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              !prev && "pointer-events-none opacity-30"
-            )}
-          >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              ← Newer
-            </div>
-            <div className="mt-1 line-clamp-1 text-sm text-white">
-              {prev?.headline ?? "Top of feed"}
-            </div>
-          </Link>
-          <Link
-            href={next ? `/app/news/${next.id}` : "/app/news"}
-            className={cn(
-              "block bg-black p-4 text-right transition-all hover:-translate-y-px hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              !next && "pointer-events-none opacity-30"
-            )}
-          >
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              Older →
-            </div>
-            <div className="mt-1 line-clamp-1 text-sm text-white">
-              {next?.headline ?? "Bottom of feed"}
-            </div>
-          </Link>
-        </nav>
-      </div>
+      </aside>
     </div>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <dt className="text-[10px] uppercase tracking-widest2 text-white/40">
-        {label}
-      </dt>
-      <dd className="text-white">{value}</dd>
-    </div>
-  );
-}

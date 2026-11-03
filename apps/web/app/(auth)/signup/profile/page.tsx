@@ -31,8 +31,8 @@ export default function ProfilePage() {
           your <span className="italic text-brand">terminal.</span>
         </h1>
         <p className="mt-8 max-w-sm font-display text-lg text-white/60">
-          Five questions. Your answers shape how the platform thinks about you —
-          what it surfaces, how it speaks, what it assumes you already know.
+          Five questions. Your answers shape how the platform thinks about you.
+          What it surfaces, how it speaks, what it assumes you already know.
         </p>
 
         <div className="mt-12 flex items-center gap-4">
@@ -49,7 +49,7 @@ export default function ProfilePage() {
                   i === step
                     ? "bg-brand scale-125"
                     : i < step
-                    ? "bg-moss"
+                    ? "bg-[#65A30D]"
                     : "bg-white/20"
                 )}
               />

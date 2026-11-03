@@ -2,148 +2,73 @@
 
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/cn";
-import type { AtrPair, AtrZoneId } from "../types";
-import { ATR_ZONE_CONFIG, GROUP_LABELS } from "../lib/zones";
-
-interface AtrTableProps {
-  pairs: AtrPair[];
-}
+import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
+import type { AtrPair } from "../types";
+import { GROUP_LABELS } from "../lib/zones";
+import { Pager, PairLink, SortTh, usePage, nextSort, sortRows } from "./FilterControls";
 
 type SortKey = "symbol" | "price" | "exhaustionPct" | "atr" | "direction";
 
-const GROUP_COLORS: Record<string, string> = {
-  major: "text-brand",
-  cross: "text-white/50",
-  commodity: "text-yellow-400",
-  index: "text-blue-400",
-};
-
-const fmt = (n: number) => {
-  if (Math.abs(n) >= 100) return n.toFixed(2);
-  if (Math.abs(n) >= 1) return n.toFixed(4);
-  return n.toFixed(5);
-};
-
-export function AtrTable({ pairs }: AtrTableProps) {
+/** One row per pair: range used, direction, then the ATR levels. */
+export function AtrTable({ pairs }: { pairs: AtrPair[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("exhaustionPct");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else {
-      setSortKey(key);
-      setSortDir(key === "symbol" ? "asc" : "desc");
-    }
+  const sorted = useMemo(() => sortRows(pairs, sortKey, sortDir), [pairs, sortKey, sortDir]);
+  const sort = (k: SortKey) => {
+    const [key, dir] = nextSort(k, sortKey, sortDir, "symbol");
+    setSortKey(key);
+    setSortDir(dir);
   };
-
-  const sorted = useMemo(() => {
-    return [...pairs].sort((a, b) => {
-      const av = a[sortKey];
-      const bv = b[sortKey];
-      if (av === null && bv === null) return 0;
-      if (av === null) return 1;
-      if (bv === null) return -1;
-      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-  }, [pairs, sortKey, sortDir]);
-
-  const columns: { key: SortKey; label: string; align: "left" | "center" | "right" }[] = [
-    { key: "symbol", label: "Symbol", align: "left" },
-    { key: "price", label: "Price", align: "right" },
-    { key: "exhaustionPct", label: "Exhaustion", align: "center" },
-    { key: "direction", label: "Dir", align: "center" },
-    { key: "atr", label: "ATR(20)", align: "right" },
-  ];
+  const th = { sortKey, dir: sortDir, onSort: sort };
+  const pg = usePage(sorted, `${sortKey}:${sortDir}:${pairs.map((r) => r.symbol).sort().join(",")}`);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[720px]">
-        <thead>
-          <tr className="border-b border-white/[0.06]">
-            <th className="w-10 px-3 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              #
-            </th>
-            {columns.map((col) => (
-              <th
-                key={col.key}
-                onClick={() => toggleSort(col.key)}
+    <>
+    <table className="w-full table-fixed text-left">
+      <thead className="border-b border-white/[0.07]">
+        <tr>
+          <SortTh k="symbol" {...th} className="w-[88px] sm:w-[120px]">Pair</SortTh>
+          <SortTh k="exhaustionPct" {...th} className="text-right">Used</SortTh>
+          <SortTh k="direction" {...th} className="w-[28px] text-right">
+            <span className="sr-only">Direction</span>
+          </SortTh>
+          <SortTh k="price" {...th} className="w-[96px] text-right">Price</SortTh>
+          <SortTh k="atr" {...th} className="hidden w-[84px] text-right sm:table-cell">ATR 20</SortTh>
+          <th className="hidden w-[96px] py-2 pr-3 text-right text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 md:table-cell">Upper</th>
+          <th className="hidden w-[96px] py-2 text-right text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 md:table-cell">Lower</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-white/[0.07]">
+        {pg.rows.map((p) => {
+          const bull = p.direction === "bullish";
+          return (
+            <tr key={p.symbol} className="hover:bg-raised">
+              <td className="py-2.5 pr-3">
+                <PairLink symbol={p.symbol} sub={GROUP_LABELS[p.group] ?? p.group} />
+              </td>
+              <td
                 className={cn(
-                  "cursor-pointer px-3 py-3 font-mono text-[10px] font-medium uppercase tracking-wider transition-colors hover:text-white/60",
-                  col.align === "left" ? "text-left" : col.align === "right" ? "text-right" : "text-center",
-                  sortKey === col.key ? "text-brand" : "text-white/25",
+                  "py-2.5 pr-3 text-right font-num text-[20px] font-semibold leading-5",
+                  p.exhaustionPct >= 100 ? "text-down" : p.exhaustionPct >= 75 ? "text-brand" : "text-white/70",
                 )}
               >
-                {col.label}
-                {sortKey === col.key && (
-                  <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>
-                )}
-              </th>
-            ))}
-            <th className="px-3 py-3 text-right font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              Upper
-            </th>
-            <th className="px-3 py-3 text-right font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              Lower
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row, idx) => {
-            const cfg = ATR_ZONE_CONFIG[row.zone as AtrZoneId];
-            const isBullish = row.direction === "bullish";
-            const isExceeded = row.zone === "exceeded";
-            return (
-              <tr
-                key={row.symbol}
-                className={cn(
-                  "border-b border-white/[0.03] transition-colors hover:bg-white/[0.02]",
-                  isExceeded && "bg-[#FF6B35]/[0.03]",
-                )}
-              >
-                <td className="px-3 py-3 font-mono text-xs text-white/20">
-                  {idx + 1}
-                </td>
-                <td className="px-3 py-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-bold text-white">
-                      {row.symbol}
-                    </span>
-                    <span className={cn("text-[9px] font-medium uppercase", GROUP_COLORS[row.group] ?? "text-white/30")}>
-                      {GROUP_LABELS[row.group] ?? row.group}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-3 py-3 text-right font-mono text-xs text-white/50">
-                  {row.price !== null
-                    ? fmt(row.price)
-                    : "—"}
-                </td>
-                <td className="px-3 py-3 text-center font-mono text-xs font-medium" style={{ color: cfg?.color }}>
-                  {row.exhaustionPct.toFixed(1)}%
-                </td>
-                <td className="px-3 py-3 text-center">
-                  <span
-                    className="font-mono text-xs font-bold"
-                    style={{ color: isBullish ? "#65A30D" : "#E03C3C" }}
-                  >
-                    {isBullish ? "▲" : "▼"}
-                  </span>
-                </td>
-                <td className="px-3 py-3 text-right font-mono text-xs text-white/50">
-                  {fmt(row.atr)}
-                </td>
-                <td className="px-3 py-3 text-right font-mono text-xs text-white/40">
-                  {fmt(row.upperLevel)}
-                </td>
-                <td className="px-3 py-3 text-right font-mono text-xs text-white/40">
-                  {fmt(row.lowerLevel)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                {p.exhaustionPct.toFixed(1)}%
+              </td>
+              <td className={cn("py-2.5 pr-3 text-right text-[12px]", bull ? "text-up" : "text-down")} title={p.direction}>
+                {bull ? "▲" : "▼"}
+              </td>
+              <td className="py-2.5 pr-3 text-right font-num text-[17px] font-medium text-white/90">
+                {p.price !== null ? fmtPrice(p.price) : "n/a"}
+              </td>
+              <td className="hidden py-2.5 pr-3 text-right font-num text-[17px] font-medium text-white/55 sm:table-cell">{fmtPrice(p.atr)}</td>
+              <td className="hidden py-2.5 pr-3 text-right font-num text-[17px] font-medium text-white/55 md:table-cell">{fmtPrice(p.upperLevel)}</td>
+              <td className="hidden py-2.5 text-right font-num text-[17px] font-medium text-white/55 md:table-cell">{fmtPrice(p.lowerLevel)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    <Pager {...pg} />
+    </>
   );
 }

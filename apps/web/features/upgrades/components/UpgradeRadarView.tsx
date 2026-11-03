@@ -1,4 +1,6 @@
-import { cn, formatDate } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { cn } from "@/lib/cn";
+import { DateBlock, countdownLabel, relativeSync } from "@/features/unlocks/components/UnlocksView";
 import {
   categoryLabel,
   daysUntil,
@@ -6,209 +8,121 @@ import {
   type UpgradeRadarData,
 } from "@/features/upgrades/types";
 
-export function UpgradeRadarHeader({ count }: { count: number | null }) {
+const EYEBROW = "text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40";
+
+function impactTone(impact: string | null) {
+  return impact === "high" ? "text-brand" : impact === "medium" ? "text-white" : "text-white/40";
+}
+
+function UpgradeRow({ e }: { e: UpgradeEvent }) {
+  const days = daysUntil(e.dateStart);
   return (
-    <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-      <div className="flex items-center gap-3">
-        <h1 className="font-mono text-lg font-bold text-white">Upgrade Radar</h1>
-        {count !== null && count > 0 && (
-          <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
-            <span className="led" aria-hidden />
-            {count} on radar
+    <li className="flex items-center gap-4 py-3.5">
+      <DateBlock iso={e.dateStart} approx={e.dateApprox} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate">
+          <span className="text-[15px] font-semibold text-white">{e.symbol}</span>
+          <span className="ml-2 text-[13px] text-white/40">
+            {e.name}
+            <span className="px-1.5 text-white/20">/</span>#{e.mcapRank}
           </span>
-        )}
-      </div>
-      <p className="mt-1 text-xs text-white/30">
-        Dated network catalysts — hard forks, mainnets, major upgrades — for top-200
-        coins, next 90 days. Best used in bull markets.
-      </p>
-    </div>
-  );
-}
-
-function Countdown({ iso, approx }: { iso: string; approx: boolean }) {
-  const days = daysUntil(iso);
-  return (
-    <span
-      className={cn(
-        "font-mono text-[11px] font-bold uppercase tracking-widest2",
-        days <= 7 ? "text-brand" : "text-white/60",
-      )}
-    >
-      {days === 0 ? "TODAY" : `IN ${approx ? "~" : ""}${days}D`}
-    </span>
-  );
-}
-
-function CategoryBadge({ category }: { category: string }) {
-  return (
-    <span className="border border-white/[0.08] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50">
-      {categoryLabel(category)}
-    </span>
-  );
-}
-
-function ImpactBadge({ impact }: { impact: string | null }) {
-  if (!impact) return null;
-  return (
-    <span
-      className={cn(
-        "px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest2",
-        impact === "high"
-          ? "bg-brand/15 text-brand"
-          : impact === "medium"
-            ? "text-white/60"
-            : "text-white/30",
-      )}
-    >
-      {impact}
-    </span>
-  );
-}
-
-// CMC's displayDate is sometimes a real date ("29 Jul", "Jul 2026") and
-// sometimes just a countdown ("IN ~3D") that would duplicate the Countdown.
-// Prefer a real date string; otherwise format dateStart (prefixed ~ if approx).
-function secondaryDate(e: UpgradeEvent): string {
-  const d = (e.displayDate || "").trim();
-  if (d && !/^(in\b|ongoing)/i.test(d)) return d;
-  const formatted = formatDate(e.dateStart);
-  return e.dateApprox ? `~${formatted}` : formatted;
-}
-
-function SourceLink({ href }: { href: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand"
-    >
-      proof ↗
-    </a>
-  );
-}
-
-function DesktopTable({ events }: { events: UpgradeEvent[] }) {
-  return (
-    <table className="w-full border-collapse">
-      <thead>
-        <tr className="border-b border-white/[0.06] font-mono text-[9px] uppercase tracking-widest2 text-white/30">
-          <th className="px-6 py-3 text-left">Catalyst</th>
-          <th className="px-3 py-3 text-left">Coin</th>
-          <th className="px-3 py-3 text-right">Rank</th>
-          <th className="px-3 py-3 text-left">Event</th>
-          <th className="px-3 py-3 text-right">Type</th>
-          <th className="px-6 py-3 text-right">Source</th>
-        </tr>
-      </thead>
-      <tbody>
-        {events.map((e) => (
-          <tr
-            key={e.id}
-            className="border-b border-white/[0.06] transition-colors hover:bg-white/[0.02]"
+        </p>
+        <p className="mt-0.5 text-[14px] leading-[21px] text-white/75">{e.title}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <span className={cn("mr-1 text-[13px] font-medium", days <= 7 ? "text-brand" : "text-white/55")}>
+            {countdownLabel(e.dateStart, e.dateApprox)}
+          </span>
+          <span className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] capitalize text-white/60">
+            {categoryLabel(e.category).toLowerCase()}
+          </span>
+          <a
+            href={e.source}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1 text-[12px] font-medium text-white/40 transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
-            <td className="px-6 py-4 align-top">
-              <Countdown iso={e.dateStart} approx={e.dateApprox} />
-              <div className="mt-0.5 font-mono text-[10px] text-white/30">{secondaryDate(e)}</div>
-            </td>
-            <td className="px-3 py-4 align-top">
-              <span className="font-mono text-sm font-bold text-white">{e.symbol}</span>
-              <span className="ml-2 text-xs text-white/40">{e.name}</span>
-            </td>
-            <td className="px-3 py-4 text-right align-top font-mono text-xs tabular-nums text-white/40">
-              #{e.mcapRank}
-            </td>
-            <td className="px-3 py-4 align-top">
-              <span className="text-sm text-white/70">{e.title}</span>
-            </td>
-            <td className="px-3 py-4 text-right align-top">
-              <span className="flex flex-wrap justify-end gap-1">
-                <ImpactBadge impact={e.impact} />
-                <CategoryBadge category={e.category} />
-              </span>
-            </td>
-            <td className="px-6 py-4 text-right align-top">
-              <SourceLink href={e.source} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function MobileList({ events }: { events: UpgradeEvent[] }) {
-  return (
-    <div>
-      {events.map((e) => (
-        <div key={e.id} className="border-b border-white/[0.06] px-4 py-4">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <span className="font-mono text-sm font-bold text-white">{e.symbol}</span>
-              <span className="ml-2 text-xs text-white/40">#{e.mcapRank}</span>
-            </div>
-            <Countdown iso={e.dateStart} approx={e.dateApprox} />
-          </div>
-          <p className="mt-2 text-sm text-white/70">{e.title}</p>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="font-mono text-[10px] text-white/30">{secondaryDate(e)}</span>
-            <span className="flex flex-wrap justify-end gap-1">
-              <ImpactBadge impact={e.impact} />
-              <CategoryBadge category={e.category} />
-            </span>
-          </div>
-          <div className="mt-2 text-right">
-            <SourceLink href={e.source} />
-          </div>
+            Proof ↗
+          </a>
         </div>
-      ))}
+      </div>
+      <div className="w-16 shrink-0 text-right">
+        <p className={cn("font-num text-[24px] font-semibold leading-7", impactTone(e.impact))}>
+          {e.impactScore != null ? e.impactScore.toFixed(1) : "n/a"}
+        </p>
+        <p className="text-[12px] capitalize text-white/40">{e.impact ?? "unrated"}</p>
+      </div>
+    </li>
+  );
+}
+
+/** Page grid shared by the live, empty, unavailable and locked states. */
+export function UpgradeRadarShell({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
+  return (
+    <div className="grid gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">{children}</div>
+      <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        {aside}
+        <Panel title="How it works">
+          <p className="text-[14px] leading-[21px] text-white/55">
+            Dated network catalysts for top-200 coins over the next 90 days: hard forks, mainnets and major upgrades. Best used in bull markets.
+          </p>
+        </Panel>
+      </aside>
     </div>
   );
 }
 
-function relativeSync(iso: string | null): string {
-  if (!iso) return "never";
-  const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  if (hours < 48) return `${hours}h ago`;
-  return `${Math.round(hours / 24)}d ago`;
-}
-
-export function ContextFooter({ data }: { data: UpgradeRadarData }) {
+function Summary({ data }: { data: UpgradeRadarData }) {
+  const week = data.events.filter((e) => daysUntil(e.dateStart) <= 7).length;
+  const high = data.events.filter((e) => e.impact === "high").length;
+  const cats = new Map<string, number>();
+  for (const e of data.events) cats.set(e.category, (cats.get(e.category) ?? 0) + 1);
+  const stats: [string, number, string?][] = [
+    ["On radar", data.events.length],
+    ["This week", week, week > 0 ? "text-brand" : undefined],
+    ["High impact", high, high > 0 ? "text-brand" : undefined],
+  ];
   return (
-    <div className="border-t border-white/[0.06] px-4 py-3 font-mono text-[10px] uppercase tracking-widest2 text-white/40 sm:px-6">
-      tracking {data.trackedTop200} of top-200 · source: coinmarketcal · synced{" "}
-      {relativeSync(data.updatedAt)}
-    </div>
+    <Panel title="Next 90 days" sub={`Tracking ${data.trackedTop200} of top-200, synced ${relativeSync(data.updatedAt)}`}>
+      <dl className="grid grid-cols-3 gap-x-4">
+        {stats.map(([k, v, tone]) => (
+          <div key={k}>
+            <dt className={EYEBROW}>{k}</dt>
+            <dd className={cn("font-num text-[28px] font-semibold leading-8 text-white", tone)}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {cats.size > 0 && (
+        <ul className="mt-4 divide-y divide-white/[0.07] border-t border-white/[0.07]">
+          {[...cats].sort((a, b) => b[1] - a[1]).map(([c, n]) => (
+            <li key={c} className="flex items-center justify-between py-2 text-[14px] capitalize text-white/75">
+              {categoryLabel(c).toLowerCase()}
+              <span className="font-num text-[18px] text-white/55">{n}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-3 text-[12px] text-white/30">Source: CoinMarketCal</p>
+    </Panel>
   );
 }
 
 export function UpgradeRadarView({ data }: { data: UpgradeRadarData }) {
   return (
-    <div className="min-h-screen">
-      <UpgradeRadarHeader count={data.events.length} />
-      {data.events.length === 0 ? (
-        <div className="px-4 py-20 text-center sm:px-6">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-            ● No catalysts on radar
-          </div>
-          <p className="mt-3 text-sm text-white/30">
+    <UpgradeRadarShell aside={<Summary data={data} />}>
+      <Panel title="Upcoming catalysts" sub="Soonest first, dates in WIB. Right: CoinMarketCal impact score.">
+        {data.events.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-white/40">
             No top-200 network upgrade in the next {data.horizonDays} days.
           </p>
-        </div>
-      ) : (
-        <>
-          <div className="hidden md:block">
-            <DesktopTable events={data.events} />
-          </div>
-          <div className="md:hidden">
-            <MobileList events={data.events} />
-          </div>
-        </>
-      )}
-      <ContextFooter data={data} />
-    </div>
+        ) : (
+          <ul className="-my-1 divide-y divide-white/[0.07]">
+            {data.events.map((e) => (
+              <UpgradeRow key={e.id} e={e} />
+            ))}
+          </ul>
+        )}
+      </Panel>
+    </UpgradeRadarShell>
   );
 }

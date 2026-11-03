@@ -3,33 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { DataLabel } from "@/components/ui/Marker";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
 import { EducationTabs } from "@/features/videos/components/EducationTabs";
 import { useWatchedVideos } from "@/features/videos/hooks/useWatchedVideos";
 import {
   categoryLabel,
-  moduleLabel,
   thumbnailUrl,
   type VideoModule,
 } from "@/features/videos/types";
-
-export function VideoModulesHeader() {
-  return (
-    <div className="border-b border-gray-3 bg-gray-2/30">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <DataLabel>Education</DataLabel>
-        <h1 className="mt-2 font-display text-3xl text-white sm:text-4xl md:text-5xl">
-          Video <span className="italic text-brand">Modules</span>
-        </h1>
-        <p className="mt-2 max-w-2xl font-display text-lg text-white/60">
-          Recorded market analysis and live session replays from the desk.
-          Numbered, curated, and restricted to operators.
-        </p>
-        <EducationTabs current="videos" />
-      </div>
-    </div>
-  );
-}
 
 function VideoRow({
   video,
@@ -43,47 +25,9 @@ function VideoRow({
   return (
     <Link
       href={`/app/education/videos/${video.slug}`}
-      className="group grid grid-cols-[1fr_auto] items-center gap-4 border-b border-gray-3 bg-black px-4 py-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none sm:grid-cols-[110px_1fr_auto_176px] sm:gap-6 sm:px-6"
+      className="group flex items-center gap-4 py-4 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
     >
-      <div className="hidden sm:block">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          {moduleLabel(index)}
-        </div>
-        {watched && (
-          <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-moss">
-            ✓ Viewed
-          </div>
-        )}
-      </div>
-
-      <div className="min-w-0">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand sm:hidden">
-          {moduleLabel(index)}
-          {watched && <span className="ml-2 text-moss">✓ Viewed</span>}
-        </div>
-        <h3
-          className={cn(
-            "mt-1 truncate font-display text-xl leading-tight transition-colors sm:mt-0 sm:text-2xl",
-            watched ? "text-white/60 group-hover:text-white" : "text-white",
-          )}
-        >
-          {video.title}
-        </h3>
-        {video.description && (
-          <p className="mt-1 hidden max-w-xl truncate text-sm text-white/50 md:block">
-            {video.description}
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col items-end gap-1 font-mono text-[9px] uppercase tracking-widest2">
-        <span className="border border-gray-3 px-1.5 py-0.5 text-white/60">
-          {categoryLabel(video.category)}
-        </span>
-        {video.duration && <span className="text-white/40">{video.duration}</span>}
-      </div>
-
-      <div className="relative hidden aspect-video overflow-hidden border border-white/[0.06] sm:block">
+      <div className="relative hidden aspect-video w-40 shrink-0 overflow-hidden rounded-lg bg-raised sm:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={thumbnailUrl(video.provider, video.videoId)}
@@ -91,76 +35,80 @@ function VideoRow({
           loading="lazy"
           className="h-full w-full object-cover saturate-50 transition-[filter] duration-200 group-hover:saturate-100"
         />
-        <div
-          className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-          aria-hidden="true"
-        >
-          <span className="bg-brand px-2 py-1 font-mono text-[9px] uppercase tracking-widest2 text-black">
-            ▶ Play
-          </span>
-        </div>
       </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+          Module {String(index + 1).padStart(2, "0")}
+          <span className="px-1.5 text-white/20">/</span>
+          {categoryLabel(video.category)}
+          {watched && <span className="ml-2 text-up">Viewed</span>}
+        </p>
+        <h3
+          className={cn(
+            "mt-1 truncate text-[17px] font-medium leading-6 transition-colors group-hover:text-white",
+            watched ? "text-white/55" : "text-white",
+          )}
+        >
+          {video.title}
+        </h3>
+        {video.description && (
+          <p className="mt-1 line-clamp-2 text-[14px] leading-[21px] text-white/55">{video.description}</p>
+        )}
+      </div>
+
+      {video.duration && (
+        <span className="shrink-0 font-num text-[20px] font-semibold text-white/75">{video.duration}</span>
+      )}
     </Link>
   );
 }
 
 const CATEGORY_TABS = [
-  { key: "analysis", label: "Modules" },
-  { key: "session", label: "Live Sessions" },
+  { id: "analysis", label: "Modules" },
+  { id: "session", label: "Live Sessions" },
 ] as const;
 
 export function RecordingsView({ videos }: { videos: VideoModule[] }) {
   const { slugs: watchedSlugs, hydrated } = useWatchedVideos();
   const [tab, setTab] = useState<VideoModule["category"]>("analysis");
   const shown = videos.filter((v) => v.category === tab);
+  const watchedCount = hydrated ? videos.filter((v) => watchedSlugs.includes(v.slug)).length : 0;
+  const pct = videos.length ? Math.round((watchedCount / videos.length) * 100) : 0;
 
   return (
-    <div className="stagger">
-      <VideoModulesHeader />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
-        <div
-          className="mb-6 flex gap-px bg-gray-3"
-          role="tablist"
-          aria-label="Video category"
+    <div className="space-y-4 px-4 pb-10 sm:px-6">
+      <EducationTabs current="videos" />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <Panel
+          title="Recordings"
+          sub="Market analysis and live session replays from the desk"
+          action={<TextTabs options={CATEGORY_TABS} value={tab} onChange={setTab} label="Video category" />}
         >
-          {CATEGORY_TABS.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              role="tab"
-              aria-selected={tab === t.key}
-              className={cn(
-                "px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-                tab === t.key
-                  ? "bg-brand text-black"
-                  : "bg-gray-2 text-white/60 hover:text-white",
-              )}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-        {shown.length === 0 ? (
-          <div className="flex min-h-[30vh] flex-col items-center justify-center gap-2 border border-gray-3 bg-black">
-            <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-              No recordings on file
-            </div>
-            <p className="text-sm text-white/30">
-              Modules are declassified here as the desk records them.
+          {shown.length === 0 ? (
+            <p className="py-10 text-center text-[14px] text-white/40">
+              No recordings yet. Modules appear here as the desk records them.
             </p>
-          </div>
-        ) : (
-          <div className="border-t border-gray-3">
-            {shown.map((v, i) => (
-              <VideoRow
-                key={v.slug}
-                video={v}
-                index={i}
-                watched={hydrated && watchedSlugs.includes(v.slug)}
-              />
-            ))}
-          </div>
-        )}
+          ) : (
+            <div className="-my-1 divide-y divide-white/[0.07]">
+              {shown.map((v, i) => (
+                <VideoRow key={v.slug} video={v} index={i} watched={hydrated && watchedSlugs.includes(v.slug)} />
+              ))}
+            </div>
+          )}
+        </Panel>
+
+        <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+          <Panel title="Your progress" sub="Watched on this device">
+            <p className="font-num text-[40px] font-semibold leading-[44px] text-white">
+              {watchedCount}
+              <span className="text-white/30"> / {videos.length}</span>
+            </p>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
+              <div className="h-full bg-brand" style={{ width: `${pct}%` }} />
+            </div>
+          </Panel>
+        </aside>
       </div>
     </div>
   );

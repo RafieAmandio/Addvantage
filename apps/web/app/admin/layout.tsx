@@ -21,65 +21,37 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-black text-white">
       <a
         href="#admin-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:border focus:border-brand focus:bg-black focus:px-4 focus:py-2 focus:font-mono focus:text-xs focus:uppercase focus:tracking-widest2 focus:text-brand"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-brand focus:px-4 focus:py-2 focus:text-[13px] focus:font-semibold focus:text-black"
       >
         Skip to content
       </a>
 
-      {/* Top bar — mirrors landing page nav feel */}
-      <nav
-        className="sticky top-0 z-40 border-b border-white/20 bg-black/90 backdrop-blur-lg"
-        aria-label="Admin navigation"
-      >
-        <div className="mx-6 flex items-center justify-between py-5 md:mx-[100px]">
-          <div className="flex items-center gap-8">
-            <Link
-              href="/admin/review"
-              className="font-mono text-base font-bold text-white transition-opacity hover:opacity-80"
-            >
-              +vantage
+      <header className="sticky top-0 z-40 bg-black/90 backdrop-blur">
+        <div className="flex items-center justify-between gap-4 px-4 pt-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <Link href="/admin/review" className="transition-opacity hover:opacity-80" aria-label="Admin home">
+              <img src="/logo-vantage.png" alt="vantage" className="h-7 w-auto" />
             </Link>
-            <div className="hidden h-4 w-px bg-white/20 sm:block" />
-            <span className="hidden font-mono text-[10px] uppercase tracking-widest2 text-brand sm:block">
-              Desk · Admin
-            </span>
+            <span className="rounded-full bg-brand px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-black">Admin</span>
           </div>
-          <Link
-            href="/app"
-            className="font-mono text-[10px] uppercase tracking-widest2 text-white/40 transition-colors hover:text-brand focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            ← Back to Domain
-          </Link>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-[13px] text-white/40 sm:block">{profile.handle ?? profile.email}</span>
+            <Link
+              href="/app"
+              className="rounded-full border border-white/[0.14] px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+            >
+              Back to app
+            </Link>
+          </div>
         </div>
-      </nav>
-
-      {/* Section nav — styled like landing page section headers */}
-      <div className="w-full overflow-hidden">
-        <div className="h-px bg-white/40 line-pulse" />
-      </div>
-      <div className="mx-6 border-x border-white/20 md:mx-[100px]">
-        <div className="flex items-center justify-between px-8 py-4">
+        <div className="px-4 py-3 sm:px-6">
           <AdminNav />
-          <span className="hidden font-mono text-[10px] uppercase tracking-widest2 text-white/30 sm:block">
-            {profile.handle ?? profile.email}
-          </span>
         </div>
-      </div>
-      <div className="w-full overflow-hidden">
-        <div className="h-px bg-white/40" />
-      </div>
+      </header>
 
-      {/* Content area — framed like landing page sections */}
-      <main id="admin-content" className="mx-6 border-x border-white/20 bg-white/[0.02] md:mx-[100px]">
-        <div className="px-6 py-8 md:px-12 md:py-12">
-          {children}
-        </div>
+      <main id="admin-content" className="px-4 pb-10 pt-2 sm:px-6">
+        {children}
       </main>
-
-      {/* Bottom line */}
-      <div className="w-full overflow-hidden">
-        <div className="h-px bg-white/40" />
-      </div>
     </div>
   );
 }

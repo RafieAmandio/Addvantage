@@ -21,7 +21,6 @@ export function EducationTabs({ current }: { current: Tab }) {
       hrefFor={(t) => HREFS[t]}
       labelFor={(t) => LABELS[t]}
       ariaLabel="Education sections"
-      className="mt-6"
     />
   );
 }

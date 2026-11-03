@@ -2,28 +2,23 @@ import Link from "next/link";
 
 export default function ReviewItemNotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-12 sm:px-6 sm:py-20">
-      <div className="w-full max-w-md text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          ● ITEM NOT FOUND
-        </div>
-        <h1 className="mt-4 font-display text-4xl text-white">
-          Review item <span className="italic text-brand">missing</span>
-        </h1>
-        <p className="mt-4 font-display text-lg text-white/60">
-          This item does not exist or has already been reviewed and moved out of
-          the queue.
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="w-full max-w-md rounded-2xl bg-panel p-6 text-center">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Item not found</p>
+        <h1 className="mt-2 text-[22px] font-semibold text-white">This review item is missing</h1>
+        <p className="mt-2 text-[14px] leading-[21px] text-white/55">
+          It does not exist, or it was already reviewed and moved out of the queue.
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
             href="/admin/review"
-            className="border border-brand/60 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-brand transition-colors hover:bg-brand hover:text-black focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-10 items-center rounded-full bg-brand px-4 text-[13px] font-semibold text-black transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
           >
-            ← Review queue
+            Review queue
           </Link>
           <Link
             href="/admin/archive"
-            className="border border-gray-3 px-4 py-2 font-mono text-[10px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
+            className="inline-flex h-10 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-raised focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
           >
             Check archive
           </Link>

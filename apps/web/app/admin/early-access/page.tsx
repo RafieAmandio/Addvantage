@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
 import { API_BASE, getAccessToken } from "@/lib/api/client";
 
 interface Application {
@@ -45,12 +46,12 @@ async function apiFetch<T>(path: string, opts: RequestInit = {}): Promise<T> {
 }
 
 function fmtAmount(a: Application): string {
-  if (a.paymentAmount == null) return "—";
+  if (a.paymentAmount == null) return "n/a";
   return `${a.paymentAmount.toLocaleString()} ${a.paymentCurrency ?? ""}`.trim();
 }
 
 function fmtDate(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return "n/a";
   return new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -61,7 +62,7 @@ function fmtDate(iso: string | null): string {
 const STATUS_STYLES: Record<string, string> = {
   draft: "text-white/40",
   pending: "text-brand",
-  provisioned: "text-moss",
+  provisioned: "text-up",
 };
 
 export default function AdminEarlyAccessPage() {
@@ -127,140 +128,140 @@ export default function AdminEarlyAccessPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          ● Loading Applications
-        </div>
+      <div className="flex min-h-[40vh] items-center justify-center text-[13px] text-white/40">
+        Loading applications
       </div>
     );
   }
 
   const pendingCount = apps.filter((a) => a.status === "pending").length;
+  const smallBtn =
+    "inline-flex h-8 items-center rounded-full px-3.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand disabled:opacity-40";
 
   return (
-    <div>
-      <div>
-        <span className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-          Early Access · Provisioning
-        </span>
-        <h1 className="mt-2 font-mono text-2xl font-bold text-white">Applications</h1>
-        <p className="mt-2 max-w-2xl font-mono text-sm font-light text-white/50">
-          Review paid applicants, check their payment proof, then provision an account. This
-          creates a VIP profile, emails a temporary password, and marks the applicant provisioned.
-          {pendingCount > 0 && ` ${pendingCount} pending.`}
-        </p>
-      </div>
-
+    <div className="space-y-4">
       {error && (
-        <div className="mt-6 border border-blood bg-blood/10 px-3 py-2 font-mono text-[10px] uppercase tracking-widest2 text-blood-bright">
+        <p role="alert" className="text-[13px] text-down">
           {error}
-        </div>
+        </p>
       )}
 
       {result && (
-        <div className="mt-6 border border-moss/50 bg-moss/10 p-5">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-moss">
-            ● Account provisioned {result.emailSent ? "· email sent" : "· EMAIL NOT SENT (copy the password below)"}
-          </div>
-          <div className="mt-3 grid gap-2 font-mono text-sm text-white sm:grid-cols-2">
+        <Panel
+          title="Account provisioned"
+          sub={
+            result.emailSent ? (
+              <span className="text-up">Email sent</span>
+            ) : (
+              <span className="text-down">Email not sent, copy the password below</span>
+            )
+          }
+          action={
+            <button onClick={() => setResult(null)} className={cn(smallBtn, "border border-white/[0.14] text-white hover:bg-raised")}>
+              Dismiss
+            </button>
+          }
+        >
+          <dl className="grid gap-3 text-[14px] sm:grid-cols-2">
             <div>
-              <span className="text-white/40">Email: </span>
-              {result.email}
+              <dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Email</dt>
+              <dd className="mt-1 break-all text-white">{result.email}</dd>
             </div>
             <div>
-              <span className="text-white/40">Temp password: </span>
-              <span className="select-all font-bold text-brand">{result.tempPassword}</span>
+              <dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">Temp password</dt>
+              <dd className="mt-1 select-all break-all font-semibold text-brand">{result.tempPassword}</dd>
             </div>
-          </div>
-          <button
-            onClick={() => setResult(null)}
-            className="mt-4 border border-gray-3 px-3 py-1 font-mono text-[9px] uppercase tracking-widest2 text-white/60 transition-colors hover:border-white/40 hover:text-white"
-          >
-            Dismiss
-          </button>
-        </div>
+          </dl>
+        </Panel>
       )}
 
-      <div className="mt-8 h-px bg-white/20" />
-
-      {apps.length === 0 ? (
-        <div className="py-20 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/30">
-            No applications yet
+      <Panel
+        title="Applications"
+        sub={
+          <>
+            Review paid applicants, check their payment proof, then provision an account. This creates a VIP
+            profile, emails a temporary password, and marks the applicant provisioned.
+          </>
+        }
+        action={
+          <div className="text-right">
+            <div className="font-num text-[28px] font-semibold leading-none text-white">{pendingCount}</div>
+            <div className="mt-1 text-[12px] text-white/40">pending of {apps.length}</div>
           </div>
-        </div>
-      ) : (
-        <div className="mt-6 space-y-px bg-gray-3">
-          {apps.map((a) => (
-            <div
-              key={a.id}
-              className={cn(
-                "grid grid-cols-12 gap-4 bg-black p-5 transition-colors hover:bg-gray-2",
-                a.status === "draft" && "opacity-50",
-              )}
-            >
-              <div className="col-span-12 md:col-span-4">
-                <div className="font-display text-lg text-white">{a.email}</div>
-                <div className="mt-0.5 font-mono text-[10px] text-white/40">
-                  @{a.telegramHandle}
-                </div>
+        }
+      >
+        {apps.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-white/40">No applications yet</p>
+        ) : (
+          <>
+            <div className="hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.9fr)_auto] gap-4 border-b border-white/[0.07] pb-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40 md:grid">
+              <span>Applicant</span>
+              <span>Payment</span>
+              <span>Cashback</span>
+              <span className="w-[270px] text-right">Action</span>
+            </div>
+            <div className="divide-y divide-white/[0.07]">
+              {apps.map((a) => (
                 <div
+                  key={a.id}
                   className={cn(
-                    "mt-1 font-mono text-[9px] uppercase tracking-widest2",
-                    STATUS_STYLES[a.status] ?? "text-white/40",
+                    "grid gap-2 py-3.5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.9fr)_auto] md:items-center md:gap-4",
+                    a.status === "draft" && "opacity-50",
                   )}
                 >
-                  ● {a.status}
-                  {a.status === "provisioned" && a.provisionedAt
-                    ? ` · ${fmtDate(a.provisionedAt)}`
-                    : ""}
-                </div>
-              </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-[14px] font-medium text-white">{a.email}</div>
+                    <div className="mt-0.5 flex flex-wrap gap-x-2 text-[13px]">
+                      <span className="text-white/55">@{a.telegramHandle}</span>
+                      <span className={cn("capitalize", STATUS_STYLES[a.status] ?? "text-white/40")}>
+                        {a.status}
+                        {a.status === "provisioned" && a.provisionedAt ? ` ${fmtDate(a.provisionedAt)}` : ""}
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="col-span-12 md:col-span-4">
-                <div className="font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                  Payment
-                </div>
-                <div className="mt-1 font-mono text-sm text-white/70">
-                  {a.paymentMethod ? a.paymentMethod.toUpperCase() : "—"} · {fmtAmount(a)}
-                </div>
-                <div className="mt-1 font-mono text-[9px] uppercase tracking-widest2 text-white/40">
-                  Cashback: {a.wantsCashback ? "yes" : a.wantsCashback === false ? "no" : "—"}
-                  {a.broker ? ` · ${a.broker}` : ""}
-                </div>
-                <div className="mt-1 font-mono text-[9px] text-white/30">
-                  Applied {fmtDate(a.createdAt)}
-                </div>
-              </div>
+                  <div className="min-w-0 text-[13px]">
+                    <div className="text-white/80">
+                      <span className="font-num text-[16px] font-semibold text-white">{fmtAmount(a)}</span>{" "}
+                      <span className="text-white/55">{a.paymentMethod ? a.paymentMethod.toUpperCase() : ""}</span>
+                    </div>
+                    <div className="text-white/40">Applied {fmtDate(a.createdAt)}</div>
+                  </div>
 
-              <div className="col-span-12 flex flex-wrap items-center gap-2 md:col-span-4 md:justify-end">
-                {a.proofImageUrl && (
-                  <button
-                    onClick={() => viewProof(a)}
-                    disabled={proofBusyId === a.id}
-                    className="border border-gray-3 px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-white/50 transition-colors hover:border-brand hover:text-brand disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                  >
-                    {proofBusyId === a.id ? "Opening…" : "View proof"}
-                  </button>
-                )}
-                {a.status === "provisioned" ? (
-                  <span className="font-mono text-[9px] uppercase tracking-widest2 text-moss">
-                    ✓ Provisioned
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => provision(a)}
-                    disabled={busyId === a.id}
-                    className="bg-brand px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest2 text-black transition-colors hover:bg-brand-dim hover:text-white disabled:opacity-40 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-                  >
-                    {busyId === a.id ? "Provisioning…" : "Provision + email"}
-                  </button>
-                )}
-              </div>
+                  <div className="min-w-0 text-[13px] text-white/55">
+                    <span className="md:hidden">Cashback: </span>
+                    {a.wantsCashback ? "Yes" : a.wantsCashback === false ? "No" : "n/a"}
+                    {a.broker ? <span className="text-white/40"> · {a.broker}</span> : null}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 md:w-[270px] md:justify-end">
+                    {a.proofImageUrl && (
+                      <button
+                        onClick={() => viewProof(a)}
+                        disabled={proofBusyId === a.id}
+                        className={cn(smallBtn, "border border-white/[0.14] text-white hover:bg-raised")}
+                      >
+                        {proofBusyId === a.id ? "Opening" : "View proof"}
+                      </button>
+                    )}
+                    {a.status === "provisioned" ? (
+                      <span className="text-[13px] font-medium text-up">Provisioned</span>
+                    ) : (
+                      <button
+                        onClick={() => provision(a)}
+                        disabled={busyId === a.id}
+                        className={cn(smallBtn, "bg-brand text-black hover:opacity-90")}
+                      >
+                        {busyId === a.id ? "Provisioning" : "Provision + email"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          </>
+        )}
+      </Panel>
     </div>
   );
 }

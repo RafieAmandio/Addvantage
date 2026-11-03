@@ -131,7 +131,7 @@ function PasswordStrength({ password }: { password: string }) {
     "bg-blood-bright",
     "bg-brand-deep",
     "bg-brand",
-    "bg-moss",
+    "bg-[#65A30D]",
   ];
 
   if (password.length === 0) return null;
@@ -225,7 +225,7 @@ export function SignupWizard() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-      {/* Left — dark panel */}
+      {/* Left, dark panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -362,10 +362,10 @@ export function SignupWizard() {
         </div>
       </div>
 
-      {/* Right — form panel */}
+      {/* Right, form panel */}
       <div className="flex flex-col items-center justify-center bg-white px-6 py-16 md:px-12">
         <div key={stepKey} className="w-full max-w-md">
-          {/* Step 01 — Identifier */}
+          {/* Step 01, Identifier */}
           {step === 0 && (
             <div className="space-y-6">
               <p
@@ -407,7 +407,7 @@ export function SignupWizard() {
             </div>
           )}
 
-          {/* Step 02 — Self-Classification */}
+          {/* Step 02, Self-Classification */}
           {step === 1 && (
             <div className="space-y-6">
               <p
@@ -451,7 +451,7 @@ export function SignupWizard() {
             </div>
           )}
 
-          {/* Step 03 — Confirmation (password + submit) */}
+          {/* Step 03, Confirmation (password + submit) */}
           {step === 2 && (
             <div className="space-y-6">
               <p

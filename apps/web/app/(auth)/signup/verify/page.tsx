@@ -32,7 +32,7 @@ function VerifyContent() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-      {/* Left — dark panel */}
+      {/* Left, dark panel */}
       <div className="relative flex flex-col overflow-hidden bg-gray px-6 pb-12 pt-20 md:px-12 md:pb-16">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -73,7 +73,7 @@ function VerifyContent() {
         </div>
       </div>
 
-      {/* Right — status panel */}
+      {/* Right, status panel */}
       <div className="flex flex-col items-center justify-center bg-white px-6 py-16 md:px-12">
         <div className="w-full max-w-md">
           {status === "waiting" && (
@@ -103,7 +103,7 @@ function VerifyContent() {
                   href="/login"
                   className="btn-pixel block w-full rounded-lg bg-brand py-4 text-center font-mono text-sm font-bold text-black transition-colors hover:bg-brand-dim"
                 >
-                  I&apos;ve Verified — Go to Login
+                  I&apos;ve Verified, Go to Login
                 </Link>
 
                 {!resent ? (

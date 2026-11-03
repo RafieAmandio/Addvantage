@@ -19,14 +19,15 @@ const LINKS = [
   { href: "/admin/meet", label: "Meet", code: "12" },
   { href: "/admin/bulletin", label: "Bulletin", code: "13" },
   { href: "/admin/giveaway", label: "Giveaway", code: "14" },
+  { href: "/admin/black-friday", label: "Black Friday", code: "15" },
 ] as const;
 
 export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center gap-6 overflow-x-auto font-mono text-[10px] uppercase tracking-widest2">
-      {LINKS.map(({ href, label, code }) => {
+    <nav aria-label="Admin sections" className="flex items-center gap-5 overflow-x-auto text-[14px] font-medium [scrollbar-width:none]">
+      {LINKS.map(({ href, label }) => {
         const active =
           href === "/admin/review"
             ? pathname.startsWith("/admin/review")
@@ -36,19 +37,15 @@ export function AdminNav() {
             key={href}
             href={href}
             className={cn(
-              "flex items-center gap-2 whitespace-nowrap py-1 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
-              active
-                ? "text-brand"
-                : "text-white/40 hover:text-white"
+              "whitespace-nowrap py-1 transition-colors focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none",
+              active ? "text-white" : "text-white/30 hover:text-white/60",
             )}
+            aria-current={active ? "page" : undefined}
           >
-            <span className={cn("tabular-nums", active ? "text-brand" : "text-white/20")}>
-              {code}
-            </span>
             {label}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

@@ -1,70 +1,50 @@
 import Link from "next/link";
-import { DataLabel, ImpactPill, BiasBadge } from "@/components/ui/Marker";
-import { formatWibTime } from "@/lib/cn";
+import { cn, formatWibTime } from "@/lib/cn";
 import type { NewsListItem } from "@/features/news/queries/news";
 
 export function RelatedNewsList({ news }: { news: NewsListItem[] }) {
   if (news.length === 0) {
-    return (
-      <div className="border border-gray-3 bg-gray-2/40 p-8 text-center">
-        <div className="font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          ● NO RELATED NEWS
-        </div>
-        <p className="mt-2 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-          No approved news items in the ±2h window overlapping this event.
-        </p>
-      </div>
-    );
+    return <p className="py-6 text-[14px] text-white/40">No approved news in the two hours around this event.</p>;
   }
 
   return (
-    <div className="space-y-px bg-gray-3">
+    <ul className="-my-1 divide-y divide-white/[0.07]">
       {news.map((n) => {
         const ts = n.publishedAt ?? n.fetchedAt;
         return (
-          <Link
-            key={n.id}
-            href={`/app/news/${n.id}`}
-            className="group grid grid-cols-12 gap-6 bg-black p-5 transition-colors hover:bg-gray-2 focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
-          >
-            <div className="col-span-12 lg:col-span-3">
-              <div className="font-mono text-[10px] uppercase tracking-widest2 text-brand">
-                [{n.sourceCode}]
+          <li key={n.id}>
+            <Link
+              href={`/app/news/${n.id}`}
+              className="group flex gap-4 py-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-white/40">
+                  {n.sourceCode}
+                  <span className="px-1.5 text-white/20">/</span>
+                  {formatWibTime(ts)} WIB
+                  {n.impact === "high" && <span className="ml-2 text-brand">High impact</span>}
+                </p>
+                <h3 className="mt-1 text-[17px] font-medium leading-6 text-white">{n.headline}</h3>
+                <p className="mt-1 line-clamp-2 text-[14px] leading-[21px] text-white/55">{n.analysis}</p>
+                {n.affects.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {n.affects.map((a) => (
+                      <span key={a} className="rounded-full border border-white/[0.12] px-2 py-px text-[11px] font-medium text-white/60">
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="mt-1 font-mono text-[10px] uppercase tracking-widest2 text-white/40">
-                {formatWibTime(ts)} WIB
-              </div>
-              <div className="mt-3 space-y-1.5">
-                <ImpactPill level={n.impact} />
-                <div>
-                  <BiasBadge bias={n.bias} />
-                </div>
-              </div>
-            </div>
-            <div className="col-span-12 lg:col-span-9">
-              <h3 className="font-display text-xl leading-snug text-white transition-colors group-hover:text-brand">
-                {n.headline}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/80">
-                {n.analysis}
-              </p>
-              {n.affects.length > 0 && (
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <DataLabel>Affects</DataLabel>
-                  {n.affects.map((a) => (
-                    <span
-                      key={a}
-                      className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest2 text-white/70"
-                    >
-                      {a}
-                    </span>
-                  ))}
-                </div>
+              {n.bias !== "neutral" && (
+                <span className={cn("hidden shrink-0 self-center text-[12px] font-semibold uppercase tracking-[0.06em] sm:block", n.bias === "bullish" ? "text-up" : "text-down")}>
+                  {n.bias === "bullish" ? "▲ Bull" : "▼ Bear"}
+                </span>
               )}
-            </div>
-          </Link>
+            </Link>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }

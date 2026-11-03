@@ -1,138 +1,180 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { AtrZoneId } from "@/features/atr/types";
 import type { ForexTier } from "@tradevantage/shared";
-import { ATR_ZONES_ORDERED } from "@/features/atr/lib/zones";
+import { formatWibTime } from "@/lib/cn";
+import { Panel } from "@/components/ui/Panel";
+import { TextTabs } from "@/components/ui/TextTabs";
+import { ATR_ZONE_CONFIG, ATR_ZONES_ORDERED, GROUP_LABELS } from "@/features/atr/lib/zones";
 import { useAtrData } from "@/features/atr/hooks/useAtrData";
-import { AtrToolbar } from "@/features/atr/components/AtrToolbar";
-import { AtrBarChart } from "@/features/atr/components/AtrBarChart";
-import { AtrList } from "@/features/atr/components/AtrList";
 import { AtrTable } from "@/features/atr/components/AtrTable";
+import { ScatterTip, ZoneScatter } from "@/components/ui/ZoneScatter";
+import { instrumentHref } from "@/features/atr/components/FilterControls";
+import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
+import { ChipToggles, StateLine, ZoneToggles, flip } from "@/features/atr/components/FilterControls";
 
-const ALL_GROUPS = new Set(["major", "cross", "commodity", "index"]);
+const GROUPS = ["major", "cross", "commodity", "index"];
+const TIERS = [
+  { id: "all", label: "All" },
+  { id: "primary", label: "Primary" },
+  { id: "secondary", label: "Secondary" },
+  { id: "thirdliner", label: "Thirdliner" },
+] as const;
 
 export default function AtrClient() {
   const [activeTier, setActiveTier] = useState<ForexTier | "all">("all");
-  const [activeZones, setActiveZones] = useState<Set<AtrZoneId>>(
-    () => new Set(ATR_ZONES_ORDERED),
-  );
-  const [activeGroups, setActiveGroups] = useState<Set<string>>(
-    () => new Set(ALL_GROUPS),
-  );
+  const [activeZones, setActiveZones] = useState<Set<AtrZoneId>>(() => new Set(ATR_ZONES_ORDERED));
+  const [activeGroups, setActiveGroups] = useState<Set<string>>(() => new Set(GROUPS));
 
   const { data, loading, error } = useAtrData();
-
-  const toggleZone = useCallback((z: AtrZoneId) => {
-    setActiveZones((prev) => {
-      const next = new Set(prev);
-      if (next.has(z)) next.delete(z);
-      else next.add(z);
-      return next;
-    });
-  }, []);
-
-  const toggleGroup = useCallback((g: string) => {
-    setActiveGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(g)) next.delete(g);
-      else next.add(g);
-      return next;
-    });
-  }, []);
 
   const filteredPairs = useMemo(() => {
     if (!data) return [];
     return data.pairs.filter(
-      (p) =>
-        activeZones.has(p.zone) &&
-        activeGroups.has(p.group) &&
-        (activeTier === "all" || p.tier === activeTier),
+      (p) => activeZones.has(p.zone) && activeGroups.has(p.group) && (activeTier === "all" || p.tier === activeTier),
     );
   }, [data, activeZones, activeGroups, activeTier]);
 
+  const points = useMemo(
+    () =>
+      [...filteredPairs]
+        .sort((a, b) => b.exhaustionPct - a.exhaustionPct)
+        .map((p) => ({
+          id: p.symbol,
+          label: p.symbol.replace("/", ""),
+          value: p.exhaustionPct,
+          color: ATR_ZONE_CONFIG[p.zone].color,
+          group: p.group,
+          href: instrumentHref(p.symbol),
+          shape: p.direction === "bullish" ? ("up" as const) : ("down" as const),
+        })),
+    [filteredPairs],
+  );
+  // ponytail: axis capped at 200%, anything beyond sits on the top edge (tooltip and table show the real number).
+  const yMax = Math.min(200, Math.max(125, Math.ceil((Math.max(0, ...filteredPairs.map((p) => p.exhaustionPct)) + 5) / 25) * 25));
+
   const totalCount = data?.pairs.length ?? 0;
-  const exceededCount = data?.pairs.filter((p) => p.zone === "exceeded").length ?? 0;
+  const zones = ATR_ZONES_ORDERED.map((z) => {
+    const c = ATR_ZONE_CONFIG[z];
+    return {
+      id: z,
+      label: c.label,
+      color: c.color,
+      range: c.max === Infinity ? `${c.min}%+` : `${c.min} to ${c.max}%`,
+      count: data?.pairs.filter((p) => p.zone === z).length ?? 0,
+    };
+  });
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/[0.06] px-4 py-6 sm:px-6">
-        <div className="flex items-center gap-3">
-          <h1 className="font-mono text-lg font-bold text-white">
-            ATR Daily Levels
-          </h1>
-          {!loading && !error && totalCount > 0 && (
-            <span className="flex items-center gap-1.5 rounded bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] text-white/30">
-              <span className="led" aria-hidden />
-              {totalCount} instruments
-            </span>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 px-4 pb-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
+        <Panel
+          title="Range used today"
+          sub={
+            <>
+              Share of the 20-day ATR travelled today, grouped by market.
+              {data?.updatedAt && <span className="text-white/30"> Updated {formatWibTime(data.updatedAt)} WIB</span>}
+            </>
+          }
+          action={<TextTabs options={TIERS} value={activeTier} onChange={setActiveTier} label="Tier" className="hidden sm:flex" />}
+        >
+          <TextTabs options={TIERS} value={activeTier} onChange={setActiveTier} label="Tier" className="mb-3 sm:hidden" />
+          {loading ? (
+            <StateLine>Computing ATR levels</StateLine>
+          ) : error ? (
+            <StateLine>{error}</StateLine>
+          ) : filteredPairs.length === 0 ? (
+            <StateLine>
+              {totalCount === 0 ? "No ATR data yet. The worker syncs every 4 hours." : "No pairs match the selected filters."}
+            </StateLine>
+          ) : (
+            <>
+              <ZoneScatter
+                ariaLabel="Daily ATR used by instrument"
+                points={points}
+                groups={GROUPS.map((g) => ({
+                  id: g,
+                  label: GROUP_LABELS[g] ?? g,
+                }))}
+                bands={ATR_ZONES_ORDERED.map((z) => ({
+                  id: z,
+                  ...ATR_ZONE_CONFIG[z],
+                }))}
+                yMin={0}
+                yMax={yMax}
+                ticks={Array.from({ length: yMax / 25 + 1 }, (_, i) => i * 25)}
+                unit="%"
+                refLines={[
+                  {
+                    value: 100,
+                    label: "100% ATR",
+                    color: "#EEEEEE",
+                    strong: true,
+                  },
+                ]}
+                renderTip={(id) => {
+                  const p = filteredPairs.find((x) => x.symbol === id)!;
+                  const c = ATR_ZONE_CONFIG[p.zone];
+                  const bull = p.direction === "bullish";
+                  return (
+                    <ScatterTip
+                      title={p.symbol.replace("/", "")}
+                      color={c.color}
+                      href={instrumentHref(p.symbol)}
+                      rows={[
+                        [
+                          "Range used",
+                          <span key="u">
+                            {p.exhaustionPct.toFixed(1)}%
+                          </span>,
+                        ],
+                        [
+                          "Today",
+                          <span key="d" className={bull ? "text-up" : "text-down"}>
+                            {bull ? "▲ Up" : "▼ Down"}
+                          </span>,
+                        ],
+                        ["Price", p.price !== null ? fmtPrice(p.price) : "n/a"],
+                        ["ATR 20", fmtPrice(p.atr)],
+                        ["Upper", fmtPrice(p.upperLevel)],
+                        ["Lower", fmtPrice(p.lowerLevel)],
+                      ]}
+                    />
+                  );
+                }}
+              />
+              <p className="mt-3 text-[12px] text-white/40">
+                {filteredPairs.length} of {totalCount} pairs. ▲ up today, ▼ down today.<span className="sm:hidden"> Swipe the chart sideways for every group.</span> Above the white line the day has travelled more than
+                its 20-day ATR.
+              </p>
+            </>
           )}
-        </div>
-        <p className="mt-1 text-xs text-white/30">
-          20-period ATR exhaustion across major pairs, crosses, commodities, and
-          indices. Pairs near 100% have used up their daily range.
-        </p>
+        </Panel>
+
+        {filteredPairs.length > 0 && (
+          <Panel title="Levels" sub="Exact numbers for the pairs shown. Sort by any column.">
+            <AtrTable pairs={filteredPairs} />
+          </Panel>
+        )}
       </div>
 
-      <AtrToolbar
-        activeTier={activeTier}
-        onTierChange={setActiveTier}
-        activeZones={activeZones}
-        onToggleZone={toggleZone}
-        activeGroups={activeGroups}
-        onToggleGroup={toggleGroup}
-        pairCount={filteredPairs.length}
-        totalCount={totalCount}
-        exceededCount={exceededCount}
-        updatedAt={data?.updatedAt ?? null}
-      />
-
-      {loading && (
-        <div className="flex items-center justify-center py-32">
-          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-brand">
-            <span className="led" aria-hidden />
-            Computing ATR levels
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="px-4 py-12 text-center text-sm text-white/40 sm:px-6">
-          {error}
-        </div>
-      )}
-
-      {!loading && !error && filteredPairs.length === 0 && (
-        <div className="px-4 py-20 text-center sm:px-6">
-          <p className="text-sm text-white/30">
-            {data && data.pairs.length === 0
-              ? "No ATR data available yet. The worker syncs every 4 hours."
-              : "No pairs match the selected filters."}
-          </p>
-        </div>
-      )}
-
-      {!loading && !error && filteredPairs.length > 0 && (
-        <>
-          <div className="hidden md:block">
-            <AtrBarChart pairs={filteredPairs} />
-          </div>
-          <div className="md:hidden">
-            <AtrList pairs={filteredPairs} />
-          </div>
-        </>
-      )}
-
-      {!loading && !error && data && data.pairs.length > 0 && (
-        <div className="border-t border-white/[0.06]">
-          <div className="px-4 py-4 sm:px-6">
-            <h2 className="font-mono text-[10px] font-medium uppercase tracking-wider text-white/25">
-              All Instruments
-            </h2>
-          </div>
-          <AtrTable pairs={filteredPairs} />
-        </div>
-      )}
+      <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <Panel title="Zones" sub="Tap a zone to hide or show it">
+          <ZoneToggles zones={zones} active={activeZones} onToggle={(z) => setActiveZones(flip(z))} label="ATR zones" />
+        </Panel>
+        <Panel title="Groups">
+          <ChipToggles
+            options={GROUPS.map((g) => ({
+              id: g,
+              label: GROUP_LABELS[g] ?? g,
+            }))}
+            active={activeGroups}
+            onToggle={(g) => setActiveGroups(flip(g))}
+            label="Instrument groups"
+          />
+        </Panel>
+      </aside>
     </div>
   );
 }

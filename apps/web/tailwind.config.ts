@@ -18,7 +18,7 @@ const config: Config = {
         },
         // Black — page backgrounds
         black: {
-          DEFAULT: "#111111",
+          DEFAULT: "#0A0A0A",
           2: "#1A1A1A",
           3: "#222222",
         },
@@ -41,13 +41,41 @@ const config: Config = {
           bright: "#E03C3C",
           text: "#fda4af",
         },
-        moss: "#65A30D",
+        // Revamp surfaces (Kalshi-dark ladder, neutral black)
+        panel: "#121212",
+        raised: "#1A1A1A",
+        // Direction only: never brand
+        up: "#00DD94",
+        down: "#FF454D",
+        moss: "#00DD94",
         steel: "#6B7280",
         wire: "#383E47",
+        // TradeVantage Paper desk brand (marketing pages only, see features/marketing/landing.css)
+        tv: {
+          paper: "#F4F3EF",
+          white: "#FFFFFF",
+          stone: "#D9D8D3",
+          graphite: "#3A3C40",
+          ink: "#111214",
+          desk: "#0E0F11",
+          signal: "#FFD400",
+          panel: "#16171A",
+          line: "#26282C",
+          soft: "#1D1E22",
+          mute: "#6B6D72",
+          mutedesk: "#8A8C91",
+          up: "#4E9F6E",
+          down: "#E06A5E",
+          uppaper: "#1F7A4A",
+          downpaper: "#B33A30",
+          shadow: "#E4E3DE",
+        },
       },
       fontFamily: {
-        display: ['"Inter"', "system-ui", "sans-serif"],
-        sans: ['"Inter"', "system-ui", "sans-serif"],
+        display: ['"Geist"', '"Inter"', "system-ui", "sans-serif"],
+        sans: ['"Geist"', '"Inter"', "system-ui", "sans-serif"],
+        // Condensed numerals + page titles
+        num: ['"Barlow Condensed"', '"Roboto Condensed"', '"Arial Narrow"', "sans-serif"],
         mono: ['"Intel One Mono"', "ui-monospace", "monospace"],
         serif: ['"Fraunces"', "Georgia", "serif"],
       },
