@@ -268,7 +268,7 @@ export default function AdminReferralPage() {
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
                   <span className={label}>Name</span>
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Bitget" className={input} />
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="BingX" className={input} />
                 </label>
                 <label className="block">
                   <span className={label}>Category</span>
@@ -284,7 +284,7 @@ export default function AdminReferralPage() {
                 <input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://www.bitget.com/referral/..."
+                  placeholder="https://bingx.com/id/partner/..."
                   className={input}
                 />
               </label>
