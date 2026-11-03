@@ -18,7 +18,7 @@ const TELEGRAM_INVITE = "https://t.me/+CooIVleIU7w3MTll";
 const TELEGRAM_NAME = "TradeVantage";
 const SUPPORT_EMAIL = "tradevantage.gg@gmail.com";
 const EXNESS_REF = "https://one.exnessonelink.com/a/ln6atwo69p";
-const BITGET_REF = "https://partner.bitget.com/bg/TVantage";
+const BINGX_REF = "https://bingx.com/id/partner/TradeVantage";
 
 // Self-contained, table-based, inline-styled email so it renders across clients.
 // Tactical/intel brand: earth hero, yellow logo mark, yellow info band, dark
@@ -107,7 +107,7 @@ export function earlyAccessConfirmationEmail(
                     <a href="${EXNESS_REF}" style="display:inline-block;background:${INK};color:${PAPER};font-family:${MONO};font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;">Open Exness &rarr;</a>
                   </td>
                   <td>
-                    <a href="${BITGET_REF}" style="display:inline-block;background:${INK};color:${PAPER};font-family:${MONO};font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;">Open Bitget &rarr;</a>
+                    <a href="${BINGX_REF}" style="display:inline-block;background:${INK};color:${PAPER};font-family:${MONO};font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;">Open BingX &rarr;</a>
                   </td>
                 </tr>
               </table>
