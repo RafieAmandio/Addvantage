@@ -63,9 +63,9 @@ const SCHEDULE = {
   unlocks: { minute: 20, divisorHour: 12 },
   /** Macro snapshot (BIS, FRED, Polymarket, Yahoo; keyless) — every 6 hours at :40 */
   macro: { minute: 40, divisorHour: 6 },
-  /** Hourly candles — every hour at :25 (requires MARKET_DATA_PROVIDER) */
+  /** Hourly candles — every hour at :25 (BARS_PROVIDER, Yahoo by default) */
   bars1h: { minute: 25, divisorHour: 1 },
-  /** Daily candles — every 4 hours at :35 (requires MARKET_DATA_PROVIDER) */
+  /** Daily candles — every 4 hours at :35 (BARS_PROVIDER, Yahoo by default) */
   bars1d: { minute: 35, divisorHour: 4 },
 } satisfies Record<string, ScheduleSpec>;
 
@@ -156,13 +156,15 @@ export function startScheduler(): void {
       Sentry.captureException(err, { tags: { scope: "gap-sync.boot" } });
       logger.error({ err: String(err) }, "gap-sync: boot sync failed");
     });
-    syncBars("1d")
-      .then(() => syncBars("1h"))
-      .catch((err) => {
-        Sentry.captureException(err, { tags: { scope: "bars-sync.boot" } });
-        logger.error({ err: String(err) }, "bars-sync: boot sync failed");
-      });
   }
+
+  // Candles do not need MARKET_DATA_PROVIDER: BARS_PROVIDER defaults to keyless Yahoo.
+  syncBars("1d")
+    .then(() => syncBars("1h"))
+    .catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "bars-sync.boot" } });
+      logger.error({ err: String(err) }, "bars-sync: boot sync failed");
+    });
 
   if (config.EMAIL_PROVIDER) {
     runRenewalReminders().catch((err) => {
@@ -215,7 +217,7 @@ export function startScheduler(): void {
       polymarketRotate: "06:00 daily",
       unlocks: "m20 every 12h",
       macro: "m40 every 6h",
-      bars: config.MARKET_DATA_PROVIDER ? "1h m25 hourly, 1d m35 every 4h" : "disabled",
+      bars: `${config.BARS_PROVIDER}: 1h m25 hourly, 1d m35 every 4h`,
     },
     "scheduler: started (setInterval 30s poll)",
   );
@@ -283,7 +285,7 @@ function pollJobs(): void {
 
   // -- Bars (1h hourly at :25, 1d every 4h at :35, requires market data) --
   for (const [job, interval] of [["bars1h", "1h"], ["bars1d", "1d"]] as const) {
-    if (config.MARKET_DATA_PROVIDER && shouldFire(job, now)) {
+    if (shouldFire(job, now)) {
       markFired(job, now);
       logger.info({ interval }, "scheduler: firing bars sync");
       syncBars(interval).catch((err) => {
