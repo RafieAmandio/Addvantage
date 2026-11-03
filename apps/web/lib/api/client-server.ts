@@ -10,7 +10,7 @@ function getAccessToken(): string | null {
 }
 
 // Demo has no API: answer from fixtures and live market data instead (lib/mock/api.ts).
-const demo = async (method: string, path: string) => (await import("@/lib/mock/api")).demoApi(method, path);
+const demo = async (method: string, path: string, body?: unknown) => (await import("@/lib/mock/api")).demoApi(method, path, body);
 
 interface ApiResponse<T> {
   success: boolean;
@@ -42,7 +42,7 @@ export async function apiGet<T>(path: string, opts?: { token?: string }): Promis
 }
 
 export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: string }): Promise<T> {
-  if (isMockMode()) return (await demo("POST", path)) as T;
+  if (isMockMode()) return (await demo("POST", path, body)) as T;
   const token = opts?.token ?? getAccessToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -55,7 +55,9 @@ export async function apiPost<T>(path: string, body?: unknown, opts?: { token?: 
   });
 
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${path}`);
+    // Status and the API's message ride along so callers can tell a 409 from a 500.
+    const message = ((await res.json().catch(() => null)) as { message?: string } | null)?.message;
+    throw Object.assign(new Error(`API ${res.status}: ${path}`), { status: res.status, apiMessage: message });
   }
 
   const json = (await res.json()) as ApiResponse<T>;

@@ -9,6 +9,7 @@ import { mockChannelPosts, mockChannelThreads } from "@/features/channel/mock";
 import { primers } from "@/features/education/mock";
 import { demoAtrScanner, demoGapScanner, demoMarket } from "@/lib/mock/market";
 import type { TimelineKind } from "@/features/timeline/types";
+import { demoBlackFriday } from "@/lib/mock/black-friday";
 
 export class DemoApiMiss extends Error {}
 
@@ -245,7 +246,12 @@ function graph(q: URLSearchParams) {
 }
 
 /** One backend call in demo. Writes succeed without persisting; reads come from fixtures and live market data. */
-export async function demoApi(method: string, path: string): Promise<unknown> {
+export async function demoApi(method: string, path: string, body?: unknown): Promise<unknown> {
+  const p = new URL(path, "http://demo").pathname.replace(/\/+$/, "");
+  if (p.startsWith("/black-friday")) {
+    const res = demoBlackFriday(method, p, body);
+    if (res !== undefined) return res;
+  }
   if (method === "GET") return get(path);
   if (method === "DELETE") return null;
   return { id: crypto.randomUUID() };
