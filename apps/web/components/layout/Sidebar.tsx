@@ -25,6 +25,8 @@ interface NavEntry {
   group: string;
   icon: string;
   locked?: boolean;
+  /** Shown with a SOON tag; the route renders a coming-soon page. */
+  soon?: boolean;
   /** One-line header tagline for the route. */
   tagline: string;
 }
@@ -43,7 +45,7 @@ const nav: NavEntry[] = [
   { label: "ATR Levels", href: "/app/atr", group: "tools-forex", icon: "atr", tagline: "Daily range bands per instrument." },
   { label: "Macro", href: "/app/macro", group: "tools-forex", icon: "macro", tagline: "Central banks, rate gaps, yields and risk mood for FX." },
   { label: "Morning Scan", href: "/app/lab/scan", group: "tools-forex", icon: "scan", tagline: "Read every market after the daily close, then rank today's plan." },
-  { label: "Chart Lab", href: "/app/lab", group: "tools-forex", icon: "method", tagline: "Key levels, breakouts and setups drawn on the chart for every market." },
+  { label: "Chart Lab", href: "/app/lab", group: "tools-forex", icon: "method", soon: !isMockMode(), tagline: "Key levels, breakouts and setups drawn on the chart for every market." },
   { label: "Gap Scanner", href: "/app/gap-screener", group: "tools-forex", icon: "gap", tagline: "Weekend gaps and whether they filled." },
   { label: "Token Unlocks", href: "/app/unlocks", group: "tools-crypto", locked: true, icon: "unlocks", tagline: "Supply shocks from upcoming unlocks, top 200 only." },
   { label: "Upgrade Radar", href: "/app/upgrades", group: "tools-crypto", locked: true, icon: "radar", tagline: "Network upgrades and launches that move price." },
@@ -364,10 +366,10 @@ function NavGroup({ label, rail, children }: { label: string; rail: boolean; chi
 }
 
 function NavItem({
-  label, href, icon, active, locked, paid, rail,
+  label, href, icon, active, locked, soon, paid, rail,
 }: {
   label: string; href: string; icon: string;
-  active?: boolean; locked?: boolean; paid: boolean; rail: boolean;
+  active?: boolean; locked?: boolean; soon?: boolean; paid: boolean; rail: boolean;
 }) {
   const isLocked = locked && !paid;
   return (
@@ -386,7 +388,10 @@ function NavItem({
     >
       <NavIcon name={icon} className={cn("shrink-0", active ? "text-brand" : "text-white/40 group-hover:text-white/70")} />
       {!rail && <span className="flex-1 truncate">{label}</span>}
-      {!rail && isLocked && (
+      {!rail && soon && (
+        <span className="rounded-full border border-brand/30 px-1.5 text-[10px] font-semibold leading-4 tracking-[0.04em] text-brand/80">SOON</span>
+      )}
+      {!rail && !soon && isLocked && (
         <span className="rounded-full border border-white/10 px-1.5 text-[10px] font-semibold leading-4 tracking-[0.04em] text-white/40">PRO</span>
       )}
     </Link>
