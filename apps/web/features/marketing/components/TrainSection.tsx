@@ -1,4 +1,4 @@
-import { exact, type KillData, type PracticeData, type ScanData } from "@/features/marketing/lib/landing";
+import { barText, exact, type KillData, type PracticeData, type ScanData } from "@/features/marketing/lib/landing";
 import { CandlesFigure } from "@/features/marketing/components/iso/Figures";
 import { Scramble } from "@/features/marketing/components/ScrambleReveal";
 import { KillDemo } from "./demos/KillDemo";
@@ -33,7 +33,7 @@ export function TrainSection({ practice, scan, kill }: { practice: PracticeData;
               Reading a chart is a skill, so it gets practised like one. Real past markets, graded by the same rules the app trades on.
             </p>
           </div>
-          <CandlesFigure sym={practice.sym} high={exact(practice.bars.at(-1)![2])} className="mx-auto w-full max-w-[380px] md:mr-0" />
+          <CandlesFigure sym={practice.sym} bars={practice.bars.slice(-3)} text={practice.bars.slice(-3).map(barText)} high={exact(practice.bars.at(-1)![2])} className="mx-auto w-full max-w-[380px] md:mr-0" />
         </div>
 
         <div className="mt-14 grid gap-x-8 gap-y-16 md:mt-20 md:grid-cols-12">

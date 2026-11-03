@@ -39,7 +39,7 @@ export interface PlanData {
 /** The hero desk: the candles up to a real hourly rejection of a board level, plus three markets' last closes. */
 export interface HeroData {
   sym: string; side: Level["side"]; level: number; bars: Bar[];
-  fmt: { level: string; extreme: string; close: string; time: string };
+  fmt: { level: string; extreme: string; close: string; time: string; bars: BarText[] };
   towers: { sym: string; val: string; chg: string; moved: boolean }[];
 }
 export interface KillData { sym: string; side: Level["side"]; risk: number; losses: { at: string; lost: string; blocks: Rule[] }[] }
@@ -65,6 +65,10 @@ function ticker(rows: BoardRow[]): TickerRow[] {
 
 /** Brand price format: the instrument's decimals, no thousands separator, never rounded further. */
 export const exact = (n: number) => n.toFixed(n >= 1000 ? 2 : n >= 10 ? 3 : 5);
+
+/** A bar as the inspect labels print it: WIB open time and the exact OHLC. */
+export interface BarText { time: string; o: string; h: string; l: string; c: string }
+export const barText = ([t, o, h, l, c]: Bar): BarText => ({ time: wibStamp(new Date(t).toISOString()), o: exact(o), h: exact(h), l: exact(l), c: exact(c) });
 
 function hero(rows: BoardRow[]): HeroData {
   // The cleanest real retest rejection in the saved history: a fresh level as the app first drew it, then a
@@ -94,7 +98,7 @@ function hero(rows: BoardRow[]): HeroData {
     const moved = ticker(rows).sort((a, b) => Math.abs(parseFloat(b.chg)) - Math.abs(parseFloat(a.chg)));
     return {
       sym: sym(symbol), side: l.side, level: l.price, bars: h.slice(i - run, i + 1).map(bar),
-      fmt: { level: exact(l.price), extreme: exact(l.side === "sell" ? k.high : k.low), close: exact(k.close), time: wibStamp(k.time) },
+      fmt: { level: exact(l.price), extreme: exact(l.side === "sell" ? k.high : k.low), close: exact(k.close), time: wibStamp(k.time), bars: h.slice(i - run, i + 1).map((c) => barText(bar(c))) },
       towers: moved.slice(0, 3).map((t, j) => ({ sym: t.sym, val: t.val.replace(/,/g, ""), chg: t.chg, moved: j === 0 })),
     };
   }

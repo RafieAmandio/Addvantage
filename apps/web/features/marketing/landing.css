@@ -245,6 +245,114 @@ html[data-scrolled] .lv-header > div {
   backdrop-filter: blur(12px);
 }
 
+/* ---------- inspectable figures ---------- */
+/* An object you can inspect lifts a few px; the rest wash back a touch (filter, not opacity, so
+   nothing behind shows through). The label is the kit's leader, drawn on. */
+.tv-obj {
+  cursor: pointer;
+  outline: none;
+  transition: transform var(--tv-base) var(--tv-ease-out), filter var(--tv-base) var(--tv-ease-out);
+}
+.tv-obj[data-active] {
+  transform: translateY(-9px);
+}
+[data-inspecting] .tv-obj:not([data-active]) {
+  filter: contrast(0.72) brightness(1.08);
+}
+.tv-landing .tv-obj:focus-visible {
+  outline: none;
+}
+.tv-ring {
+  fill: none;
+  stroke: #111214;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.tv-plug {
+  transition: transform 260ms var(--tv-ease-out);
+}
+.tv-led {
+  transition: fill var(--tv-fast) var(--tv-ease-out);
+}
+.tv-tilt {
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 400ms var(--tv-ease-out);
+}
+.tv-hide,
+.tv-figure [data-cue].tv-hide {
+  opacity: 0 !important;
+  transition: opacity var(--tv-fast) var(--tv-ease-out);
+}
+.tv-callout-label {
+  margin-top: 0;
+  transform: translate(var(--tx, 0), var(--ty, calc(-100% + 7px)));
+}
+.tv-scene {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
+}
+.tv-scene[data-dragging] {
+  cursor: grabbing;
+}
+.tv-scene[data-dragging] .tv-obj {
+  cursor: grabbing;
+}
+.tv-scene:focus-visible {
+  outline-offset: 6px;
+}
+.tv-par-back,
+.tv-par-front {
+  transition: transform 500ms var(--tv-ease-out);
+}
+.tv-par-back {
+  transform: translate(calc(var(--px, 0) * 2px), calc(var(--py, 0) * 1.5px));
+}
+.tv-par-front {
+  transform: translate(calc(var(--px, 0) * 5px), calc(var(--py, 0) * 3.5px));
+}
+.tv-hint {
+  position: absolute;
+  right: 8px;
+  bottom: -2px;
+  font: 500 11px/1.3 var(--font-tv-mono), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6d72;
+  pointer-events: none;
+  transition: opacity 600ms var(--tv-ease-out);
+}
+.tv-hint-off {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tv-callout path {
+    animation: tv-draw var(--tv-base) var(--tv-ease-out) both;
+  }
+  .tv-callout-label {
+    animation: tv-fade var(--tv-base) 80ms var(--tv-ease-out) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tv-obj,
+  .tv-plug,
+  .tv-hide,
+  .tv-par-back,
+  .tv-par-front {
+    transition: none;
+  }
+}
+@keyframes tv-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes tv-fade {
+  from { opacity: 0; }
+}
+
 /* ---------- cards ---------- */
 .tv-card {
   transition: border-color var(--tv-base) var(--tv-ease-out), background-color var(--tv-base) var(--tv-ease-out);

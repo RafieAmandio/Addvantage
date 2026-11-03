@@ -3,6 +3,7 @@ import { Scramble } from "@/features/marketing/components/ScrambleReveal";
 import { Frame } from "@/features/marketing/components/Frame";
 import { Roll } from "@/features/marketing/components/Roll";
 import { Build } from "@/features/marketing/components/iso/Build";
+import { Tilt } from "@/features/marketing/components/iso/Inspect";
 
 const FREE = ["Unfiltered news + impact analysis", "Economic calendar", "My Channel (founder broadcast)", "Public psychology primers"];
 const VIP = ["Everything in Free", "Daily / weekly Trading Plan", "1v1 Consultation (founders)", "Full Education library", "Hashtag explorer (full)", "All collab channels"];
@@ -55,8 +56,10 @@ export function AccessSection() {
             <List items={VIP} />
             <Build className="tv-card-obj order-first sm:order-none">
               <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at="150">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full max-w-[300px]" loading="lazy" />
+                <Tilt className="max-w-[300px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full" loading="lazy" />
+                </Tilt>
               </div>
             </Build>
           </div>

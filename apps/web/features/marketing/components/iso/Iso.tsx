@@ -1,4 +1,4 @@
-import { P, ellipse, faces, pts, silhouette, type B } from "@/features/marketing/lib/iso";
+import { P, ellipse, faces, pts, rot, silhouette, type B, type View } from "@/features/marketing/lib/iso";
 
 /** Block faces, lit from the back left (brand kit, "Faces, grain and floor shadow"). */
 export const FACE = {
@@ -23,17 +23,20 @@ export const GrainDefs = ({ id }: { id: string }) => (
 
 const line = { stroke: INK, strokeWidth: 0.9, strokeLinejoin: "round" as const, vectorEffect: "non-scaling-stroke" as const };
 
-/** One axis-aligned block: left, right and top faces, grain on lit faces, 0.9 px Ink hairline. */
-export function Block({ b, u, face = "white", grain }: { b: B; u: number; face?: Face; grain?: string }) {
+// A side's colour between the lit left and the dark right, so a turning block shades continuously.
+const mix = (a: string, b: string, t: number) =>
+  t <= 0 ? a : t >= 1 ? b : `#${[1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t) + parseInt(b.slice(i, i + 2), 16) * t).toString(16).padStart(2, "0")).join("")}`;
+
+/** One axis-aligned block: its visible sides and top, grain on lit faces, 0.9 px Ink hairline. */
+export function Block({ b, u, face = "white", grain, view }: { b: B; u: number; face?: Face; grain?: string; view?: View }) {
   const s = FACE[face];
-  const f = faces(b);
   return (
     <g>
-      {(["left", "right", "top"] as const).map((k) => {
-        const p = pts(f[k], u);
+      {faces(b, view).map((f, k) => {
+        const p = pts(f.pts, u, view);
         return (
           <g key={k}>
-            <polygon points={p} fill={s[k]} />
+            <polygon points={p} fill={f.top ? s.top : mix(s.left, s.right, f.shade)} />
             {s.grain && grain && <polygon points={p} fill={`url(#${grain})`} opacity={0.14} />}
             <polygon points={p} fill="none" {...line} />
           </g>
@@ -43,22 +46,26 @@ export function Block({ b, u, face = "white", grain }: { b: B; u: number; face?:
   );
 }
 
-/** Flat floor shadow: the footprint shifted 0.35 units along +x and +y, no blur. */
-export function Shadow({ b, u, z = b[4], fill = "#E4E3DE" }: { b: B; u: number; z?: number; fill?: string }) {
+/** Flat floor shadow: the footprint shifted `off` units down the screen (+x +y as the camera sees it), no blur. */
+export function Shadow({ b, u, z = b[4], fill = "#E4E3DE", off = 0.35, view }: { b: B; u: number; z?: number; fill?: string; off?: number; view?: View }) {
   const [x0, x1, y0, y1] = b;
-  return <polygon points={pts([[x0 + 0.35, y0 + 0.35, z], [x1 + 0.35, y0 + 0.35, z], [x1 + 0.35, y1 + 0.35, z], [x0 + 0.35, y1 + 0.35, z]], u)} fill={fill} />;
+  const ps = ([[x0, y0], [x1, y0], [x1, y1], [x0, y1]] as const).map(([x, y]) => {
+    const [rx, ry] = rot(x, y, view);
+    return P(rx + off, ry + off, z, u).map((n) => n.toFixed(2)).join(",");
+  });
+  return <polygon points={ps.join(" ")} fill={fill} />;
 }
 
 /**
  * Something that builds out of the floor: the group starts pushed down by its own height and
  * is clipped to its final outline, so it reads as extruding, then rises on `[data-build]`.
  */
-export function Rise({ id, b, u, from = b[4], at = 0, children }: { id: string; b: B; u: number; from?: number; at?: number; children: React.ReactNode }) {
+export function Rise({ id, b, u, from = b[4], at = 0, view, children }: { id: string; b: B; u: number; from?: number; at?: number; view?: View; children: React.ReactNode }) {
   const clip: B = [b[0], b[1], b[2], b[3], Math.min(from, b[4]), b[5]];
   return (
     <g clipPath={`url(#${id})`}>
       <clipPath id={id}>
-        <polygon points={silhouette(clip, u)} />
+        <polygon points={silhouette(clip, u, view)} />
       </clipPath>
       <g data-build="" data-dy={((b[5] - Math.min(from, b[4])) * u).toFixed(1)} data-at={at}>
         {children}
@@ -68,8 +75,8 @@ export function Rise({ id, b, u, from = b[4], at = 0, children }: { id: string; 
 }
 
 /** Something that slides in along a world axis (a plate along its length, a card onto the desk). */
-export function Slide({ v, u, at = 0, children }: { v: [number, number, number]; u: number; at?: number; children: React.ReactNode }) {
-  const [dx, dy] = P(v[0], v[1], v[2], u);
+export function Slide({ v, u, at = 0, view, children }: { v: [number, number, number]; u: number; at?: number; view?: View; children: React.ReactNode }) {
+  const [dx, dy] = P(v[0], v[1], v[2], u, view && { ...view, cx: 0, cy: 0 });
   return (
     <g data-build="" data-dx={dx.toFixed(1)} data-dy={dy.toFixed(1)} data-fade="" data-at={at}>
       {children}
@@ -88,9 +95,9 @@ export function Leader({ d, ax, ay, cue }: { d: string; ax: number; ay: number; 
 }
 
 /** Upright cylinder with a face on top, for the session clock. */
-export function Cylinder({ cx, cy, z, r, h, u, children }: { cx: number; cy: number; z: number; r: number; h: number; u: number; children?: React.ReactNode }) {
-  const t = ellipse(cx, cy, z + h, r, u);
-  const [, by] = P(cx, cy, z, u);
+export function Cylinder({ cx, cy, z, r, h, u, view, children }: { cx: number; cy: number; z: number; r: number; h: number; u: number; view?: View; children?: React.ReactNode }) {
+  const t = ellipse(cx, cy, z + h, r, u, view);
+  const [, by] = P(cx, cy, z, u, view);
   const body = `M${t.cx - t.rx} ${t.cy}L${t.cx - t.rx} ${by}A${t.rx} ${t.ry} 0 0 0 ${t.cx + t.rx} ${by}L${t.cx + t.rx} ${t.cy}Z`;
   return (
     <g>
@@ -102,4 +109,4 @@ export function Cylinder({ cx, cy, z, r, h, u, children }: { cx: number; cy: num
 }
 
 /** Polyline of points on a z plane, for arcs and ticks on a clock face. */
-export const flat = (ps: [number, number][], z: number, u: number) => ps.map(([x, y]) => P(x, y, z, u).map((n) => n.toFixed(2)).join(",")).join(" ");
+export const flat = (ps: [number, number][], z: number, u: number, view?: View) => ps.map(([x, y]) => P(x, y, z, u, view).map((n) => n.toFixed(2)).join(",")).join(" ");
