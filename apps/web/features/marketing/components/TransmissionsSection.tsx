@@ -9,13 +9,14 @@ const ICON = ["news", "calendar", "todays-brief", "consultation", "education", "
 export function TransmissionsSection() {
   return (
     <Frame id="transmissions" label="Transmissions" num="02" flip>
-      <div className="grid grid-cols-1 gap-px bg-tv-stone md:grid-cols-3">
+      {/* Phone: a snap carousel, one card and a bit of the next. Desktop: two rows of three filling the screen. */}
+      <div className="flex snap-x snap-mandatory gap-px overflow-x-auto overscroll-x-contain bg-tv-stone [scrollbar-width:none] md:grid md:grid-cols-3 md:overflow-visible">
         {pillars.map((p, i) => (
           <article
             key={p.code}
             data-reveal
             style={{ ["--i" as string]: i }}
-            className="tv-card flex flex-col gap-5 bg-tv-paper p-6 md:gap-6 md:p-10"
+            className="tv-card flex w-[84%] shrink-0 snap-start flex-col gap-5 bg-tv-paper p-6 md:w-auto md:justify-center md:gap-6 md:p-10"
           >
             <div className="flex items-start justify-between">
               {/* eslint-disable-next-line @next/next/no-img-element */}

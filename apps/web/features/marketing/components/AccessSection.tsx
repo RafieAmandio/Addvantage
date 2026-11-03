@@ -22,7 +22,7 @@ const List = ({ items }: { items: string[] }) => (
 /** Two tiers side by side. VIP+ is pro equipment: the kit's isometric VIP card slides onto the desk. */
 export function AccessSection() {
   return (
-    <Frame id="access" label="Access" num="04" className="pb-20 md:pb-32">
+    <Frame id="access" label="Access" num="04">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]">
         <div data-reveal style={{ ["--i" as string]: 1 }} className="flex flex-col gap-6 p-6 md:p-12">
           <p className="tv-eyebrow flex items-center justify-between">

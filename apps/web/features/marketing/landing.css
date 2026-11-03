@@ -353,6 +353,27 @@ html[data-scrolled] .lv-header > div {
   from { opacity: 0; }
 }
 
+/* ---------- segmented control (Train) ---------- */
+.tv-seg {
+  padding: 12px 8px;
+  color: #111214;
+  touch-action: manipulation;
+  transition: background-color var(--tv-base) var(--tv-ease-out), color var(--tv-base) var(--tv-ease-out);
+}
+.tv-seg:active {
+  transform: scale(0.98);
+  transition-duration: var(--tv-fast);
+}
+.tv-seg-on {
+  background: #111214;
+  color: #f4f3ef;
+}
+@media (hover: hover) {
+  .tv-seg:not(.tv-seg-on):hover {
+    background: #e4e3de;
+  }
+}
+
 /* ---------- cards ---------- */
 .tv-card {
   transition: border-color var(--tv-base) var(--tv-ease-out), background-color var(--tv-base) var(--tv-ease-out);

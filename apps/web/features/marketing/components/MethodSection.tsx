@@ -36,13 +36,13 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
   const next = () => !picked && setOpen((o) => (o + 1) % STEPS.length);
 
   return (
-    <section id="method" className="relative z-10 bg-tv-paper px-2 pt-20 md:px-4 md:pt-32">
-      {/* The one dark band on the page: the desk, where the real app screens run. */}
-      <div data-reveal="band" className="tv-on-desk rounded-[16px] bg-tv-desk py-16 text-tv-paper md:py-28">
-      <div className="mx-auto grid max-w-[1240px] gap-12 px-4 sm:px-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:px-10">
+    <section id="method" className="relative z-10 flex flex-col bg-tv-paper px-2 pt-6 md:min-h-[100svh] md:p-2">
+      {/* The one dark band on the page: the desk, where the real app screens run. Fills one screen. */}
+      <div data-reveal="band" className="tv-on-desk flex flex-1 flex-col justify-center rounded-[16px] bg-tv-desk py-8 text-tv-paper md:py-[clamp(1.5rem,5svh,3.5rem)]">
+      <div className="mx-auto grid w-full max-w-[1240px] items-center gap-8 px-4 sm:px-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16 md:px-10">
         <div className="flex flex-col">
           <p data-reveal className="tv-eyebrow text-tv-mutedesk">The lab, on the desk</p>
-          <h2 data-reveal className="mt-5 text-[clamp(2.4rem,5.2vw,4.25rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+          <h2 data-reveal className="mt-5 text-[clamp(2.4rem,min(5.2vw,8svh),4.25rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
             <Scramble text="Filter. Read." />
             <br />
             <Scramble text="Execute." delay={250} />
@@ -51,7 +51,7 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
             Signals tell you what to do. This shows you how to see it, then stops you when you don&apos;t.
           </p>
 
-          <ol className="mt-10 border-t border-tv-line">
+          <ol className="mt-6 border-t border-tv-line md:mt-[clamp(1rem,4svh,2.5rem)]">
             {STEPS.map((s, i) => {
               const on = open === i;
               return (
@@ -64,7 +64,7 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
                       setOpen(i);
                       setPicked(true);
                     }}
-                    className="tv-step group grid w-full grid-cols-[2.5rem_1fr_auto] items-baseline gap-x-2 py-5 text-left"
+                    className="tv-step group grid w-full grid-cols-[2.5rem_1fr_auto] items-baseline gap-x-2 py-4 text-left"
                   >
                     <span className={cn("font-mono text-sm tabular-nums transition-colors", on ? "text-tv-signal" : "text-tv-mutedesk")}>{String(i + 1).padStart(2, "0")}</span>
                     <span className={cn("text-2xl font-semibold tracking-[-0.02em] transition-colors duration-200 md:text-3xl", on ? "text-tv-paper" : "text-tv-mutedesk [@media(hover:hover)]:group-hover:text-tv-paper")}>{s.title}</span>
@@ -75,7 +75,7 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
                   </button>
                   {/* Height snaps (no layout animation); the body fades up 8px like the FAQ. */}
                   <div id={`method-${i}`} hidden={!on} className={on ? "lv-in" : undefined}>
-                    <p className="max-w-[46ch] pb-6 pl-[3rem] text-[15px] leading-relaxed text-tv-paper/85">{s.body}</p>
+                    <p className="max-w-[46ch] pb-4 pl-[3rem] text-[15px] leading-relaxed text-tv-paper/85">{s.body}</p>
                     {!picked && on && (
                       <span aria-hidden className="mb-5 ml-[3rem] block h-px w-24 overflow-hidden bg-tv-line motion-reduce:hidden">
                         <span className="block h-full w-full origin-left bg-tv-signal" style={{ animation: `nudge ${s.secs}s linear both` }} />
@@ -89,7 +89,7 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
           <p className="tv-eyebrow mt-6 text-tv-mutedesk">Pick a step. The demo on the right is live.</p>
         </div>
 
-        <div data-reveal="card" className="min-h-[460px] md:sticky md:top-24 md:self-start">
+        <div data-reveal="card" className="min-h-[460px]">
           <div key={open} className="lv-in h-full">
             {open === 0 && <FilterDemo onLoop={next} />}
             {open === 1 && <ReadDemo d={read} onLoop={next} />}

@@ -21,14 +21,15 @@ export function Frame({ id, label, num, flip, className, children }: { id?: stri
   const l = <Scramble text={label} key="l" />;
   const n = <Scramble text={num} delay={150} key="n" className="text-tv-mute" />;
   return (
-    <section id={id} className={cn("relative z-10 bg-tv-paper pt-20 text-tv-ink md:pt-32", className)}>
+    <section id={id} className={cn("relative z-10 flex flex-col bg-tv-paper pt-14 text-tv-ink md:min-h-[100svh] md:pt-[clamp(2.5rem,7svh,4.5rem)]", className)}>
       <Inset>
         <div data-reveal className="tv-eyebrow flex items-center justify-between px-6 py-4 text-[12px] md:px-8">
           {flip ? [n, l] : [l, n]}
         </div>
       </Inset>
       <Rule />
-      <Inset>{children}</Inset>
+      {/* The content stretches to fill the screen, so a frame never reads as a thin band. */}
+      <Inset className="flex flex-1 flex-col [&>*]:flex-1">{children}</Inset>
       <Rule from="right" />
     </section>
   );

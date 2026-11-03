@@ -41,8 +41,11 @@ export default function LandingPage() {
       <ConsoleEasterEgg />
       <LandingMotion />
       <MarketingNav />
-      <HeroSection hero={d.hero} />
-      <BoardStrip board={d.board} asOf={d.asOf} />
+      {/* The hero and the board strip share the first screen exactly. */}
+      <div className="flex min-h-[100svh] flex-col">
+        <HeroSection hero={d.hero} />
+        <BoardStrip board={d.board} asOf={d.asOf} />
+      </div>
       <PositioningSection markets={d.ticker} />
       <TransmissionsSection />
       <MethodSection read={d.read} plan={d.plan} />
