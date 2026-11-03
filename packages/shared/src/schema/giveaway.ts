@@ -19,3 +19,5 @@ export const GiveawayEntrySchema = z.object({
   website: z.string().max(0).optional(),
 });
 export type GiveawayEntryInput = z.infer<typeof GiveawayEntrySchema>;
+
+export { bingxUid as bingxUidField };

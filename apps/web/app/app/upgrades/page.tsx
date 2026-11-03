@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canOpenRoute } from "@tradevantage/shared";
 import { getProfile } from "@/lib/auth/session";
 import { getUpgradeRadar } from "@/features/upgrades/queries/upgrades";
 import {
@@ -13,7 +14,7 @@ export const revalidate = 0;
 
 export default async function UpgradesPage() {
   const profile = await getProfile();
-  const hasAccess = !!profile && (profile.tier === "vip" || profile.isAdmin);
+  const hasAccess = !!profile && (canOpenRoute(profile.tier, "/app/upgrades") || profile.isAdmin);
 
   if (!hasAccess) return <UpgradeRadarLocked />;
 

@@ -8,10 +8,14 @@ export const dynamic = "force-dynamic";
 async function handle(req: NextRequest, { params }: { params: { path: string[] } }) {
   if (!isMockMode()) return NextResponse.json({ success: false }, { status: 404 });
   try {
-    const data = await demoApi(req.method, `/${params.path.join("/")}${req.nextUrl.search}`);
+    const body = req.headers.get("content-type")?.includes("application/json") ? await req.json().catch(() => undefined) : undefined;
+    const data = await demoApi(req.method, `/${params.path.join("/")}${req.nextUrl.search}`, body);
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    return NextResponse.json({ success: false, message: String(err) }, { status: err instanceof DemoApiMiss ? 404 : 500 });
+    // Demo handlers can throw a real API status (e.g. 409) with the API's message.
+    const e = err as { status?: number; apiMessage?: string };
+    const status = e.status ?? (err instanceof DemoApiMiss ? 404 : 500);
+    return NextResponse.json({ success: false, message: e.apiMessage ?? String(err) }, { status });
   }
 }
 

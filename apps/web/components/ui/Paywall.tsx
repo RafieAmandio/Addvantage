@@ -3,9 +3,11 @@ import Link from "next/link";
 export function PaywallOverlay({
   surface,
   reason,
+  back = { href: "/app", label: "Back to home" },
 }: {
   surface: string;
   reason?: string;
+  back?: { href: string; label: string };
 }) {
   return (
     <div className="relative h-full" role="region" aria-label={`${surface}: upgrade required`}>
@@ -27,10 +29,10 @@ export function PaywallOverlay({
             Upgrade access
           </Link>
           <Link
-            href="/app"
+            href={back.href}
             className="rounded-full border border-white/[0.14] px-5 py-2.5 text-[14px] text-white/70 transition-colors hover:bg-raised hover:text-white focus-visible:ring-1 focus-visible:ring-brand focus-visible:outline-none"
           >
-            Back to home
+            {back.label}
           </Link>
         </div>
       </div>

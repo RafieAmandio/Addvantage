@@ -8,6 +8,8 @@ import { updateSession } from "@/lib/auth/middleware";
 const APPLY_HOSTS = new Set(["apply.tradevantage.gg", "early.tradevantage.gg"]);
 // giveaway.tradevantage.gg/ rewrites to the internal /giveaway route.
 const GIVEAWAY_HOST = "giveaway.tradevantage.gg";
+// blackfriday.tradevantage.gg/ rewrites to the internal /black-friday route.
+const BLACK_FRIDAY_HOST = "blackfriday.tradevantage.gg";
 
 export async function middleware(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0];
@@ -20,6 +22,11 @@ export async function middleware(request: NextRequest) {
     if (host === GIVEAWAY_HOST) {
       const url = request.nextUrl.clone();
       url.pathname = "/giveaway";
+      return NextResponse.rewrite(url);
+    }
+    if (host === BLACK_FRIDAY_HOST) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/black-friday";
       return NextResponse.rewrite(url);
     }
   }
