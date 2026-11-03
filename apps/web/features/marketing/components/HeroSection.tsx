@@ -11,11 +11,13 @@ const LINKS = [
   ["Lab", "#method"],
   ["Journal", "#train"],
   ["Access", "#access"],
-  ["FAQ", "#faq"],
 ];
 
-/** Clear over the hero, Paper with a hairline once the page moves; tucks away reading down. */
-export function MarketingNav() {
+/**
+ * Clear over the hero, Paper with a hairline once the page moves; tucks away reading down.
+ * `home` is "" on the landing (in-page anchors, so Lenis glides) and "/" anywhere else.
+ */
+export function MarketingNav({ home = "" }: { home?: "" | "/" }) {
   return (
     <header className="lv-header fixed inset-x-0 top-0 z-50">
       <div className="px-4 md:px-8">
@@ -26,10 +28,13 @@ export function MarketingNav() {
           </Link>
           <nav aria-label="Sections" className="hidden items-center gap-8 text-[15px] text-tv-ink md:flex">
             {LINKS.map(([l, h]) => (
-              <a key={l} href={h} className="tv-link py-1">
+              <a key={l} href={`${home}${h}`} className="tv-link py-1">
                 {l}
               </a>
             ))}
+            <Link href="/faq" className="tv-link py-1">
+              FAQ
+            </Link>
           </nav>
           <div className="flex items-center gap-2 md:gap-3">
             <Link href="/login" className="tv-btn tv-btn-sm px-3 text-tv-ink">
