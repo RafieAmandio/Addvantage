@@ -455,3 +455,14 @@ html[data-scrolled] .lv-header > div {
     transition-duration: 0ms !important;
   }
 }
+
+/* Partner logo: ink at rest so Signal stays the only colour, its own colour on hover. */
+.tv-partner {
+  filter: grayscale(1) brightness(0.12);
+  transition: filter var(--tv-base) var(--tv-ease-out);
+}
+@media (hover: hover) {
+  .tv-partner:hover {
+    filter: none;
+  }
+}

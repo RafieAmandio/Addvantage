@@ -17,6 +17,9 @@ export function MarketingFooter() {
           <p>Telegram (free pillars)</p>
           <p>Web app (paid)</p>
           <p>1v1 Consult</p>
+          <p className="tv-eyebrow mt-4 text-tv-mute">Exchange partner</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto self-start" loading="lazy" />
         </div>
         <div className="flex w-full max-w-[227px] flex-col items-start gap-4 text-[15px]">
           <p className="tv-eyebrow text-tv-mute">Operator</p>

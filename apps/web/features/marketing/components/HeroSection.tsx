@@ -77,6 +77,12 @@ export function HeroSection({ hero }: { hero: HeroData }) {
           <a href="#method" className="tv-link mt-6 text-[15px] font-medium">
             See the lab <span aria-hidden className="tv-arrow">↓</span>
           </a>
+          {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
+          <p className="mt-10 flex items-center gap-4 border-t border-tv-stone pt-5">
+            <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
+          </p>
         </div>
 
         <figure className="relative md:-ml-10 md:-mr-24">

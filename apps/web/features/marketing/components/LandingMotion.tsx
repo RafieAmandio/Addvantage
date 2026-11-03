@@ -54,7 +54,7 @@ export function LandingMotion() {
     // Smooth wheel scrolling, same setup as Kaoba: mouse and trackpad only,
     // touch stays native, reduced motion gets none.
     const lenis = matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches
-      ? new Lenis({ autoRaf: true, anchors: { offset: -80 } })
+      ? new Lenis({ autoRaf: true, lerp: 0.075, anchors: { offset: -80 } })
       : null;
     return () => {
       lenis?.destroy();
