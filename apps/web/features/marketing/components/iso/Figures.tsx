@@ -182,7 +182,7 @@ export function JournalFigure({ className }: { className?: string }) {
  * The session clock, live: a 24 h WIB dial with the three sessions as arcs, the hand on the
  * current WIB time. The session that is open now is the one Signal arc.
  */
-export function ClockFigure({ hour, arcs, className }: { hour: number | null; arcs: { name: string; from: number; to: number; open: boolean }[]; className?: string }) {
+export function ClockFigure({ hour, arcs, className, litColor = "#FFD400" }: { hour: number | null; arcs: { name: string; from: number; to: number; open: boolean }[]; className?: string; litColor?: string }) {
   const u = 38;
   const r = 2.6;
   const h = 0.55;
@@ -203,7 +203,7 @@ export function ClockFigure({ hour, arcs, className }: { hour: number | null; ar
               {arcs.map((a, j) => {
                 const to = a.to <= a.from ? a.to + 24 : a.to;
                 const ps = Array.from({ length: 41 }, (_, q) => at(r * (0.7 - j * 0.11), a.from + ((to - a.from) * q) / 40));
-                return <polyline key={a.name} points={flat(ps, h, u)} strokeWidth={j === lit ? 4 : 1.3} stroke={j === lit ? "#FFD400" : "#111214"} />;
+                return <polyline key={a.name} points={flat(ps, h, u)} strokeWidth={j === lit ? 4 : 1.3} stroke={j === lit ? litColor : "#111214"} />;
               })}
               {hour !== null && <polyline points={flat([[0, 0], at(r * 0.78, hour)], h, u)} strokeWidth={1.8} />}
             </g>
