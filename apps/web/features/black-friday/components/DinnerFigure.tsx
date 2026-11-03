@@ -43,13 +43,14 @@ function Plate({ x, y, u }: { x: number; y: number; u: number }) {
   );
 }
 
-function chair(x: number, near: boolean, k: number, u: number, yours: boolean, fid: string): Item {
+function chair(x: number, near: boolean, k: number, u: number, yours: boolean, fid: string, signal: boolean): Item {
   const y0 = near ? D + 0.25 : -1.05;
   const seat = box(x - 0.4, y0, 0, 0.8, 0.8, 0.5);
   // The backrest sits on the side away from the table.
   const back = near ? box(x - 0.4, y0 + 0.66, 0, 0.8, 0.14, BACK) : box(x - 0.4, y0, 0, 0.8, 0.14, BACK);
   const b: B = [seat[0], seat[1], seat[2], seat[3], 0, BACK];
-  const face = yours ? "signal" : "white";
+  // The highlighted chair is the Signal unless the screen already spends its yellow elsewhere.
+  const face = yours ? (signal ? "signal" : "graphite") : "white";
   const parts = near ? [seat, back] : [back, seat]; // far part first
   const n = near ? 6 + SEATS_X.indexOf(x) : 1 + SEATS_X.indexOf(x);
   return {
@@ -70,13 +71,14 @@ function chair(x: number, near: boolean, k: number, u: number, yours: boolean, f
 }
 
 /**
- * The BingX dinner: a long table, ten chairs, place settings and a runner, built the landing's
- * way (table rises, then the chairs drop in one by one). Hover, tap or focus lifts a chair.
- * One Signal: the empty chair on the near side, "your seat?".
+ * The BingX dinner as a small card: the iso table as a thumbnail (it builds in the landing's
+ * way, table first, then the chairs drop in; hover, tap or focus lifts a chair) and the facts
+ * beside it. `signal` off turns the highlighted chair graphite where the screen's one yellow
+ * is already taken (the plan step's chosen Full marker).
  */
-export function DinnerFigure({ compact, className }: { compact?: boolean; className?: string }) {
+export function DinnerCard({ id, signal = true, className }: { id: string; signal?: boolean; className?: string }) {
   const u = 30;
-  const fid = compact ? "bf-dinner-c" : "bf-dinner";
+  const fid = `bf-dinner-${id}`;
   const table = box(0, 0, 0, L, D, TOP);
   const slab = box(0, 0, TOP - 0.16, L, D, 0.16);
   const legs = [
@@ -91,7 +93,7 @@ export function DinnerFigure({ compact, className }: { compact?: boolean; classN
 
   const items: Item[] = [
     {
-      id: "bf-table",
+      id: `${fid}-table`,
       b: table,
       el: (key) => (
         <Rise key={key} id={`${fid}-rise`} b={table} u={u} from={0} at={0}>
@@ -112,27 +114,18 @@ export function DinnerFigure({ compact, className }: { compact?: boolean; classN
         </Rise>
       ),
     },
-    ...SEATS_X.map((x, i) => chair(x, false, i, u, false, fid)),
-    ...SEATS_X.map((x, i) => chair(x, true, i + 5, u, i === YOURS, fid)),
+    ...SEATS_X.map((x, i) => chair(x, false, i, u, false, fid, signal)),
+    ...SEATS_X.map((x, i) => chair(x, true, i + 5, u, i === YOURS, fid, signal)),
   ];
 
   return (
-    <figure className={cn("flex flex-col", className)}>
-      <Figure
-        id={fid}
-        u={u}
-        items={items}
-        floor={[table]}
-        labels={
-          compact
-            ? []
-            : [{ anchor: [SEATS_X[YOURS]!, D + 0.65, 0.5], main: "Your seat?", sub: "By invitation", dy: 78, dx: -36, cue: 1500 }]
-        }
-        pad={compact ? [20, 20, 20, 20] : [30, 30, 64, 30]}
-        className="w-full"
-      />
-      <figcaption className="mt-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-tv-mute">
-        10 seats <span aria-hidden>/</span> by invitation <span aria-hidden>/</span> sponsored by BingX
+    <figure className={cn("flex w-full items-center gap-4 rounded-[10px] border border-tv-stone p-3 md:max-w-[340px]", className)}>
+      {/* The table is too small here for callouts; hover still lifts a chair. */}
+      <Figure id={fid} u={u} items={items} floor={[table]} labels={[]} tip={false} pad={[14, 14, 14, 14]} className="w-[132px] shrink-0 sm:w-[150px]" />
+      <figcaption className="flex flex-col gap-1 font-mono text-[11px] font-medium uppercase leading-[1.3] tracking-[0.08em] text-tv-mute">
+        <span className="text-[12px] text-tv-ink">BingX dinner</span>
+        <span>10 seats</span>
+        <span>By invitation</span>
       </figcaption>
     </figure>
   );

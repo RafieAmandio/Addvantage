@@ -1,4 +1,8 @@
-import { BF_BCA_PRICE_IDR, BF_FULL_PRICE_USD } from "@tradevantage/shared/schema";
+import { BF_BCA_PRICE_IDR, BF_FULL_PRICE_USD, EARLY_ACCESS_PRICE } from "@tradevantage/shared/schema";
+
+// The struck price is apply's normal early-access USDT price, so the two never drift apart.
+export const WAS_PRICE = `$${EARLY_ACCESS_PRICE.usdt.amount}`;
+export const NOW_PRICE = `$${BF_FULL_PRICE_USD}`;
 import { PAYMENT_DESTINATIONS } from "@/features/early-access/content";
 
 // Stepper labels (index === step). The done screen sits after the last one.
@@ -48,7 +52,8 @@ export const PLANS = {
   full: {
     n: "01",
     name: "Full access",
-    price: `$${BF_FULL_PRICE_USD}`,
+    price: NOW_PRICE,
+    was: WAS_PRICE,
     term: "One year of VIP+ Trader",
     lines: ["Everything on the desk for 1 year", "Trading plans and 1v1 consults", "Forex tools, calendar, education"],
     dinner: "Full access members get a chance to be invited to an exclusive dinner sponsored by BingX. 10 seats.",

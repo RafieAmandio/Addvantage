@@ -10,7 +10,7 @@ import { Build } from "@/features/marketing/components/iso/Build";
 import { CopyPrice } from "@/features/marketing/components/iso/CopyPrice";
 import { Ticker } from "@/features/marketing/components/iso/Ticker";
 import { BF_LOSS_BUCKETS } from "@tradevantage/shared/schema";
-import { DinnerFigure } from "@/features/black-friday/components/DinnerFigure";
+import { DinnerCard } from "@/features/black-friday/components/DinnerFigure";
 import { saveBlackFridayDraft, submitBlackFridayApplication } from "@/features/black-friday/actions";
 import {
   BCA_DESTINATION,
@@ -22,6 +22,8 @@ import {
   PROMO_ACKS,
   STEPS,
   USDT_DESTINATION,
+  NOW_PRICE,
+  WAS_PRICE,
   type Destination,
 } from "@/features/black-friday/content";
 
@@ -176,10 +178,10 @@ export function BlackFridayWizard() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1240px] px-4 pb-20 pt-24 sm:px-6 md:px-10 md:pt-32">
+    <div className="mx-auto w-full max-w-[1240px] px-4 pb-20 pt-24 sm:px-6 md:px-10 md:pt-28">
       <div className="grid gap-y-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-x-20">
         {/* Left: the pitch and the stepper */}
-        <aside className="md:sticky md:top-28 md:self-start">
+        <aside className="md:sticky md:top-24 md:self-start">
           <p className="tv-eyebrow flex items-center gap-2.5 text-tv-mute">
             Black Friday <span aria-hidden>/</span> with
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -191,17 +193,27 @@ export function BlackFridayWizard() {
             Get the desk.
           </h1>
           <p className={cn("mt-5 max-w-[30rem] text-[17px] leading-[1.55] text-tv-graphite", (step > 0 || done) && "hidden md:block")}>
-            Sign up on BingX with our code, then pick a plan. Free opens the crypto tools and the news desk. Full access is every tool for a year at $500.
+            Sign up on BingX with our code, then pick a plan. Free opens the crypto tools and the news desk. Full access is every tool for a year:{" "}
+            <Was>{WAS_PRICE}</Was>, now <span className="font-mono">{NOW_PRICE}</span>.
           </p>
 
-          <ol className="mt-8 hidden border-t border-tv-ink md:block" aria-label="Application steps">
+          {/* The member card sits right under the pitch so it is on screen at 1280x800; it builds once, again when the application is in. */}
+          <Build key={done ? "done" : "start"} immediate className="mt-7 hidden max-w-[280px] md:block">
+            <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at={done ? "100" : "300"}>
+              <Tilt>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full" />
+              </Tilt>
+            </div>
+          </Build>
+          <ol className="mt-7 hidden border-t border-tv-ink md:block" aria-label="Application steps">
             {STEPS.map((s, i) => {
               const state = done || i < step ? "done" : i === step ? "now" : "next";
               return (
                 <li
                   key={s.n}
                   aria-current={state === "now" ? "step" : undefined}
-                  className={cn("flex items-center gap-4 border-b border-tv-stone py-2.5 text-[15px] transition-colors", state === "next" && "text-tv-mute", state === "now" && "font-semibold")}
+                  className={cn("flex items-center gap-4 border-b border-tv-stone py-2 text-[15px] transition-colors", state === "next" && "text-tv-mute", state === "now" && "font-semibold")}
                 >
                   <span className="font-mono text-[12px] tabular-nums text-tv-mute">{s.n}</span>
                   <span className="flex-1">{s.label}</span>
@@ -214,21 +226,12 @@ export function BlackFridayWizard() {
             })}
           </ol>
 
-          {/* The member card builds onto the desk once; again when the application is in. */}
-          <Build key={done ? "done" : "start"} immediate className="mt-12 hidden max-w-[340px] md:block">
-            <div data-build="" data-dx="-60" data-dy="34" data-fade="" data-at={done ? "100" : "300"}>
-              <Tilt>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/vip-card.svg" alt="The VIP+ member card, drawn on the desk" width={390} height={237} className="h-auto w-full" />
-              </Tilt>
-            </div>
-          </Build>
         </aside>
 
         {/* Right: the form */}
         <section className="relative min-w-0 border-t border-tv-ink pt-6">
           {/* The one Signal on a step screen: progress, as a hairline. */}
-          <div aria-hidden className="bf-progress absolute inset-x-0 -top-px" style={{ ["--p" as string]: done ? 1 : (step + 1) / STEPS.length }} />
+          {!done && <div aria-hidden className="bf-progress absolute inset-x-0 -top-px" style={{ ["--p" as string]: (step + 1) / STEPS.length }} />}
           {done ? (
             <Done plan={plan} uid={bingxUid} method={payMethod} />
           ) : (
@@ -360,7 +363,11 @@ export function BlackFridayWizard() {
                             <span aria-hidden className={cn("bf-mark h-2.5 w-2.5 shrink-0 rounded-[3px] transition-colors", on ? (k === "full" ? "border border-tv-ink bg-tv-signal" : "bg-tv-ink") : "border border-tv-mute")} data-on={on || undefined} />
                           </span>
                           <span className="mt-2 text-[20px] font-semibold tracking-[-0.01em]">{p.name}</span>
-                          <span className="mt-3 font-mono text-[28px] font-medium tabular-nums leading-none">{p.price}</span>
+                          <span className="mt-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 font-mono tabular-nums leading-none">
+                            {"was" in p && <Was>{p.was}</Was>}
+                            <span className="text-[28px] font-medium">{p.price}</span>
+                            {"was" in p && <span className="rounded-[3px] border border-tv-stone px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-tv-mute">Black Friday</span>}
+                          </span>
                           <span className="mt-1.5 text-[13px] text-tv-mute">{p.term}</span>
                           <ul className="mt-4 space-y-1.5 border-t border-tv-stone pt-4 text-[14px] leading-[1.4]">
                             {p.lines.map((l) => (
@@ -379,7 +386,7 @@ export function BlackFridayWizard() {
 
                   {plan === "full" && (
                     <div className="space-y-6">
-                      <DinnerFigure compact className="bf-drop mx-auto w-full max-w-[420px]" />
+                      <DinnerCard id="plan" signal={false} className="bf-drop" />
                       {BCA_DESTINATION && (
                         <Group label="Pay with">
                           <Options
@@ -706,7 +713,7 @@ function Done({ plan, uid, method }: { plan: Plan | null; uid: string; method: M
   return (
     <div role="status">
       <p className="tv-eyebrow flex items-center gap-2.5 text-tv-mute">
-        <span aria-hidden className="h-2.5 w-2.5 rounded-[3px] bg-tv-signal" />
+        <span aria-hidden className={cn("h-2.5 w-2.5 rounded-[3px]", full ? "bg-tv-ink" : "bg-tv-signal")} />
         Application received
       </p>
       <h2 className="mt-4 text-[clamp(2.4rem,4.4vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.035em]">Submitted.</h2>
@@ -714,9 +721,9 @@ function Done({ plan, uid, method }: { plan: Plan | null; uid: string; method: M
         Every application is reviewed by the desk before access is granted, on the free plan and on Full access. We&apos;ll email you.
       </p>
       {full && (
-        <div className="mt-6 max-w-[40rem]">
+        <div className="mt-6 max-w-[34rem]">
           <p className="text-[17px] leading-[1.55]">You&apos;re in for a chance to be invited to the exclusive BingX dinner (10 seats).</p>
-          <DinnerFigure className="mt-6" />
+          <DinnerCard id="done" className="mt-4" />
         </div>
       )}
       <dl className="mt-8 border-t border-tv-ink">
@@ -747,4 +754,14 @@ function promoAcks(plan: Plan | null): { key: string; label: string }[] {
     { key: "scope", label: PROMO_ACKS.scope[plan === "full" ? "full" : "free"] },
     ...(plan === "full" ? [{ key: "dinner", label: PROMO_ACKS.dinner }] : []),
   ];
+}
+
+/** The normal price, struck: muted ink with a hairline through it, in mono. */
+function Was({ children }: { children: React.ReactNode }) {
+  return (
+    <s className="font-mono text-tv-ink/40 decoration-tv-ink/40 decoration-1">
+      <span className="sr-only">Normally </span>
+      {children}
+    </s>
+  );
 }
