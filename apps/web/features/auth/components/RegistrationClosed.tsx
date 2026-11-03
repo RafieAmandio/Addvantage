@@ -1,63 +1,37 @@
 import Link from "next/link";
+import { PaperAuthShell } from "@/features/auth/components/PaperAuth";
+import { Roll } from "@/features/marketing/components/Roll";
 
 // Public sign-up is invite-only for now: early access is the only way in.
 // Shown at /signup when NEXT_PUBLIC_REGISTRATION_OPEN !== "1".
 export function RegistrationClosed() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-white">
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.05]" aria-hidden />
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#111111] via-transparent to-[#111111]"
-        aria-hidden
-      />
-
-      <div className="relative z-10 w-full max-w-xl">
-        <Link href="/" className="font-mono text-base font-bold text-white">
-          +vantage
-        </Link>
-
-        <div
-          className="mt-12 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-brand"
-          style={{ animation: "fadeSlideUp 0.5s ease-out both" }}
-        >
-          <span className="led animate-pulse" aria-hidden />
-          Registration // Invite only
-        </div>
-
-        <h1
-          className="mt-6 font-sans text-[clamp(2.75rem,9vw,80px)] font-bold leading-[0.95] text-white"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.1s both" }}
-        >
+    <PaperAuthShell
+      eyebrow="Registration / Invite only"
+      title={
+        <>
           Invite
           <br />
-          only<span className="text-brand">.</span>
-        </h1>
-
-        <p
-          className="mx-auto mt-6 max-w-md font-mono text-sm leading-[1.6] text-white/60"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.2s both" }}
-        >
-          Public sign-up is paused. The only way in right now is early access: a founding cohort with a 100% money-back guarantee.
-        </p>
-
-        <div
-          className="mt-10 flex flex-col items-center gap-5"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.3s both" }}
-        >
-          <Link
-            href="/early-access"
-            className="btn-pixel rounded-lg bg-brand px-8 py-4 font-mono text-sm font-bold text-black transition-colors hover:bg-brand-dim"
-          >
-            Request early access &rarr;
-          </Link>
-          <Link
-            href="/login"
-            className="font-mono text-sm text-white/50 transition-colors hover:text-brand"
-          >
-            Already an operator? Sign in
-          </Link>
-        </div>
-      </div>
-    </main>
+          only.
+        </>
+      }
+      copy="Public sign-up is paused. The only way in right now is early access: a founding cohort with a 100% money-back guarantee."
+    >
+      <p className="tv-eyebrow text-tv-mute">Request access</p>
+      <h2 className="mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.05] tracking-[-0.03em]">Apply for early access</h2>
+      <p className="mt-4 text-[15px] leading-[1.55] text-tv-graphite">
+        Tell the desk how you trade. Every application is read before access is granted.
+      </p>
+      <Link href="/early-access" className="tv-btn tv-btn-ink mt-8 w-full">
+        <Roll label="Request early access" />
+        <span aria-hidden className="tv-arrow">→</span>
+      </Link>
+      <p className="mt-8 border-t border-tv-stone pt-6 text-[15px] text-tv-graphite">
+        Already an operator?{" "}
+        <Link href="/login" className="tv-link font-medium text-tv-ink">
+          Sign in
+        </Link>
+      </p>
+    </PaperAuthShell>
   );
 }
