@@ -43,3 +43,8 @@ CREATE INDEX "black_friday_applications_created_at_idx" ON "black_friday_applica
 -- RLS: backend-only table (service-role connection bypasses it, web never queries
 -- it directly). Enable with no policy. Required by CI db-rls-guard.
 ALTER TABLE "black_friday_applications" ENABLE ROW LEVEL SECURITY;
+
+-- The legacy 0001_init SQL put CHECK (tier IN ('visitor','free','vip')) on profiles.
+-- Prisma doesn't model CHECK constraints, so widen it here for the Black Friday 'crypto' tier.
+ALTER TABLE "profiles" DROP CONSTRAINT IF EXISTS "profiles_tier_check";
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_tier_check" CHECK ("tier" IN ('visitor', 'free', 'vip', 'crypto'));
