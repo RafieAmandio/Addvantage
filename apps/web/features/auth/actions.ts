@@ -66,6 +66,8 @@ export async function loginAction(
     // Simulate auth latency so the button's loading state is visible in mock
     // mode. No-op in production (mock mode is a local/prototype flag only).
     await new Promise((resolve) => setTimeout(resolve, 900));
+    // Demo only: this password shows the wrong-password state without a backend.
+    if (parsed.data.password === "wrong-password") return { ok: false, error: "invalid_credentials" };
     redirect("/app");
   }
 
@@ -133,6 +135,9 @@ export async function signupAction(
   }
 
   if (isMockMode()) {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    // Demo only: a taken@ address shows the email-taken state without a backend.
+    if (parsed.data.email.startsWith("taken@")) return { ok: false, error: "email_taken" };
     return { ok: true, done: true, email: parsed.data.email };
   }
 
@@ -167,6 +172,11 @@ export interface VerifyEmailState {
 }
 
 export async function verifyEmailAction(token: string): Promise<VerifyEmailState> {
+  if (isMockMode()) {
+    // Demo only: never call the API; token "expired" shows the failure state.
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    return token === "expired" ? { ok: false, error: "invalid_or_expired" } : { ok: true };
+  }
   try {
     const res = await fetch(`${API_BASE}/auth/verify-email?token=${token}`);
     if (!res.ok) {
@@ -179,6 +189,10 @@ export async function verifyEmailAction(token: string): Promise<VerifyEmailState
 }
 
 export async function resendVerificationAction(): Promise<{ ok: boolean; error?: string }> {
+  if (isMockMode()) {
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    return { ok: true };
+  }
   try {
     await apiPost("/auth/resend-verification");
     return { ok: true };
