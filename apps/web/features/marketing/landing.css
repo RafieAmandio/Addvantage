@@ -674,22 +674,37 @@ html[data-scrolled] .lv-header > div {
 
 /* ---------- auth plates ---------- */
 /*
+ * The plates are graded so their own ground is pure black, and the plate is laid on the Desk with
+ * `lighten`: anything darker than #0E0F11 takes the panel's exact colour, so the picture has no box,
+ * while the hairlines and the yellow (brighter than the panel in every channel that matters) stay.
+ * Every edge is also feathered, so photographic plates with content at the edge melt as well.
+ */
+.tv-plate {
+  mix-blend-mode: lighten;
+}
+.tv-plate-frame {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 76%, transparent), linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-composite: intersect;
+}
+/*
  * Desktop: the art sits in each plate between 43% and 97% of its height, so the frame is sized to put
- * that band between the header (80px) and the headline block (the bottom 360px). Edges are masked so
- * the picture melts into the Desk ground. The plate wipes up once, then the picture drifts slowly.
+ * that band between the header (80px) and the headline block (the bottom 260px + 17vw, which tracks
+ * the vw-sized headline).
  */
 @media (min-width: 768px) {
   .tv-plate-frame {
-    --h: calc((max(100svh, 640px) - 500px) / 0.54);
+    --h: calc((max(100svh, 640px) - 260px - 17vw) / 0.54);
     position: absolute;
     left: 50%;
     top: calc(80px - 0.43 * var(--h));
     height: var(--h);
     aspect-ratio: 2 / 3;
     transform: translateX(-50%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 36%, #000 44%, #000 94%, transparent), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 34%, #000 46%, #000 90%, transparent), linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
     -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to bottom, transparent 36%, #000 44%, #000 94%, transparent), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(to bottom, transparent 34%, #000 46%, #000 90%, transparent), linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
     mask-composite: intersect;
   }
   .tv-plate-img {
