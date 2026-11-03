@@ -36,21 +36,7 @@ export const blackFridayService = {
     if (input.bingxUid) await assertUidFree(input.bingxUid, input.email);
     assertEditable(await blackFridayRepository.findByEmail(input.email));
     const row = await blackFridayRepository.upsertDraft(input).catch(rethrowUnique);
-    return {
-      status: row.status,
-      application: {
-        answers: row.answers,
-        biggestLossAmount: row.biggestLossAmount == null ? null : Number(row.biggestLossAmount),
-        biggestLossCurrency: row.biggestLossCurrency,
-        bingxUid: row.bingxUid,
-        bingxProofPath: row.bingxProofPath,
-        plan: row.plan,
-        paymentMethod: row.paymentMethod,
-        paymentProofPath: row.paymentProofPath,
-        signedName: row.signedName,
-        acknowledgements: row.acknowledgements,
-      },
-    };
+    return { status: row.status };
   },
 
   async submit(input: BlackFridayApplicationInput) {

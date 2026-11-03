@@ -3,17 +3,12 @@ import { AppError } from "@/core/errors/index.js";
 import { getEmailProvider, earlyAccessCredentialsEmail } from "@/integrations/email/index.js";
 import { getStorageProvider } from "@/integrations/storage/index.js";
 import { authService } from "@/features/auth/auth.service.js";
-import {
-  BF_DINNER_SEATS,
-  BF_FULL_PRICE_USD,
-  BF_LOSS_BUCKETS,
-  lossBucket,
-} from "@tradevantage/shared/schema";
+import { BF_APPROVED, BF_DINNER_SEATS, summariseBlackFriday } from "@tradevantage/shared/schema";
 import { blackFridayRepository } from "./black-friday.repository.js";
 
 const PROOF_BUCKET = "payment-proofs";
 const YEAR_MS = 365 * 24 * 3600 * 1000;
-const APPROVED = new Set(["approved", "provisioned"]);
+const APPROVED = new Set<string>(BF_APPROVED);
 // Tiers a free-plan approval leaves alone. `free` and `visitor` move to `crypto`, the plan they applied for.
 const KEEP_ON_FREE_PLAN = new Set(["vip", "crypto"]);
 
@@ -49,39 +44,6 @@ export function toAdminRow(r: Row) {
 }
 export type AdminRow = ReturnType<typeof toAdminRow>;
 
-/** The admin view: loss buckets (counts, per plan, rows by loss desc) and the totals strip. */
-export function summarise(rows: AdminRow[], drafts = 0) {
-  const groups = BF_LOSS_BUCKETS.map((b) => {
-    const items = rows
-      .filter((r) => lossBucket(r.biggestLossUsd) === b.key)
-      .sort((a, z) => z.biggestLossUsd - a.biggestLossUsd);
-    return {
-      key: b.key,
-      label: b.label,
-      count: items.length,
-      byPlan: { free: items.filter((r) => r.plan === "free").length, full: items.filter((r) => r.plan === "full").length },
-      items,
-    };
-  });
-  const approvedFull = rows.filter((r) => r.plan === "full" && APPROVED.has(r.status)).length;
-  return {
-    groups,
-    totals: {
-      applications: rows.length,
-      drafts,
-      free: rows.filter((r) => r.plan === "free").length,
-      full: rows.filter((r) => r.plan === "full").length,
-      pending: rows.filter((r) => r.status === "submitted").length,
-      approved: rows.filter((r) => APPROVED.has(r.status)).length,
-      rejected: rows.filter((r) => r.status === "rejected").length,
-      approvedFull,
-      paidUsd: approvedFull * BF_FULL_PRICE_USD,
-      dinnerInvited: rows.filter((r) => r.dinnerInvitedAt).length,
-      dinnerSeats: BF_DINNER_SEATS,
-    },
-  };
-}
-
 async function load(id: string) {
   const app = await blackFridayRepository.findById(id);
   if (!app) throw new AppError("Application not found", 404);
@@ -91,7 +53,7 @@ async function load(id: string) {
 export const blackFridayAdminService = {
   async list() {
     const [rows, drafts] = await Promise.all([blackFridayRepository.listSubmitted(), blackFridayRepository.countDrafts()]);
-    return summarise(rows.map(toAdminRow), drafts);
+    return summariseBlackFriday(rows.map(toAdminRow), drafts);
   },
 
   async proofUrl(id: string, kind: "bingx" | "payment") {

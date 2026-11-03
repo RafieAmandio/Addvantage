@@ -109,3 +109,44 @@ export type BlackFridayApplicationInput = z.infer<typeof BlackFridayApplicationS
 
 export const BlackFridayRejectSchema = z.object({ note: z.string().trim().max(500).optional() });
 export const BlackFridayDinnerSchema = z.object({ invited: z.boolean() });
+
+export const BF_APPROVED = ["approved", "provisioned"] as const;
+const isApproved = (status: string) => (BF_APPROVED as readonly string[]).includes(status);
+
+export interface BfSummaryRow {
+  plan: string | null;
+  status: string;
+  biggestLossUsd: number;
+  dinnerInvitedAt: Date | string | null;
+}
+
+/** The admin view: loss buckets (count, per plan, rows by loss desc) and the totals strip. */
+export function summariseBlackFriday<T extends BfSummaryRow>(rows: T[], drafts = 0) {
+  const groups = BF_LOSS_BUCKETS.map((b) => {
+    const items = rows.filter((r) => lossBucket(r.biggestLossUsd) === b.key).sort((a, z) => z.biggestLossUsd - a.biggestLossUsd);
+    return {
+      key: b.key,
+      label: b.label,
+      count: items.length,
+      byPlan: { free: items.filter((r) => r.plan === "free").length, full: items.filter((r) => r.plan === "full").length },
+      items,
+    };
+  });
+  const approvedFull = rows.filter((r) => r.plan === "full" && isApproved(r.status)).length;
+  return {
+    groups,
+    totals: {
+      applications: rows.length,
+      drafts,
+      free: rows.filter((r) => r.plan === "free").length,
+      full: rows.filter((r) => r.plan === "full").length,
+      pending: rows.filter((r) => r.status === "submitted").length,
+      approved: rows.filter((r) => isApproved(r.status)).length,
+      rejected: rows.filter((r) => r.status === "rejected").length,
+      approvedFull,
+      paidUsd: approvedFull * BF_FULL_PRICE_USD,
+      dinnerInvited: rows.filter((r) => r.dinnerInvitedAt).length,
+      dinnerSeats: BF_DINNER_SEATS,
+    },
+  };
+}

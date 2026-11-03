@@ -27,7 +27,8 @@ vi.mock("@/integrations/email/index.js", async () => {
 });
 
 import { blackFridayService, UID_TAKEN } from "../black-friday.service.js";
-import { blackFridayAdminService, summarise, type AdminRow } from "../black-friday-admin.service.js";
+import { summariseBlackFriday as summarise } from "@tradevantage/shared/schema";
+import { blackFridayAdminService, type AdminRow } from "../black-friday-admin.service.js";
 
 const NOW = new Date("2026-11-28T00:00:00Z");
 const YEAR = 365 * 24 * 3600 * 1000;
