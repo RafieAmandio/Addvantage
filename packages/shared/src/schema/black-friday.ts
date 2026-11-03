@@ -28,13 +28,13 @@ export function bfPrice(method: "usdt" | "bca"): { amount: number; currency: str
 
 // The biggest-loss answer is one of these buckets; the admin groups by it directly.
 export const BF_LOSS_BUCKETS = [
-  { key: "lt1k", label: "Under $1,000" },
-  { key: "1k-10k", label: "$1,000 to $10,000" },
-  { key: "10k-50k", label: "$10,000 to $50,000" },
-  { key: "50k-100k", label: "$50,000 to $100,000" },
-  { key: "100k+", label: "Over $100,000" },
+  { key: "lt500", label: "Under $500" },
+  { key: "500-1k", label: "$500 to $1,000" },
+  { key: "1k-2k", label: "$1,000 to $2,000" },
+  { key: "2k-5k", label: "$2,000 to $5,000" },
+  { key: "5k+", label: "Over $5,000" },
 ] as const;
-export const BF_LOSS_BUCKET_KEYS = ["lt1k", "1k-10k", "10k-50k", "50k-100k", "100k+"] as const;
+export const BF_LOSS_BUCKET_KEYS = ["lt500", "500-1k", "1k-2k", "2k-5k", "5k+"] as const;
 export type BfBucketKey = (typeof BF_LOSS_BUCKET_KEYS)[number];
 
 // Profiling questions. Apply asks none beyond identity, so these are the spec's three.
@@ -119,7 +119,8 @@ const byReview = (a: BfSummaryRow, z: BfSummaryRow) =>
 
 /** The admin view: loss buckets (count, per plan, pending first then newest) and the totals strip. */
 export function summariseBlackFriday<T extends BfSummaryRow>(rows: T[], drafts = 0) {
-  const groups = BF_LOSS_BUCKETS.map((b) => {
+  type Group = { key: string; label: string; count: number; byPlan: { free: number; full: number }; items: T[] };
+  const groups: Group[] = BF_LOSS_BUCKETS.map((b) => {
     const items = rows.filter((r) => r.biggestLossBucket === b.key).sort(byReview);
     return {
       key: b.key,
@@ -129,6 +130,17 @@ export function summariseBlackFriday<T extends BfSummaryRow>(rows: T[], drafts =
       items,
     };
   });
+  // Answers saved under an earlier bucket set still show, in their own group, instead of vanishing.
+  const known = new Set<string>(BF_LOSS_BUCKET_KEYS);
+  const other = rows.filter((r) => !known.has(r.biggestLossBucket ?? "")).sort(byReview);
+  if (other.length)
+    groups.push({
+      key: "other",
+      label: "Earlier answer",
+      count: other.length,
+      byPlan: { free: other.filter((r) => r.plan === "free").length, full: other.filter((r) => r.plan === "full").length },
+      items: other,
+    });
   const approvedFull = rows.filter((r) => r.plan === "full" && isApproved(r.status)).length;
   return {
     groups,

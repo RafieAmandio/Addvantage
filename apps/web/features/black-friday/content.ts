@@ -47,7 +47,7 @@ export const PLANS = {
     name: "Free account",
     price: "$0",
     term: "No payment",
-    lines: ["Token Unlocks radar", "Upgrade Radar", "The news desk"],
+    lines: ["Real-time market updates and trading plans in the group", "Token Unlocks radar", "Upgrade Radar", "The news desk"],
   },
   full: {
     n: "01",
@@ -55,7 +55,7 @@ export const PLANS = {
     price: NOW_PRICE,
     was: WAS_PRICE,
     term: "One year of VIP+ Trader",
-    lines: ["Everything on the desk for 1 year", "Trading plans and 1v1 consults", "Forex tools, calendar, education"],
+    lines: ["Real-time market updates and trading plans in the group", "Everything on the desk for 1 year", "Trading plans and 1v1 consults", "Forex tools, calendar, education"],
     dinner: "Full access members get a chance to be invited to an exclusive dinner sponsored by BingX. 10 seats.",
   },
 } as const;
@@ -93,7 +93,7 @@ export const BCA_DESTINATION: Destination | null =
 export const PROMO_ACKS = {
   review: "Every application is reviewed by the desk. Access starts only once mine is approved, on the free plan and on Full access alike.",
   scope: {
-    free: "The free account opens Token Unlocks, Upgrade Radar and the news desk. The rest of the desk needs VIP+ Trader.",
+    free: "The free account opens the group with market updates and trading plans, plus Token Unlocks, Upgrade Radar and the news desk. The rest of the desk needs VIP+ Trader.",
     full: "Full access is VIP+ Trader for 1 year, counted from the day my application is approved.",
   },
   dinner:
