@@ -4,7 +4,6 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Roll } from "@/features/marketing/components/Roll";
 import { Magnet } from "@/features/marketing/components/Magnet";
-import { Scramble } from "@/features/marketing/components/ScrambleReveal";
 import { SESSIONS, countdown, hhmm, marketNow, wall } from "@/features/marketing/lib/sessions";
 import { ClockFigure } from "@/features/marketing/components/iso/Figures";
 import { useNow } from "@/features/marketing/lib/use-now";
@@ -16,14 +15,8 @@ function Meta({ r }: { r: Read }) {
     <p className="tv-eyebrow flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-tv-ink/25 pb-4">
       <span>Request access</span>
       <span className="flex items-center gap-2 tabular-nums" aria-live="off">
-        <span
-          data-loop
-          className={cn(
-            "h-2 w-2 rounded-full bg-tv-ink",
-            r && r.sessions.some((s) => s.open) && "lv-live",
-          )}
-          aria-hidden
-        />
+        {/* Filled while a session is open, hollow while every market is shut. */}
+        <span className={cn("h-2 w-2 border border-tv-ink", r?.sessions.some((s) => s.open) && "bg-tv-ink")} aria-hidden />
         {r ? `Jakarta ${r.wib} WIB` : "Jakarta, UTC+7"}
       </span>
     </p>
@@ -57,7 +50,8 @@ function Sessions({ r }: { r: Read }) {
       {rows.map((s) => (
         <li key={s.name} className="flex items-center justify-between gap-3 border-b border-tv-ink/25 py-3 last:border-b-0 sm:flex-col sm:items-start sm:border-b-0 sm:border-r sm:px-4 sm:first:pl-0 sm:last:border-r-0">
           <span className="flex items-center gap-2 font-medium">
-            <span className={cn("rounded-[3px] px-1.5 py-0.5 text-[10px]", s.open ? "bg-tv-ink text-tv-paper" : "border border-tv-ink/50")}>{s.open ? "Open" : "Shut"}</span>
+            <span aria-hidden className={cn("h-2 w-2 border border-tv-ink", s.open && "bg-tv-ink")} />
+            <span className="w-[2.6rem]">{s.open ? "Open" : "Shut"}</span>
             {s.name} <span className="tabular-nums">{s.local}</span>
           </span>
           <span className="tabular-nums text-tv-ink/70">{r ? (s.open ? `Closes ${hhmm(s.flip, "Asia/Jakarta")} WIB` : `Opens ${hhmm(s.nextOpen, "Asia/Jakarta")} WIB`) : ""}</span>
@@ -90,8 +84,8 @@ export function CloseSection() {
         <div className="my-auto grid gap-12 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] md:items-center md:gap-10">
           <div>
             <h2 className="text-[clamp(2.9rem,7vw,6rem)] font-semibold leading-[0.95] tracking-[-0.04em]">
-              <Scramble text="Stop copying" duration={800} className="block whitespace-nowrap" />
-              <Scramble text="signals." delay={200} duration={700} className="block" />
+              <span className="block whitespace-nowrap">Stop copying</span>
+              <span className="block">signals.</span>
             </h2>
             <div className="mt-8 flex w-full max-w-[520px] flex-col gap-3 sm:flex-row">
               <Magnet>
