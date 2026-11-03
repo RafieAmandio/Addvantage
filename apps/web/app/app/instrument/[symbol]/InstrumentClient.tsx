@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { isMockMode } from "@/lib/config/public";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { useAppState, isPaid } from "@/lib/state";
@@ -176,9 +177,11 @@ export default function InstrumentClient({
             }
           >
             <InstrumentChart bars={bars} levels={levels} pins={pins} />
-            <Link href={`/app/lab/${symbol}`} className="mt-3 inline-flex h-9 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white hover:bg-raised">
-              Open in Chart Lab
-            </Link>
+            {isMockMode() && ( // Chart Lab is coming soon in production
+              <Link href={`/app/lab/${symbol}`} className="mt-3 inline-flex h-9 items-center rounded-full border border-white/[0.14] px-4 text-[13px] font-medium text-white hover:bg-raised">
+                Open in Chart Lab
+              </Link>
+            )}
           </Panel>
 
           <Panel title="Scenarios" sub="Desk setups on this pair from published plans" action={<PanelLink href="/app/plan">Plans</PanelLink>}>

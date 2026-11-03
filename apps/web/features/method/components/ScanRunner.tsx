@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { isMockMode } from "@/lib/config/public";
 import Link from "next/link";
 import type { BoardRow } from "@tradevantage/shared";
 import { cn } from "@/lib/cn";
@@ -135,9 +136,11 @@ export function ScanRunner({ rows, date }: { rows: BoardRow[]; date: string }) {
                 <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-brand">The one you can&apos;t not trade</p>
                 <p className="mt-1 font-num text-[28px] font-semibold text-white">{ranked[0].r.symbol.replace("/", "")}</p>
                 {ranked[0].p!.note && <p className="text-[14px] text-white/70">{ranked[0].p!.note}</p>}
-                <Link href={`/app/lab/${ranked[0].r.symbol.replace("/", "")}`} className="mt-3 inline-flex h-10 items-center rounded-full bg-brand px-4 text-[14px] font-semibold text-black transition motion-safe:active:scale-[0.97]">
-                  Map its levels in Chart Lab
-                </Link>
+                {isMockMode() && ( // Chart Lab is coming soon in production
+                  <Link href={`/app/lab/${ranked[0].r.symbol.replace("/", "")}`} className="mt-3 inline-flex h-10 items-center rounded-full bg-brand px-4 text-[14px] font-semibold text-black transition motion-safe:active:scale-[0.97]">
+                    Map its levels in Chart Lab
+                  </Link>
+                )}
               </div>
             ) : (
               <p className="mt-4 text-[14px] text-white/55">You did not rate any market. Nothing clear today is a valid answer: no trade is a position too.</p>
