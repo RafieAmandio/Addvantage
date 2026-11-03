@@ -43,7 +43,7 @@ export default function LandingPage() {
         <HeroSection hero={d.hero} />
         <BoardStrip board={d.board} asOf={d.asOf} />
       </div>
-      <PositioningSection markets={d.ticker} />
+      <PositioningSection />
       <TransmissionsSection />
       <MethodSection read={d.read} plan={d.plan} />
       <TrainSection practice={d.practice} scan={d.scan} kill={d.kill} />
