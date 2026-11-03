@@ -2,6 +2,8 @@ export interface EarlyAccessCredentialsParams {
   email: string;
   tempPassword: string;
   loginUrl: string;
+  /** Replaces the "Payment confirmed" line (the Black Friday free plan has no payment). */
+  intro?: string;
 }
 
 const BRAND = "#FFD400";
@@ -45,7 +47,7 @@ export function earlyAccessCredentialsEmail(
               <div style="font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#111;font-weight:bold;">Access // Granted</div>
               <div style="font-family:${MONO};font-size:26px;font-weight:bold;color:${INK};margin-top:10px;">Your account is ready.</div>
               <p style="font-family:${MONO};font-size:14px;line-height:1.6;color:#333;margin:14px 0 0;">
-                Payment confirmed. Here are your login details, operator. Sign in, then change your password right away.
+                ${params.intro ?? "Payment confirmed. Here are your login details, operator. Sign in, then change your password right away."}
               </p>
             </td>
           </tr>

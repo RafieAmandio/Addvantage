@@ -55,7 +55,8 @@ export const authRepository = {
     email: string;
     passwordHash: string;
     handle?: string;
-    renewsAt: Date;
+    renewsAt: Date | null;
+    tier: "vip" | "crypto";
   }) =>
     prisma.profile.create({
       data: {
@@ -63,7 +64,7 @@ export const authRepository = {
         passwordHash: data.passwordHash,
         handle: data.handle,
         emailVerified: true,
-        tier: "vip",
+        tier: data.tier,
         signedLiability: true,
         renewsAt: data.renewsAt,
       },

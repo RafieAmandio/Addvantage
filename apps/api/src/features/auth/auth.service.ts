@@ -164,7 +164,9 @@ export const authService = {
   provisionPaidAccount: async (input: {
     email: string;
     handle?: string;
-    renewsAt: Date;
+    renewsAt: Date | null;
+    /** Defaults to vip (early access). Black Friday free plan provisions `crypto`. */
+    tier?: "vip" | "crypto";
   }) => {
     const existing = await authRepository.findByEmail(input.email);
     if (existing) {
@@ -178,6 +180,7 @@ export const authService = {
       passwordHash,
       handle: input.handle,
       renewsAt: input.renewsAt,
+      tier: input.tier ?? "vip",
     });
 
     return { profile, tempPassword };

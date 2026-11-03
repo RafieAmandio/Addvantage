@@ -334,6 +334,40 @@ model EarlyAccessApplication {
   @@map("early_access_applications")
 }
 
+// Black Friday intake (blackfriday.tradevantage.gg). Draft keyed by email like early access;
+// bingx_uid is unique across applications. Loss is kept raw plus a USD-normalised copy for grouping.
+model BlackFridayApplication {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email               String    @unique
+  name                String
+  contact             String
+  answers             Json?
+  biggestLossAmount   Decimal?  @map("biggest_loss_amount") @db.Decimal
+  biggestLossCurrency String?   @map("biggest_loss_currency")
+  biggestLossUsd      Decimal?  @map("biggest_loss_usd") @db.Decimal
+  bingxUid            String?   @unique @map("bingx_uid")
+  bingxProofPath      String?   @map("bingx_proof_path")
+  plan                String?
+  paymentMethod       String?   @map("payment_method")
+  paymentAmount       Decimal?  @map("payment_amount") @db.Decimal
+  paymentCurrency     String?   @map("payment_currency")
+  paymentProofPath    String?   @map("payment_proof_path")
+  signedName          String?   @map("signed_name")
+  signedAt            DateTime? @map("signed_at") @db.Timestamptz(6)
+  acknowledgements    Json?
+  status              String    @default("draft")
+  reviewedAt          DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  reviewNote          String?   @map("review_note")
+  dinnerInvitedAt     DateTime? @map("dinner_invited_at") @db.Timestamptz(6)
+  accountId           String?   @map("account_id") @db.Uuid
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("black_friday_applications")
+}
+
 model EmailLog {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profileId         String?   @map("profile_id") @db.Uuid

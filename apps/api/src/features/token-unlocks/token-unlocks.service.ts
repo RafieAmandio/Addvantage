@@ -1,3 +1,4 @@
+import { canOpenRoute } from "@tradevantage/shared";
 import { ForbiddenError } from "@/core/errors/index.js";
 import { tokenUnlocksRepository } from "./token-unlocks.repository.js";
 
@@ -6,11 +7,11 @@ import { tokenUnlocksRepository } from "./token-unlocks.repository.js";
 const MIN_PCT_SUPPLY = 4.9;
 const HORIZON_DAYS = 90;
 
-// Token unlocks are VIP-only. The gate lives here so unlock data never
+// Token unlocks are VIP-only, plus the Black Friday `crypto` tier. The gate lives here so unlock data never
 // reaches free-tier clients (same pattern as the videos feature).
 async function assertVipAccess(userId: string) {
   const profile = await tokenUnlocksRepository.getProfileAccess(userId);
-  if (!profile || (profile.tier !== "vip" && !profile.isAdmin)) {
+  if (!profile || (!canOpenRoute(profile.tier, "/app/unlocks") && !profile.isAdmin)) {
     throw new ForbiddenError("VIP access required");
   }
 }

@@ -95,3 +95,6 @@ export const EarlyAccessApplicationSchema = z.object({
 export type EarlyAccessApplicationInput = z.infer<
   typeof EarlyAccessApplicationSchema
 >;
+
+// Field rules reused by the Black Friday intake so both flows validate identically.
+export { email as applicantEmail, fullName as legalName, acknowledgements as waiverAcknowledgements };
