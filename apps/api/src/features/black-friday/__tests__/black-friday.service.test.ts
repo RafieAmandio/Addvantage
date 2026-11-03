@@ -38,7 +38,7 @@ const input = {
   name: "Ada Lovelace",
   contact: "@ada",
   answers: { experience: "1-3" as const, markets: ["crypto" as const], positionSize: "lt1k" as const },
-  biggestLossBucket: "1k-10k" as const,
+  biggestLossBucket: "500-1k" as const,
   bingxUid: "123456789",
   bingxProofPath: "black-friday/x.png",
   plan: "full" as const,
@@ -57,7 +57,7 @@ const input = {
 };
 
 const row = (o: Partial<AdminRow>): AdminRow =>
-  ({ id: "x", plan: "free", status: "submitted", biggestLossBucket: "lt1k", dinnerInvitedAt: null, createdAt: new Date("2026-11-01"), ...o }) as AdminRow;
+  ({ id: "x", plan: "free", status: "submitted", biggestLossBucket: "lt500", dinnerInvitedAt: null, createdAt: new Date("2026-11-01"), ...o }) as AdminRow;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -72,19 +72,25 @@ describe("loss buckets", () => {
         row({ id: "a", plan: "free", status: "provisioned", createdAt: d(20) }),
         row({ id: "b", plan: "full", status: "submitted", createdAt: d(2) }),
         row({ id: "c", plan: "full", status: "submitted", createdAt: d(9) }),
-        row({ id: "d", plan: "full", status: "approved", biggestLossBucket: "1k-10k" }),
-        row({ id: "e", plan: "full", status: "rejected", biggestLossBucket: "100k+" }),
-        row({ id: "f", plan: "free", biggestLossBucket: "100k+" }),
+        row({ id: "d", plan: "full", status: "approved", biggestLossBucket: "500-1k" }),
+        row({ id: "e", plan: "full", status: "rejected", biggestLossBucket: "5k+" }),
+        row({ id: "f", plan: "free", biggestLossBucket: "5k+" }),
       ],
       3,
     );
-    const lt1k = groups.find((g) => g.key === "lt1k")!;
+    const lt1k = groups.find((g) => g.key === "lt500")!;
     expect(lt1k.count).toBe(3);
     expect(lt1k.byPlan).toEqual({ free: 1, full: 2 });
     expect(lt1k.items.map((r) => r.id)).toEqual(["c", "b", "a"]);
-    expect(groups.map((g) => g.key)).toEqual(["lt1k", "1k-10k", "10k-50k", "50k-100k", "100k+"]);
+    expect(groups.map((g) => g.key)).toEqual(["lt500", "500-1k", "1k-2k", "2k-5k", "5k+"]);
     expect(groups.map((g) => g.count)).toEqual([3, 1, 0, 0, 2]);
     expect(totals).toMatchObject({ applications: 6, drafts: 3, free: 2, full: 4, pending: 3, approved: 2, approvedFull: 1, paidUsd: 500 });
+  });
+
+  it("keeps answers from an earlier bucket set in their own group", () => {
+    const { groups } = summarise([row({ id: "old", biggestLossBucket: "10k-50k" }), row({ id: "new" })]);
+    expect(groups.at(-1)).toMatchObject({ key: "other", count: 1 });
+    expect(groups.at(-1)!.items.map((r) => r.id)).toEqual(["old"]);
   });
 });
 
@@ -95,7 +101,7 @@ describe("blackFridayService", () => {
     repo.finalize.mockResolvedValue({ id: "app-1" });
     await expect(blackFridayService.submit(input)).resolves.toEqual({ id: "app-1" });
     expect(repo.finalize).toHaveBeenCalledWith(
-      expect.objectContaining({ biggestLossBucket: "1k-10k", paymentAmount: 500, paymentCurrency: "USDT", plan: "full" }),
+      expect.objectContaining({ biggestLossBucket: "500-1k", paymentAmount: 500, paymentCurrency: "USDT", plan: "full" }),
     );
   });
 
