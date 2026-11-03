@@ -96,8 +96,8 @@ export function Slide({ v, u, at = 0, view, children }: { v: [number, number, nu
 export function Leader({ d, ax, ay, cue }: { d: string; ax: number; ay: number; cue: number }) {
   return (
     <g data-cue={cue}>
-      <circle cx={ax} cy={ay} r={2.4} fill={INK} className="tv-dot" />
-      <path d={d} pathLength={1} fill="none" stroke={INK} strokeWidth={0.8} vectorEffect="non-scaling-stroke" className="tv-leader" />
+      <circle cx={ax} cy={ay} r={2.4} fill="currentColor" className="tv-dot" />
+      <path d={d} pathLength={1} fill="none" stroke="currentColor" strokeWidth={0.8} vectorEffect="non-scaling-stroke" className="tv-leader" />
     </g>
   );
 }

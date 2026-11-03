@@ -42,7 +42,7 @@ export function useInspect() {
       } else if (e.key === "Escape") e.currentTarget.blur();
     },
   });
-  return { active, ring, bind, clear: () => setActive(null) };
+  return { active, ring, bind, set: setActive, clear: () => setActive(null) };
 }
 
 /**
@@ -57,8 +57,8 @@ export function callout(ax: number, ay: number, ey: number, mid: number) {
 
 export const CalloutPath = ({ c }: { c: ReturnType<typeof callout> }) => (
   <g className="tv-callout" pointerEvents="none">
-    <circle cx={c.ax} cy={c.ay} r={2.4} fill="#111214" />
-    <path d={c.d} pathLength={1} strokeDasharray={1} fill="none" stroke="#111214" strokeWidth={0.8} vectorEffect="non-scaling-stroke" />
+    <circle cx={c.ax} cy={c.ay} r={2.4} fill="currentColor" />
+    <path d={c.d} pathLength={1} strokeDasharray={1} fill="none" stroke="currentColor" strokeWidth={0.8} vectorEffect="non-scaling-stroke" />
   </g>
 );
 
