@@ -279,6 +279,8 @@ function pollJobs(): void {
       Sentry.captureException(err, { tags: { scope: "macro-sync.cron" } });
       logger.error({ err: String(err) }, "macro-sync: scheduled sync failed");
     });
+  }
+
   // -- Bars (1h hourly at :25, 1d every 4h at :35, requires market data) --
   for (const [job, interval] of [["bars1h", "1h"], ["bars1d", "1d"]] as const) {
     if (config.MARKET_DATA_PROVIDER && shouldFire(job, now)) {
