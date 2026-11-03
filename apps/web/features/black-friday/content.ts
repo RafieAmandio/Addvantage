@@ -80,3 +80,17 @@ export const BCA_DESTINATION: Destination | null =
         rows: PAYMENT_DESTINATIONS.bca.rows,
         note: "Transfer the exact amount, then upload your transfer receipt below.",
       };
+
+/**
+ * The promo's own terms, signed in the waiver step right after apply's four acknowledgements and
+ * stored with them in `acknowledgements`. Only promo facts; apply has no refund clause, so neither does this.
+ */
+export const PROMO_ACKS = {
+  review: "Every application is reviewed by the desk. Access starts only once mine is approved, on the free plan and on Full access alike.",
+  scope: {
+    free: "The free account opens Token Unlocks, Upgrade Radar and the news desk. The rest of the desk needs VIP+ Trader.",
+    full: "Full access is VIP+ Trader for 1 year, counted from the day my application is approved.",
+  },
+  dinner:
+    "The BingX dinner is a chance to be invited, at the desk's discretion, for 10 seats sponsored by BingX. It is an invitation the desk may extend, not something I win or am owed.",
+} as const;

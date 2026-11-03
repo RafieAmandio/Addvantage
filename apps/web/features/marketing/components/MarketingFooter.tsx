@@ -1,13 +1,14 @@
 import Link from "next/link";
 
 /** The old footer's columns on Paper, then the "+ vantage" wordmark (the kit's outline, never live Futura) rising out of its baseline at a set size, not stretched edge to edge. */
-export function MarketingFooter() {
+/** `snapshot` off drops the price-snapshot line on pages that show no prices (the Black Friday flow). */
+export function MarketingFooter({ snapshot = true }: { snapshot?: boolean }) {
   return (
     <footer className="relative z-10 overflow-hidden border-t border-tv-stone bg-tv-paper text-tv-ink">
       <div className="mx-auto flex max-w-[1240px] flex-wrap items-start justify-between gap-10 px-4 py-14 sm:px-6 md:px-10 md:py-20">
         <div className="flex w-full flex-col gap-8 md:max-w-[360px]">
           <p className="text-[15px] leading-[1.5] text-tv-graphite">
-            TradeVantage does not manage funds. TradeVantage accepts no liability for trading decisions made by recipients. Liability waiver enforced at signup. Prices on this page are real closes from a saved snapshot, shown as examples, not advice.
+            TradeVantage does not manage funds. TradeVantage accepts no liability for trading decisions made by recipients. Liability waiver enforced at signup.{snapshot && " Prices on this page are real closes from a saved snapshot, shown as examples, not advice."}
           </p>
         </div>
         <div className="flex w-full max-w-[227px] flex-col gap-4 text-[15px]">

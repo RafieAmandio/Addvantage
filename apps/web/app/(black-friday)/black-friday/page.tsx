@@ -35,7 +35,7 @@ export default function BlackFridayPage() {
         </div>
       </header>
       <BlackFridayWizard />
-      <MarketingFooter />
+      <MarketingFooter snapshot={false} />
     </main>
   );
 }

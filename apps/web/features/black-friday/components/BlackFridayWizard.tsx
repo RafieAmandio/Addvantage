@@ -9,7 +9,8 @@ import { Roll } from "@/features/marketing/components/Roll";
 import { Build } from "@/features/marketing/components/iso/Build";
 import { CopyPrice } from "@/features/marketing/components/iso/CopyPrice";
 import { Ticker } from "@/features/marketing/components/iso/Ticker";
-import { BF_LOSS_BUCKETS, lossBucket, lossToUsd } from "@tradevantage/shared/schema";
+import { BF_LOSS_BUCKETS } from "@tradevantage/shared/schema";
+import { DinnerFigure } from "@/features/black-friday/components/DinnerFigure";
 import { saveBlackFridayDraft, submitBlackFridayApplication } from "@/features/black-friday/actions";
 import {
   BCA_DESTINATION,
@@ -18,6 +19,7 @@ import {
   MARKET_OPTIONS,
   PLANS,
   POSITION_OPTIONS,
+  PROMO_ACKS,
   STEPS,
   USDT_DESTINATION,
   type Destination,
@@ -38,7 +40,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UID_RE = /^\d{4,24}$/;
 
 const input =
-  "h-12 w-full rounded-[2px] border border-tv-stone bg-tv-white px-3.5 text-[16px] text-tv-ink outline-none transition-colors placeholder:text-tv-mute/70 hover:border-tv-graphite focus:border-tv-ink aria-[invalid=true]:border-tv-downpaper";
+  "h-12 w-full rounded-[10px] border border-tv-stone bg-tv-white px-3.5 text-[16px] text-tv-ink outline-none transition-colors placeholder:text-tv-mute/70 hover:border-tv-graphite focus:border-tv-ink aria-[invalid=true]:border-tv-downpaper";
 const label = "block text-[15px] font-medium text-tv-ink";
 const hint = "mt-1.5 text-[13px] leading-[1.45] text-tv-mute";
 const err = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
@@ -46,14 +48,6 @@ const err = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
 function looksLikeFullName(v: string) {
   const t = v.trim();
   return t.length >= 5 && /\s/.test(t) && /^[\p{L}\s.'-]+$/u.test(t);
-}
-
-// Indonesians write 16.000.000; IDR has no decimals, so dots and commas are separators there.
-function parseAmount(raw: string, currency: "USD" | "IDR"): number | null {
-  const t = raw.trim().replace(/\s/g, "");
-  if (!t) return null;
-  const n = Number(currency === "IDR" ? t.replace(/[.,]/g, "") : t.replace(/,/g, ""));
-  return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
 export function BlackFridayWizard() {
@@ -70,12 +64,12 @@ export function BlackFridayWizard() {
   const [experience, setExperience] = useState("");
   const [markets, setMarkets] = useState<string[]>([]);
   const [positionSize, setPositionSize] = useState("");
-  const [lossRaw, setLossRaw] = useState("");
-  const [lossCurrency, setLossCurrency] = useState<"USD" | "IDR">("USD");
+  const [lossBucket, setLossBucket] = useState("");
   const [bingxUid, setBingxUid] = useState("");
   const [plan, setPlan] = useState<Plan | null>(null);
   const [method, setMethod] = useState<Method | null>(null);
-  const [acks, setAcks] = useState<Record<string, boolean>>({ risk: false, ownResearch: false, noGuarantee: false, terms: false });
+  // Apply's four acknowledgements, then the promo's own (dinner only for Full).
+  const [acks, setAcks] = useState<Record<string, boolean>>({ risk: false, ownResearch: false, noGuarantee: false, terms: false, review: false, scope: false, dinner: false });
   const [signedName, setSignedName] = useState("");
   const [proofs, setProofs] = useState<Record<ProofKind, Proof>>({ bingx: EMPTY_PROOF, payment: EMPTY_PROOF });
 
@@ -84,7 +78,6 @@ export function BlackFridayWizard() {
   const [stepError, setStepError] = useState<string | null>(null);
   const [uidError, setUidError] = useState<string | null>(null);
 
-  const lossAmount = parseAmount(lossRaw, lossCurrency);
   const nameOk = looksLikeFullName(signedName);
   const lastStep = STEPS.length - 1;
   // With BCA unpriced, USDT is the only way to pay, so it is chosen for the applicant.
@@ -92,10 +85,10 @@ export function BlackFridayWizard() {
 
   const canContinue = [
     EMAIL_RE.test(email.trim()) && name.trim().length >= 2 && contact.trim().length >= 3,
-    !!experience && markets.length > 0 && !!positionSize && lossAmount !== null,
+    !!experience && markets.length > 0 && !!positionSize && !!lossBucket,
     UID_RE.test(bingxUid) && !!proofs.bingx.path && !proofs.bingx.busy,
     plan === "free" || (plan === "full" && !!payMethod && !!proofs.payment.path && !proofs.payment.busy),
-    ACK_ITEMS.every((a) => acks[a.key]) && nameOk,
+    promoAcks(plan).every((a) => acks[a.key]) && ACK_ITEMS.every((a) => acks[a.key]) && nameOk,
   ][step];
 
   const go = (n: number) => {
@@ -154,19 +147,22 @@ export function BlackFridayWizard() {
       name,
       contact,
       answers: { experience, markets, positionSize },
-      biggestLossAmount: lossAmount,
-      biggestLossCurrency: lossCurrency,
+      biggestLossBucket: lossBucket,
       bingxUid,
       bingxProofPath: proofs.bingx.path,
       plan,
       paymentMethod: full ? payMethod : undefined,
       paymentProofPath: full ? proofs.payment.path : undefined,
       signedName,
-      acknowledgements: acks,
+      // Stored like apply: one boolean per acknowledgement the applicant ticked.
+      acknowledgements: Object.fromEntries([...ACK_ITEMS, ...promoAcks(plan)].map((a) => [a.key, acks[a.key]])),
       website,
     });
     setPending(false);
-    if (res.ok) return setDone(true);
+    if (res.ok) {
+      setDone(true);
+      return window.scrollTo({ top: 0 });
+    }
     if (res.error === "uid_taken") {
       setShake((n) => n + 1);
       setUidError("That BingX UID is already on another application. Check the number, or contact us if it's yours.");
@@ -211,7 +207,7 @@ export function BlackFridayWizard() {
                   <span className="flex-1">{s.label}</span>
                   <span
                     aria-hidden
-                    className={cn("h-2.5 w-2.5 transition-colors", state === "next" ? "border border-tv-mute" : "bg-tv-ink")}
+                    className={cn("h-2.5 w-2.5 rounded-[3px] transition-colors", state === "next" ? "border border-tv-mute" : "bg-tv-ink")}
                   />
                 </li>
               );
@@ -276,7 +272,7 @@ export function BlackFridayWizard() {
                             type="button"
                             aria-pressed={on}
                             onClick={() => setMarkets((m) => (on ? m.filter((x) => x !== o.value) : [...m, o.value]))}
-                            className={cn("flex h-11 items-center gap-2.5 rounded-[2px] border px-3.5 text-[15px] transition-colors", on ? "border-tv-ink" : "border-tv-stone hover:border-tv-graphite")}
+                            className={cn("flex h-11 items-center gap-2.5 rounded-[8px] border px-3.5 text-[15px] transition-colors", on ? "border-tv-ink" : "border-tv-stone hover:border-tv-graphite")}
                           >
                             <Mark on={on} />
                             {o.label}
@@ -288,42 +284,9 @@ export function BlackFridayWizard() {
                   <Group label="Typical position size">
                     <Options options={POSITION_OPTIONS} value={positionSize} onChange={setPositionSize} />
                   </Group>
-                  <Field id="bf-loss" label="What is your biggest single trading loss?" hint="One trade, the amount you actually lost. 0 is a fine answer.">
-                    <div className="bf-field relative mt-2 flex">
-                      <input
-                        id="bf-loss"
-                        type="text"
-                        inputMode="decimal"
-                        autoComplete="off"
-                        value={lossRaw}
-                        onChange={(e) => setLossRaw(e.target.value)}
-                        placeholder={lossCurrency === "IDR" ? "16.000.000" : "1,000"}
-                        aria-invalid={lossRaw.trim() !== "" && lossAmount === null}
-                        className={cn(input, "min-w-0 flex-1 rounded-r-none font-mono tabular-nums")}
-                      />
-                      <span aria-hidden className="bf-line" />
-                      <label htmlFor="bf-loss-currency" className="sr-only">Currency</label>
-                      <select
-                        id="bf-loss-currency"
-                        value={lossCurrency}
-                        onChange={(e) => setLossCurrency(e.target.value as "USD" | "IDR")}
-                        className="h-12 rounded-[2px] rounded-l-none border border-l-0 border-tv-stone bg-tv-paper px-3 font-mono text-[15px] text-tv-ink outline-none hover:border-tv-graphite focus:border-tv-ink"
-                      >
-                        <option value="USD">USD</option>
-                        <option value="IDR">IDR</option>
-                      </select>
-                    </div>
-                    {lossAmount !== null && (
-                      <p className="mt-2 flex flex-wrap items-center gap-3 font-mono text-[13px] leading-[1.2] tabular-nums text-tv-graphite" aria-live="polite">
-                        <span>
-                          {lossCurrency === "IDR" ? "≈ " : ""}$<RollingNumber value={Math.round(lossToUsd(lossAmount, lossCurrency)).toLocaleString("en-US")} fast /> USD
-                        </span>
-                        <span key={lossBucket(lossToUsd(lossAmount, lossCurrency))} className="bf-drop border border-tv-ink px-1.5 py-px text-[11px] uppercase tracking-[0.08em] text-tv-ink">
-                          {BF_LOSS_BUCKETS.find((b) => b.key === lossBucket(lossToUsd(lossAmount, lossCurrency)))!.label}
-                        </span>
-                      </p>
-                    )}
-                  </Field>
+                  <Group label="What is your biggest single trading loss?" hint="One trade, in US dollars.">
+                    <Options options={BF_LOSS_BUCKETS.map((b) => ({ value: b.key, label: b.label }))} value={lossBucket} onChange={setLossBucket} />
+                  </Group>
                 </Step>
               )}
 
@@ -332,7 +295,7 @@ export function BlackFridayWizard() {
                   <div className="border-y border-tv-stone py-5">
                     <p className="text-[15px] leading-[1.55] text-tv-graphite">
                       Create your BingX account with code{" "}
-                      <CopyPrice text={BINGX.code} className="border-b border-tv-ink font-mono font-medium text-tv-ink">
+                      <CopyPrice text={BINGX.code} className="rounded-[8px] border border-tv-ink px-2 py-0.5 font-mono font-medium text-tv-ink">
                         {BINGX.code}
                       </CopyPrice>
                       . Already on BingX under another code? This offer needs an account opened with ours.
@@ -375,8 +338,8 @@ export function BlackFridayWizard() {
 
               {step === 3 && (
                 <Step title="Pick a plan">
-                  <div role="radiogroup" aria-label="Plan" className="grid border-y border-tv-ink pt-1 sm:grid-cols-2">
-                    {(["free", "full"] as const).map((k, i) => {
+                  <div role="radiogroup" aria-label="Plan" className="grid gap-3 pt-1 sm:grid-cols-2">
+                    {(["free", "full"] as const).map((k) => {
                       const p = PLANS[k];
                       const on = plan === k;
                       return (
@@ -387,15 +350,14 @@ export function BlackFridayWizard() {
                           aria-checked={on}
                           onClick={() => setPlan(k)}
                           className={cn(
-                            "bf-card relative flex flex-col p-5 text-left",
-                            i === 1 && "border-t border-tv-stone sm:border-l sm:border-t-0",
-                            on ? "z-10 bg-tv-white outline outline-1 outline-tv-ink" : "hover:bg-tv-white/60",
+                            "bf-card relative flex flex-col rounded-[10px] border p-5 text-left",
+                            on ? "border-tv-ink bg-tv-white" : "border-tv-stone hover:border-tv-graphite",
                           )}
                         >
                           <span className="flex items-center justify-between">
                             <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-tv-mute">{p.n}</span>
                             {/* Full access carries the screen's one Signal when chosen. */}
-                            <span aria-hidden className={cn("h-2.5 w-2.5 shrink-0 transition-colors", on ? (k === "full" ? "bg-tv-signal outline outline-1 outline-tv-ink" : "bg-tv-ink") : "border border-tv-mute")} />
+                            <span aria-hidden className={cn("bf-mark h-2.5 w-2.5 shrink-0 rounded-[3px] transition-colors", on ? (k === "full" ? "border border-tv-ink bg-tv-signal" : "bg-tv-ink") : "border border-tv-mute")} data-on={on || undefined} />
                           </span>
                           <span className="mt-2 text-[20px] font-semibold tracking-[-0.01em]">{p.name}</span>
                           <span className="mt-3 font-mono text-[28px] font-medium tabular-nums leading-none">{p.price}</span>
@@ -403,7 +365,7 @@ export function BlackFridayWizard() {
                           <ul className="mt-4 space-y-1.5 border-t border-tv-stone pt-4 text-[14px] leading-[1.4]">
                             {p.lines.map((l) => (
                               <li key={l} className="flex gap-2.5">
-                                <span aria-hidden className="mt-[5px] h-2 w-2 shrink-0 bg-tv-ink" />
+                                <span aria-hidden className="mt-[5px] h-2 w-2 shrink-0 rounded-[2px] bg-tv-ink" />
                                 {l}
                               </li>
                             ))}
@@ -417,6 +379,7 @@ export function BlackFridayWizard() {
 
                   {plan === "full" && (
                     <div className="space-y-6">
+                      <DinnerFigure compact className="bf-drop mx-auto w-full max-w-[420px]" />
                       {BCA_DESTINATION && (
                         <Group label="Pay with">
                           <Options
@@ -446,15 +409,15 @@ export function BlackFridayWizard() {
 
               {step === 4 && (
                 <Step title="Liability waiver">
-                  <p className="text-[15px] leading-[1.55] text-tv-graphite">The same waiver every member signs. Tick all four, then sign with your full legal name.</p>
+                  <p className="text-[15px] leading-[1.55] text-tv-graphite">The same waiver every member signs, then the Black Friday terms. Tick every line, then sign with your full legal name.</p>
                   <div className="border-t border-tv-stone">
-                    {ACK_ITEMS.map((a) => (
-                      <label key={a.key} className="flex cursor-pointer items-start gap-3.5 border-b border-tv-stone py-3.5">
+                    {[...ACK_ITEMS, ...promoAcks(plan)].map((a, i) => (
+                      <label key={a.key} className={cn("flex cursor-pointer items-start gap-3.5 border-b border-tv-stone py-3.5", i === ACK_ITEMS.length && "border-t border-t-tv-ink")}>
                         <input
                           type="checkbox"
                           checked={acks[a.key]}
                           onChange={(e) => setAcks((s) => ({ ...s, [a.key]: e.target.checked }))}
-                          className="mt-[3px] h-4 w-4 shrink-0 rounded-none accent-tv-ink"
+                          className="mt-[3px] h-4 w-4 shrink-0 accent-tv-ink"
                         />
                         <span className="text-[15px] leading-[1.5]">{a.label}</span>
                       </label>
@@ -531,14 +494,14 @@ export function BlackFridayWizard() {
 }
 
 /** Mono digits that roll to their value (the landing's Ticker), and roll again when it changes. */
-function RollingNumber({ value, fast }: { value: string; fast?: boolean }) {
+function RollingNumber({ value }: { value: string }) {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const f = requestAnimationFrame(() => setOn(true));
     return () => cancelAnimationFrame(f);
   }, []);
   return (
-    <span className={cn("tv-figure tabular-nums", fast && "bf-fast")}>
+    <span className="tv-figure tabular-nums">
       <span data-cue="" data-on={on || undefined}>
         <Ticker value={value} />
       </span>
@@ -592,7 +555,7 @@ function Group({ label: text, hint: h, children }: { label: string; hint?: strin
 
 /** Included / chosen: a filled Ink square. Not chosen: the hairline square. Same mark as the landing. */
 function Mark({ on }: { on: boolean }) {
-  return <span aria-hidden className={cn("h-2.5 w-2.5 shrink-0", on ? "bg-tv-ink" : "border border-tv-mute")} />;
+  return <span aria-hidden data-on={on || undefined} className={cn("bf-mark h-2.5 w-2.5 shrink-0 rounded-[3px]", on ? "bg-tv-ink" : "border border-tv-mute")} />;
 }
 
 function Options({
@@ -615,7 +578,7 @@ function Options({
             role="radio"
             aria-checked={on}
             onClick={() => onChange(o.value)}
-            className={cn("flex h-11 items-center gap-2.5 rounded-[2px] border px-3.5 text-left text-[15px] transition-colors", on ? "border-tv-ink bg-tv-white" : "border-tv-stone hover:border-tv-graphite")}
+            className={cn("flex h-11 items-center gap-2.5 rounded-[8px] border px-3.5 text-left text-[15px] transition-colors", on ? "border-tv-ink bg-tv-white" : "border-tv-stone hover:border-tv-graphite")}
           >
             <Mark on={on} />
             {o.label}
@@ -643,7 +606,7 @@ function useCopy() {
 function PaymentDetails({ dest }: { dest: Destination }) {
   const { copied, copy } = useCopy();
   return (
-    <div className="border-y border-tv-ink">
+    <div className="rounded-[10px] border border-tv-ink px-4">
       <div className="flex items-baseline justify-between border-b border-tv-stone py-3">
         <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-tv-mute">{dest.method}</span>
         <span className="font-mono text-[20px] font-medium tabular-nums">{dest.amountLabel}</span>
@@ -694,15 +657,15 @@ function Upload({ id, label: text, hint: h, proof, onSelect }: { id: string; lab
           if (f) onSelect(f);
         }}
         className={cn(
-          "relative mt-3 flex items-center gap-4 rounded-[2px] border p-3 transition-colors",
+          "relative mt-3 flex items-center gap-4 overflow-hidden rounded-[10px] border p-3 transition-colors",
           over ? "border-tv-ink bg-tv-white" : proof.path ? "border-tv-ink" : "border-dashed border-tv-graphite/40",
         )}
       >
         {proof.preview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={proof.preview} src={proof.preview} alt="" className="bf-drop h-14 w-14 shrink-0 border border-tv-stone object-cover" />
+          <img key={proof.preview} src={proof.preview} alt="" className="bf-drop h-14 w-14 shrink-0 rounded-[6px] border border-tv-stone object-cover" />
         ) : (
-          <span aria-hidden className="h-14 w-14 shrink-0 border border-dashed border-tv-stone" />
+          <span aria-hidden className="h-14 w-14 shrink-0 rounded-[6px] border border-dashed border-tv-stone" />
         )}
         <span className="min-w-0 flex-1 text-[14px] text-tv-graphite" aria-live="polite">
           {state}
@@ -721,7 +684,7 @@ function Upload({ id, label: text, hint: h, proof, onSelect }: { id: string; lab
             e.target.value = "";
           }}
         />
-        <span aria-hidden data-state={proof.busy ? "busy" : proof.path ? "done" : "idle"} className="bf-upload-bar absolute inset-x-0 -bottom-px" />
+        <span aria-hidden data-state={proof.busy ? "busy" : proof.path ? "done" : "idle"} className="bf-upload-bar absolute inset-x-0 bottom-0" />
       </div>
       {proof.error && (
         <p role="alert" className={err}>
@@ -743,7 +706,7 @@ function Done({ plan, uid, method }: { plan: Plan | null; uid: string; method: M
   return (
     <div role="status">
       <p className="tv-eyebrow flex items-center gap-2.5 text-tv-mute">
-        <span aria-hidden className="h-2.5 w-2.5 bg-tv-signal" />
+        <span aria-hidden className="h-2.5 w-2.5 rounded-[3px] bg-tv-signal" />
         Application received
       </p>
       <h2 className="mt-4 text-[clamp(2.4rem,4.4vw,3.75rem)] font-semibold leading-[0.98] tracking-[-0.035em]">Submitted.</h2>
@@ -751,17 +714,9 @@ function Done({ plan, uid, method }: { plan: Plan | null; uid: string; method: M
         Every application is reviewed by the desk before access is granted, on the free plan and on Full access. We&apos;ll email you.
       </p>
       {full && (
-        <div className="mt-6 max-w-[34rem]">
+        <div className="mt-6 max-w-[40rem]">
           <p className="text-[17px] leading-[1.55]">You&apos;re in for a chance to be invited to the exclusive BingX dinner (10 seats).</p>
-          {/* Ten seats on one hairline, drawn in once. */}
-          <Build immediate className="mt-3">
-            <svg data-cue="700" viewBox="0 0 300 12" className="h-3 w-full max-w-[300px]" aria-hidden>
-              <path className="tv-leader" pathLength={1} d="M1 6H299" fill="none" stroke="#111214" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-              {Array.from({ length: 10 }, (_, i) => (
-                <rect key={i} className="tv-dot" x={11 + i * 31} y={2} width={8} height={8} fill="#F4F3EF" stroke="#111214" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-              ))}
-            </svg>
-          </Build>
+          <DinnerFigure className="mt-6" />
         </div>
       )}
       <dl className="mt-8 border-t border-tv-ink">
@@ -772,15 +727,24 @@ function Done({ plan, uid, method }: { plan: Plan | null; uid: string; method: M
           </div>
         ))}
       </dl>
-      <Build immediate className="mt-10 max-w-[320px] md:hidden">
+      {!full && <Build immediate className="mt-10 max-w-[320px] md:hidden">
         <div data-build="" data-dx="-40" data-dy="24" data-fade="" data-at="150">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/vip-card.svg" alt="" width={390} height={237} className="h-auto w-full" />
         </div>
-      </Build>
+      </Build>}
       <a href="https://tradevantage.gg" className="tv-link mt-8 inline-block text-[15px] text-tv-graphite">
         <span aria-hidden>←</span> TradeVantage
       </a>
     </div>
   );
+}
+
+/** The promo terms for the chosen plan, in the shape of apply's ACK_ITEMS. */
+function promoAcks(plan: Plan | null): { key: string; label: string }[] {
+  return [
+    { key: "review", label: PROMO_ACKS.review },
+    { key: "scope", label: PROMO_ACKS.scope[plan === "full" ? "full" : "free"] },
+    ...(plan === "full" ? [{ key: "dinner", label: PROMO_ACKS.dinner }] : []),
+  ];
 }
