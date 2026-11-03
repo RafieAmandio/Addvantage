@@ -16,7 +16,7 @@ export function TierGate({ children }: { children: React.ReactNode }) {
   const { tier } = useAppState();
   if (tier !== "crypto" || canOpenRoute(tier, pathname)) return <>{children}</>;
   return (
-    <div className="relative min-h-[calc(100vh-80px)]">
+    <div className="relative h-[calc(100svh-80px)] min-h-[560px]">
       <PaywallOverlay
         surface={routeMeta(pathname).title}
         reason="Your free account opens News, Token Unlocks and Upgrade Radar. Upgrade to VIP+ Trader for the full desk: plans, consults, the forex tools and the calendar."
