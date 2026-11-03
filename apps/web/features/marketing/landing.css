@@ -637,3 +637,37 @@ html[data-scrolled] .lv-header > div {
 .tv-drill:not(:hover):not(:focus-visible):not([data-aimed]) .tv-drill-cursor {
   opacity: 0;
 }
+
+/* ---------- form fields (Black Friday, auth) ---------- */
+/* Focus hairline under a field: draws in from the left. */
+.bf-line {
+  position: absolute;
+  inset: auto 10px 0 10px; /* inside the 10px corners */
+  height: 1px;
+  background: #111214;
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+.bf-field:focus-within .bf-line {
+  transform: scaleX(1);
+}
+
+/* Valid tick inside a field. */
+.bf-tick path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.bf-tick[data-on] path {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bf-line { transition: transform 0.32s var(--tv-ease-out); }
+  .bf-tick path { transition: stroke-dashoffset 0.32s var(--tv-ease-out); }
+}
+
+/* Fields show focus with their ink border and the drawn hairline; the landing's 2px offset ring is for links and buttons. */
+.tv-landing .bf-field input:focus-visible {
+  outline: none;
+}
