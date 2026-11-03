@@ -93,6 +93,7 @@ export function PracticeDemo({ d }: { d: PracticeData }) {
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
           className="tv-drill absolute inset-0 h-full w-full"
+          data-aimed={aimed || undefined}
           role="slider"
           tabIndex={0}
           aria-label={`${d.sym} hourly chart, ${n} candles. ${d.prompt} Left and right arrows move, Enter taps.`}

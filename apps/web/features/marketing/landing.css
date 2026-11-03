@@ -615,3 +615,25 @@ html[data-scrolled] .lv-header > div {
 .tv-drill:focus-visible {
   outline-offset: 4px;
 }
+/* A print on the desk: the floor shadow the iso blocks cast, and crop marks just outside each corner. */
+.tv-sheet {
+  box-shadow: 12px 12px 0 #e4e3de;
+  --crop: linear-gradient(#111214, #111214);
+}
+.tv-sheet::before,
+.tv-sheet::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  background:
+    var(--crop) 0 13px / 9px 1px no-repeat, var(--crop) 13px 0 / 1px 9px no-repeat,
+    var(--crop) 100% 13px / 9px 1px no-repeat, var(--crop) calc(100% - 13px) 0 / 1px 9px no-repeat;
+}
+.tv-sheet::after {
+  transform: scaleY(-1);
+}
+/* The aim band shows while you are aiming: hover, keyboard focus, or a first tap on touch. */
+.tv-drill:not(:hover):not(:focus-visible):not([data-aimed]) .tv-drill-cursor {
+  opacity: 0;
+}

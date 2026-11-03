@@ -188,8 +188,8 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
             <polyline key={yy} points={flat([[JOURNAL[0] + 0.4, JOURNAL[2] + yy], [JOURNAL[1] - (i ? 0.4 : 1.8), JOURNAL[2] + yy]], JOURNAL[5], U)} stroke="#B9B8B3" strokeWidth={1} vectorEffect="non-scaling-stroke" />
           ))}
           <Block b={TICKET} u={U} grain={G} />
-          <FlatText x={(TICKET[0] + TICKET[1]) / 2 - 0.55} y={(TICKET[2] + TICKET[3]) / 2 + 0.15} z={TICKET[5]} size={0.5}>
-            <text className="font-mono" fill="#111214" fontWeight={600}>{`${plan.over.risk}%`}</text>
+          <FlatText x={(TICKET[0] + TICKET[1]) / 2} y={(TICKET[2] + TICKET[3]) / 2} z={TICKET[5]} size={0.8}>
+            <text className="font-mono" fill="#111214" fontWeight={600} textAnchor="middle" dominantBaseline="central">{`${plan.over.risk}%`}</text>
           </FlatText>
           {/* The stamp: a ruled box with NO, slammed down when the station is up. */}
           <g key={step === 2 ? "on" : "off"} className={cn(step === 2 && "lv-thud")}>
@@ -239,7 +239,7 @@ export function MethodSection({ read, plan }: { read: ReadData; plan: PlanData }
           </h2>
           <p className="mt-5 max-w-[34ch] text-[17px] leading-relaxed text-[#B5B7BB]">Signals tell you what to do. This shows you how to see it, then stops you when you don&apos;t.</p>
 
-          <div className="mt-8 border-t border-[#2E3035] pt-5 md:mt-auto" aria-live="polite">
+          <div className="mt-8 border-t border-[#2E3035] pt-5 md:mt-10" aria-live="polite">
             <p className="flex gap-5 font-mono text-[12px] uppercase tracking-[0.08em]">
               {STEPS.map((x, i) => (
                 <button
