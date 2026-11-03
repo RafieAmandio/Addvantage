@@ -5,7 +5,7 @@ import { useCursorGrid, cursorGrid } from "@/features/marketing/lib/use-cursor-g
 import { faq } from "@/features/marketing/lib/data";
 import { Frame } from "@/features/marketing/components/Frame";
 import { Scramble } from "@/features/marketing/components/ScrambleReveal";
-import { JournalFigure } from "@/features/marketing/components/iso/Figures";
+import { DiscordFigure } from "@/features/marketing/components/iso/Figures";
 
 /**
  * Where's the Discord: four reasons as a native accordion (keyboard and find-in-page for free),
@@ -27,7 +27,7 @@ export function FaqSection() {
             <span className="text-tv-mute">Nowhere. </span>
             <span className="font-semibold">4 Reasons.</span>
           </p>
-          <JournalFigure className="relative z-10 mt-auto w-full max-w-[420px] pt-10" />
+          <DiscordFigure className="relative z-10 mt-auto w-full max-w-[420px] pt-10" />
         </div>
         <div data-reveal="vline" className="hidden bg-tv-stone md:block" />
         <div className="relative z-10 flex flex-col border-t border-tv-stone md:border-t-0">

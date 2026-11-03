@@ -140,6 +140,62 @@ export function CandlesFigure({ high, sym, className }: { high: string; sym: str
 }
 
 /** A closed journal slab with its bookmark ribbon: the one accent. Slides onto the desk. */
+/**
+ * Where's the Discord: a chat server on the desk with its plug pulled. A speech bubble with two eyes
+ * on the top face reads as "the server" without copying anyone's mark; the loose plug is the one Signal.
+ */
+export function DiscordFigure({ className }: { className?: string }) {
+  const u = 36;
+  const server = box(0, 0, 0, 2.6, 2.0, 2.2);
+  const plug = box(3.6, 3.15, 0, 0.9, 0.5, 0.42);
+  const top = server[5];
+  const bubble = flat([[0.45, 0.45], [2.15, 0.45], [2.15, 1.3], [1.0, 1.3], [0.7, 1.62], [0.72, 1.3], [0.45, 1.3]], top, u);
+  const cable = [[1.3, 2.0], [1.3, 3.4], [3.6, 3.4]].map(([x, y]) => P(x, y, 0.05, u).map((n) => n.toFixed(1)).join(",")).join(" ");
+  const prongs = [3.3, 3.5]
+    .map((y) => {
+      const [a, b] = P(4.5, y, 0.2, u);
+      const [c, d] = P(4.85, y, 0.2, u);
+      return `M${a.toFixed(1)} ${b.toFixed(1)}L${c.toFixed(1)} ${d.toFixed(1)}`;
+    })
+    .join("");
+  const items: Item[] = [
+    {
+      b: server,
+      el: (k) => (
+        <Rise key={k} id="tv-discord-rise" b={server} u={u} from={0}>
+          <Block b={server} u={u} grain={grain("discord")} />
+          <polygon points={bubble} fill="#111214" />
+          <ellipse {...ellipse(1.05, 0.88, top, 0.13, u)} fill="#F4F3EF" />
+          <ellipse {...ellipse(1.6, 0.88, top, 0.13, u)} fill="#F4F3EF" />
+        </Rise>
+      ),
+    },
+    {
+      b: [1.2, 4.85, 2.0, 3.65, 0, 0.42],
+      el: (k) => (
+        <g key={k}>
+          <polyline points={cable} fill="none" stroke="#111214" strokeWidth={1.6} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+          <Slide v={[-1.4, 0, 0]} u={u} at={350}>
+            <path d={prongs} stroke="#111214" strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
+            <Block b={plug} u={u} face="signal" />
+          </Slide>
+        </g>
+      ),
+    },
+  ];
+  return (
+    <Figure
+      id="discord"
+      u={u}
+      items={items}
+      floor={[server, plug]}
+      pad={[40, 190, 90, 40]}
+      className={className}
+      labels={[{ anchor: [4.05, 3.4, 0.42], main: "Server offline", sub: "Unplugged on purpose", dy: 46, dx: 70, cue: 900 }]}
+    />
+  );
+}
+
 export function JournalFigure({ className }: { className?: string }) {
   const u = 36;
   const slab = box(0, 0, 0, 5.6, 3.8, 0.42);
