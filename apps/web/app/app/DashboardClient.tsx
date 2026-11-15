@@ -21,6 +21,8 @@ import { ConsensusHero, type ConsensusMarket } from "@/features/dashboard/compon
 import { PlanCard } from "@/features/dashboard/components/PlanCard";
 import { CalendarPanel } from "@/features/dashboard/components/CalendarPanel";
 import { RangePanel } from "@/features/dashboard/components/RangePanel";
+import { FearGreedPanel } from "@/features/dashboard/components/FearGreedPanel";
+import type { FearGreedPoint } from "@/features/dashboard/lib/fear-greed";
 import { NewsPanel } from "@/features/dashboard/components/NewsPanel";
 import type { NewsListItem } from "@/features/news/queries/news";
 import type { Plan } from "@/features/plan/types";
@@ -37,6 +39,7 @@ interface Props {
   atr: AtrScannerData;
   calendar: CalendarEvent[];
   macro: MacroData;
+  fearGreed: FearGreedPoint[];
 }
 
 /** A panel slot that holds its entrance and loops until it scrolls into view, and pauses them on a hidden tab. */
@@ -49,7 +52,7 @@ function Live({ className, children }: { className?: string; children: React.Rea
   );
 }
 
-export function DashboardClient({ news, plans, bulletins, consensus, atr: atrInitial, calendar, macro }: Props) {
+export function DashboardClient({ news, plans, bulletins, consensus, atr: atrInitial, calendar, macro, fearGreed }: Props) {
   // Prices refresh in place every minute (not a page refresh); a moved price flashes its direction.
   const [atr, setAtr] = useState(atrInitial);
   useEvery(60_000, () => {
@@ -151,6 +154,9 @@ export function DashboardClient({ news, plans, bulletins, consensus, atr: atrIni
         <div className="enter flex min-w-0 flex-col gap-4" style={{ "--i": 5 } as React.CSSProperties}>
           <Live>
             <CalendarPanel events={calendar} />
+          </Live>
+          <Live>
+            <FearGreedPanel points={fearGreed} />
           </Live>
           <Live>
             <RangePanel pairs={atr.pairs} />

@@ -12,8 +12,8 @@ const UA = "TradeVantage/1.0";
 const GammaMarketSchema = z.object({
   id: z.string(),
   question: z.string(),
-  outcomes: z.string(),
-  outcomePrices: z.string(),
+  outcomes: z.string().optional(),
+  outcomePrices: z.string().optional(), // missing on strikes that are not open yet; parseOutcomes skips those
   volume: z.string().optional(),
   liquidity: z.string().optional(),
   groupItemTitle: z.string().optional().nullable(),
@@ -36,8 +36,10 @@ const GammaEventSchema = z.object({
   markets: z.array(GammaMarketSchema).default([]),
 });
 
+// Search returns trimmed markets (no outcomePrices), so only the ids are read
+// from it and each open event is refetched in full.
 const GammaSearchResultSchema = z.object({
-  events: z.array(GammaEventSchema).default([]),
+  events: z.array(z.object({ id: z.string(), closed: z.boolean().optional().nullable() })).default([]),
 });
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -73,6 +75,7 @@ async function searchEvents(query: string, limit = 5): Promise<z.infer<typeof Ga
   const params = new URLSearchParams({
     q: query,
     limit: String(limit),
+    events_status: "active",
   });
 
   const raw = await retry(
@@ -85,8 +88,17 @@ async function searchEvents(query: string, limit = 5): Promise<z.infer<typeof Ga
   );
 
   const parsed = GammaSearchResultSchema.safeParse(raw);
-  if (!parsed.success) return [];
-  return parsed.data.events;
+  if (!parsed.success) {
+    logger.warn({ query, issues: parsed.error.issues.slice(0, 3) }, "polymarket-search: unexpected shape");
+    return [];
+  }
+  const full: z.infer<typeof GammaEventSchema>[] = [];
+  for (const e of parsed.data.events) {
+    if (e.closed === true) continue;
+    const ev = await fetchEventById(e.id);
+    if (ev) full.push(ev);
+  }
+  return full;
 }
 
 // ─── Parse market outcomes ──────────────────────────────────────────
@@ -95,6 +107,7 @@ function parseOutcomes(markets: z.infer<typeof GammaMarketSchema>[]): OutcomeSna
   const outcomes: OutcomeSnapshot[] = [];
 
   for (const m of markets) {
+    if (!m.outcomePrices) continue;
     let prices: number[];
     try {
       prices = JSON.parse(m.outcomePrices) as number[];
