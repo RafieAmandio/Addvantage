@@ -1,7 +1,7 @@
-import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
+import { syncCalendar } from "../calendar/sync";
 
 async function main() {
-  const inserted = await syncTradingEconomicsCalendar();
+  const inserted = await syncCalendar();
   console.log(`Calendar sync done: ${inserted} new events`);
   process.exit(0);
 }
