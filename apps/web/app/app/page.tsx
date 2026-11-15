@@ -6,6 +6,7 @@ import { listBulletins } from "@/features/bulletin/queries/bulletins";
 import { listTimelineEvents } from "@/features/timeline/queries/timeline";
 import { timelineEventToCalendarEvent } from "@/features/calendar/lib/fromTimeline";
 import { getMacro } from "@/features/macro/queries";
+import { getFearGreed } from "@/features/dashboard/lib/fear-greed";
 import { apiGet } from "@/lib/api/client-server";
 import { getProfile } from "@/lib/auth/session";
 import type { AtrScannerData } from "@/features/atr/types";
@@ -29,7 +30,7 @@ export default async function HomePage() {
   const canSeeBulletin = !!profile && (profile.tier === "vip" || profile.isAdmin);
   const now = Date.now();
 
-  const [news, plans, predictions, bulletins, atr, macroEvents, macro] = await Promise.all([
+  const [news, plans, predictions, bulletins, atr, macroEvents, macro, fearGreed] = await Promise.all([
     listApprovedNews(),
     listPublishedPlans({ limit: 20 }),
     listPredictions().catch((err) => {
@@ -46,6 +47,7 @@ export default async function HomePage() {
     }).catch(() => []),
     // Rates and gauges from /app/macro, shown beside each consensus market.
     getMacro(),
+    getFearGreed(),
   ]);
 
   // Live markets first; history for the top two outcomes of each.
@@ -77,6 +79,7 @@ export default async function HomePage() {
       atr={atr}
       calendar={calendar}
       macro={macro}
+      fearGreed={fearGreed}
     />
   );
 }
