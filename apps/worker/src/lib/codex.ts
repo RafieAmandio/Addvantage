@@ -84,7 +84,7 @@ export function createCodexTokenStore(path: string) {
     try {
       const f = JSON.parse(await readFile(path, "utf8"));
       if (f?.tokens?.access_token && f.tokens.refresh_token) return f;
-    } catch {}
+    } catch { /* missing or unreadable auth file: treated as signed out below */ }
     throw new CodexAuthError();
   };
   const creds = (f: AuthFile) => {
