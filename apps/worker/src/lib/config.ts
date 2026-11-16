@@ -9,7 +9,7 @@ import "dotenv/config";
 // invalid short strings. This lets us ship a template .env with blank fields.
 const emptyToUndef = (v: unknown) => (v === "" ? undefined : v);
 
-const LLM_PROVIDERS = ["openai", "openlimits", "moonshot"] as const;
+const LLM_PROVIDERS = ["openai", "openlimits", "moonshot", "codex"] as const;
 export type LLMProvider = (typeof LLM_PROVIDERS)[number];
 
 const EnvSchema = z.object({
@@ -32,6 +32,8 @@ const EnvSchema = z.object({
   LLM_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
   LLM_MODEL: z.string().default("gpt-4o-mini"),
   LLM_BASE_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  /** LLM_PROVIDER=codex: ChatGPT-subscription OAuth tokens, written by `codex:login`. */
+  CODEX_AUTH_FILE: z.string().default("/data/codex/auth.json"),
 
   TELEGRAM_BOT_TOKEN: z.preprocess(
     emptyToUndef,
