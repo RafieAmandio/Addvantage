@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions";
 import { config, type LLMProvider } from "./config";
+import { codexRespond, createCodexTokenStore } from "./codex";
 
 export interface ChatRequest {
   model?: string;
@@ -192,7 +193,52 @@ class OpenLimitsProvider extends AIProvider {
   }
 }
 
+/** ChatGPT subscription via the Codex backend (Responses API). Reasoning models: no temperature. */
+class CodexProvider extends AIProvider {
+  private tokens = createCodexTokenStore(config.CODEX_AUTH_FILE);
+
+  constructor() {
+    super("codex-oauth", "https://chatgpt.com/backend-api/codex"); // OpenAI client unused
+  }
+
+  get supportsJsonSchema() {
+    return true;
+  }
+
+  override async chat(req: ChatRequest): Promise<string> {
+    const text = await codexRespond(this.tokens, {
+      model: req.model ?? config.LLM_MODEL,
+      instructions: req.system,
+      input: [{ role: "user", content: [{ type: "input_text", text: req.user }] }],
+      reasoning: { effort: "low" },
+      ...(req.jsonSchema ? { text: { format: { type: "json_schema", ...req.jsonSchema } } } : {}),
+    });
+    if (!text) throw new Error("ai: empty response");
+    return text;
+  }
+
+  override async vision(req: VisionRequest): Promise<string> {
+    const text = await codexRespond(this.tokens, {
+      model: config.LLM_MODEL,
+      instructions: "Answer the user's request about the image.",
+      input: [
+        {
+          role: "user",
+          content: [
+            { type: "input_image", image_url: `data:${req.mediaType};base64,${req.imageBase64}` },
+            { type: "input_text", text: req.prompt },
+          ],
+        },
+      ],
+      reasoning: { effort: "low" },
+    });
+    if (!text) throw new Error("vision: empty response");
+    return text;
+  }
+}
+
 const PROVIDERS: Record<LLMProvider, (apiKey: string, baseURL?: string) => AIProvider> = {
+  codex: () => new CodexProvider(),
   openai: (key, url) =>
     new StandardProvider(key, url ?? "https://api.openai.com/v1", { jsonSchema: true }),
   openlimits: (key, url) =>
@@ -205,6 +251,7 @@ let instance: AIProvider | null = null;
 
 export function ai(): AIProvider {
   if (instance) return instance;
+  if (config.LLM_PROVIDER === "codex") return (instance = PROVIDERS.codex(""));
   if (!config.LLM_API_KEY) {
     throw new Error("LLM_API_KEY is not set — required for the AI pipeline");
   }

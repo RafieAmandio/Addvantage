@@ -15,7 +15,8 @@
     "kobeissi:login": "tsx src/adapters/kobeissi/login.ts",
     "run:calendar": "tsx src/cli/run-calendar.ts",
     "clean": "rm -rf dist .turbo tsconfig.tsbuildinfo",
-    "run:macro": "tsx src/cli/run-macro.ts"
+    "run:macro": "tsx src/cli/run-macro.ts",
+    "codex:login": "tsx src/cli/codex-login.ts"
   },
   "dependencies": {
     "@logtail/pino": "^0.5.8",
