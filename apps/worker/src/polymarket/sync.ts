@@ -30,6 +30,7 @@ const GammaEventSchema = z.object({
   slug: z.string(),
   volume: z.number().optional(),
   liquidity: z.number().optional(),
+  startDate: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
   closed: z.boolean().optional().nullable(),
   active: z.boolean().optional().nullable(),
@@ -269,14 +270,15 @@ export async function rotatePolymarketSlugs(): Promise<void> {
         return Number.isNaN(ms) ? null : ms;
       };
 
-      // Skip ultra-short-dated markets (daily/weekly) so we track the monthly
-      // consensus market rather than churning on markets that resolve in days.
-      // If every candidate is short-dated (some symbols only have weeklies),
-      // fall back to the full candidate set so rotation never gets stuck.
-      const MIN_HORIZON_MS = 10 * 24 * 60 * 60 * 1000;
+      // Track the monthly (or longer) market, not dailies and weeklies: judge an event by how long it
+      // runs (start to end), not by time left, so November stays until it closes and December takes
+      // over, and a yearly market only shows when no monthly one is open. If every candidate is short
+      // (some symbols only have weeklies), fall back to all of them so rotation never gets stuck.
+      const MIN_SPAN_MS = 20 * 24 * 60 * 60 * 1000;
       const monthly = candidates.filter((e) => {
         const end = endMs(e);
-        return end !== null && end > now + MIN_HORIZON_MS;
+        const start = e.startDate ? new Date(e.startDate).getTime() : NaN;
+        return end !== null && !Number.isNaN(start) && end - start >= MIN_SPAN_MS;
       });
       const pool = monthly.length > 0 ? monthly : candidates;
 
