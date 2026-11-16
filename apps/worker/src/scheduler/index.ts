@@ -5,7 +5,7 @@ import { config } from "../lib/config";
 import { runSource } from "../pipeline/runSource";
 import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
-import { syncTradingEconomicsCalendar } from "../calendar/tradingeconomics";
+import { syncCalendar } from "../calendar/sync";
 import { syncRsi } from "../rsi/sync-rsi";
 import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
@@ -138,9 +138,9 @@ export function startScheduler(): void {
   // ---- boot-time runs (fire-and-forget) ----
   void tick();
 
-  syncTradingEconomicsCalendar().catch((err) => {
-    Sentry.captureException(err, { tags: { scope: "te-calendar.boot" } });
-    logger.error({ err: String(err) }, "te-calendar: boot sync failed");
+  syncCalendar().catch((err) => {
+    Sentry.captureException(err, { tags: { scope: "calendar.boot" } });
+    logger.error({ err: String(err) }, "calendar: boot sync failed");
   });
 
   if (config.MARKET_DATA_PROVIDER) {
@@ -236,10 +236,10 @@ function pollJobs(): void {
   // -- calendar (every 6h at :07) --
   if (shouldFire("calendar", now)) {
     markFired("calendar", now);
-    logger.info("scheduler: firing te-calendar sync");
-    syncTradingEconomicsCalendar().catch((err) => {
-      Sentry.captureException(err, { tags: { scope: "te-calendar.cron" } });
-      logger.error({ err: String(err) }, "te-calendar: scheduled sync failed");
+    logger.info("scheduler: firing calendar sync");
+    syncCalendar().catch((err) => {
+      Sentry.captureException(err, { tags: { scope: "calendar.cron" } });
+      logger.error({ err: String(err) }, "calendar: scheduled sync failed");
     });
   }
 

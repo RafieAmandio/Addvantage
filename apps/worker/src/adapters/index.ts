@@ -8,7 +8,7 @@ import { TruthSocialAdapter } from "./truth-social";
 import { ForexFactoryAdapter } from "./forexfactory";
 import { MktNewsAdapter } from "./mktnews";
 import { KobeissiAdapter } from "./kobeissi/adapter";
-// TradingEconomics is a calendar adapter, not a news adapter — see calendar/tradingeconomics.ts
+// TradingEconomics is a calendar adapter, not a news adapter — see calendar/sync.ts
 
 /** Ordered registry. The scheduler iterates this list on each tick. */
 export const ADAPTERS: SourceAdapter[] = [
