@@ -13,108 +13,102 @@ CHROME_CANDIDATES = [
     "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
 ]
 
-# TradeVantage logo mark (public/figma/logo-mark.svg), recolored to brand yellow.
-LOGO = ('<svg viewBox="0 0 15.3079 16" width="19" height="20" style="display:block" '
-        'xmlns="http://www.w3.org/2000/svg">'
-        '<path d="M5.30986 1.13169e-05L10.463 11.2513L12.8758 5.99305H15.3079L10.4438 16L2.88743 1.13169e-05H5.30986Z" fill="#FFD400"/>'
-        '<path d="M0.787486 2.49371H11.2873L10.4998 4.59366H2.05315e-06L0.787486 2.49371Z" fill="#FFD400"/></svg>')
+HERE = os.path.dirname(os.path.abspath(__file__))
+ASSETS = os.path.join(HERE, "assets")
+
+def b64(path):
+    return base64.b64encode(pathlib.Path(path).read_bytes()).decode()
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&'
-         'family=Intel+One+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">')
+         '<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&'
+         'family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">')
 
+# TradeVantage "Paper desk" brand (the tradevantage.gg landing): paper ground with a faint grid,
+# ink type, one signal yellow, mono uppercase labels, hairline rules, dark desk frames for charts.
 CSS = r"""
 :root{
-  --bg:#111111;--bg2:#161616;--surf:#1A1A1A;--surf2:#1F1F1F;
-  --ink:#EEEEEE;--ink2:#D6D6D6;--muted:#9A9A9A;--faint:#6E6E6E;
-  --line:rgba(255,255,255,0.09);--line2:rgba(255,255,255,0.16);
-  --brand:#FFD400;--brand-dim:#E6C000;
-  --blood:#E03C3C;--moss:#8FCF2E;--steel:#8A94A6;
-  --mono:"Intel One Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --sans:"Inter","Helvetica Neue",-apple-system,Arial,sans-serif;
+  --paper:#F4F3EF;--white:#FFFFFF;--stone:#D9D8D3;--shadow:#E4E3DE;
+  --ink:#111214;--graphite:#3A3C40;--mute:#6B6D72;--desk:#0E0F11;
+  --signal:#FFD400;--up:#1F7A4A;--down:#B33A30;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--paper);}
 @page{size:A4;margin:0;}
-body{font-family:var(--sans);color:var(--ink);font-size:10.4pt;line-height:1.66;margin:0;
-  background:var(--bg);-webkit-font-smoothing:antialiased;}
-.page{padding:15mm 15mm 16mm;}
-.mono{font-family:var(--mono);}
+body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-height:1.62;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+.page{padding:14mm 17mm;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
 
-/* Cover */
-.cover{padding:2mm 0 7mm;margin-bottom:9mm;border-bottom:2px solid var(--brand);}
-.brandbar{display:flex;align-items:center;gap:8px;margin-bottom:11mm;}
-.brandbar .wm{font-family:var(--mono);font-weight:700;font-size:13pt;letter-spacing:-.01em;color:var(--ink);}
-.brandbar .tag{margin-left:auto;font-family:var(--mono);font-size:7.4pt;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--faint);border:1px solid var(--line);padding:3px 9px;}
-.eyebrow{font-family:var(--mono);font-size:8pt;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--brand);font-weight:600;margin-bottom:12px;}
-h1.title{font-family:var(--sans);font-size:27pt;line-height:1.1;margin:0 0 4mm;font-weight:800;
-  letter-spacing:-.02em;color:#fff;max-width:15em;}
-.meta{display:grid;grid-template-columns:auto 1fr;gap:5px 18px;font-size:9.2pt;color:var(--ink2);margin-top:5mm;}
-.meta dt{font-family:var(--mono);font-size:7.8pt;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--faint);align-self:center;}
-.meta dd{margin:0;}
-.chips{margin-top:5mm;}
-.pchip{display:inline-block;background:var(--surf);border:1px solid var(--line2);
-  padding:3px 11px;margin:0 6px 6px 0;font-family:var(--mono);font-size:8pt;color:var(--ink2);}
+/* ---------- cover ---------- */
+.cover{height:297mm;padding:15mm 17mm 0;display:flex;flex-direction:column;break-after:page;position:relative;overflow:hidden;}
+.topbar{display:flex;align-items:center;justify-content:space-between;}
+.topbar img{height:7.2mm;display:block;}
+.eyebrow,.lbl{font-family:var(--mono);font-weight:500;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);}
+.cover .eyebrow{margin-top:22mm;}
+h1.title{font-family:var(--sans);font-weight:600;font-size:38pt;line-height:1.02;letter-spacing:-.035em;
+  margin:5mm 0 0;max-width:15.5em;text-wrap:balance;}
+.rows{margin-top:10mm;border-top:1px solid var(--ink);max-width:128mm;}
+.row{display:grid;grid-template-columns:13mm 28mm 1fr;align-items:baseline;padding:2.6mm 0;border-bottom:1px solid var(--stone);font-size:10pt;}
+.row .n,.row .k{font-family:var(--mono);font-size:7.4pt;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);}
+.row .v{color:var(--ink);font-weight:500;}
+.hero{position:relative;margin:auto -17mm 0;}
+.hero img{display:block;width:100%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 11%);mask-image:linear-gradient(to bottom,transparent,#000 11%);}
+.tag{position:absolute;font-family:var(--mono);font-weight:500;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);line-height:1.25;white-space:nowrap;}
+.tag small{display:block;color:var(--mute);font-size:7.4pt;letter-spacing:.08em;}
+.sig{display:inline-block;width:2.2mm;height:2.2mm;background:var(--signal);border:1px solid var(--ink);margin-right:2mm;vertical-align:-.2mm;}
 
-/* Headings */
-h2{font-family:var(--sans);font-size:15pt;font-weight:700;margin:11mm 0 4mm;color:#fff;
-  letter-spacing:-.015em;padding-bottom:3mm;border-bottom:1px solid var(--line);
-  display:flex;align-items:baseline;gap:10px;break-after:avoid;}
-h2::before{content:attr(data-n);font-family:var(--mono);font-size:9pt;font-weight:700;
-  color:var(--brand);letter-spacing:.05em;}
-h3{font-family:var(--sans);font-size:11.6pt;font-weight:700;margin:6mm 0 2mm;color:var(--brand-dim);break-after:avoid;}
-p{margin:2.6mm 0;}
-strong{color:#fff;font-weight:700;}
-em{color:var(--ink2);}
-hr{border:none;border-top:1px solid var(--line);margin:8mm 0;}
-a,.wl{color:var(--brand);text-decoration:none;font-weight:500;
-  border-bottom:1px solid rgba(255,212,0,.32);}
-ul,ol{margin:2.6mm 0;padding-left:5.5mm;}
-li{margin:1.6mm 0;}
-li::marker{color:var(--brand);}
-code{font-family:var(--mono);font-size:.9em;background:var(--surf2);border:1px solid var(--line);
-  padding:.5px 5px;color:var(--brand-dim);}
+/* ---------- body ---------- */
+h2{font-family:var(--sans);font-weight:600;font-size:19pt;line-height:1.1;letter-spacing:-.025em;
+  margin:11mm 0 4mm;padding-top:3mm;border-top:1px solid var(--ink);break-after:avoid;break-inside:avoid;text-wrap:balance;}
+h2::before{content:attr(data-n);display:block;font-family:var(--mono);font-weight:500;font-size:7.4pt;
+  letter-spacing:.14em;color:var(--mute);margin-bottom:2.4mm;}
+h3{font-family:var(--sans);font-weight:600;font-size:12.4pt;letter-spacing:-.015em;margin:7mm 0 2mm;break-after:avoid;}
+p{margin:2.4mm 0;}
+strong{font-weight:600;color:var(--ink);}
+em{color:var(--graphite);}
+hr{border:none;border-top:1px solid var(--stone);margin:8mm 0;}
+ul,ol{margin:2.4mm 0;padding-left:5mm;}
+li{margin:1.4mm 0;}
+ul>li::marker{content:"\25AA  ";color:var(--ink);}
+ol>li::marker{font-family:var(--mono);font-size:8.4pt;color:var(--mute);}
+a,.wl{color:var(--ink);text-decoration:none;font-weight:500;
+  background:linear-gradient(transparent 62%,rgba(255,212,0,.55) 62%);}
+code{font-family:var(--mono);font-size:.86em;background:var(--white);border:1px solid var(--stone);padding:0 4px;}
 
-/* Figures */
-figure{margin:6mm 0;text-align:center;break-inside:avoid;}
-figure img{display:block;margin:0 auto;width:auto;height:auto;
-  max-width:138mm;max-height:88mm;object-fit:contain;
-  border:1px solid var(--line2);background:#000;}
-figcaption{font-family:var(--mono);font-size:8pt;color:var(--muted);margin-top:3mm;
-  padding:0 6mm;line-height:1.5;letter-spacing:.01em;}
+/* figures: chart frames sit on a dark desk tile */
+body{counter-reset:fig;}
+figure{margin:6mm 0;break-inside:avoid;counter-increment:fig;}
+figure img{display:block;width:100%;max-height:96mm;object-fit:contain;background:var(--desk);
+  border:1px solid var(--ink);padding:1.6mm;}
+figcaption{font-size:8.4pt;line-height:1.5;color:var(--graphite);margin-top:2.2mm;}
+figcaption::before{content:"FIG " counter(fig, decimal-leading-zero);font-family:var(--mono);font-size:7pt;
+  letter-spacing:.14em;color:var(--ink);font-weight:600;margin-right:2.4mm;}
 
-/* Callouts — full border, label tag, tinted panel (no side stripe) */
-.callout{border:1px solid var(--line2);background:var(--surf);padding:4mm 5mm;margin:5mm 0;
-  break-inside:avoid;font-size:10pt;}
+/* callouts: white card, ink hairline, mono chip */
+.callout{background:var(--white);border:1px solid var(--ink);padding:3.6mm 4.4mm;margin:5mm 0;break-inside:avoid;font-size:9.8pt;
+  box-shadow:1.2mm 1.2mm 0 var(--shadow);}
 .callout p:first-of-type{margin-top:0;}.callout p:last-child{margin-bottom:0;}
-.callout-label{font-family:var(--mono);font-size:7.2pt;letter-spacing:.16em;text-transform:uppercase;
-  font-weight:700;margin-right:9px;padding:2px 8px;color:#111;vertical-align:1.5px;}
-.callout-tip{border-color:rgba(255,212,0,.34);background:rgba(255,212,0,.055);}
-.cl-tip{background:var(--brand);}
-.callout-important{border-color:rgba(255,212,0,.34);background:rgba(255,212,0,.05);}
-.cl-important{background:var(--brand);}
-.callout-warning{border-color:rgba(224,60,60,.4);background:rgba(224,60,60,.07);}
-.cl-warning{background:var(--blood);color:#fff;}
-.callout-note{border-color:var(--line2);background:var(--surf2);}
-.cl-note{background:var(--steel);color:#fff;}
+.callout-label{font-family:var(--mono);font-size:6.8pt;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+  padding:1px 6px;margin-right:2.4mm;vertical-align:1px;border:1px solid var(--ink);}
+.cl-note{background:var(--paper);color:var(--ink);}
+.cl-tip{background:var(--signal);color:var(--ink);}
+.cl-important{background:var(--ink);color:var(--signal);}
+.cl-warning{background:var(--down);color:#fff;border-color:var(--down);}
+.cl-note::before{content:"Note";}.cl-tip::before{content:"Tip";}.cl-important::before{content:"Key";}.cl-warning::before{content:"Risk";}
 
-/* Table */
-table{border-collapse:collapse;width:100%;margin:5mm 0;font-size:8.7pt;break-inside:avoid;
-  border:1px solid var(--line2);}
-th{background:var(--brand);color:#111;text-align:left;padding:6px 9px;font-family:var(--mono);
-  font-weight:700;font-size:7.6pt;letter-spacing:.08em;text-transform:uppercase;}
-td{padding:6px 9px;border-top:1px solid var(--line);vertical-align:top;color:var(--ink2);}
-tr:nth-child(even) td{background:var(--bg2);}
-td strong{color:#fff;}
+/* tables: white sheet, mono header, hairline rows */
+table{border-collapse:collapse;width:100%;margin:5mm 0;font-size:8.6pt;background:var(--white);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);break-inside:auto;}
+thead{display:table-header-group;}
+th{text-align:left;padding:2.2mm 2.4mm;font-family:var(--mono);font-weight:500;font-size:6.8pt;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink);}
+td{padding:2.2mm 2.4mm;border-top:1px solid var(--stone);vertical-align:top;}
+tr{break-inside:avoid;}
+td:first-child{font-weight:600;}
 
-/* Footer */
-.foot{margin-top:12mm;padding-top:4mm;border-top:2px solid var(--brand);
-  font-family:var(--mono);font-size:7.6pt;letter-spacing:.06em;color:var(--faint);
-  display:flex;justify-content:space-between;text-transform:uppercase;}
+/* end mark */
+.foot{margin:12mm 0 4mm;padding-top:3mm;border-top:1px solid var(--ink);display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:7pt;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
 """
 
 def find_chrome():
@@ -143,7 +137,7 @@ def main():
     def grab(label):
         mm = re.search(rf"\*\*{label}:\*\*\s*(.+)", body)
         if not mm: return ""
-        return re.sub(r"\*\*|\[\[|\]\]", "", mm.group(1)).strip()
+        return re.sub(r"\*\*|\[\[|\]\]|`", "", mm.group(1)).strip()
     platform = grab("Platform")
     date_line = grab("Date").split("·")[0].strip()
     duration = grab("Duration")
@@ -179,7 +173,7 @@ def main():
             while i < len(lines) and lines[i].startswith(">"):
                 inner.append(re.sub(r"^>\s?", "", lines[i])); i += 1
             out.append(f"::: {{.callout .callout-{ct}}}")
-            if ctitle: out.append(f'[]{{.callout-label .cl-{ct}}} **{ctitle}**\n')
+            out.append(f'[]{{.callout-label .cl-{ct}}}' + (f' **{ctitle}**' if ctitle else '') + '\n')
             out.extend(inner); out.append(":::\n")
         else:
             out.append(lines[i]); i += 1
@@ -196,7 +190,8 @@ def main():
     counter = {"n": 0}
     def num_h2(mo):
         counter["n"] += 1
-        return f'<h2 data-n="{counter["n"]:02d}">{mo.group(1)}</h2>'
+        text = re.sub(r"^\s*\d+\.\s+", "", mo.group(1))
+        return f'<h2 data-n="{counter["n"]:02d} /">{text}</h2>'
     html_body = re.sub(r"<h2[^>]*>(.*?)</h2>", num_h2, html_body, flags=re.S)
 
     def embed(mo):
@@ -205,22 +200,36 @@ def main():
         return f'src="data:image/{mime};base64,{base64.b64encode(pathlib.Path(fp).read_bytes()).decode()}"'
     html_body = re.sub(r'src="([^"]+\.(?:jpg|jpeg|png))"', embed, html_body)
 
-    chips = "".join(f'<span class="pchip">{x.strip()}</span>' for x in participants.split(",") if x.strip())
-    meta = ""
-    for label, val in [("Platform", platform), ("Date", date_line), ("Duration", duration)]:
-        if val: meta += f"<dt>{label}</dt><dd>{val}</dd>\n"
+    # The cover shows the theme; "TradeVantage Class:" and the trailing "(date)" are implied by the page.
+    theme = re.sub(r"^TradeVantage Class:\s*", "", title)
+    theme = re.sub(r"\s*\(\d{4}-\d{2}-\d{2}\)\s*$", "", theme)
+    syms = [x.strip().strip('"').replace("!", "") for x in re.sub(r"[\[\]]", "", fmv("symbols")).split(",") if x.strip()][:3]
+    while len(syms) < 3: syms.append("")
+    presenter = grab("Presenter").split(",")[0] or "Anthony Tjipto"
+    rows = ""
+    for i, (k, v) in enumerate([("Date", date_line), ("Duration", duration), ("Presenter", presenter), ("Platform", platform.split("(")[0].strip())], 1):
+        if v: rows += f'<div class="row"><span class="n">{i:02d}</span><span class="k">{k}</span><span class="v">{v}</span></div>'
+    lockup = f'data:image/svg+xml;base64,{b64(os.path.join(ASSETS, "lockup-paper.svg"))}'
+    hero = f'data:image/jpeg;base64,{b64(os.path.join(ASSETS, "hero-desk.jpg"))}'
+    # tags sit on the drawing's leader lines (positions measured on assets/hero-desk.jpg, 1440x800)
+    tags = (f'<span class="tag" style="left:69%;top:5.4%"><span class="sig"></span>Class report<small>{date_line}</small></span>'
+            f'<span class="tag" style="left:57.2%;top:20.6%">{syms[0]}</span>'
+            f'<span class="tag" style="left:64.3%;top:34.4%">{syms[1]}</span>'
+            f'<span class="tag" style="left:71.3%;top:46.4%">{syms[2]}</span>'
+            f'<span class="tag" style="left:16.6%;top:33.4%;text-align:right;transform:translateX(-100%)">{duration}<small>on Zoom</small></span>')
     html = f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONTS}
 <style>{CSS}</style></head>
-<body><div class="page">
-<div class="cover">
-  <div class="brandbar">{LOGO}<span class="wm">+vantage</span><span class="tag">Class Report</span></div>
-  <div class="eyebrow">TradeVantage · Trading Class Recap</div>
-  <h1 class="title">{title}</h1>
-  <dl class="meta">{meta}</dl>
-  {'<div class="chips">'+chips+'</div>' if chips else ''}
-</div>
+<body>
+<section class="cover">
+  <div class="topbar"><img src="{lockup}" alt="+vantage"><span class="lbl">tradevantage.gg</span></div>
+  <div class="eyebrow">TradeVantage / Class report</div>
+  <h1 class="title">{theme}</h1>
+  <div class="rows">{rows}</div>
+  <div class="hero"><img src="{hero}" alt="">{tags}</div>
+</section>
+<div class="page">
 {html_body}
-<div class="foot"><span>+vantage · tradevantage.gg</span><span>{date_line}</span></div>
+<div class="foot"><span>+vantage / tradevantage.gg</span><span>Class report / {date_line}</span></div>
 </div></body></html>"""
 
     tmp_html = tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w")
