@@ -3,7 +3,7 @@
 
 Polls Zoom every POLL_MINUTES for finished cloud recordings of the class, then per new recording:
   1. downloads the MP4 and Zoom's own transcript (VTT)
-  2. runs Claude Code headless to read the transcript, pull chart frames and write report.md + summary.txt
+  2. runs the Codex CLI (ChatGPT subscription) headless to read the transcript, pull chart frames and write report.md + summary.txt
   3. renders the branded +vantage PDF
   4. uploads MP4 + PDF to Drive, shares both "anyone with the link"
   5. inserts the video (video_modules) and the recap (class_reports) on tradevantage.gg
@@ -130,7 +130,7 @@ Nobody is watching this run: do not ask questions, just finish. Files in the cur
 2. For each topic extract chart frames with
    ffmpeg -y -ss <seconds> -i video.mp4 -frames:v 1 -q:v 3 frames/{date}-NN-<short-label>.jpg -loglevel error
    (NN = 01, 02, ...). Read every frame you keep and read prices and levels off the chart. Prices come from the frames,
-   exact as shown, never guessed or rounded. Keep 12 to 25 frames; delete the ones you don't use.
+   exact as shown, never guessed or rounded. Use your image viewing tool on each frame. Keep 12 to 25 frames; delete the ones you don't use.
 3. Write report.md in the example's format: frontmatter (type analysis, title "TradeVantage Class: <theme> ({date})",
    date {date}, symbols, timeframe multi, session daily, bias, tags, sources ["frames/"]); Meeting Overview where Date
    and Duration share ONE bullet exactly like "- **Date:** {date} · **Duration:** ~{minutes} minutes"; numbered topic
@@ -150,14 +150,17 @@ def write_report(work, date, minutes, topic):
     shutil.copy(example, os.path.join(work, "example-report.md"))
     os.makedirs(os.path.join(work, "frames"), exist_ok=True)
     prompt = PROMPT.format(date=date, minutes=minutes, topic=topic)
+    # Codex CLI on the ChatGPT subscription, sharing the worker's login (CODEX_HOME=/codex = worker volume).
+    # ponytail: the CLI doesn't take the worker's refresh lock; a refresh race at the same second would sign one out. Own login if that ever happens.
+    # The container is the sandbox, so Codex's own sandbox is off.
     subprocess.run(
-        ["claude", "-p", prompt, "--model", E("CLAUDE_MODEL", "opus"),
-         "--allowedTools", "Read", "Write", "Edit", "Glob", "Bash(ffmpeg:*)", "Bash(ffprobe:*)", "Bash(ls:*)", "Bash(rm:*)"],
-        cwd=work, check=True, timeout=60 * 60, text=True,
+        ["codex", "exec", "--dangerously-bypass-approvals-and-sandbox", "--skip-git-repo-check", "-C", work,
+         *(["-m", E("CODEX_MODEL")] if E("CODEX_MODEL") else []), "-"],
+        input=prompt, check=True, timeout=60 * 60, text=True,
     )
     rep, summ = os.path.join(work, "report.md"), os.path.join(work, "summary.txt")
     if not (os.path.exists(rep) and os.path.exists(summ)):
-        raise RuntimeError("claude finished without report.md and summary.txt")
+        raise RuntimeError("codex finished without report.md and summary.txt")
     body = open(rep).read()
     missing = [f for f in re.findall(r"!\[\[([^\]|]+)", body) if not os.path.exists(os.path.join(work, "frames", f))]
     if missing:
