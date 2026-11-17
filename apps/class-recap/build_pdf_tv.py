@@ -13,109 +13,148 @@ CHROME_CANDIDATES = [
     "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
 ]
 
-# TradeVantage logo mark (public/figma/logo-mark.svg), recolored to brand yellow.
-LOGO = ('<svg viewBox="0 0 15.3079 16" width="19" height="20" style="display:block" '
-        'xmlns="http://www.w3.org/2000/svg">'
-        '<path d="M5.30986 1.13169e-05L10.463 11.2513L12.8758 5.99305H15.3079L10.4438 16L2.88743 1.13169e-05H5.30986Z" fill="#FFD400"/>'
-        '<path d="M0.787486 2.49371H11.2873L10.4998 4.59366H2.05315e-06L0.787486 2.49371Z" fill="#FFD400"/></svg>')
+HERE = os.path.dirname(os.path.abspath(__file__))
+ASSETS = os.path.join(HERE, "assets")
+
+def b64(path):
+    return base64.b64encode(pathlib.Path(path).read_bytes()).decode()
 
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&'
-         'family=Intel+One+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">')
+         '<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&'
+         'family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">')
 
+# TradeVantage "Paper desk" brand (the tradevantage.gg landing): paper ground with a faint grid,
+# ink type, one signal yellow, mono uppercase labels, hairline rules, dark desk frames for charts.
 CSS = r"""
 :root{
-  --bg:#111111;--bg2:#161616;--surf:#1A1A1A;--surf2:#1F1F1F;
-  --ink:#EEEEEE;--ink2:#D6D6D6;--muted:#9A9A9A;--faint:#6E6E6E;
-  --line:rgba(255,255,255,0.09);--line2:rgba(255,255,255,0.16);
-  --brand:#FFD400;--brand-dim:#E6C000;
-  --blood:#E03C3C;--moss:#8FCF2E;--steel:#8A94A6;
-  --mono:"Intel One Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --sans:"Inter","Helvetica Neue",-apple-system,Arial,sans-serif;
+  --paper:#F4F3EF;--white:#FFFFFF;--stone:#D9D8D3;--shadow:#E4E3DE;
+  --ink:#111214;--graphite:#3A3C40;--mute:#6B6D72;--desk:#0E0F11;
+  --signal:#FFD400;--up:#1F7A4A;--down:#B33A30;
+  --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
-html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--paper);}
 @page{size:A4;margin:0;}
-body{font-family:var(--sans);color:var(--ink);font-size:10.4pt;line-height:1.66;margin:0;
-  background:var(--bg);-webkit-font-smoothing:antialiased;}
-.page{padding:15mm 15mm 16mm;}
-.mono{font-family:var(--mono);}
+body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-height:1.62;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+.page{padding:14mm 17mm;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
 
-/* Cover */
-.cover{padding:2mm 0 7mm;margin-bottom:9mm;border-bottom:2px solid var(--brand);}
-.brandbar{display:flex;align-items:center;gap:8px;margin-bottom:11mm;}
-.brandbar .wm{font-family:var(--mono);font-weight:700;font-size:13pt;letter-spacing:-.01em;color:var(--ink);}
-.brandbar .tag{margin-left:auto;font-family:var(--mono);font-size:7.4pt;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--faint);border:1px solid var(--line);padding:3px 9px;}
-.eyebrow{font-family:var(--mono);font-size:8pt;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--brand);font-weight:600;margin-bottom:12px;}
-h1.title{font-family:var(--sans);font-size:27pt;line-height:1.1;margin:0 0 4mm;font-weight:800;
-  letter-spacing:-.02em;color:#fff;max-width:15em;}
-.meta{display:grid;grid-template-columns:auto 1fr;gap:5px 18px;font-size:9.2pt;color:var(--ink2);margin-top:5mm;}
-.meta dt{font-family:var(--mono);font-size:7.8pt;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--faint);align-self:center;}
-.meta dd{margin:0;}
-.chips{margin-top:5mm;}
-.pchip{display:inline-block;background:var(--surf);border:1px solid var(--line2);
-  padding:3px 11px;margin:0 6px 6px 0;font-family:var(--mono);font-size:8pt;color:var(--ink2);}
+/* ---------- cover: one colour, one graphic, a few words ---------- */
+.cover{height:297mm;position:relative;overflow:hidden;background:var(--signal);break-after:page;}
+.cover .art{position:absolute;left:-24mm;right:-30mm;bottom:-22mm;}
+.cover .art svg{display:block;width:100%;height:auto;}
+.cover .top{position:absolute;top:18mm;left:17mm;right:17mm;display:grid;grid-template-columns:1fr 64mm;gap:10mm;}
+.cover .logo{grid-column:1/-1;height:7mm;margin-bottom:6mm;}
+.cover .big{font-weight:700;font-size:58pt;line-height:.88;letter-spacing:-.03em;margin:0;}
+.cover .when{display:block;margin-top:5mm;font-size:9pt;}
+.cover .side{padding-top:2mm;}
+.cover .side b{display:block;font-weight:600;font-size:13pt;line-height:1.2;letter-spacing:-.01em;margin-top:1.5mm;}
+.cover .side p{margin:2.4mm 0 0;font-size:9pt;line-height:1.45;}
+.cover .lbl{font-family:var(--mono);font-weight:500;font-size:7.4pt;letter-spacing:.14em;text-transform:uppercase;}
+/* the calls open the report on page 2 */
+.calls{background:var(--desk);color:#EDEDEA;padding:7mm 9mm 6mm;margin:0 0 9mm;}
+.calls-h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #2A2C30;padding-bottom:2.6mm;}
+.calls-h b{font-family:var(--mono);font-weight:600;font-size:8pt;letter-spacing:.24em;text-transform:uppercase;color:var(--signal);}
+.calls-h span{font-family:var(--mono);font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:#8A8C91;}
+.call{display:grid;grid-template-columns:28mm 21mm 1fr;gap:3mm;align-items:baseline;padding:2.5mm 0;border-bottom:1px solid #1F2125;}
+.call .sym{font-family:var(--mono);font-weight:600;font-size:9.4pt;color:#fff;letter-spacing:.02em;}
+.chip{font-family:var(--mono);font-weight:600;font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;padding:.5mm 1.8mm;justify-self:start;}
+.chip.bear{background:#E06A5E;color:#111214;}.chip.bull{background:#4E9F6E;color:#111214;}.chip.watch{background:var(--signal);color:#111214;}
+.call .txt{font-size:8.8pt;line-height:1.4;color:#C9C9C5;}
+.calls-f{margin-top:4mm;font-family:var(--mono);font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;color:#6B6D72;}
 
-/* Headings */
-h2{font-family:var(--sans);font-size:15pt;font-weight:700;margin:11mm 0 4mm;color:#fff;
-  letter-spacing:-.015em;padding-bottom:3mm;border-bottom:1px solid var(--line);
-  display:flex;align-items:baseline;gap:10px;break-after:avoid;}
-h2::before{content:attr(data-n);font-family:var(--mono);font-size:9pt;font-weight:700;
-  color:var(--brand);letter-spacing:.05em;}
-h3{font-family:var(--sans);font-size:11.6pt;font-weight:700;margin:6mm 0 2mm;color:var(--brand-dim);break-after:avoid;}
-p{margin:2.6mm 0;}
-strong{color:#fff;font-weight:700;}
-em{color:var(--ink2);}
-hr{border:none;border-top:1px solid var(--line);margin:8mm 0;}
-a,.wl{color:var(--brand);text-decoration:none;font-weight:500;
-  border-bottom:1px solid rgba(255,212,0,.32);}
-ul,ol{margin:2.6mm 0;padding-left:5.5mm;}
-li{margin:1.6mm 0;}
-li::marker{color:var(--brand);}
-code{font-family:var(--mono);font-size:.9em;background:var(--surf2);border:1px solid var(--line);
-  padding:.5px 5px;color:var(--brand-dim);}
+/* ---------- body ---------- */
+h2{font-family:var(--sans);font-weight:600;font-size:19pt;line-height:1.1;letter-spacing:-.025em;
+  margin:11mm 0 4mm;padding-top:3mm;border-top:1px solid var(--ink);break-after:avoid;break-inside:avoid;text-wrap:balance;}
+h2::before{content:attr(data-n);display:block;font-family:var(--mono);font-weight:500;font-size:7.4pt;
+  letter-spacing:.14em;color:var(--mute);margin-bottom:2.4mm;}
+h3{font-family:var(--sans);font-weight:600;font-size:12.4pt;letter-spacing:-.015em;margin:7mm 0 2mm;break-after:avoid;}
+p{margin:2.4mm 0;}
+strong{font-weight:600;color:var(--ink);}
+em{color:var(--graphite);}
+hr{border:none;border-top:1px solid var(--stone);margin:8mm 0;}
+ul,ol{margin:2.4mm 0;padding-left:5mm;}
+li{margin:1.4mm 0;}
+ul>li::marker{content:"\25AA  ";color:var(--ink);}
+ol>li::marker{font-family:var(--mono);font-size:8.4pt;color:var(--mute);}
+a,.wl{color:var(--ink);text-decoration:none;font-weight:500;
+  background:linear-gradient(transparent 62%,rgba(255,212,0,.55) 62%);}
+code{font-family:var(--mono);font-size:.86em;background:var(--white);border:1px solid var(--stone);padding:0 4px;}
 
-/* Figures */
-figure{margin:6mm 0;text-align:center;break-inside:avoid;}
-figure img{display:block;margin:0 auto;width:auto;height:auto;
-  max-width:138mm;max-height:88mm;object-fit:contain;
-  border:1px solid var(--line2);background:#000;}
-figcaption{font-family:var(--mono);font-size:8pt;color:var(--muted);margin-top:3mm;
-  padding:0 6mm;line-height:1.5;letter-spacing:.01em;}
+/* figures: chart frames sit on a dark desk tile */
+body{counter-reset:fig;}
+figure{margin:6mm 0;break-inside:avoid;counter-increment:fig;}
+figure img{display:block;width:100%;max-height:96mm;object-fit:contain;background:var(--desk);
+  border:1px solid var(--ink);padding:1.6mm;}
+figcaption{font-size:8.4pt;line-height:1.5;color:var(--graphite);margin-top:2.2mm;}
+figcaption::before{content:"FIG " counter(fig, decimal-leading-zero);font-family:var(--mono);font-size:7pt;
+  letter-spacing:.14em;color:var(--ink);font-weight:600;margin-right:2.4mm;}
 
-/* Callouts — full border, label tag, tinted panel (no side stripe) */
-.callout{border:1px solid var(--line2);background:var(--surf);padding:4mm 5mm;margin:5mm 0;
-  break-inside:avoid;font-size:10pt;}
+/* callouts: white card, ink hairline, mono chip */
+.callout{background:var(--white);border:1px solid var(--ink);padding:3.6mm 4.4mm;margin:5mm 0;break-inside:avoid;font-size:9.8pt;
+  box-shadow:1.2mm 1.2mm 0 var(--shadow);}
 .callout p:first-of-type{margin-top:0;}.callout p:last-child{margin-bottom:0;}
-.callout-label{font-family:var(--mono);font-size:7.2pt;letter-spacing:.16em;text-transform:uppercase;
-  font-weight:700;margin-right:9px;padding:2px 8px;color:#111;vertical-align:1.5px;}
-.callout-tip{border-color:rgba(255,212,0,.34);background:rgba(255,212,0,.055);}
-.cl-tip{background:var(--brand);}
-.callout-important{border-color:rgba(255,212,0,.34);background:rgba(255,212,0,.05);}
-.cl-important{background:var(--brand);}
-.callout-warning{border-color:rgba(224,60,60,.4);background:rgba(224,60,60,.07);}
-.cl-warning{background:var(--blood);color:#fff;}
-.callout-note{border-color:var(--line2);background:var(--surf2);}
-.cl-note{background:var(--steel);color:#fff;}
+.callout-label{font-family:var(--mono);font-size:6.8pt;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+  padding:1px 6px;margin-right:2.4mm;vertical-align:1px;border:1px solid var(--ink);}
+.cl-note{background:var(--paper);color:var(--ink);}
+.cl-tip{background:var(--signal);color:var(--ink);}
+.cl-important{background:var(--ink);color:var(--signal);}
+.cl-warning{background:var(--down);color:#fff;border-color:var(--down);}
+.cl-note::before{content:"Note";}.cl-tip::before{content:"Tip";}.cl-important::before{content:"Key";}.cl-warning::before{content:"Risk";}
 
-/* Table */
-table{border-collapse:collapse;width:100%;margin:5mm 0;font-size:8.7pt;break-inside:avoid;
-  border:1px solid var(--line2);}
-th{background:var(--brand);color:#111;text-align:left;padding:6px 9px;font-family:var(--mono);
-  font-weight:700;font-size:7.6pt;letter-spacing:.08em;text-transform:uppercase;}
-td{padding:6px 9px;border-top:1px solid var(--line);vertical-align:top;color:var(--ink2);}
-tr:nth-child(even) td{background:var(--bg2);}
-td strong{color:#fff;}
+/* tables: white sheet, mono header, hairline rows */
+table{border-collapse:collapse;width:100%;margin:5mm 0;font-size:8.6pt;background:var(--white);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);break-inside:auto;}
+thead{display:table-header-group;}
+th{text-align:left;padding:2.2mm 2.4mm;font-family:var(--mono);font-weight:500;font-size:6.8pt;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink);}
+td{padding:2.2mm 2.4mm;border-top:1px solid var(--stone);vertical-align:top;}
+tr{break-inside:avoid;}
+td:first-child{font-weight:600;}
 
-/* Footer */
-.foot{margin-top:12mm;padding-top:4mm;border-top:2px solid var(--brand);
-  font-family:var(--mono);font-size:7.6pt;letter-spacing:.06em;color:var(--faint);
-  display:flex;justify-content:space-between;text-transform:uppercase;}
+/* end mark */
+.foot{margin:12mm 0 4mm;padding-top:3mm;border-top:1px solid var(--ink);display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:7pt;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
 """
+
+def blocks(seed):
+    """Abstract isometric blocks for the cover (columns, beams, slabs) in white, ink and a deeper yellow,
+    like an annual-report cover. Seeded by the date so each class differs.
+    Every shape is drawn as unit-cell prisms back to front, which keeps the painter's order correct."""
+    import math, random
+    rnd = random.Random(seed)
+    c = math.cos(math.pi / 6)
+    P = lambda x, y, z: ((x - y) * c, (x + y) * .5 - z)
+    cols = [("#FFFFFF", "#ECEAE3", "#CFCDC6"), ("#3A3C40", "#1E1F22", "#111214"), ("#FFE04D", "#F2C400", "#D9A900")]
+    q = lambda pts: " ".join("%.3f,%.3f" % P(*p) for p in pts)
+    poly = lambda pts, f: f'<polygon points="{q(pts)}" fill="{f}" stroke="{f}" stroke-width=".02"/>'
+    N, used, shapes = 9, set(), []
+    kinds = [((1, 1), (3, 7)), ((4, 1), (1, 2)), ((1, 4), (1, 2)), ((2, 2), (1, 1)), ((3, 1), (2, 4)), ((1, 3), (2, 4))]
+    for _ in range(60):                                # try shapes, keep the ones that fit with a gap around them
+        (w, d), (h0, h1) = rnd.choice(kinds)
+        x, y = rnd.randrange(N - w + 1), rnd.randrange(N - d + 1)
+        cells = {(i, j) for i in range(x, x + w) for j in range(y, y + d)}
+        if {(i + a, j + b) for i, j in cells for a in (-1, 0, 1) for b in (-1, 0, 1)} & used: continue
+        used |= cells
+        shapes.append((x, y, x + w, y + d, rnd.uniform(h0, h1), rnd.choices(cols, (4, 3, 2))[0]))
+        if len(used) > 30: break
+    # painter's order: footprints never touch, so A is behind B when it is fully on B's -x or -y side
+    ov = lambda a0, a1, b0, b1: a0 < b1 and b0 < a1
+    behind = lambda A, B: (A[2] <= B[0] and (ov(A[1], A[3], B[1], B[3]) or A[3] <= B[1])) or \
+                          (A[3] <= B[1] and (ov(A[0], A[2], B[0], B[2]) or A[2] <= B[0]))
+    order = []
+    while shapes:
+        nxt = next(S for S in shapes if not any(behind(T, S) for T in shapes if T is not S))
+        order.append(nxt); shapes.remove(nxt)
+    svg = ""
+    for x, y, X, Y, h, col in order:
+        svg += (poly([(x, Y, 0), (X, Y, 0), (X, Y, h), (x, Y, h)], col[1])
+                + poly([(X, y, 0), (X, Y, 0), (X, Y, h), (X, y, h)], col[2])
+                + poly([(x, y, h), (X, y, h), (X, Y, h), (x, Y, h)], col[0]))
+    # frame the whole 9x9 floor, not just the shapes, so the composition sits in the same place every time
+    x0, x1 = P(0, N, 0)[0], P(N, 0, 0)[0]
+    y0, y1 = P(0, 0, 8)[1], P(N, N, 0)[1]
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:.1f} {y0:.1f} {x1-x0:.1f} {y1-y0:.1f}">{svg}</svg>'
 
 def find_chrome():
     for c in CHROME_CANDIDATES:
@@ -126,6 +165,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("md"); ap.add_argument("out_pdf")
     ap.add_argument("--imgdir"); ap.add_argument("--vault", default=VAULT_DEFAULT)
+    ap.add_argument("--summary", help="summary.txt with the calls (default: next to the report)")
     a = ap.parse_args()
 
     raw = pathlib.Path(a.md).read_text()
@@ -143,7 +183,7 @@ def main():
     def grab(label):
         mm = re.search(rf"\*\*{label}:\*\*\s*(.+)", body)
         if not mm: return ""
-        return re.sub(r"\*\*|\[\[|\]\]", "", mm.group(1)).strip()
+        return re.sub(r"\*\*|\[\[|\]\]|`", "", mm.group(1)).strip()
     platform = grab("Platform")
     date_line = grab("Date").split("·")[0].strip()
     duration = grab("Duration")
@@ -179,7 +219,7 @@ def main():
             while i < len(lines) and lines[i].startswith(">"):
                 inner.append(re.sub(r"^>\s?", "", lines[i])); i += 1
             out.append(f"::: {{.callout .callout-{ct}}}")
-            if ctitle: out.append(f'[]{{.callout-label .cl-{ct}}} **{ctitle}**\n')
+            out.append(f'[]{{.callout-label .cl-{ct}}}' + (f' **{ctitle}**' if ctitle else '') + '\n')
             out.extend(inner); out.append(":::\n")
         else:
             out.append(lines[i]); i += 1
@@ -196,7 +236,8 @@ def main():
     counter = {"n": 0}
     def num_h2(mo):
         counter["n"] += 1
-        return f'<h2 data-n="{counter["n"]:02d}">{mo.group(1)}</h2>'
+        text = re.sub(r"^\s*\d+\.\s+", "", mo.group(1))
+        return f'<h2 data-n="{counter["n"]:02d} /">{text}</h2>'
     html_body = re.sub(r"<h2[^>]*>(.*?)</h2>", num_h2, html_body, flags=re.S)
 
     def embed(mo):
@@ -205,22 +246,55 @@ def main():
         return f'src="data:image/{mime};base64,{base64.b64encode(pathlib.Path(fp).read_bytes()).decode()}"'
     html_body = re.sub(r'src="([^"]+\.(?:jpg|jpeg|png))"', embed, html_body)
 
-    chips = "".join(f'<span class="pchip">{x.strip()}</span>' for x in participants.split(",") if x.strip())
-    meta = ""
-    for label, val in [("Platform", platform), ("Date", date_line), ("Duration", duration)]:
-        if val: meta += f"<dt>{label}</dt><dd>{val}</dd>\n"
+    # The cover shows the theme; "TradeVantage Class:" and the trailing "(date)" are implied by the page.
+    theme = re.sub(r"^TradeVantage Class:\s*", "", title)
+    theme = re.sub(r"\s*\(\d{4}-\d{2}-\d{2}\)\s*$", "", theme)
+    presenter = grab("Presenter").split(",")[0] or "Anthony Tjipto"
+    dek = fmv("dek") or re.sub(r"^[a-z]", lambda m: m.group(0).upper(), grab("Format"))
+    try:
+        d = __import__("datetime").date.fromisoformat(date_line)
+        long_date = d.strftime("%A %-d %B %Y")
+    except ValueError:
+        long_date = date_line
+    # the calls: summary.txt bullets "• SYMBOL: text"
+    sp = a.summary or os.path.join(os.path.dirname(os.path.abspath(a.md)), "summary.txt")
+    calls = ""
+    if os.path.exists(sp):
+        for ln in pathlib.Path(sp).read_text().splitlines():
+            # "• SYMBOL | Bearish | text" (what the writer is asked for); older "• SYMBOL: text" falls back to Watch
+            mo = re.match(r"^\s*[•\-*]\s*([^|:]{1,24})\s*\|\s*(bearish|bullish|watch|neutral)\s*\|\s*(.+)$", ln, re.I)
+            if mo:
+                sym, kind, txt = mo.group(1).strip(), mo.group(2).lower(), mo.group(3).strip()
+            else:
+                mo = re.match(r"^\s*[•\-*]\s*([^:]{1,24}):\s*(.+)$", ln)
+                if not mo: continue
+                sym, txt = mo.group(1).strip(), mo.group(2).strip()
+                kind = next((k for k in ("bearish", "bullish") if re.match(k, txt, re.I)), "watch")
+                txt = re.sub(r"^(bearish|bullish|neutral)\w*( lean| view| bias)?[,:]?\s*", "", txt, flags=re.I)
+            kind = {"bearish": "bear", "bullish": "bull"}.get(kind, "watch")
+            txt = txt[:1].upper() + txt[1:]
+            calls += (f'<div class="call"><span class="sym">{sym}</span>'
+                      f'<span class="chip {kind}">{ {"bear":"Bearish","bull":"Bullish","watch":"Watch"}[kind] }</span>'
+                      f'<span class="txt">{txt}</span></div>')
+    lockup = f'data:image/svg+xml;base64,{b64(os.path.join(ASSETS, "lockup-paper.svg"))}'
+    cover = f"""<section class="cover">
+  <div class="top">
+    <img class="logo" src="{lockup}" alt="+vantage">
+    <div><h1 class="big">CLASS<br>REPORT</h1><span class="lbl when">{long_date}</span></div>
+    <div class="side"><b>{theme}</b>{f'<p>{dek}</p>' if dek else ''}</div>
+  </div>
+  <div class="art">{blocks(date_line)}</div>
+</section>"""
+    calls_html = (f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>'
+                  f'{calls}<div class="calls-f">Education only. Size every trade to your own risk.</div></div>') if calls else ""
     html = f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONTS}
 <style>{CSS}</style></head>
-<body><div class="page">
-<div class="cover">
-  <div class="brandbar">{LOGO}<span class="wm">+vantage</span><span class="tag">Class Report</span></div>
-  <div class="eyebrow">TradeVantage · Trading Class Recap</div>
-  <h1 class="title">{title}</h1>
-  <dl class="meta">{meta}</dl>
-  {'<div class="chips">'+chips+'</div>' if chips else ''}
-</div>
+<body>
+{cover}
+<div class="page">
+{calls_html}
 {html_body}
-<div class="foot"><span>+vantage · tradevantage.gg</span><span>{date_line}</span></div>
+<div class="foot"><span>+vantage / tradevantage.gg</span><span>Class report / {date_line}</span></div>
 </div></body></html>"""
 
     tmp_html = tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w")

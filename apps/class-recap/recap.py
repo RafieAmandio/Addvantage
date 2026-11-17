@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Class recap bot: Zoom cloud recording -> recap report + PDF -> Drive -> tradevantage.gg -> Telegram.
+"""Class recap bot: class recording -> recap report + PDF -> Drive -> tradevantage.gg -> Telegram.
 
-Polls Zoom every POLL_MINUTES for finished cloud recordings of the class, then per new recording:
+Polls the Drive inbox every POLL_MINUTES (Dio's Mac uploads each class there, see mac-watch.sh), then per class:
   1. downloads the MP4 and Zoom's own transcript (VTT)
   2. runs the Codex CLI (ChatGPT subscription) headless to read the transcript, pull chart frames and write report.md + summary.txt
   3. renders the branded +vantage PDF
@@ -69,54 +69,26 @@ def alert(text):
             log("alert failed", e)
 
 
-# ---------- zoom ----------
-def zoom_token():
-    r = requests.post(
-        "https://zoom.us/oauth/token",
-        params={"grant_type": "account_credentials", "account_id": E("ZOOM_ACCOUNT_ID")},
-        auth=(E("ZOOM_CLIENT_ID"), E("ZOOM_CLIENT_SECRET")),
-        timeout=30,
-    )
-    r.raise_for_status()
-    return r.json()["access_token"]
+# ---------- inbox ----------
+# Dio's Mac uploads each class recording to INBOX/<zoom file stem>/ (video.mp4, transcript.vtt, then .ready).
+# The university Zoom account can't have API apps, so Zoom itself is never polled.
+INBOX = f"gdrive:{E('DRIVE_INBOX', 'TradeVantage Class Inbox')}"
 
 
-def zoom_meetings(token):
-    today = dt.date.today()
-    params = {"from": str(today - dt.timedelta(days=int(E("LOOKBACK_DAYS", "3")))), "to": str(today), "page_size": 50}
-    user = urllib.parse.quote(E("ZOOM_USER", "me"))
-    r = requests.get(f"https://api.zoom.us/v2/users/{user}/recordings", params=params,
-                     headers={"Authorization": f"Bearer {token}"}, timeout=30)
-    r.raise_for_status()
-    topic = (E("ZOOM_TOPIC") or "").lower()
-    out = []
-    for m in r.json().get("meetings", []):
-        if topic and topic not in m.get("topic", "").lower():
-            continue
-        if m.get("duration", 0) < int(E("MIN_MINUTES", "20")):
-            continue
-        out.append(m)
-    return out
+def inbox_ready():
+    try:
+        dirs = [d.rstrip("/") for d in run(["rclone", "lsf", INBOX, "--dirs-only"]).split()]
+    except subprocess.CalledProcessError:
+        return []  # inbox not created yet
+    return [d for d in dirs if ".ready" in run(["rclone", "lsf", f"{INBOX}/{d}"]).split()]
 
 
-VIEW_PREF = ["shared_screen_with_speaker_view", "shared_screen_with_gallery_view", "shared_screen", "active_speaker"]
-
-
-def pick_files(m):
-    files = [f for f in m.get("recording_files", []) if f.get("status") == "completed"]
-    mp4s = [f for f in files if f.get("file_type") == "MP4"]
-    mp4s.sort(key=lambda f: VIEW_PREF.index(f["recording_type"]) if f.get("recording_type") in VIEW_PREF else 99)
-    vtt = next((f for f in files if f.get("file_type") == "TRANSCRIPT"), None)
-    return (mp4s[0] if mp4s else None), vtt
-
-
-def download(url, token, path):
-    with requests.get(url, headers={"Authorization": f"Bearer {token}"}, stream=True, timeout=60) as r:
-        r.raise_for_status()
-        with open(path, "wb") as f:
-            for chunk in r.iter_content(1 << 20):
-                f.write(chunk)
-    log("downloaded", path, os.path.getsize(path) // (1 << 20), "MB")
+def class_start(stem):
+    """GMT20261116-085941 (Zoom's UTC start) -> aware datetime in WIB."""
+    m = re.search(r"GMT(\d{8})-(\d{6})", stem)
+    if not m:
+        raise RuntimeError(f"can't read a start time from {stem!r}")
+    return dt.datetime.strptime(m.group(1) + m.group(2), "%Y%m%d%H%M%S").replace(tzinfo=dt.timezone.utc).astimezone(WIB)
 
 
 # ---------- report ----------
@@ -137,7 +109,11 @@ Nobody is watching this run: do not ask questions, just finish. Files in the cur
    sections with ![[frame-file.jpg]] embeds and an italic caption under each; callouts; a watchlist table; key lessons;
    concepts referenced. Write in English. If the transcript is unclear on something, say so instead of inventing it.
 4. Write summary.txt, the Telegram caption for members: plain text, no markdown, at most 650 characters. First line is the
-   report title. Then 3 to 5 lines starting with "• " giving the main calls (instrument, bias, key level).
+   report title. Then 3 to 5 call lines, exactly in the form "• SYMBOL | Bias | what he said and the key level", where Bias is
+   Bearish, Bullish or Watch (Watch when he had no directional call, e.g. "wait for confirmation"). Example:
+   • ES1! | Bearish | Sell a retracement near 7,672.75, chart target 7,107.50.
+5. Add to report.md's frontmatter a line dek: "<one sentence, at most 30 words, saying what the class covered and the main takeaway>".
+Do not add any note about the transcript source, its language or its quality (no "Transcript source" callout).
 Never use em dashes or en dashes anywhere in report.md or summary.txt; use commas, colons or "to".
 """
 
@@ -168,7 +144,10 @@ def write_report(work, date, minutes, topic):
     for p in (rep, summ):  # house rule: no em or en dashes
         t = open(p).read().replace(" — ", ", ").replace("—", ", ").replace(" – ", " to ").replace("–", " to ")
         open(p, "w").write(t)
-    return open(rep).read(), open(summ).read().strip()
+    # no "Transcript source" callout even if the example still has one
+    md = re.sub(r"^> \[!\w+\][^\n]*transcript[^\n]*\n(?:>[^\n]*\n)*\n?", "", open(rep).read(), flags=re.M | re.I)
+    open(rep, "w").write(md)
+    return md, open(summ).read().strip()
 
 
 def title_of(report):
@@ -206,26 +185,18 @@ def publish_site(date, start, title, summary, minutes, video_id, pdf_id):
 
 
 # ---------- pipeline ----------
-def process(m, token):
-    start = dt.datetime.fromisoformat(m["start_time"].replace("Z", "+00:00")).astimezone(WIB)
-    date, minutes = start.strftime("%Y-%m-%d"), m.get("duration", 0)
-    mp4, vtt = pick_files(m)
-    if not mp4:
-        return "waiting", "no finished MP4 yet"
-    if not vtt:
-        age_h = (dt.datetime.now(WIB) - start).total_seconds() / 3600 - minutes / 60
-        if age_h < 8:
-            return "waiting", "Zoom transcript not ready yet"
-        raise RuntimeError("no Zoom audio transcript 8h after the class. Is 'Audio transcript' on in Zoom cloud recording settings?")
-
-    work = os.path.join(DATA, "work", f"{date}-{re.sub(r'[^A-Za-z0-9]', '', m['uuid'])[:12]}")
+def process(stem):
+    start = class_start(stem)
+    date = start.strftime("%Y-%m-%d")
+    work = os.path.join(DATA, "work", stem)
     os.makedirs(work, exist_ok=True)
+    run(["rclone", "copy", f"{INBOX}/{stem}", work, "--exclude", ".ready"])
     video = os.path.join(work, "video.mp4")
-    if not os.path.exists(video) or os.path.getsize(video) != mp4.get("file_size", -1):
-        download(mp4["download_url"], token, video)
-    download(vtt["download_url"], token, os.path.join(work, "transcript.vtt"))
+    if not (os.path.exists(video) and os.path.exists(os.path.join(work, "transcript.vtt"))):
+        raise RuntimeError("inbox folder is missing video.mp4 or transcript.vtt")
+    minutes = round(float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", video])) / 60)
 
-    report, summary = write_report(work, date, minutes, m.get("topic", ""))
+    report, summary = write_report(work, date, minutes, "TradeVantage Class")
     title = title_of(report)
     pdf = os.path.join(work, f"{date} TradeVantage Class.pdf")
     run(["python3", os.path.join(HERE, "build_pdf_tv.py"), os.path.join(work, "report.md"), pdf, "--imgdir", os.path.join(work, "frames")])
@@ -240,34 +211,34 @@ def process(m, token):
 
     publish_site(date, start, title, summary, minutes, video_id, pdf_id)
 
-    caption = (f"{summary}\n\nRecording: https://drive.google.com/file/d/{video_id}/view"
-               f"\nOn the site: {SITE}/app/education")[:1024]
+    calls = re.sub(r"^• ([^|]+?) \| (\w+) \| ", lambda m: f"• {m.group(1)} ({m.group(2).lower()}): ", summary, flags=re.M)
+    caption = (f"{calls}\n\nRecording: https://drive.google.com/file/d/{video_id}/view"
+               f"\nOn the site: {SITE}/app/education/reports")[:1024]
     with open(pdf, "rb") as f:
         tg("sendDocument", data={"chat_id": E("TELEGRAM_CHAT_ID"), "caption": caption},
            files={"document": (os.path.basename(pdf), f, "application/pdf")})
 
-    os.remove(video)  # Drive has it; the VPS disk is small
+    run(["rclone", "purge", f"{INBOX}/{stem}"])  # to Drive trash; the video now lives in the reports folder
+    shutil.rmtree(work, ignore_errors=True)  # the VPS disk is small
     return "done", f"video {video_id} pdf {pdf_id}"
 
 
 def poll():
     state = load_state()
-    token = zoom_token()
-    for m in zoom_meetings(token):
-        key = m["uuid"]
-        st = state.get(key, {"attempts": 0})
+    for stem in inbox_ready():
+        st = state.get(stem, {"attempts": 0})
         if st.get("status") == "done" or st.get("attempts", 0) >= MAX_ATTEMPTS:
             continue
-        log("meeting", m.get("topic"), m.get("start_time"), m.get("duration"), "min")
+        log("class", stem)
         try:
-            status, note = process(m, token)
+            status, note = process(stem)
         except Exception as e:
             st["attempts"] = st.get("attempts", 0) + 1
             status, note = "failed", f"{type(e).__name__}: {e}"
             traceback.print_exc()
-            alert(f"{m.get('start_time')} attempt {st['attempts']}/{MAX_ATTEMPTS} failed: {note}")
+            alert(f"{stem} attempt {st['attempts']}/{MAX_ATTEMPTS} failed: {note}")
         st.update(status=status, note=note, at=dt.datetime.now(WIB).isoformat())
-        state[key] = st
+        state[stem] = st
         save_state(state)
         log(status, note)
 
