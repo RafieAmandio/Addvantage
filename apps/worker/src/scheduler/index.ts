@@ -6,6 +6,7 @@ import { runSource } from "../pipeline/runSource";
 import { ADAPTERS } from "../adapters";
 import { runRenewalReminders } from "./renewal-reminder";
 import { syncCalendar } from "../calendar/sync";
+import { syncActuals } from "../calendar/actuals";
 import { syncRsi } from "../rsi/sync-rsi";
 import { syncAtr } from "../atr/sync-atr";
 import { syncPolymarketSnapshots, rotatePolymarketSlugs } from "../polymarket/sync";
@@ -29,6 +30,8 @@ import { syncBars } from "../bars/sync-bars";
 
 let pollTimer: NodeJS.Timeout | null = null;
 let inFlightTick: Promise<void> | null = null;
+let actualsMinute = -1;
+let actualsBusy = false;
 
 type ScheduleSpec = {
   minute: number;
@@ -45,7 +48,7 @@ const WIB_RSI_HOURS = [0, 4, 8, 12, 16, 20] as const;
 const SCHEDULE = {
   /** Main source ingestion — every hour at :03 */
   sources: { minute: 3, divisorHour: 1 },
-  /** TradingEconomics calendar — every 6 hours at :07 */
+  /** ForexFactory calendar schedule, every 6 hours at :07 (actuals run separately, every minute) */
   calendar: { minute: 7, divisorHour: 6 },
   /** RSI sync — every 4 hours from 08:05 WIB (requires MARKET_DATA_PROVIDER) */
   rsi: { minute: 5, fixedHours: WIB_RSI_HOURS, divisorHour: 4, timezone: WIB_TIMEZONE },
@@ -208,7 +211,7 @@ export function startScheduler(): void {
   logger.info(
     {
       sources: "m3 every 1h",
-      calendar: "m7 every 6h",
+      calendar: "m7 every 6h, actuals every minute inside release windows",
       rsi: config.MARKET_DATA_PROVIDER ? "08:05/12:05/16:05/20:05/00:05/04:05 WIB" : "disabled",
       atr: config.MARKET_DATA_PROVIDER ? "m12 every 4h" : "disabled",
       gap: config.MARKET_DATA_PROVIDER ? "m16 every 4h" : "disabled",
@@ -241,6 +244,21 @@ function pollJobs(): void {
       Sentry.captureException(err, { tags: { scope: "calendar.cron" } });
       logger.error({ err: String(err) }, "calendar: scheduled sync failed");
     });
+  }
+
+  // -- calendar actuals (every minute; only fetches while a release is under 15 min old) --
+  const minute = Math.floor(now.getTime() / 60_000);
+  if (minute !== actualsMinute && !actualsBusy) {
+    actualsMinute = minute;
+    actualsBusy = true;
+    syncActuals(now.getTime())
+      .catch((err) => {
+        Sentry.captureException(err, { tags: { scope: "calendar-actuals.cron" } });
+        logger.error({ err: String(err) }, "calendar: actuals pass failed");
+      })
+      .finally(() => {
+        actualsBusy = false;
+      });
   }
 
   // -- RSI (every 4h from 08:05 WIB, requires market data) --

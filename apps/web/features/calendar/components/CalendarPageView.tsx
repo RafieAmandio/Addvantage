@@ -2,7 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEvery } from "@/features/dashboard/hooks/useLive";
 import { useUrlSyncedState } from "@/lib/hooks/useUrlSyncedState";
 import type { CalendarEvent } from "@/features/calendar/types";
 import {
@@ -40,6 +41,17 @@ interface CalendarPageViewProps {
 
 export function CalendarPageView({ events = [] }: CalendarPageViewProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // The worker fills actuals within minutes of a release; refetch only while one is still missing.
+  useEvery(60_000, () => {
+    const now = Date.now();
+    const waiting = events.some((e) => {
+      const age = now - new Date(e.ts).getTime();
+      return !e.actual && (e.forecast || e.previous) && age >= 0 && age < 20 * 60_000;
+    });
+    if (waiting) router.refresh();
+  });
 
   const [view, setView] = useState<ViewMode>(() =>
     parseViewMode(searchParams.get("view"))
