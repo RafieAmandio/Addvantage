@@ -43,7 +43,7 @@ body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-hei
 
 /* ---------- cover: one colour, one graphic, a few words ---------- */
 .cover{height:297mm;position:relative;overflow:hidden;background:var(--signal);break-after:page;}
-.cover .art{position:absolute;left:-36mm;right:-44mm;bottom:-48mm;}
+.cover .art{position:absolute;left:-24mm;right:-30mm;bottom:-22mm;}
 .cover .art svg{display:block;width:100%;height:auto;}
 .cover .top{position:absolute;top:18mm;left:17mm;right:17mm;display:grid;grid-template-columns:1fr 64mm;gap:10mm;}
 .cover .logo{grid-column:1/-1;height:7mm;margin-bottom:6mm;}
@@ -117,39 +117,44 @@ td:first-child{font-weight:600;}
   font-family:var(--mono);font-size:7pt;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
 """
 
-def candles(seed):
-    """One row of big isometric candlesticks climbing to the upper right, each with a flat shadow on the page.
-    White = up, ink = down; seeded by the date so each class gets its own chart."""
+def blocks(seed):
+    """Abstract isometric blocks for the cover (columns, beams, slabs) in white, ink and a deeper yellow,
+    like an annual-report cover. Seeded by the date so each class differs.
+    Every shape is drawn as unit-cell prisms back to front, which keeps the painter's order correct."""
     import math, random
     rnd = random.Random(seed)
     c = math.cos(math.pi / 6)
     P = lambda x, y, z: ((x - y) * c, (x + y) * .5 - z)
-    up, dn = ("#FFFFFF", "#ECEAE3", "#CFCDC6"), ("#3A3C40", "#1E1F22", "#111214")
-    q = lambda pts: " ".join("%.2f,%.2f" % P(*p) for p in pts)
-    poly = lambda pts, f: f'<polygon points="{q(pts)}" fill="{f}"/>'
-    def prism(x, y, z, w, h, col):
-        X, Y, Z = x + w, y + w, z + h
-        return (poly([(x, Y, z), (X, Y, z), (X, Y, Z), (x, Y, Z)], col[1])
-                + poly([(X, y, z), (X, Y, z), (X, Y, Z), (X, y, Z)], col[2])
-                + poly([(x, y, Z), (X, y, Z), (X, Y, Z), (x, Y, Z)], col[0]))
-    parts = []                                         # (depth, svg); dense field, rows are price series
-    for r in range(6):
-        price = rnd.uniform(4, 10)
-        for i in range(7):
-            x, y = i * 3.0, r * 3.0
-            o = price; price = max(2.5, price + rnd.uniform(-2.8, 3.0)); cl = price
-            b0, b1 = min(o, cl), max(o, cl) + 1.2
-            lo, hi = 0, b1 + rnd.uniform(.8, 2.6)      # wicks stand on the floor so the field reads as one mass
-            col = up if cl >= o else dn
-            parts.append((x + y, prism(x + .95, y + .95, lo, .5, b0 - lo, col) + prism(x, y, b0, 2.4, b1 - b0, col)
-                          + prism(x + .95, y + .95, b1, .5, hi - b1, col)))
-    parts.sort(key=lambda t: t[0])
-    bodies = [sv for _, sv in reversed(parts)]
-    svg = "".join(reversed(bodies))   # far candles first
-    pts = [tuple(map(float, m.split(","))) for m in re.findall(r"-?[\d.]+,-?[\d.]+", svg)]
-    x0, y0 = min(p[0] for p in pts), min(p[1] for p in pts)
-    x1, y1 = max(p[0] for p in pts), max(p[1] for p in pts)
-    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0-.5:.1f} {y0-.5:.1f} {x1-x0+1:.1f} {y1-y0+1:.1f}">{svg}</svg>'
+    cols = [("#FFFFFF", "#ECEAE3", "#CFCDC6"), ("#3A3C40", "#1E1F22", "#111214"), ("#FFE04D", "#F2C400", "#D9A900")]
+    q = lambda pts: " ".join("%.3f,%.3f" % P(*p) for p in pts)
+    poly = lambda pts, f: f'<polygon points="{q(pts)}" fill="{f}" stroke="{f}" stroke-width=".02"/>'
+    N, used, shapes = 9, set(), []
+    kinds = [((1, 1), (3, 7)), ((4, 1), (1, 2)), ((1, 4), (1, 2)), ((2, 2), (1, 1)), ((3, 1), (2, 4)), ((1, 3), (2, 4))]
+    for _ in range(60):                                # try shapes, keep the ones that fit with a gap around them
+        (w, d), (h0, h1) = rnd.choice(kinds)
+        x, y = rnd.randrange(N - w + 1), rnd.randrange(N - d + 1)
+        cells = {(i, j) for i in range(x, x + w) for j in range(y, y + d)}
+        if {(i + a, j + b) for i, j in cells for a in (-1, 0, 1) for b in (-1, 0, 1)} & used: continue
+        used |= cells
+        shapes.append((x, y, x + w, y + d, rnd.uniform(h0, h1), rnd.choices(cols, (4, 3, 2))[0]))
+        if len(used) > 30: break
+    # painter's order: footprints never touch, so A is behind B when it is fully on B's -x or -y side
+    ov = lambda a0, a1, b0, b1: a0 < b1 and b0 < a1
+    behind = lambda A, B: (A[2] <= B[0] and (ov(A[1], A[3], B[1], B[3]) or A[3] <= B[1])) or \
+                          (A[3] <= B[1] and (ov(A[0], A[2], B[0], B[2]) or A[2] <= B[0]))
+    order = []
+    while shapes:
+        nxt = next(S for S in shapes if not any(behind(T, S) for T in shapes if T is not S))
+        order.append(nxt); shapes.remove(nxt)
+    svg = ""
+    for x, y, X, Y, h, col in order:
+        svg += (poly([(x, Y, 0), (X, Y, 0), (X, Y, h), (x, Y, h)], col[1])
+                + poly([(X, y, 0), (X, Y, 0), (X, Y, h), (X, y, h)], col[2])
+                + poly([(x, y, h), (X, y, h), (X, Y, h), (x, Y, h)], col[0]))
+    # frame the whole 9x9 floor, not just the shapes, so the composition sits in the same place every time
+    x0, x1 = P(0, N, 0)[0], P(N, 0, 0)[0]
+    y0, y1 = P(0, 0, 8)[1], P(N, N, 0)[1]
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0:.1f} {y0:.1f} {x1-x0:.1f} {y1-y0:.1f}">{svg}</svg>'
 
 def find_chrome():
     for c in CHROME_CANDIDATES:
@@ -278,7 +283,7 @@ def main():
     <div><h1 class="big">CLASS<br>REPORT</h1><span class="lbl when">{long_date}</span></div>
     <div class="side"><b>{theme}</b>{f'<p>{dek}</p>' if dek else ''}</div>
   </div>
-  <div class="art">{candles(date_line)}</div>
+  <div class="art">{blocks(date_line)}</div>
 </section>"""
     calls_html = (f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>'
                   f'{calls}<div class="calls-f">Education only. Size every trade to your own risk.</div></div>') if calls else ""
