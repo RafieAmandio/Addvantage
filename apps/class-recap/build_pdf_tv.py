@@ -41,37 +41,27 @@ body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-hei
   -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
 .page{padding:14mm 17mm;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
 
-/* ---------- cover: masthead, headline, contents + art, the calls ---------- */
-.cover{height:297mm;padding:12mm 15mm 0;display:flex;flex-direction:column;break-after:page;overflow:hidden;}
-.mast{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:3mm;
-  border-bottom:2px solid var(--ink);box-shadow:0 1.2mm 0 -0.9mm var(--ink);}
-.mast img{height:6.6mm;display:block;}
-.mast .c{font-family:var(--mono);font-weight:600;font-size:8pt;letter-spacing:.32em;text-transform:uppercase;}
-.mast .r{justify-self:end;}
-.lbl{font-family:var(--mono);font-weight:500;font-size:7.4pt;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);}
-.dateline{display:flex;gap:4mm;margin-top:4mm;padding-bottom:3mm;border-bottom:1px solid var(--stone);}
-.dateline span+span::before{content:"/";margin-right:4mm;color:var(--stone);}
-h1.title{font-family:var(--sans);font-weight:600;font-size:42pt;line-height:.98;letter-spacing:-.04em;
-  margin:12mm 0 0;max-width:13.5em;text-wrap:balance;}
-.dek{font-size:12.6pt;line-height:1.45;color:var(--graphite);max-width:132mm;margin:5mm 0 0;letter-spacing:-.005em;}
-.mid{display:grid;grid-template-columns:72mm 1fr;gap:6mm;margin-top:auto;padding-top:9mm;align-items:end;}
-.toc{border-top:1px solid var(--ink);padding-bottom:5mm;}
-.toc .lbl{display:block;padding:2.4mm 0 1.6mm;}
-.toc ol{list-style:none;margin:0;padding:0;}
-.toc li{display:grid;grid-template-columns:9mm 1fr;padding:1.5mm 0;border-top:1px solid var(--stone);font-size:8.8pt;line-height:1.3;margin:0;}
-.toc li span{font-family:var(--mono);font-size:7pt;color:var(--mute);padding-top:.4mm;}
-.art{margin-right:-15mm;align-self:end;}
-.art img{display:block;width:100%;-webkit-mask-image:radial-gradient(ellipse 62% 58% at 52% 55%,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 62% 58% at 52% 55%,#000 62%,transparent 100%);}
-.calls{background:var(--desk);color:#EDEDEA;margin:0 -15mm;padding:7mm 15mm 6mm;}
+/* ---------- cover: one colour, one graphic, a few words ---------- */
+.cover{height:297mm;position:relative;overflow:hidden;background:var(--signal);break-after:page;}
+.cover .art{position:absolute;left:-60mm;right:-70mm;bottom:-40mm;}
+.cover .art svg{display:block;width:100%;height:auto;}
+.cover .top{position:absolute;top:18mm;left:17mm;right:17mm;display:grid;grid-template-columns:1fr 64mm;gap:10mm;}
+.cover .logo{grid-column:1/-1;height:7mm;margin-bottom:6mm;}
+.cover .big{font-weight:700;font-size:54pt;line-height:.9;letter-spacing:-.045em;margin:0;}
+.cover .side b{display:block;font-weight:600;font-size:13pt;line-height:1.2;letter-spacing:-.01em;margin-top:1.5mm;}
+.cover .side p{margin:2.4mm 0 0;font-size:9pt;line-height:1.45;}
+.cover .lbl{font-family:var(--mono);font-weight:500;font-size:7.4pt;letter-spacing:.14em;text-transform:uppercase;}
+/* the calls open the report on page 2 */
+.calls{background:var(--desk);color:#EDEDEA;padding:7mm 9mm 6mm;margin:0 0 9mm;}
 .calls-h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #2A2C30;padding-bottom:2.6mm;}
 .calls-h b{font-family:var(--mono);font-weight:600;font-size:8pt;letter-spacing:.24em;text-transform:uppercase;color:var(--signal);}
 .calls-h span{font-family:var(--mono);font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:#8A8C91;}
-.call{display:grid;grid-template-columns:30mm 21mm 1fr;gap:3mm;align-items:baseline;padding:2.5mm 0;border-bottom:1px solid #1F2125;}
+.call{display:grid;grid-template-columns:28mm 21mm 1fr;gap:3mm;align-items:baseline;padding:2.5mm 0;border-bottom:1px solid #1F2125;}
 .call .sym{font-family:var(--mono);font-weight:600;font-size:9.4pt;color:#fff;letter-spacing:.02em;}
 .chip{font-family:var(--mono);font-weight:600;font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;padding:.5mm 1.8mm;justify-self:start;}
 .chip.bear{background:#E06A5E;color:#111214;}.chip.bull{background:#4E9F6E;color:#111214;}.chip.watch{background:var(--signal);color:#111214;}
 .call .txt{font-size:8.8pt;line-height:1.4;color:#C9C9C5;}
-.calls-f{display:flex;justify-content:space-between;margin-top:4mm;font-family:var(--mono);font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;color:#6B6D72;}
+.calls-f{margin-top:4mm;font-family:var(--mono);font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;color:#6B6D72;}
 
 /* ---------- body ---------- */
 h2{font-family:var(--sans);font-weight:600;font-size:19pt;line-height:1.1;letter-spacing:-.025em;
@@ -124,6 +114,41 @@ td:first-child{font-weight:600;}
 .foot{margin:12mm 0 4mm;padding-top:3mm;border-top:1px solid var(--ink);display:flex;justify-content:space-between;
   font-family:var(--mono);font-size:7pt;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
 """
+
+def iso_candles(seed):
+    """Isometric 3D candlesticks, three rows deep, flat-shaded (white = up, ink = down)."""
+    import random, math
+    rnd = random.Random(seed)
+    c, sn = math.cos(math.pi / 6), 0.5
+    P = lambda x, y, z: ((x - y) * c, (x + y) * sn - z)
+    up = ("#FFFFFF", "#ECEAE3", "#C9C7BF")      # top, left face, right face
+    dn = ("#4A4C51", "#1E1F22", "#0E0F11")
+    shapes = []                                  # (sort key, svg)
+    def prism(x, y, z, w, d, h, col, k):
+        q = lambda pts: " ".join(f"{X:.2f},{Y:.2f}" for X, Y in (P(*p) for p in pts))
+        top = q([(x, y, z+h), (x+w, y, z+h), (x+w, y+d, z+h), (x, y+d, z+h)])
+        lf = q([(x, y+d, z), (x+w, y+d, z), (x+w, y+d, z+h), (x, y+d, z+h)])
+        rt = q([(x+w, y, z), (x+w, y+d, z), (x+w, y+d, z+h), (x+w, y, z+h)])
+        shapes.append((k, "".join(f'<polygon points="{pts}" fill="{f}" stroke="{f}" stroke-width=".04" stroke-linejoin="round"/>'
+                                  for pts, f in ((lf, col[1]), (rt, col[2]), (top, col[0])))))
+    for row, y in enumerate((0, 2.8, 5.6, 8.4)):
+        price = rnd.uniform(4, 9)
+        for i in range(11):
+            x = i * 2.0 - row * 1.5
+            o = price; price = max(1.5, price + rnd.uniform(-2.2, 2.6)); cl = price
+            lo, hi = min(o, cl) - rnd.uniform(.3, 1.6), max(o, cl) + rnd.uniform(.3, 1.6)
+            b0, b1 = min(o, cl), max(o, cl) + .35
+            col = up if cl >= o else dn
+            k = x + y
+            prism(x+.5, y+.5, lo, .4, .4, b0-lo, col, (k, 0))
+            prism(x, y, b0, 1.4, 1.4, b1-b0, col, (k, 1))
+            prism(x+.5, y+.5, b1, .4, .4, hi-b1, col, (k, 2))
+    shapes.sort(key=lambda t: t[0])
+    pts = [tuple(map(float, p.split(","))) for _, sv in shapes for p in re.findall(r"[-\d.]+,[-\d.]+", sv)]
+    x0, x1 = min(p[0] for p in pts), max(p[0] for p in pts)
+    y0, y1 = min(p[1] for p in pts), max(p[1] for p in pts)
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0-1:.1f} {y0-1:.1f} {x1-x0+2:.1f} {y1-y0+2:.1f}">'
+            + "".join(sv for _, sv in shapes) + "</svg>")
 
 def find_chrome():
     for c in CHROME_CANDIDATES:
@@ -222,17 +247,9 @@ def main():
     dek = fmv("dek") or re.sub(r"^[a-z]", lambda m: m.group(0).upper(), grab("Format"))
     try:
         d = __import__("datetime").date.fromisoformat(date_line)
-        long_date, week = d.strftime("%A %-d %B %Y"), f"Week {d.isocalendar()[1]:02d} / {d.year}"
+        long_date = d.strftime("%A %-d %B %Y")
     except ValueError:
-        long_date, week = date_line, ""
-    mins = re.search(r"\d+", duration or "")
-    dateline = "".join(f"<span>{x}</span>" for x in [long_date, f"{mins.group(0)} min" if mins else "", presenter] if x)
-
-    # contents: the numbered topic sections, not the overview or the reference lists at the end
-    skip = re.compile(r"overview|lessons|concepts|related|watchlist|timestamps", re.I)
-    secs = [re.sub(r"^\d+\.\s*", "", h) for h in re.findall(r"^##\s+(.+)$", body, re.M) if not skip.search(h)][:6]
-    toc = "".join(f"<li><span>{i:02d}</span>{h}</li>" for i, h in enumerate(secs, 1))
-
+        long_date = date_line
     # the calls: summary.txt bullets "• SYMBOL: text"
     sp = a.summary or os.path.join(os.path.dirname(os.path.abspath(a.md)), "summary.txt")
     calls = ""
@@ -254,23 +271,22 @@ def main():
                       f'<span class="chip {kind}">{ {"bear":"Bearish","bull":"Bullish","watch":"Watch"}[kind] }</span>'
                       f'<span class="txt">{txt}</span></div>')
     lockup = f'data:image/svg+xml;base64,{b64(os.path.join(ASSETS, "lockup-paper.svg"))}'
-    hero = f'data:image/jpeg;base64,{b64(os.path.join(ASSETS, "hero-desk.jpg"))}'
     cover = f"""<section class="cover">
-  <div class="mast"><img src="{lockup}" alt="+vantage"><span class="c">Class Report</span><span class="lbl r">{week}</span></div>
-  <div class="dateline lbl">{dateline}</div>
-  <h1 class="title">{theme}</h1>
-  {f'<p class="dek">{dek}</p>' if dek else ''}
-  <div class="mid">
-    <div class="toc"><span class="lbl">In this report</span><ol>{toc}</ol></div>
-    <div class="art"><img src="{hero}" alt=""></div>
+  <div class="top">
+    <img class="logo" src="{lockup}" alt="+vantage">
+    <h1 class="big">Class<br>Report</h1>
+    <div class="side"><span class="lbl">{long_date}</span><b>{theme}</b>{f'<p>{dek}</p>' if dek else ''}</div>
   </div>
-  {f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>{calls}<div class="calls-f"><span>+vantage / tradevantage.gg</span><span>Education only. Size every trade to your own risk.</span></div></div>' if calls else ''}
+  <div class="art">{iso_candles(date_line)}</div>
 </section>"""
+    calls_html = (f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>'
+                  f'{calls}<div class="calls-f">Education only. Size every trade to your own risk.</div></div>') if calls else ""
     html = f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONTS}
 <style>{CSS}</style></head>
 <body>
 {cover}
 <div class="page">
+{calls_html}
 {html_body}
 <div class="foot"><span>+vantage / tradevantage.gg</span><span>Class report / {date_line}</span></div>
 </div></body></html>"""
