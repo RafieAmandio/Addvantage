@@ -43,8 +43,8 @@ body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-hei
 
 /* ---------- cover: one colour, one graphic, a few words ---------- */
 .cover{height:297mm;position:relative;overflow:hidden;background:var(--signal);break-after:page;}
-.cover .art{position:absolute;left:10mm;right:-14mm;bottom:12mm;height:165mm;}
-.cover .art svg{display:block;width:100%;height:100%;}
+.cover .art{position:absolute;left:-36mm;right:-44mm;bottom:-48mm;}
+.cover .art svg{display:block;width:100%;height:auto;}
 .cover .top{position:absolute;top:18mm;left:17mm;right:17mm;display:grid;grid-template-columns:1fr 64mm;gap:10mm;}
 .cover .logo{grid-column:1/-1;height:7mm;margin-bottom:6mm;}
 .cover .big{font-weight:700;font-size:58pt;line-height:.88;letter-spacing:-.03em;margin:0;}
@@ -132,20 +132,24 @@ def candles(seed):
         return (poly([(x, Y, z), (X, Y, z), (X, Y, Z), (x, Y, Z)], col[1])
                 + poly([(X, y, z), (X, Y, z), (X, Y, Z), (X, y, Z)], col[2])
                 + poly([(x, y, Z), (X, y, Z), (X, Y, Z), (x, Y, Z)], col[0]))
-    bodies, price = [], 6.0
-    for i in range(8):
-        y = -i * 3.4                                   # along -y = up and to the right on the page
-        o = price; price = max(3, price + rnd.uniform(-2.6, 2.9)); cl = price
-        b0, b1 = min(o, cl), max(o, cl) + .6
-        lo, hi = b0 - rnd.uniform(.8, 2.2), b1 + rnd.uniform(.8, 2.2)
-        col = up if cl >= o else dn
-        bodies.append(prism(.95, y + .95, lo, .5, b0 - lo, col) + prism(0, y, b0, 2.4, b1 - b0, col)
-                      + prism(.95, y + .95, b1, .5, hi - b1, col))
+    parts = []                                         # (depth, svg); dense field, rows are price series
+    for r in range(6):
+        price = rnd.uniform(4, 10)
+        for i in range(7):
+            x, y = i * 3.0, r * 3.0
+            o = price; price = max(2.5, price + rnd.uniform(-2.8, 3.0)); cl = price
+            b0, b1 = min(o, cl), max(o, cl) + 1.2
+            lo, hi = 0, b1 + rnd.uniform(.8, 2.6)      # wicks stand on the floor so the field reads as one mass
+            col = up if cl >= o else dn
+            parts.append((x + y, prism(x + .95, y + .95, lo, .5, b0 - lo, col) + prism(x, y, b0, 2.4, b1 - b0, col)
+                          + prism(x + .95, y + .95, b1, .5, hi - b1, col)))
+    parts.sort(key=lambda t: t[0])
+    bodies = [sv for _, sv in reversed(parts)]
     svg = "".join(reversed(bodies))   # far candles first
     pts = [tuple(map(float, m.split(","))) for m in re.findall(r"-?[\d.]+,-?[\d.]+", svg)]
     x0, y0 = min(p[0] for p in pts), min(p[1] for p in pts)
     x1, y1 = max(p[0] for p in pts), max(p[1] for p in pts)
-    return f'<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax meet" viewBox="{x0-.5:.1f} {y0-.5:.1f} {x1-x0+1:.1f} {y1-y0+1:.1f}">{svg}</svg>'
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0-.5:.1f} {y0-.5:.1f} {x1-x0+1:.1f} {y1-y0+1:.1f}">{svg}</svg>'
 
 def find_chrome():
     for c in CHROME_CANDIDATES:
