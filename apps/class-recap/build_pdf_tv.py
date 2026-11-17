@@ -43,11 +43,13 @@ body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-hei
 
 /* ---------- cover: one colour, one graphic, a few words ---------- */
 .cover{height:297mm;position:relative;overflow:hidden;background:var(--signal);break-after:page;}
-.cover .art{position:absolute;left:-60mm;right:-70mm;bottom:-40mm;}
-.cover .art svg{display:block;width:100%;height:auto;}
+.cover .art{position:absolute;left:10mm;right:-14mm;bottom:12mm;height:165mm;}
+.cover .art svg{display:block;width:100%;height:100%;}
 .cover .top{position:absolute;top:18mm;left:17mm;right:17mm;display:grid;grid-template-columns:1fr 64mm;gap:10mm;}
 .cover .logo{grid-column:1/-1;height:7mm;margin-bottom:6mm;}
-.cover .big{font-weight:700;font-size:54pt;line-height:.9;letter-spacing:-.045em;margin:0;}
+.cover .big{font-weight:700;font-size:58pt;line-height:.88;letter-spacing:-.03em;margin:0;}
+.cover .when{display:block;margin-top:5mm;font-size:9pt;}
+.cover .side{padding-top:2mm;}
 .cover .side b{display:block;font-weight:600;font-size:13pt;line-height:1.2;letter-spacing:-.01em;margin-top:1.5mm;}
 .cover .side p{margin:2.4mm 0 0;font-size:9pt;line-height:1.45;}
 .cover .lbl{font-family:var(--mono);font-weight:500;font-size:7.4pt;letter-spacing:.14em;text-transform:uppercase;}
@@ -115,40 +117,35 @@ td:first-child{font-weight:600;}
   font-family:var(--mono);font-size:7pt;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);}
 """
 
-def iso_candles(seed):
-    """Isometric 3D candlesticks, three rows deep, flat-shaded (white = up, ink = down)."""
-    import random, math
+def candles(seed):
+    """One row of big isometric candlesticks climbing to the upper right, each with a flat shadow on the page.
+    White = up, ink = down; seeded by the date so each class gets its own chart."""
+    import math, random
     rnd = random.Random(seed)
-    c, sn = math.cos(math.pi / 6), 0.5
-    P = lambda x, y, z: ((x - y) * c, (x + y) * sn - z)
-    up = ("#FFFFFF", "#ECEAE3", "#C9C7BF")      # top, left face, right face
-    dn = ("#4A4C51", "#1E1F22", "#0E0F11")
-    shapes = []                                  # (sort key, svg)
-    def prism(x, y, z, w, d, h, col, k):
-        q = lambda pts: " ".join(f"{X:.2f},{Y:.2f}" for X, Y in (P(*p) for p in pts))
-        top = q([(x, y, z+h), (x+w, y, z+h), (x+w, y+d, z+h), (x, y+d, z+h)])
-        lf = q([(x, y+d, z), (x+w, y+d, z), (x+w, y+d, z+h), (x, y+d, z+h)])
-        rt = q([(x+w, y, z), (x+w, y+d, z), (x+w, y+d, z+h), (x+w, y, z+h)])
-        shapes.append((k, "".join(f'<polygon points="{pts}" fill="{f}" stroke="{f}" stroke-width=".04" stroke-linejoin="round"/>'
-                                  for pts, f in ((lf, col[1]), (rt, col[2]), (top, col[0])))))
-    for row, y in enumerate((0, 2.8, 5.6, 8.4)):
-        price = rnd.uniform(4, 9)
-        for i in range(11):
-            x = i * 2.0 - row * 1.5
-            o = price; price = max(1.5, price + rnd.uniform(-2.2, 2.6)); cl = price
-            lo, hi = min(o, cl) - rnd.uniform(.3, 1.6), max(o, cl) + rnd.uniform(.3, 1.6)
-            b0, b1 = min(o, cl), max(o, cl) + .35
-            col = up if cl >= o else dn
-            k = x + y
-            prism(x+.5, y+.5, lo, .4, .4, b0-lo, col, (k, 0))
-            prism(x, y, b0, 1.4, 1.4, b1-b0, col, (k, 1))
-            prism(x+.5, y+.5, b1, .4, .4, hi-b1, col, (k, 2))
-    shapes.sort(key=lambda t: t[0])
-    pts = [tuple(map(float, p.split(","))) for _, sv in shapes for p in re.findall(r"[-\d.]+,[-\d.]+", sv)]
-    x0, x1 = min(p[0] for p in pts), max(p[0] for p in pts)
-    y0, y1 = min(p[1] for p in pts), max(p[1] for p in pts)
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x0-1:.1f} {y0-1:.1f} {x1-x0+2:.1f} {y1-y0+2:.1f}">'
-            + "".join(sv for _, sv in shapes) + "</svg>")
+    c = math.cos(math.pi / 6)
+    P = lambda x, y, z: ((x - y) * c, (x + y) * .5 - z)
+    up, dn = ("#FFFFFF", "#ECEAE3", "#CFCDC6"), ("#3A3C40", "#1E1F22", "#111214")
+    q = lambda pts: " ".join("%.2f,%.2f" % P(*p) for p in pts)
+    poly = lambda pts, f: f'<polygon points="{q(pts)}" fill="{f}"/>'
+    def prism(x, y, z, w, h, col):
+        X, Y, Z = x + w, y + w, z + h
+        return (poly([(x, Y, z), (X, Y, z), (X, Y, Z), (x, Y, Z)], col[1])
+                + poly([(X, y, z), (X, Y, z), (X, Y, Z), (X, y, Z)], col[2])
+                + poly([(x, y, Z), (X, y, Z), (X, Y, Z), (x, Y, Z)], col[0]))
+    bodies, price = [], 6.0
+    for i in range(8):
+        y = -i * 3.4                                   # along -y = up and to the right on the page
+        o = price; price = max(3, price + rnd.uniform(-2.6, 2.9)); cl = price
+        b0, b1 = min(o, cl), max(o, cl) + .6
+        lo, hi = b0 - rnd.uniform(.8, 2.2), b1 + rnd.uniform(.8, 2.2)
+        col = up if cl >= o else dn
+        bodies.append(prism(.95, y + .95, lo, .5, b0 - lo, col) + prism(0, y, b0, 2.4, b1 - b0, col)
+                      + prism(.95, y + .95, b1, .5, hi - b1, col))
+    svg = "".join(reversed(bodies))   # far candles first
+    pts = [tuple(map(float, m.split(","))) for m in re.findall(r"-?[\d.]+,-?[\d.]+", svg)]
+    x0, y0 = min(p[0] for p in pts), min(p[1] for p in pts)
+    x1, y1 = max(p[0] for p in pts), max(p[1] for p in pts)
+    return f'<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax meet" viewBox="{x0-.5:.1f} {y0-.5:.1f} {x1-x0+1:.1f} {y1-y0+1:.1f}">{svg}</svg>'
 
 def find_chrome():
     for c in CHROME_CANDIDATES:
@@ -274,10 +271,10 @@ def main():
     cover = f"""<section class="cover">
   <div class="top">
     <img class="logo" src="{lockup}" alt="+vantage">
-    <h1 class="big">Class<br>Report</h1>
-    <div class="side"><span class="lbl">{long_date}</span><b>{theme}</b>{f'<p>{dek}</p>' if dek else ''}</div>
+    <div><h1 class="big">CLASS<br>REPORT</h1><span class="lbl when">{long_date}</span></div>
+    <div class="side"><b>{theme}</b>{f'<p>{dek}</p>' if dek else ''}</div>
   </div>
-  <div class="art">{iso_candles(date_line)}</div>
+  <div class="art">{candles(date_line)}</div>
 </section>"""
     calls_html = (f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>'
                   f'{calls}<div class="calls-f">Education only. Size every trade to your own risk.</div></div>') if calls else ""

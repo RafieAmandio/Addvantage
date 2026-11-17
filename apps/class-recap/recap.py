@@ -113,6 +113,7 @@ Nobody is watching this run: do not ask questions, just finish. Files in the cur
    Bearish, Bullish or Watch (Watch when he had no directional call, e.g. "wait for confirmation"). Example:
    • ES1! | Bearish | Sell a retracement near 7,672.75, chart target 7,107.50.
 5. Add to report.md's frontmatter a line dek: "<one sentence, at most 30 words, saying what the class covered and the main takeaway>".
+Do not add any note about the transcript source, its language or its quality (no "Transcript source" callout).
 Never use em dashes or en dashes anywhere in report.md or summary.txt; use commas, colons or "to".
 """
 
@@ -143,7 +144,10 @@ def write_report(work, date, minutes, topic):
     for p in (rep, summ):  # house rule: no em or en dashes
         t = open(p).read().replace(" — ", ", ").replace("—", ", ").replace(" – ", " to ").replace("–", " to ")
         open(p, "w").write(t)
-    return open(rep).read(), open(summ).read().strip()
+    # no "Transcript source" callout even if the example still has one
+    md = re.sub(r"^> \[!\w+\][^\n]*transcript[^\n]*\n(?:>[^\n]*\n)*\n?", "", open(rep).read(), flags=re.M | re.I)
+    open(rep, "w").write(md)
+    return md, open(summ).read().strip()
 
 
 def title_of(report):
