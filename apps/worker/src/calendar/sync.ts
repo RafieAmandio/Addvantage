@@ -6,7 +6,7 @@ import type { Impact } from "@tradevantage/shared";
 /**
  * Economic calendar from the ForexFactory weekly JSON feed (free, no key). TradingEconomics stopped
  * serving its table as HTML in 2026, which left the old scraper with zero rows every run.
- * The feed has no "actual" column, so released numbers aren't shown.
+ * The feed has no "actual" column; calendar/actuals.ts fills released numbers in from Myfxbook.
  */
 const FEEDS = [
   "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
@@ -165,6 +165,18 @@ export async function syncCalendar(): Promise<number> {
   const from = new Date(Math.min(...times));
   const to = new Date(Math.max(...times));
 
+  // The replace below would drop actuals filled in by syncActuals; carry them over by externalId.
+  const stored = await prisma.timelineEvent.findMany({
+    where: { kind: "macro", sourceCode: "FF", occurredAt: { gte: from, lte: to } },
+    select: { metadata: true },
+  });
+  const actuals = new Map(
+    stored.flatMap((r) => {
+      const m = (r.metadata ?? {}) as Record<string, unknown>;
+      return m.actual && m.externalId ? [[String(m.externalId), String(m.actual)] as const] : [];
+    }),
+  );
+
   await prisma.$transaction([
     prisma.timelineEvent.deleteMany({ where: { kind: "macro", sourceCode: { in: ["TE", "FF"] }, occurredAt: { gte: from, lte: to } } }),
     prisma.timelineEvent.createMany({
@@ -186,6 +198,7 @@ export async function syncCalendar(): Promise<number> {
           affects: ev.affects,
           previous: ev.previous || null,
           forecast: ev.forecast || null,
+          actual: actuals.get(ev.externalId) ?? null,
         },
       })),
     }),

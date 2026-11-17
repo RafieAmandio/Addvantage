@@ -10,6 +10,7 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
+    "test": "SUPABASE_URL=http://localhost tsx --test src/**/*.test.ts",
     "run:once": "tsx src/cli/run-once.ts",
     "run:bars": "tsx src/cli/run-bars.ts",
     "kobeissi:login": "tsx src/adapters/kobeissi/login.ts",
