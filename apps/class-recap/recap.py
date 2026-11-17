@@ -109,7 +109,10 @@ Nobody is watching this run: do not ask questions, just finish. Files in the cur
    sections with ![[frame-file.jpg]] embeds and an italic caption under each; callouts; a watchlist table; key lessons;
    concepts referenced. Write in English. If the transcript is unclear on something, say so instead of inventing it.
 4. Write summary.txt, the Telegram caption for members: plain text, no markdown, at most 650 characters. First line is the
-   report title. Then 3 to 5 lines starting with "• " giving the main calls (instrument, bias, key level).
+   report title. Then 3 to 5 call lines, exactly in the form "• SYMBOL | Bias | what he said and the key level", where Bias is
+   Bearish, Bullish or Watch (Watch when he had no directional call, e.g. "wait for confirmation"). Example:
+   • ES1! | Bearish | Sell a retracement near 7,672.75, chart target 7,107.50.
+5. Add to report.md's frontmatter a line dek: "<one sentence, at most 30 words, saying what the class covered and the main takeaway>".
 Never use em dashes or en dashes anywhere in report.md or summary.txt; use commas, colons or "to".
 """
 
@@ -204,7 +207,8 @@ def process(stem):
 
     publish_site(date, start, title, summary, minutes, video_id, pdf_id)
 
-    caption = (f"{summary}\n\nRecording: https://drive.google.com/file/d/{video_id}/view"
+    calls = re.sub(r"^• ([^|]+?) \| (\w+) \| ", lambda m: f"• {m.group(1)} ({m.group(2).lower()}): ", summary, flags=re.M)
+    caption = (f"{calls}\n\nRecording: https://drive.google.com/file/d/{video_id}/view"
                f"\nOn the site: {SITE}/app/education/reports")[:1024]
     with open(pdf, "rb") as f:
         tg("sendDocument", data={"chat_id": E("TELEGRAM_CHAT_ID"), "caption": caption},

@@ -41,23 +41,37 @@ body{margin:0;font-family:var(--sans);color:var(--ink);font-size:10.2pt;line-hei
   -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
 .page{padding:14mm 17mm;-webkit-box-decoration-break:clone;box-decoration-break:clone;}
 
-/* ---------- cover ---------- */
-.cover{height:297mm;padding:15mm 17mm 0;display:flex;flex-direction:column;break-after:page;position:relative;overflow:hidden;}
-.topbar{display:flex;align-items:center;justify-content:space-between;}
-.topbar img{height:7.2mm;display:block;}
-.eyebrow,.lbl{font-family:var(--mono);font-weight:500;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);}
-.cover .eyebrow{margin-top:22mm;}
-h1.title{font-family:var(--sans);font-weight:600;font-size:38pt;line-height:1.02;letter-spacing:-.035em;
-  margin:5mm 0 0;max-width:15.5em;text-wrap:balance;}
-.rows{margin-top:10mm;border-top:1px solid var(--ink);max-width:128mm;}
-.row{display:grid;grid-template-columns:13mm 28mm 1fr;align-items:baseline;padding:2.6mm 0;border-bottom:1px solid var(--stone);font-size:10pt;}
-.row .n,.row .k{font-family:var(--mono);font-size:7.4pt;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);}
-.row .v{color:var(--ink);font-weight:500;}
-.hero{position:relative;margin:auto -17mm 0;}
-.hero img{display:block;width:100%;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 11%);mask-image:linear-gradient(to bottom,transparent,#000 11%);}
-.tag{position:absolute;font-family:var(--mono);font-weight:500;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);line-height:1.25;white-space:nowrap;}
-.tag small{display:block;color:var(--mute);font-size:7.4pt;letter-spacing:.08em;}
-.sig{display:inline-block;width:2.2mm;height:2.2mm;background:var(--signal);border:1px solid var(--ink);margin-right:2mm;vertical-align:-.2mm;}
+/* ---------- cover: masthead, headline, contents + art, the calls ---------- */
+.cover{height:297mm;padding:12mm 15mm 0;display:flex;flex-direction:column;break-after:page;overflow:hidden;}
+.mast{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding-bottom:3mm;
+  border-bottom:2px solid var(--ink);box-shadow:0 1.2mm 0 -0.9mm var(--ink);}
+.mast img{height:6.6mm;display:block;}
+.mast .c{font-family:var(--mono);font-weight:600;font-size:8pt;letter-spacing:.32em;text-transform:uppercase;}
+.mast .r{justify-self:end;}
+.lbl{font-family:var(--mono);font-weight:500;font-size:7.4pt;letter-spacing:.14em;text-transform:uppercase;color:var(--graphite);}
+.dateline{display:flex;gap:4mm;margin-top:4mm;padding-bottom:3mm;border-bottom:1px solid var(--stone);}
+.dateline span+span::before{content:"/";margin-right:4mm;color:var(--stone);}
+h1.title{font-family:var(--sans);font-weight:600;font-size:42pt;line-height:.98;letter-spacing:-.04em;
+  margin:12mm 0 0;max-width:13.5em;text-wrap:balance;}
+.dek{font-size:12.6pt;line-height:1.45;color:var(--graphite);max-width:132mm;margin:5mm 0 0;letter-spacing:-.005em;}
+.mid{display:grid;grid-template-columns:72mm 1fr;gap:6mm;margin-top:auto;padding-top:9mm;align-items:end;}
+.toc{border-top:1px solid var(--ink);padding-bottom:5mm;}
+.toc .lbl{display:block;padding:2.4mm 0 1.6mm;}
+.toc ol{list-style:none;margin:0;padding:0;}
+.toc li{display:grid;grid-template-columns:9mm 1fr;padding:1.5mm 0;border-top:1px solid var(--stone);font-size:8.8pt;line-height:1.3;margin:0;}
+.toc li span{font-family:var(--mono);font-size:7pt;color:var(--mute);padding-top:.4mm;}
+.art{margin-right:-15mm;align-self:end;}
+.art img{display:block;width:100%;-webkit-mask-image:radial-gradient(ellipse 62% 58% at 52% 55%,#000 62%,transparent 100%);mask-image:radial-gradient(ellipse 62% 58% at 52% 55%,#000 62%,transparent 100%);}
+.calls{background:var(--desk);color:#EDEDEA;margin:0 -15mm;padding:7mm 15mm 6mm;}
+.calls-h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #2A2C30;padding-bottom:2.6mm;}
+.calls-h b{font-family:var(--mono);font-weight:600;font-size:8pt;letter-spacing:.24em;text-transform:uppercase;color:var(--signal);}
+.calls-h span{font-family:var(--mono);font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:#8A8C91;}
+.call{display:grid;grid-template-columns:30mm 21mm 1fr;gap:3mm;align-items:baseline;padding:2.5mm 0;border-bottom:1px solid #1F2125;}
+.call .sym{font-family:var(--mono);font-weight:600;font-size:9.4pt;color:#fff;letter-spacing:.02em;}
+.chip{font-family:var(--mono);font-weight:600;font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;padding:.5mm 1.8mm;justify-self:start;}
+.chip.bear{background:#E06A5E;color:#111214;}.chip.bull{background:#4E9F6E;color:#111214;}.chip.watch{background:var(--signal);color:#111214;}
+.call .txt{font-size:8.8pt;line-height:1.4;color:#C9C9C5;}
+.calls-f{display:flex;justify-content:space-between;margin-top:4mm;font-family:var(--mono);font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;color:#6B6D72;}
 
 /* ---------- body ---------- */
 h2{font-family:var(--sans);font-weight:600;font-size:19pt;line-height:1.1;letter-spacing:-.025em;
@@ -120,6 +134,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("md"); ap.add_argument("out_pdf")
     ap.add_argument("--imgdir"); ap.add_argument("--vault", default=VAULT_DEFAULT)
+    ap.add_argument("--summary", help="summary.txt with the calls (default: next to the report)")
     a = ap.parse_args()
 
     raw = pathlib.Path(a.md).read_text()
@@ -203,30 +218,58 @@ def main():
     # The cover shows the theme; "TradeVantage Class:" and the trailing "(date)" are implied by the page.
     theme = re.sub(r"^TradeVantage Class:\s*", "", title)
     theme = re.sub(r"\s*\(\d{4}-\d{2}-\d{2}\)\s*$", "", theme)
-    syms = [x.strip().strip('"').replace("!", "") for x in re.sub(r"[\[\]]", "", fmv("symbols")).split(",") if x.strip()][:3]
-    while len(syms) < 3: syms.append("")
     presenter = grab("Presenter").split(",")[0] or "Anthony Tjipto"
-    rows = ""
-    for i, (k, v) in enumerate([("Date", date_line), ("Duration", duration), ("Presenter", presenter), ("Platform", platform.split("(")[0].strip())], 1):
-        if v: rows += f'<div class="row"><span class="n">{i:02d}</span><span class="k">{k}</span><span class="v">{v}</span></div>'
+    dek = fmv("dek") or re.sub(r"^[a-z]", lambda m: m.group(0).upper(), grab("Format"))
+    try:
+        d = __import__("datetime").date.fromisoformat(date_line)
+        long_date, week = d.strftime("%A %-d %B %Y"), f"Week {d.isocalendar()[1]:02d} / {d.year}"
+    except ValueError:
+        long_date, week = date_line, ""
+    mins = re.search(r"\d+", duration or "")
+    dateline = "".join(f"<span>{x}</span>" for x in [long_date, f"{mins.group(0)} min" if mins else "", presenter] if x)
+
+    # contents: the numbered topic sections, not the overview or the reference lists at the end
+    skip = re.compile(r"overview|lessons|concepts|related|watchlist|timestamps", re.I)
+    secs = [re.sub(r"^\d+\.\s*", "", h) for h in re.findall(r"^##\s+(.+)$", body, re.M) if not skip.search(h)][:6]
+    toc = "".join(f"<li><span>{i:02d}</span>{h}</li>" for i, h in enumerate(secs, 1))
+
+    # the calls: summary.txt bullets "• SYMBOL: text"
+    sp = a.summary or os.path.join(os.path.dirname(os.path.abspath(a.md)), "summary.txt")
+    calls = ""
+    if os.path.exists(sp):
+        for ln in pathlib.Path(sp).read_text().splitlines():
+            # "• SYMBOL | Bearish | text" (what the writer is asked for); older "• SYMBOL: text" falls back to Watch
+            mo = re.match(r"^\s*[•\-*]\s*([^|:]{1,24})\s*\|\s*(bearish|bullish|watch|neutral)\s*\|\s*(.+)$", ln, re.I)
+            if mo:
+                sym, kind, txt = mo.group(1).strip(), mo.group(2).lower(), mo.group(3).strip()
+            else:
+                mo = re.match(r"^\s*[•\-*]\s*([^:]{1,24}):\s*(.+)$", ln)
+                if not mo: continue
+                sym, txt = mo.group(1).strip(), mo.group(2).strip()
+                kind = next((k for k in ("bearish", "bullish") if re.match(k, txt, re.I)), "watch")
+                txt = re.sub(r"^(bearish|bullish|neutral)\w*( lean| view| bias)?[,:]?\s*", "", txt, flags=re.I)
+            kind = {"bearish": "bear", "bullish": "bull"}.get(kind, "watch")
+            txt = txt[:1].upper() + txt[1:]
+            calls += (f'<div class="call"><span class="sym">{sym}</span>'
+                      f'<span class="chip {kind}">{ {"bear":"Bearish","bull":"Bullish","watch":"Watch"}[kind] }</span>'
+                      f'<span class="txt">{txt}</span></div>')
     lockup = f'data:image/svg+xml;base64,{b64(os.path.join(ASSETS, "lockup-paper.svg"))}'
     hero = f'data:image/jpeg;base64,{b64(os.path.join(ASSETS, "hero-desk.jpg"))}'
-    # tags sit on the drawing's leader lines (positions measured on assets/hero-desk.jpg, 1440x800)
-    tags = (f'<span class="tag" style="left:69%;top:5.4%"><span class="sig"></span>Class report<small>{date_line}</small></span>'
-            f'<span class="tag" style="left:57.2%;top:20.6%">{syms[0]}</span>'
-            f'<span class="tag" style="left:64.3%;top:34.4%">{syms[1]}</span>'
-            f'<span class="tag" style="left:71.3%;top:46.4%">{syms[2]}</span>'
-            f'<span class="tag" style="left:16.6%;top:33.4%;text-align:right;transform:translateX(-100%)">{duration}<small>on Zoom</small></span>')
+    cover = f"""<section class="cover">
+  <div class="mast"><img src="{lockup}" alt="+vantage"><span class="c">Class Report</span><span class="lbl r">{week}</span></div>
+  <div class="dateline lbl">{dateline}</div>
+  <h1 class="title">{theme}</h1>
+  {f'<p class="dek">{dek}</p>' if dek else ''}
+  <div class="mid">
+    <div class="toc"><span class="lbl">In this report</span><ol>{toc}</ol></div>
+    <div class="art"><img src="{hero}" alt=""></div>
+  </div>
+  {f'<div class="calls"><div class="calls-h"><b>The calls</b><span>From the class, not signals</span></div>{calls}<div class="calls-f"><span>+vantage / tradevantage.gg</span><span>Education only. Size every trade to your own risk.</span></div></div>' if calls else ''}
+</section>"""
     html = f"""<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>{FONTS}
 <style>{CSS}</style></head>
 <body>
-<section class="cover">
-  <div class="topbar"><img src="{lockup}" alt="+vantage"><span class="lbl">tradevantage.gg</span></div>
-  <div class="eyebrow">TradeVantage / Class report</div>
-  <h1 class="title">{theme}</h1>
-  <div class="rows">{rows}</div>
-  <div class="hero"><img src="{hero}" alt="">{tags}</div>
-</section>
+{cover}
 <div class="page">
 {html_body}
 <div class="foot"><span>+vantage / tradevantage.gg</span><span>Class report / {date_line}</span></div>
