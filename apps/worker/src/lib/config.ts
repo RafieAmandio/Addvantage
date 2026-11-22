@@ -52,6 +52,9 @@ const EnvSchema = z.object({
   SITE_URL: z.string().url().default("http://localhost:3000"),
 
   FRED_API_KEY: z.preprocess(emptyToUndef, z.string().min(1).optional()),
+  // FRED blocks the VPS IP; route FRED calls through the Cloudflare worker `fred-proxy` when set.
+  FRED_PROXY_URL: z.preprocess(emptyToUndef, z.string().url().optional()),
+  FRED_PROXY_TOKEN: z.preprocess(emptyToUndef, z.string().min(1).optional()),
 
   // Optional CoinGecko demo key — the public endpoint works without it; the
   // key just raises rate limits for the token-unlocks sync.

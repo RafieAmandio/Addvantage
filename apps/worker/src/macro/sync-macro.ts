@@ -1,6 +1,7 @@
 import { prisma, Prisma } from "@tradevantage/db";
 import { logger } from "../lib/logger";
 import { retry } from "../lib/retry";
+import { viaFredProxy } from "../lib/fred-proxy";
 
 /**
  * Macro snapshot for the forex desk: policy rates (BIS), next-decision odds
@@ -47,10 +48,10 @@ export interface MacroData {
 
 const round = (n: number, d = 4) => Math.round(n * 10 ** d) / 10 ** d;
 
-async function getText(url: string): Promise<string> {
+async function getText(url: string, headers: Record<string, string> = {}): Promise<string> {
   return retry(
     async () => {
-      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 TradeVantage" } });
+      const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 TradeVantage", ...headers } });
       if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
       return res.text();
     },
@@ -61,7 +62,8 @@ const getJson = async <T>(url: string) => JSON.parse(await getText(url)) as T;
 
 /** FRED keyless CSV → [{date, v}] with blanks ("." ) dropped. */
 async function fred(id: string) {
-  const csv = await getText(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`);
+  const req = viaFredProxy(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`);
+  const csv = await getText(req.url, req.headers);
   return csv
     .trim()
     .split("\n")
