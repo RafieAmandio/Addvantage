@@ -3,7 +3,8 @@ import { FOREX_PAIRS } from "@tradevantage/shared";
 /**
  * Symbols TwelveData's Basic plan answers with 404 ("available starting with the Grow/Pro plan"
  * or "symbol invalid"), checked 2026-11-22. Requesting them every run was ~440 errors a day.
- * ponytail: fixed list; drop it if the plan is upgraded, or compute these from the Yahoo bars instead.
+ * RSI, ATR and gaps for these come from the stored Yahoo bars (lib/bars-candles.ts).
+ * ponytail: fixed list; drop it if the TwelveData plan is upgraded.
  */
 export const TWELVEDATA_UNSUPPORTED = new Set([
   "XAG/USD", "XAU/EUR", "WTI/USD", "HG1", "SPX", "NDX", "DJI", "DXY", "FTSE", "STOXX50E", "FCHI",
