@@ -1,88 +1,92 @@
 import { P, box, type B } from "@/features/marketing/lib/iso";
-import { Block, GrainDefs, Shadow, type Face } from "@/features/marketing/components/iso/Iso";
+import { Block, GrainDefs, type Face } from "@/features/marketing/components/iso/Iso";
 import "./access-scene.css";
 
-const U = 40;
+const U = 34;
 const G = "tvg-access";
 
-// Three rows of candles standing on the floor like a skyline, closes walking a market's path.
-// Heights are bar closes, up bars white, down bars graphite, each with an ink wick on top.
-const ROWS: { y: number; h: number[] }[] = [
-  { y: -4.4, h: [2.4, 2.8, 2.6, 3.3, 3.0, 3.7, 4.2, 3.8, 3.5, 4.0, 4.6, 4.3, 4.9] },
-  { y: -2.2, h: [1.5, 1.9, 1.7, 2.3, 2.6, 2.3, 2.0, 2.5, 3.0, 2.8, 2.4, 2.9, 3.3] },
-  { y: 0, h: [0.8, 1.1, 0.9, 1.3, 1.0, 1.5, 1.2, 1.0, 1.2, 1.6, 1.4, 1.8, 1.5] },
-];
-const STEP = 1.15;
-const BAR = 0.8;
+// A hillside of stacked cubes (a heightmap of unit voxels), a clear path up the middle to a tall
+// door frame standing open, the doorway lit in Signal. Cloud blocks float above the back.
+const GX = 15;
+const GY = 11;
+const DX = 5.5; // door frame's left edge
+const DY = 4; // the frame stands in the plane y = DY
+const DW = 3.4;
+const DH = 7.8;
+const T = 0.4; // frame thickness
 
-type Part = { b: B; face: Face; shadow?: boolean };
-
-const parts: Part[] = [];
-for (const r of ROWS) {
-  r.h.forEach((h, i) => {
-    const x = i * STEP;
-    const down = i > 0 && h < r.h[i - 1]! - 0.25;
-    parts.push({ b: box(x, r.y, 0, BAR, BAR, h), face: down ? "graphite" : "white", shadow: true });
-    parts.push({ b: box(x + BAR / 2 - 0.06, r.y + BAR / 2 - 0.06, h, 0.12, 0.12, 0.35 + ((i * 7) % 5) * 0.12), face: "ink" });
-  });
+const rnd = (x: number, y: number) => {
+  const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+};
+const onPath = (x: number, y: number) => y >= DY && x >= DX - 0.5 && x <= DX + DW + (y - DY) * 0.5;
+function height(x: number, y: number) {
+  if (onPath(x, y)) return 0;
+  const back = Math.max(0, DY - y) * 0.42; // the hill climbs behind the door
+  const side = Math.abs(x + 0.5 - (DX + DW / 2)) * 0.26;
+  return Math.max(0, Math.min(5, Math.round(back + side + rnd(x, y) * 1.6 - 0.6)));
 }
-// Back to front: on this grid the back corner's x + y orders every block correctly.
-parts.sort((a, b) => a.b[0] + a.b[2] - (b.b[0] + b.b[2]) || a.b[4] - b.b[4]);
 
-// The door: a plate in front of the skyline, an ink frame, the leaf swung open toward the viewer in Signal.
-const DX = 10.4;
-const DY = 2.8;
-const DOOR: Part[] = [
-  { b: box(DX - 1.4, DY - 0.7, -0.12, 4.2, 3.4, 0.12), face: "white", shadow: true },
-  { b: box(DX, DY, 0, 0.2, 0.2, 2.8), face: "ink" },
-  { b: box(DX + 1.4, DY, 0, 0.2, 0.2, 2.8), face: "ink" },
-  { b: box(DX, DY, 2.8, 1.6, 0.2, 0.2), face: "ink" },
-  { b: box(DX + 0.2, DY + 0.2, 0, 0.12, 1.3, 2.75), face: "signal" },
-];
+type Vox = { b: B; face: Face; d: number };
+const vox: Vox[] = [];
+for (let x = 0; x < GX; x++)
+  for (let y = 0; y < GY; y++)
+    for (let z = 0; z < height(x, y); z++) vox.push({ b: box(x, y, z, 1, 1, 1), face: rnd(x * 3 + z, y * 5 + z) < 0.14 ? "graphite" : "white", d: x + y + z });
+vox.sort((a, b) => a.d - b.d);
+const behind = vox.filter((v) => v.b[2] < DY);
+const front = vox.filter((v) => v.b[2] >= DY);
 
-const all = [...parts.map((p) => p.b), ...DOOR.map((p) => p.b)];
-const corners = all.flatMap(([x0, x1, y0, y1, z0, z1]) => [P(x0, y1, z0, U), P(x1, y0, z0, U), P(x1, y1, z0, U), P(x0, y0, z1, U), P(x1, y1, z1, U)]);
-const pad = 40;
-const minX = Math.min(...corners.map((c) => c[0])) - pad;
-const maxX = Math.max(...corners.map((c) => c[0])) + pad;
-const minY = Math.min(...corners.map((c) => c[1])) - pad;
-const maxY = Math.max(...corners.map((c) => c[1])) + pad;
+const FRAME: B[] = [box(DX, DY, 0, T, T, DH), box(DX + DW - T, DY, 0, T, T, DH), box(DX, DY, DH, DW, T, T)];
+const LEAF = box(DX + T, DY + T, 0, 0.16, DW - 2 * T - 0.2, DH - 0.05); // swung open toward the viewer
+const CLOUDS: B[] = [box(0.5, -1.5, 7.6, 3.4, 2, 0.6), box(1.3, -1.1, 8.2, 1.7, 1.2, 0.5), box(9.5, -2.5, 9, 3.8, 2.2, 0.6), box(10.4, -2, 9.6, 1.9, 1.2, 0.5)];
 
-/** Light falling through the open door onto the plate, a flat Signal patch on the floor. */
-const light = [
-  [DX + 0.2, DY + 0.2],
-  [DX + 1.4, DY + 0.2],
-  [DX + 1.9, DY + 2.2],
-  [DX + 0.5, DY + 2.2],
-]
-  .map(([x, y]) => P(x!, y!, 0, U).map((n) => n.toFixed(1)).join(","))
-  .join(" ");
+const poly = (ps: [number, number, number][]) => ps.map(([x, y, z]) => P(x, y, z, U).map((n) => n.toFixed(1)).join(",")).join(" ");
+const yf = DY + T; // the frame's front plane
+const OPENING = poly([[DX + T, yf, 0], [DX + DW - T, yf, 0], [DX + DW - T, yf, DH], [DX + T, yf, DH]]);
+const SPILL = poly([[DX + T, yf, 0], [DX + DW - T, yf, 0], [DX + DW + 1.2, yf + 4.5, 0], [DX + T + 1.4, yf + 4.5, 0]]);
+
+const pts = [...vox.map((v) => v.b), ...FRAME, ...CLOUDS].flatMap(([x0, x1, y0, y1, z0, z1]) => [P(x0, y1, z0, U), P(x1, y0, z0, U), P(x1, y1, z0, U), P(x0, y0, z1, U)]);
+const minX = Math.min(...pts.map((p) => p[0])) - 20;
+const maxX = Math.max(...pts.map((p) => p[0])) + 20;
+const minY = Math.min(...pts.map((p) => p[1])) - 30;
+const maxY = Math.max(...pts.map((p) => p[1])) + 20;
+
+const Cube = ({ v }: { v: Vox }) => (
+  <g className="as-rise" style={{ ["--i" as string]: v.d }}>
+    <Block b={v.b} u={U} face={v.face} grain={G} />
+  </g>
+);
 
 /**
- * The auth illustration: the market as a skyline of candles, and in front of it one door standing
- * open in Signal, light on the floor. Blocks rise in row by row, the door last. Drawn in code with
- * the landing's iso kit; reduced motion shows it built.
+ * The auth illustration: a hillside of cubes, a clear path up to a tall door frame standing open,
+ * the doorway and the floor in front of it lit Signal, cloud blocks above. Built in code with the
+ * landing's iso kit; cubes rise in from the back, then the door, then the light.
  */
 export function AccessScene({ className }: { className?: string }) {
   return (
-    <svg viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} preserveAspectRatio="xMidYMax slice" className={className} aria-hidden>
+    <svg viewBox={`${minX} ${minY} ${maxX - minX} ${maxY - minY}`} preserveAspectRatio="xMidYMid slice" className={className} aria-hidden>
       <defs>
         <GrainDefs id={G} />
       </defs>
-      {parts.map((p, k) => (
-        <g key={k} className="as-rise" style={{ ["--i" as string]: k }}>
-          {p.shadow && <Shadow b={p.b} u={U} />}
-          <Block b={p.b} u={U} face={p.face} grain={G} />
-        </g>
-      ))}
-      <g className="as-door">
-        <Shadow b={DOOR[0]!.b} u={U} off={0.45} />
-        <Block b={DOOR[0]!.b} u={U} face="white" grain={G} />
-        <polygon points={light} fill="#FFD400" opacity={0.55} className="as-light" />
-        {DOOR.slice(1).map((p, k) => (
-          <Block key={k} b={p.b} u={U} face={p.face} grain={G} />
+      <g className="as-cloud">
+        {CLOUDS.map((b, k) => (
+          <Block key={k} b={b} u={U} grain={G} />
         ))}
       </g>
+      {behind.map((v, k) => (
+        <Cube key={k} v={v} />
+      ))}
+      <g className="as-door">
+        <polygon points={SPILL} fill="#FFD400" opacity={0.5} className="as-light" />
+        <polygon points={OPENING} fill="#FFD400" className="as-light" />
+        {FRAME.map((b, k) => (
+          <Block key={k} b={b} u={U} face="ink" />
+        ))}
+        <Block b={LEAF} u={U} face="white" grain={G} />
+      </g>
+      {front.map((v, k) => (
+        <Cube key={k} v={v} />
+      ))}
     </svg>
   );
 }
