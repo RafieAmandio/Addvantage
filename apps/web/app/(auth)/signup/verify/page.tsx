@@ -31,17 +31,7 @@ function VerifyContent() {
   };
 
   return (
-    <PaperAuthShell
-      eyebrow="Verification"
-      title={
-        <>
-          Check your
-          <br />
-          inbox.
-        </>
-      }
-      copy="We sent a verification link to confirm your identity. No verification, no access."
-    >
+    <PaperAuthShell>
       {status === "waiting" && (
         <VerifyStatus eyebrow="Verification pending" title="Confirm your email">
           {email && (

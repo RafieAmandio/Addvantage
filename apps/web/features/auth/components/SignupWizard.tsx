@@ -85,15 +85,6 @@ export function SignupWizard() {
 
   return (
     <PaperAuthShell
-      eyebrow="Sign up"
-      title={
-        <>
-          This is a filter,
-          <br />
-          not a funnel.
-        </>
-      }
-      copy="Three steps, then a liability waiver. If you can't get through it, this isn't for you."
       aside={
         <ol className="mb-10 hidden border-t border-tv-stone md:block" aria-label="Sign-up steps">
           {STEPS.map((s, i) => {

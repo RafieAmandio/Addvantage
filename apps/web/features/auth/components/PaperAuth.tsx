@@ -8,7 +8,12 @@ import { cn } from "@/lib/cn";
 import { tvFonts } from "@/features/marketing/lib/fonts";
 import { Roll } from "@/features/marketing/components/Roll";
 import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
-import { ChartLabDemo } from "./ChartLabDemo";
+import { HeroDesk } from "@/features/marketing/components/HeroDesk";
+import type { HeroData } from "@/features/marketing/lib/landing";
+import hero from "../hero-desk.json";
+
+/** The landing hero desk's data, snapshotted from the landing sample so the auth bundle skips the full candle file. */
+const HERO = hero as unknown as HeroData;
 
 /** Field classes, the same as the Black Friday form. */
 export const paperInput =
@@ -18,29 +23,14 @@ export const paperHint = "mt-1.5 text-[13px] leading-[1.45] text-tv-mute";
 export const paperErr = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
 
 /**
- * The auth pages in the landing's hand: Paper with the kit's grain, the product printed as a sheet
- * (the live Chart Lab demo) and the headline under it on the left, the form on the right past a
- * hairline. On a phone the sheet is left out so the form comes first.
+ * The auth pages, Retool-plain: the form on white on the left, nothing but its own heading; the
+ * landing's isometric desk on Paper filling the right half, the exchange partner at its foot.
+ * On a phone the desk is left out.
  */
-export function PaperAuthShell({
-  eyebrow,
-  title,
-  copy,
-  aside,
-  children,
-}: {
-  eyebrow: React.ReactNode;
-  title: React.ReactNode;
-  copy: React.ReactNode;
-  /** Shown above the form on desktop (the sign-up steps). */
-  aside?: React.ReactNode;
-  children: React.ReactNode;
-}) {
+export function PaperAuthShell({ aside, children }: { /** Shown above the form on desktop (the sign-up steps). */ aside?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <main style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className={`tv-landing tv-grain relative isolate min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] ${tvFonts}`}>
-      <aside
-        className="relative flex flex-col overflow-hidden px-4 pb-8 pt-4 sm:px-6 md:sticky md:top-0 md:h-svh md:min-h-[720px] md:border-r md:border-tv-stone md:px-12 md:pb-10 md:pt-6"
-      >
+    <main className={`tv-landing min-h-svh bg-tv-white text-tv-ink md:grid md:grid-cols-2 ${tvFonts}`}>
+      <section className="flex min-h-svh min-w-0 flex-col px-4 pb-10 pt-4 sm:px-6 md:px-12 md:pt-6">
         <header className="flex h-10 items-center justify-between">
           <Link href="/" className="flex items-center" aria-label="TradeVantage home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -50,21 +40,26 @@ export function PaperAuthShell({
             <span aria-hidden>←</span> Back to the site
           </Link>
         </header>
-        <div className="relative hidden flex-1 items-center justify-center py-8 md:flex">
-          <ChartLabDemo />
-        </div>
-        <div className="mt-10 md:mt-0">
-          <p className="tv-eyebrow lv-in text-tv-mute">{eyebrow}</p>
-          <h1 className="lv-in mt-4 text-[clamp(2.5rem,4.6vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.035em] [--i:1] md:mt-5">{title}</h1>
-          <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-graphite [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
-        </div>
-      </aside>
-      <section className="flex min-w-0 items-center justify-center px-4 pb-14 pt-4 sm:px-6 md:px-12 md:py-16">
-        <div className="relative w-full max-w-[440px]">
-          {aside}
-          {children}
+        <div className="flex flex-1 items-center justify-center py-10">
+          <div className="lv-in relative w-full max-w-[400px]">
+            {aside}
+            {children}
+          </div>
         </div>
       </section>
+      <aside
+        style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }}
+        className="tv-grain relative hidden flex-col overflow-hidden border-l border-tv-stone bg-tv-paper md:sticky md:top-0 md:flex md:h-svh"
+      >
+        <figure className="flex flex-1 items-center justify-center px-4">
+          <HeroDesk d={HERO} className="w-full" />
+        </figure>
+        <p className="flex items-center justify-center gap-4 border-t border-tv-stone py-6">
+          <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
+        </p>
+      </aside>
     </main>
   );
 }

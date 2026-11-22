@@ -7,17 +7,7 @@ export const viewport: Viewport = { themeColor: "#F4F3EF" };
 
 export default function LoginPage() {
   return (
-    <PaperAuthShell
-      eyebrow="Operator login"
-      title={
-        <>
-          Back to
-          <br />
-          the desk.
-        </>
-      }
-      copy="Your session stays on this device. We don't track browsing history, and logging out clears everything."
-    >
+    <PaperAuthShell>
       <LoginForm />
     </PaperAuthShell>
   );

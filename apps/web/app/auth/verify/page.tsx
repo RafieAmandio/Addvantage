@@ -23,17 +23,7 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   return (
-    <PaperAuthShell
-      eyebrow="Verification"
-      title={
-        <>
-          Email
-          <br />
-          verification.
-        </>
-      }
-      copy="One click from the email confirms the address is yours. Then you can log in."
-    >
+    <PaperAuthShell>
       {status === "loading" && (
         <VerifyStatus eyebrow="Verifying" title="Checking your link" busy>
           <p className="text-[15px] leading-[1.55] text-tv-graphite">Verifying your email.</p>

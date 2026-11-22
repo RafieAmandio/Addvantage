@@ -40,17 +40,7 @@ export default function LiabilityPage() {
   };
 
   return (
-    <PaperAuthShell
-      eyebrow="Liability waiver"
-      title={
-        <>
-          Read every
-          <br />
-          line.
-        </>
-      }
-      copy="This document is binding. If you don't agree, close the tab."
-    >
+    <PaperAuthShell>
       <div className="flex items-baseline justify-between gap-4">
         <p className="tv-eyebrow text-tv-mute">Document W-001</p>
         <p className="tv-eyebrow text-tv-mute">Final form</p>

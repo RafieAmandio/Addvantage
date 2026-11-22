@@ -6,17 +6,7 @@ import { Roll } from "@/features/marketing/components/Roll";
 // Shown at /signup when NEXT_PUBLIC_REGISTRATION_OPEN !== "1".
 export function RegistrationClosed() {
   return (
-    <PaperAuthShell
-      eyebrow="Registration / Invite only"
-      title={
-        <>
-          Invite
-          <br />
-          only.
-        </>
-      }
-      copy="Public sign-up is paused. The only way in right now is early access: a founding cohort with a 100% money-back guarantee."
-    >
+    <PaperAuthShell>
       <p className="tv-eyebrow text-tv-mute">Request access</p>
       <h2 className="mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.05] tracking-[-0.03em]">Apply for early access</h2>
       <p className="mt-4 text-[15px] leading-[1.55] text-tv-graphite">
