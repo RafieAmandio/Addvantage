@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { prisma } from "@tradevantage/db";
+import { FOREX_PAIRS } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
-import { twelvedataSymbols } from "../lib/twelvedata-symbols";
+import { TWELVEDATA_UNSUPPORTED } from "../lib/twelvedata-symbols";
+import { candlesFromBars } from "../lib/bars-candles";
 import { delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -129,7 +131,8 @@ export async function syncGaps(): Promise<void> {
   }
 
   const delayMs = config.RSI_REFRESH_DELAY_MS;
-  const symbols = twelvedataSymbols();
+  // TwelveData for what its plan serves, the stored Yahoo bars for the rest.
+  const symbols = FOREX_PAIRS.map((p) => p.symbol);
   const results: GapResult[] = [];
   let errors = 0;
 
@@ -137,16 +140,18 @@ export async function syncGaps(): Promise<void> {
 
   for (const symbol of symbols) {
     try {
-      const candles = await fetchDailyCandles(symbol, getNextApiKey());
+      const fromBars = TWELVEDATA_UNSUPPORTED.has(symbol);
+      const candles = fromBars ? await candlesFromBars(symbol, "1d", 15) : await fetchDailyCandles(symbol, getNextApiKey());
+      if (fromBars && !candles?.length) continue; // no bars at all (XAU/EUR)
       if (!candles || candles.length < 5) {
         errors++;
-        await delay(delayMs);
+        if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
         continue;
       }
 
       const gap = findWeekendGap(candles);
       if (!gap) {
-        await delay(delayMs);
+        if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
         continue;
       }
 
@@ -154,7 +159,7 @@ export async function syncGaps(): Promise<void> {
       const gapPct = Math.abs(gapSize / gap.fridayClose) * 100;
 
       if (gapPct < MIN_GAP_PCT) {
-        await delay(delayMs);
+        if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
         continue;
       }
 
@@ -192,7 +197,7 @@ export async function syncGaps(): Promise<void> {
       errors++;
       logger.error({ symbol, err: String(err) }, "gap-sync: fetch failed");
     }
-    await delay(delayMs);
+    if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
   }
 
   if (results.length === 0) {

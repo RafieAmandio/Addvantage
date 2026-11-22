@@ -5,7 +5,8 @@ import { RSI_INTERVALS } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
-import { twelvedataSymbols } from "../lib/twelvedata-symbols";
+import { twelvedataSymbols, TWELVEDATA_UNSUPPORTED } from "../lib/twelvedata-symbols";
+import { candlesFromBars, rsi, to4h } from "../lib/bars-candles";
 import { toIsoUtc, delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -163,6 +164,26 @@ export async function syncRsi(): Promise<void> {
   }
 
   const prices = await fetchPrices(symbols, getNextApiKey());
+
+  // Symbols TwelveData won't serve: RSI(14) from the stored Yahoo bars (1h, 4h built from 1h, 1d).
+  for (const symbol of TWELVEDATA_UNSUPPORTED) {
+    try {
+      const hourly = await candlesFromBars(symbol, "1h", 700);
+      const daily = await candlesFromBars(symbol, "1d", 300);
+      const series: Record<string, typeof hourly> = { "1h": hourly, "4h": to4h(hourly), "1day": daily };
+      for (const interval of RSI_INTERVALS) {
+        const c = series[interval] ?? [];
+        const value = rsi(c.map((x) => x.close));
+        if (value === null) continue;
+        results.push({ symbol, interval, rsi: value, ts: toIsoUtc(c[c.length - 1]!.datetime) });
+      }
+      const last = hourly[hourly.length - 1] ?? daily[daily.length - 1];
+      if (last) prices.set(symbol, last.close);
+    } catch (err) {
+      errors++;
+      logger.error({ symbol, err: String(err) }, "rsi-sync: bars fallback failed");
+    }
+  }
 
   if (results.length === 0) {
     logger.warn("rsi-sync: no results to persist");

@@ -1,11 +1,12 @@
 import { z } from "zod";
 import * as Sentry from "@sentry/node";
 import { prisma } from "@tradevantage/db";
-import { ATR_PERIOD } from "@tradevantage/shared";
+import { FOREX_PAIRS, ATR_PERIOD } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
-import { twelvedataSymbols } from "../lib/twelvedata-symbols";
+import { TWELVEDATA_UNSUPPORTED } from "../lib/twelvedata-symbols";
+import { candlesFromBars } from "../lib/bars-candles";
 import { toIsoUtc, delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -130,7 +131,8 @@ export async function syncAtr(): Promise<void> {
   }
 
   const delayMs = config.RSI_REFRESH_DELAY_MS;
-  const symbols = twelvedataSymbols();
+  // TwelveData for what its plan serves, the stored Yahoo bars for the rest.
+  const symbols = FOREX_PAIRS.map((p) => p.symbol);
   const results: AtrResult[] = [];
   let errors = 0;
 
@@ -141,11 +143,13 @@ export async function syncAtr(): Promise<void> {
 
   for (const symbol of symbols) {
     try {
-      const candles = await fetchDailyCandles(symbol, getNextApiKey());
+      const fromBars = TWELVEDATA_UNSUPPORTED.has(symbol);
+      const candles = fromBars ? await candlesFromBars(symbol, "1d", 200) : await fetchDailyCandles(symbol, getNextApiKey());
+      if (fromBars && !candles?.length) continue; // no bars at all (XAU/EUR)
       if (!candles || candles.length < ATR_PERIOD + 2) {
         logger.warn({ symbol, count: candles?.length }, "atr: insufficient candles");
         errors++;
-        await delay(delayMs);
+        if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
         continue;
       }
 
@@ -153,7 +157,7 @@ export async function syncAtr(): Promise<void> {
       if (!Number.isFinite(atr) || atr <= 0) {
         logger.warn({ symbol, atr }, "atr: invalid ATR value");
         errors++;
-        await delay(delayMs);
+        if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
         continue;
       }
 
@@ -181,7 +185,7 @@ export async function syncAtr(): Promise<void> {
       errors++;
       logger.error({ symbol, err: String(err) }, "atr-sync: fetch failed");
     }
-    await delay(delayMs);
+    if (!TWELVEDATA_UNSUPPORTED.has(symbol)) await delay(delayMs);
   }
 
   if (results.length === 0) {
