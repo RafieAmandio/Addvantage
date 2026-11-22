@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
-import "@/features/marketing/landing.css";
-import { tvFonts } from "@/features/marketing/lib/fonts";
-import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
-import { PaperButton, paperInput, paperLabel } from "@/features/auth/components/PaperAuth";
+import { PaperAuthShell, PaperButton, paperInput, paperLabel } from "@/features/auth/components/PaperAuth";
+import { StairScene } from "@/features/auth/components/AccessScene";
 import { API_BASE } from "@/lib/api/client";
 import { isMockMode } from "@/lib/config/public";
 import {
@@ -178,21 +176,8 @@ export function EarlyAccessWizard() {
   }
 
   return (
-    <main
-      style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }}
-      className={`tv-landing tv-grain relative isolate flex min-h-svh flex-col bg-tv-paper px-4 pb-12 pt-4 text-tv-ink sm:px-6 md:px-12 md:pt-6 ${tvFonts}`}
-    >
-      <header className="flex h-10 items-center justify-between">
-        <Link href="/" className="flex items-center" aria-label="TradeVantage home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
-        </Link>
-        <Link href="/signup" className="tv-link py-1 text-[15px] text-tv-graphite hover:text-tv-ink">
-          <span aria-hidden>←</span> Back
-        </Link>
-      </header>
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <div className="w-full max-w-[460px] py-12">
+    <PaperAuthShell art={<StairScene step={step} done={done} className="absolute inset-0 h-full w-full p-8" />}>
+      <div>
         {!done && <Progress step={step} />}
         {done ? (
           <ConfirmationPanel />
@@ -470,9 +455,8 @@ export function EarlyAccessWizard() {
             </div>
           </div>
         )}
-        </div>
       </div>
-    </main>
+    </PaperAuthShell>
   );
 }
 

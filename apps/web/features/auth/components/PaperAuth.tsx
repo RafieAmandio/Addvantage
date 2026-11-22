@@ -22,7 +22,17 @@ export const paperErr = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
  * right the isometric skyline-and-door illustration over the top two thirds, the partners under it.
  * On a phone the desk is left out.
  */
-export function PaperAuthShell({ aside, children }: { /** Shown above the form on desktop (the sign-up steps). */ aside?: React.ReactNode; children: React.ReactNode }) {
+export function PaperAuthShell({
+  aside,
+  art,
+  children,
+}: {
+  /** Shown above the form on desktop (the sign-up steps). */
+  aside?: React.ReactNode;
+  /** The illustration on the right; the door scene by default. */
+  art?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <main className={`tv-landing min-h-svh bg-tv-white text-tv-ink md:grid md:grid-cols-2 ${tvFonts}`}>
       <section className="flex min-h-svh min-w-0 flex-col px-4 pb-10 pt-4 sm:px-6 md:px-12 md:pt-6">
@@ -44,7 +54,7 @@ export function PaperAuthShell({ aside, children }: { /** Shown above the form o
       </section>
       <aside className="relative hidden flex-col border-l border-tv-stone bg-tv-paper md:sticky md:top-0 md:flex md:h-svh">
         <div style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative h-[64%] overflow-hidden border-b border-tv-stone">
-          <AccessScene className="absolute inset-0 h-full w-full" />
+          {art ?? <AccessScene className="absolute inset-0 h-full w-full" />}
         </div>
         <div className="flex flex-1 flex-col items-center justify-center gap-7 px-8">
           <p className="text-[15px] font-medium">Built with partners traders already use</p>

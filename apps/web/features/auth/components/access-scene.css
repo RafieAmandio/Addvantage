@@ -29,3 +29,8 @@
   svg:has(.as-doorhit:hover) .as-lit { filter: brightness(1.08) saturate(1.25); }
   .as-doorhit:hover .as-leaf { filter: brightness(1.06); }
 }
+/* The lit tread steps up a touch when it becomes current. */
+@keyframes as-step { from { transform: translateY(8px); opacity: 0.4; } }
+@media (prefers-reduced-motion: no-preference) {
+  .as-tread[data-on] { animation: as-step 0.5s cubic-bezier(0.23, 1, 0.32, 1) both; }
+}

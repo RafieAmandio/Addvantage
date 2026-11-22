@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { cn } from "@/lib/cn";
 import { P, box, type B } from "@/features/marketing/lib/iso";
 import { Block, GrainDefs, type Face } from "@/features/marketing/components/iso/Iso";
 import "./access-scene.css";
@@ -87,7 +88,7 @@ const minY = dTop - VH * 0.24;
  * The door, lit or shut: its glow under everything in front, the frame, and the leaf, open or
  * closed. Clicking it swings it; hovering brightens the light.
  */
-function Door({ open, onToggle, children }: { open: boolean; onToggle: () => void; children?: React.ReactNode }) {
+function Door({ open, onToggle, children }: { open: boolean; onToggle?: () => void; children?: React.ReactNode }) {
   return (
     <>
       <g className="as-lit" data-on={open || undefined}>
@@ -101,7 +102,7 @@ function Door({ open, onToggle, children }: { open: boolean; onToggle: () => voi
           <polygon points={OPENING} fill="#FFF3B0" />
         </g>
       </g>
-      <g className="as-door as-doorhit" onClick={onToggle}>
+      <g className={cn("as-door", onToggle && "as-doorhit")} onClick={onToggle}>
         {FRAME.map((b, k) => (
           <Block key={k} b={b} u={U} face="ink" />
         ))}
@@ -110,7 +111,7 @@ function Door({ open, onToggle, children }: { open: boolean; onToggle: () => voi
             <Block b={LEAF} u={U} face="signal" grain={G} />
           </g>
           <g className="as-swing" data-on={!open || undefined}>
-            <Block b={SHUT} u={U} face="signal" grain={G} />
+            <Block b={SHUT} u={U} face="white" grain={G} />
           </g>
         </g>
       </g>
@@ -224,6 +225,75 @@ export function DoorMark({ className }: { className?: string }) {
       </g>
       <g className="as-par" style={{ ["--d" as string]: 3 }}>
         <Door open={open} onToggle={() => setOpen((o) => !o)} />
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 0 }}>
+        {fore.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+// The application's figure: four treads climbing to a landing, the door standing on it. The tread
+// for the current step is lit Signal; the door stays shut until the application is in, then opens
+// and glows.
+const RISE = 0.9;
+const TREAD = 1.5;
+const LAND = 4 * RISE;
+const LANDING = box(DX - 1.6, DY - 2.4, 0, DW + 3.2, 2.4 + T + 0.6, LAND);
+const TREADS = [0, 1, 2, 3].map((k) => box(DX + T, DY + T + 0.6 + (3 - k) * TREAD, 0, DW - 2 * T, TREAD, (k + 1) * RISE));
+const STAIR_SIDE: Part[] = ([
+  { b: box(DX - 4.4, DY - 3, 0, 2.2, 2.2, 2.2), face: "white" },
+  { b: box(DX - 4.4, DY - 3, 2.2, 1.1, 1.1, 1.1), face: "graphite" },
+  { b: box(DX - 4.6, DY + 0.4, 0, 1.6, 1.6, 1.6), face: "white" },
+  { b: box(DX - 3.2, DY + 4.6, 0, 1.2, 1.2, 1.2), face: "graphite" },
+  { b: box(DX + DW + 2, DY - 2.6, 0, 2.2, 2.2, 3.3), face: "white" },
+  { b: box(DX + DW + 2.4, DY + 1.2, 0, 1.6, 1.6, 1.6), face: "white" },
+  { b: box(DX + DW + 2.6, DY + 1.6, 1.6, 0.9, 0.9, 0.9), face: "graphite" },
+  { b: box(DX + DW + 1.4, DY + 5.2, 0, 1.2, 1.2, 1.2), face: "white" },
+] satisfies Part[]).sort((a, b) => key(a.b) - key(b.b));
+const STAIR_CLOUDS: B[] = [box(DX - 7, DY - 4, LAND + DH + 1, 3.6, 2.2, 0.6), box(DX - 6.2, DY - 3.6, LAND + DH + 1.6, 1.8, 1.2, 0.5), box(DX + DW + 2, DY - 6, LAND + DH + 2.4, 4, 2.4, 0.6)];
+const st = [LANDING, ...TREADS, ...STAIR_SIDE.map((p) => p.b), ...STAIR_CLOUDS].flatMap(([x0, x1, y0, y1, z0, z1]) => [P(x0, y1, z0, U), P(x1, y0, z0, U), P(x1, y1, z0, U), P(x0, y0, z1, U)]);
+const SX = Math.min(...st.map((p) => p[0])) - 40;
+const SY = Math.min(...st.map((p) => p[1])) - 40;
+const SW = Math.max(...st.map((p) => p[0])) + 40 - SX;
+const SH = Math.max(...st.map((p) => p[1])) + 30 - SY;
+
+/** Steps to the door for the application wizard: `step` lights its tread, `done` opens the door. */
+export function StairScene({ step, done, className }: { step: number; done: boolean; className?: string }) {
+  const par = useParallax();
+  const back = STAIR_SIDE.filter((p) => p.b[2] < DY + T);
+  const fore = STAIR_SIDE.filter((p) => p.b[2] >= DY + T);
+  return (
+    <svg {...par} viewBox={`${SX} ${SY} ${SW} ${SH}`} preserveAspectRatio="xMidYMid meet" className={className} aria-hidden>
+      <Defs />
+      <g className="as-par" style={{ ["--d" as string]: 20 }}>
+        <g className="as-cloud">
+          {STAIR_CLOUDS.map((b, k) => (
+            <Block key={k} b={b} u={U} grain={G} />
+          ))}
+        </g>
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 8 }}>
+        {back.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 4 }}>
+        <g className="as-rise" style={{ ["--i" as string]: 4 }}>
+          <Block b={LANDING} u={U} face="white" grain={G} />
+        </g>
+        <g transform={`translate(0 ${-LAND * U})`}>
+          <Door open={done} />
+        </g>
+        {[3, 2, 1, 0].map((k) => (
+          <g key={k} className="as-rise" style={{ ["--i" as string]: 10 + (3 - k) * 3 }}>
+            <g className="as-tread" data-on={(!done && k === step) || undefined}>
+              <Block b={TREADS[k]!} u={U} face={!done && k === step ? "signal" : "white"} grain={G} />
+            </g>
+          </g>
+        ))}
       </g>
       <g className="as-par" style={{ ["--d" as string]: 0 }}>
         {fore.map((p, k) => (
