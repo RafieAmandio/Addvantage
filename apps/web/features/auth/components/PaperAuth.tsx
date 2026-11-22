@@ -7,6 +7,7 @@ import "@/features/marketing/landing.css";
 import { cn } from "@/lib/cn";
 import { tvFonts } from "@/features/marketing/lib/fonts";
 import { Roll } from "@/features/marketing/components/Roll";
+import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
 import { ChartLabDemo } from "./ChartLabDemo";
 
 /** Field classes, the same as the Black Friday form. */
@@ -16,28 +17,16 @@ export const paperLabel = "block text-[15px] font-medium text-tv-ink";
 export const paperHint = "mt-1.5 text-[13px] leading-[1.45] text-tv-mute";
 export const paperErr = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
 
-type Scene = "login" | "signup" | "verify" | "waiver";
-
-/** One plate per auth page, each carrying the screen's one Signal (the flag, the lamp, the lit window). */
-const PLATES: Record<Scene, { src: string; alt: string; caption: string }> = {
-  login: { src: "/auth/terrain.webp", alt: "A terrain block whose ridgeline traces a price chart, a yellow flag on the highest swing", caption: "Plate 01 / Market structure" },
-  signup: { src: "/auth/desk-night.webp", alt: "A trader's desk drawn in hairlines, two charts on screen, the lamp in yellow", caption: "Plate 02 / The desk at night" },
-  verify: { src: "/auth/night-floor.webp", alt: "A city grid at night seen from a high window, one window lit yellow", caption: "Plate 03 / One light on" },
-  waiver: { src: "/auth/night-floor.webp", alt: "A city grid at night seen from a high window, one window lit yellow", caption: "Plate 03 / One light on" },
-};
-
 /**
- * The auth pages: a full-height Desk plate on the left with the headline set at its foot (the
- * composition of the old auth pages), the form on Paper on the right. The plate wipes up on load
- * and drifts slowly; reduced motion holds it still. On a phone the plate is a strip under the
- * lockup, the headline follows it, then the form.
+ * The auth pages in the landing's hand: Paper with the kit's grain, the product printed as a sheet
+ * (the live Chart Lab demo) and the headline under it on the left, the form on the right past a
+ * hairline. On a phone the sheet is left out so the form comes first.
  */
 export function PaperAuthShell({
   eyebrow,
   title,
   copy,
   aside,
-  scene = "login",
   children,
 }: {
   eyebrow: React.ReactNode;
@@ -45,44 +34,32 @@ export function PaperAuthShell({
   copy: React.ReactNode;
   /** Shown above the form on desktop (the sign-up steps). */
   aside?: React.ReactNode;
-  scene?: Scene;
   children: React.ReactNode;
 }) {
-  const plate = PLATES[scene];
   return (
-    <main className={`tv-landing min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] ${tvFonts}`}>
-      <aside className="tv-on-desk relative isolate flex flex-col overflow-hidden bg-tv-desk px-4 pb-8 pt-4 text-tv-paper sm:px-6 md:sticky md:top-3 md:m-3 md:h-[calc(100svh-24px)] md:min-h-[680px] md:rounded-[22px] md:px-10 md:pb-8 md:pt-7">
+    <main style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className={`tv-landing tv-grain relative isolate min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] ${tvFonts}`}>
+      <aside
+        className="relative flex flex-col overflow-hidden px-4 pb-8 pt-4 sm:px-6 md:sticky md:top-0 md:h-svh md:min-h-[720px] md:border-r md:border-tv-stone md:px-12 md:pb-10 md:pt-6"
+      >
         <header className="flex h-10 items-center justify-between">
           <Link href="/" className="flex items-center" aria-label="TradeVantage home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/lockup-desk.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
+            <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
           </Link>
-          <Link href="/" className="tv-link py-1 text-[15px] text-tv-mutedesk hover:text-tv-paper">
+          <Link href="/" className="tv-link py-1 text-[15px] text-tv-graphite hover:text-tv-ink">
             <span aria-hidden>←</span> Back to the site
           </Link>
         </header>
-        <div className="tv-plate absolute inset-0 -z-10 hidden opacity-70 md:block">
-          <div className="tv-plate-frame h-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={plate.src} alt={plate.alt} width={1440} height={2160} fetchPriority="high" className="tv-plate-img h-full w-full object-cover object-[50%_72%]" />
-          </div>
-        </div>
-        <div className="relative mt-6 flex flex-1 items-center justify-center pb-6 md:mt-4 md:pb-12">
+        <div className="relative hidden flex-1 items-center justify-center py-8 md:flex">
           <ChartLabDemo />
         </div>
-        <div>
-          <p className="tv-eyebrow lv-in text-tv-mutedesk">
-            {eyebrow}
-          </p>
-          <h1 className="lv-in mt-4 text-[clamp(2.5rem,4.6vw,4.5rem)] font-semibold leading-[0.92] tracking-[-0.045em] [--i:1] md:mt-5">{title}</h1>
-          <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-mutedesk [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
+        <div className="mt-10 md:mt-0">
+          <p className="tv-eyebrow lv-in text-tv-mute">{eyebrow}</p>
+          <h1 className="lv-in mt-4 text-[clamp(2.5rem,4.6vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.035em] [--i:1] md:mt-5">{title}</h1>
+          <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-graphite [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
         </div>
-        <p className="tv-eyebrow hidden items-center justify-between pt-8 text-tv-mutedesk md:flex">
-          <span>{plate.caption}</span>
-          <span>TradeVantage</span>
-        </p>
       </aside>
-      <section className="flex min-w-0 items-center justify-center px-4 py-12 sm:px-6 md:px-12 md:py-16">
+      <section className="flex min-w-0 items-center justify-center px-4 pb-14 pt-4 sm:px-6 md:px-12 md:py-16">
         <div className="relative w-full max-w-[440px]">
           {aside}
           {children}

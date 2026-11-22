@@ -86,7 +86,6 @@ export function SignupWizard() {
   return (
     <PaperAuthShell
       eyebrow="Sign up"
-      scene="signup"
       title={
         <>
           This is a filter,

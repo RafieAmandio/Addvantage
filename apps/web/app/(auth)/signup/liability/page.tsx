@@ -41,7 +41,6 @@ export default function LiabilityPage() {
 
   return (
     <PaperAuthShell
-      scene="waiver"
       eyebrow="Liability waiver"
       title={
         <>
