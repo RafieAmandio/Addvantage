@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { prisma } from "@tradevantage/db";
-import { FOREX_PAIRS } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
+import { twelvedataSymbols } from "../lib/twelvedata-symbols";
 import { delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -129,7 +129,7 @@ export async function syncGaps(): Promise<void> {
   }
 
   const delayMs = config.RSI_REFRESH_DELAY_MS;
-  const symbols = FOREX_PAIRS.map((p) => p.symbol);
+  const symbols = twelvedataSymbols();
   const results: GapResult[] = [];
   let errors = 0;
 

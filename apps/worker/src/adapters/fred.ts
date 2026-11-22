@@ -48,6 +48,7 @@ export class FredAdapter implements SourceAdapter {
     }
 
     const out: Candidate[] = [];
+    let lastErr: unknown;
     for (const s of SERIES) {
       try {
         const obs = await fetchJson<FredObservationsResponse>(
@@ -81,8 +82,12 @@ export class FredAdapter implements SourceAdapter {
         });
       } catch (err) {
         ctx.logger.error({ series: s.id, err: String(err) }, "fred fetch failed");
+        lastErr = err;
       }
     }
+    // Every series failed (e.g. FRED unreachable from the server): fail the run so the
+    // source shows lastError instead of a fresh "last success".
+    if (out.length === 0 && lastErr) throw lastErr;
     return out;
   }
 
