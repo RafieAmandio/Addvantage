@@ -1,0 +1,8 @@
+/* The auth illustration builds in: blocks rise in draw order, then the door, then the light. Transform and opacity only. */
+@keyframes as-rise { from { opacity: 0; transform: translateY(24px); } }
+@keyframes as-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .as-rise { animation: as-rise 0.7s cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: calc(var(--i) * 14ms + 0.1s); }
+  .as-door { animation: as-rise 0.9s cubic-bezier(0.23, 1, 0.32, 1) 1.5s both; }
+  .as-light { animation: as-fade 0.8s ease-out 2.3s both; }
+}

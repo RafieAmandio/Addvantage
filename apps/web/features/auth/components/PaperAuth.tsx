@@ -8,12 +8,7 @@ import { cn } from "@/lib/cn";
 import { tvFonts } from "@/features/marketing/lib/fonts";
 import { Roll } from "@/features/marketing/components/Roll";
 import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
-import { HeroDesk } from "@/features/marketing/components/HeroDesk";
-import type { HeroData } from "@/features/marketing/lib/landing";
-import hero from "../hero-desk.json";
-
-/** The landing hero desk's data, snapshotted from the landing sample so the auth bundle skips the full candle file. */
-const HERO = hero as unknown as HeroData;
+import { AccessScene } from "./AccessScene";
 
 /** Field classes, the same as the Black Friday form. */
 export const paperInput =
@@ -23,8 +18,8 @@ export const paperHint = "mt-1.5 text-[13px] leading-[1.45] text-tv-mute";
 export const paperErr = "mt-1.5 text-[13px] leading-[1.45] text-tv-downpaper";
 
 /**
- * The auth pages, Retool-plain: the form on white on the left, nothing but its own heading; the
- * landing's isometric desk on Paper filling the right half, the exchange partner at its foot.
+ * The auth pages, Retool-plain: the form on white on the left, nothing but its own heading; on the
+ * right the isometric skyline-and-door illustration over the top two thirds, the partners under it.
  * On a phone the desk is left out.
  */
 export function PaperAuthShell({ aside, children }: { /** Shown above the form on desktop (the sign-up steps). */ aside?: React.ReactNode; children: React.ReactNode }) {
@@ -47,18 +42,25 @@ export function PaperAuthShell({ aside, children }: { /** Shown above the form o
           </div>
         </div>
       </section>
-      <aside
-        style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }}
-        className="tv-grain relative hidden flex-col overflow-hidden border-l border-tv-stone bg-tv-paper md:sticky md:top-0 md:flex md:h-svh"
-      >
-        <figure className="flex flex-1 items-center justify-center px-4">
-          <HeroDesk d={HERO} className="w-full" />
-        </figure>
-        <p className="flex items-center justify-center gap-4 border-t border-tv-stone py-6">
-          <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
-        </p>
+      <aside className="relative hidden flex-col border-l border-tv-stone bg-tv-paper md:sticky md:top-0 md:flex md:h-svh">
+        <div style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative h-[64%] overflow-hidden border-b border-tv-stone">
+          <AccessScene className="absolute inset-0 h-full w-full" />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-7 px-8">
+          <p className="text-[15px] font-medium">Built with partners traders already use</p>
+          <ul className="flex items-center gap-14">
+            <li className="flex flex-col items-center gap-2.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
+              <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+            </li>
+            <li className="flex flex-col items-center gap-2.5">
+              {/* ponytail: wordmark set in type until TradingView's official logo files and partner OK arrive. */}
+              <span className="text-[21px] font-semibold leading-6 tracking-[-0.02em]">TradingView</span>
+              <span className="tv-eyebrow text-tv-mute">Tool partner</span>
+            </li>
+          </ul>
+        </div>
       </aside>
     </main>
   );

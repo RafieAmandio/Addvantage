@@ -32,8 +32,7 @@ export function LoginForm() {
 
   return (
     <form action={formAction} className="w-full">
-      <p className="tv-eyebrow text-tv-mute">Log in</p>
-      <h2 className="mt-3 text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.05] tracking-[-0.03em]">Sign in to your account</h2>
+      <h2 className="text-[clamp(1.75rem,3vw,2.25rem)] font-semibold leading-[1.1] tracking-[-0.03em]">Welcome back</h2>
 
       <div key={shake} className={cn("mt-8 space-y-6", shake > 0 && "lv-shake")}>
         <PaperField id="login-email" label="Email">
@@ -72,15 +71,14 @@ export function LoginForm() {
         </p>
       )}
 
-      <PaperSubmit label="Sign in" busyLabel="Signing in" className="mt-8 w-full" />
+      <PaperSubmit label="Log in" busyLabel="Logging in" className="mt-8 w-full" />
 
       <p className="mt-8 border-t border-tv-stone pt-6 text-[15px] text-tv-graphite">
-        No account yet?{" "}
+        New here?{" "}
         <Link href="/signup" className="tv-link font-medium text-tv-ink">
           Request access
         </Link>
       </p>
-      <p className="mt-3 text-[13px] leading-[1.45] text-tv-mute">By signing in you agree to the terms accepted during registration.</p>
     </form>
   );
 }
