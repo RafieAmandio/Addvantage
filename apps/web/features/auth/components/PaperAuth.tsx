@@ -67,17 +67,15 @@ export function PaperAuthShell({
           </div>
         </div>
         <div className="mt-6 md:mt-auto">
-          <p className="tv-eyebrow lv-in flex items-center gap-3 text-tv-mutedesk">
-            <span aria-hidden className="tv-rule h-px w-8 bg-tv-mutedesk" />
+          <p className="tv-eyebrow lv-in text-tv-mutedesk">
             {eyebrow}
           </p>
           <h1 className="lv-in mt-4 text-[clamp(2.75rem,6.2vw,5.75rem)] font-semibold leading-[0.92] tracking-[-0.045em] [--i:1] md:mt-5">{title}</h1>
           <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-mutedesk [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
         </div>
-        <p className="tv-eyebrow hidden items-center gap-3 pt-8 text-tv-mutedesk md:flex">
-          {plate.caption}
-          <span aria-hidden className="h-px flex-1 bg-tv-line" />
-          TradeVantage
+        <p className="tv-eyebrow hidden items-center justify-between pt-8 text-tv-mutedesk md:flex">
+          <span>{plate.caption}</span>
+          <span>TradeVantage</span>
         </p>
       </aside>
       <section className="flex min-w-0 items-center justify-center px-4 py-12 sm:px-6 md:px-12 md:py-16">
