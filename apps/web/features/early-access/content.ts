@@ -50,11 +50,10 @@ export const PARTNER_BROKERS: PartnerBroker[] = [
       "https://mlbcppehtoytqqbrkirn.supabase.co/storage/v1/object/public/uploads/referral/314d500c-6821-44a7-8b24-5936266116cd.webp",
   },
   {
-    name: "Bitget",
+    name: "BingX",
     kind: "Crypto exchange",
-    url: "https://partner.bitget.com/bg/TVantage",
-    logoUrl:
-      "https://mlbcppehtoytqqbrkirn.supabase.co/storage/v1/object/public/uploads/referral/399281be-842e-40de-929a-49dd65fc873c.png",
+    url: "https://bingx.com/id/partner/TradeVantage",
+    logoUrl: "/brand/partners/bingx-mark.svg",
   },
 ];
 

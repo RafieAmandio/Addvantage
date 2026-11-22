@@ -1,62 +1,42 @@
 import Link from "next/link";
+import "@/features/marketing/landing.css";
+import { tvFonts } from "@/features/marketing/lib/fonts";
+import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
+import { Roll } from "@/features/marketing/components/Roll";
+import { DoorMark } from "./AccessScene";
 
 // Public sign-up is invite-only for now: early access is the only way in.
 // Shown at /signup when NEXT_PUBLIC_REGISTRATION_OPEN !== "1".
+// One centred column on Paper, the glowing door above the ask (Whop's waitlist layout).
 export function RegistrationClosed() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-white">
-      <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.05]" aria-hidden />
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#111111] via-transparent to-[#111111]"
-        aria-hidden
-      />
-
-      <div className="relative z-10 w-full max-w-xl">
-        <Link href="/" className="font-mono text-base font-bold text-white">
-          +vantage
+    <main
+      style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }}
+      className={`tv-landing tv-grain relative isolate flex min-h-svh flex-col bg-tv-paper px-4 pb-10 pt-4 text-tv-ink sm:px-6 md:px-12 md:pt-6 ${tvFonts}`}
+    >
+      <header className="flex h-10 items-center justify-between">
+        <Link href="/" className="flex items-center" aria-label="TradeVantage home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/lockup-paper.svg" alt="+ vantage" width={319} height={73} className="h-[26px] w-auto md:h-[30px]" />
         </Link>
-
-        <div
-          className="mt-12 flex items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-widest2 text-brand"
-          style={{ animation: "fadeSlideUp 0.5s ease-out both" }}
-        >
-          <span className="led animate-pulse" aria-hidden />
-          Registration // Invite only
-        </div>
-
-        <h1
-          className="mt-6 font-sans text-[clamp(2.75rem,9vw,80px)] font-bold leading-[0.95] text-white"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.1s both" }}
-        >
-          Invite
-          <br />
-          only<span className="text-brand">.</span>
-        </h1>
-
-        <p
-          className="mx-auto mt-6 max-w-md font-mono text-sm leading-[1.6] text-white/60"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.2s both" }}
-        >
-          Public sign-up is paused. The only way in right now is early access: a founding cohort with a 100% money-back guarantee.
+        <Link href="/" className="tv-link py-1 text-[15px] text-tv-graphite hover:text-tv-ink">
+          <span aria-hidden>←</span> Back to the site
+        </Link>
+      </header>
+      <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
+        <DoorMark className="w-[220px] md:w-[280px]" />
+        <h1 className="lv-in mt-6 text-[clamp(2rem,4vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.035em] [--i:1]">Want early access?</h1>
+        <p className="lv-in mt-3 text-[16px] text-tv-graphite [--i:2]">We read every application.</p>
+        <Link href="/early-access" className="tv-btn tv-btn-ink lv-in mt-8 [--i:3]">
+          <Roll label="Apply for access" />
+          <span aria-hidden className="tv-arrow">→</span>
+        </Link>
+        <p className="lv-in mt-6 text-[15px] text-tv-graphite [--i:4]">
+          Have an account?{" "}
+          <Link href="/login" className="tv-link font-medium text-tv-ink">
+            Log in
+          </Link>
         </p>
-
-        <div
-          className="mt-10 flex flex-col items-center gap-5"
-          style={{ animation: "fadeSlideUp 0.5s ease-out 0.3s both" }}
-        >
-          <Link
-            href="/early-access"
-            className="btn-pixel rounded-lg bg-brand px-8 py-4 font-mono text-sm font-bold text-black transition-colors hover:bg-brand-dim"
-          >
-            Request early access &rarr;
-          </Link>
-          <Link
-            href="/login"
-            className="font-mono text-sm text-white/50 transition-colors hover:text-brand"
-          >
-            Already an operator? Sign in
-          </Link>
-        </div>
       </div>
     </main>
   );
