@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { HeroData } from "@/features/marketing/lib/landing";
-import { HeroDesk } from "@/features/marketing/components/HeroDesk";
+import { HeroScene } from "@/features/marketing/components/HeroScene";
 import { Magnet } from "@/features/marketing/components/Magnet";
 import { Roll } from "@/features/marketing/components/Roll";
 import { Jitter } from "@/features/marketing/components/ScrambleReveal";
@@ -52,46 +52,42 @@ export function MarketingNav({ home = "" }: { home?: "" | "/" }) {
 
 export function HeroSection({ hero }: { hero: HeroData }) {
   return (
-    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col justify-center overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-20">
-      <div className="mx-auto grid w-full max-w-[1240px] items-center gap-y-6 px-4 sm:px-6 md:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] md:gap-x-4 md:px-8 md:pb-16">
-        <div className="relative z-10 flex flex-col items-start md:py-10">
-          <h1 className="text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
-            <span className="block">Read the market.</span>
-            <span className="block">
-              Not the <Jitter text="noise" />.
-            </span>
-          </h1>
-          <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
-            Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
-          </p>
-          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <Magnet>
-              <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
-                <Roll label="Request access" />
-                <span aria-hidden className="tv-arrow">
-                  →
-                </span>
-              </Link>
-            </Magnet>
-            <Link href="/login" className="tv-btn tv-btn-line">
-              <Roll label="Log in" />
+    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col overflow-hidden bg-tv-paper pt-28 text-tv-ink md:pt-32">
+      <div className="relative z-10 mx-auto flex w-full max-w-[880px] flex-col items-center px-4 text-center sm:px-6">
+        <h1 className="text-[clamp(2.75rem,6vw,5.25rem)] font-semibold leading-[0.96] tracking-[-0.04em]">
+          Read the market. <br className="hidden sm:block" />
+          Not the <Jitter text="noise" />.
+        </h1>
+        <p className="mt-6 max-w-[36rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
+          Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
+        </p>
+        <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+          <Magnet>
+            <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
+              <Roll label="Request access" />
+              <span aria-hidden className="tv-arrow">
+                →
+              </span>
             </Link>
-          </div>
-          <a href="#method" className="tv-link mt-6 text-[15px] font-medium">
-            See the lab <span aria-hidden className="tv-arrow">↓</span>
-          </a>
-          {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
-          <p className="mt-10 flex items-center gap-4 border-t border-tv-stone pt-5">
-            <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-6 w-auto" />
-          </p>
+          </Magnet>
+          <Link href="/login" className="tv-btn tv-btn-line">
+            <Roll label="Log in" />
+          </Link>
         </div>
-
-        <figure className="relative pb-6 md:-ml-10 md:-mr-24 md:pb-0">
-          <HeroDesk d={hero} />
-        </figure>
+        {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
+        <p className="mt-7 flex items-center gap-4">
+          <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-5 w-auto" />
+        </p>
       </div>
+
+      <figure className="relative mt-4 h-[380px] md:mt-2 md:h-[max(520px,68vh)]">
+        <HeroScene d={hero} className="absolute inset-0 h-full w-full" />
+        <a href="#method" className="tv-link absolute bottom-4 left-4 md:left-8 text-[15px] font-medium">
+          See the lab <span aria-hidden className="tv-arrow">↓</span>
+        </a>
+      </figure>
     </section>
   );
 }
