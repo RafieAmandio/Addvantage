@@ -7,6 +7,7 @@ import "@/features/marketing/landing.css";
 import { cn } from "@/lib/cn";
 import { tvFonts } from "@/features/marketing/lib/fonts";
 import { Roll } from "@/features/marketing/components/Roll";
+import { ChartLabDemo } from "./ChartLabDemo";
 
 /** Field classes, the same as the Black Friday form. */
 export const paperInput =
@@ -49,8 +50,8 @@ export function PaperAuthShell({
 }) {
   const plate = PLATES[scene];
   return (
-    <main className={`tv-landing min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-2 ${tvFonts}`}>
-      <aside className="tv-on-desk relative isolate flex flex-col overflow-hidden bg-tv-desk px-4 pb-8 pt-4 text-tv-paper sm:px-6 md:sticky md:top-0 md:h-svh md:min-h-[640px] md:px-10 md:pb-8 md:pt-7">
+    <main className={`tv-landing min-h-svh bg-tv-paper text-tv-ink md:grid md:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] ${tvFonts}`}>
+      <aside className="tv-on-desk relative isolate flex flex-col overflow-hidden bg-tv-desk px-4 pb-8 pt-4 text-tv-paper sm:px-6 md:sticky md:top-3 md:m-3 md:h-[calc(100svh-24px)] md:min-h-[680px] md:rounded-[22px] md:px-10 md:pb-8 md:pt-7">
         <header className="flex h-10 items-center justify-between">
           <Link href="/" className="flex items-center" aria-label="TradeVantage home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -60,17 +61,20 @@ export function PaperAuthShell({
             <span aria-hidden>←</span> Back to the site
           </Link>
         </header>
-        <div className="tv-plate relative -mx-4 mt-4 h-[210px] sm:-mx-6 md:absolute md:inset-0 md:-z-10 md:m-0 md:h-auto">
+        <div className="tv-plate absolute inset-0 -z-10 hidden opacity-70 md:block">
           <div className="tv-plate-frame h-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={plate.src} alt={plate.alt} width={1440} height={2160} fetchPriority="high" className="tv-plate-img h-full w-full object-cover object-[50%_72%]" />
           </div>
         </div>
-        <div className="mt-6 md:mt-auto">
+        <div className="relative mt-6 flex flex-1 items-center justify-center pb-6 md:mt-4 md:pb-12">
+          <ChartLabDemo />
+        </div>
+        <div>
           <p className="tv-eyebrow lv-in text-tv-mutedesk">
             {eyebrow}
           </p>
-          <h1 className="lv-in mt-4 text-[clamp(2.75rem,6.2vw,5.75rem)] font-semibold leading-[0.92] tracking-[-0.045em] [--i:1] md:mt-5">{title}</h1>
+          <h1 className="lv-in mt-4 text-[clamp(2.5rem,4.6vw,4.5rem)] font-semibold leading-[0.92] tracking-[-0.045em] [--i:1] md:mt-5">{title}</h1>
           <p className="lv-in mt-4 max-w-[27rem] text-[16px] leading-[1.55] text-tv-mutedesk [--i:2] md:mt-5 md:text-[17px]">{copy}</p>
         </div>
         <p className="tv-eyebrow hidden items-center justify-between pt-8 text-tv-mutedesk md:flex">
