@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef, useState } from "react";
 import { P, box, type B } from "@/features/marketing/lib/iso";
 import { Block, GrainDefs, type Face } from "@/features/marketing/components/iso/Iso";
 import "./access-scene.css";
@@ -64,6 +67,7 @@ const front = parts.filter((p) => p.b[2] >= DY);
 
 const FRAME: B[] = [box(DX, DY, 0, T, T, DH), box(DX + DW - T, DY, 0, T, T, DH), box(DX, DY, DH, DW, T, T)];
 const LEAF = box(DX + T, DY + T, 0, 0.22, DW - 2 * T - 0.25, DH - 0.08); // swung open toward the viewer
+const SHUT = box(DX + T, DY + 0.12, 0, DW - 2 * T, 0.3, DH - 0.05); // closed, in the frame's plane
 const poly = (ps: [number, number, number][]) => ps.map(([x, y, z]) => P(x, y, z, U).map((n) => n.toFixed(1)).join(",")).join(" ");
 const yf = DY + T; // the frame's front plane
 const OPENING = poly([[DX + T, yf, 0], [DX + DW - T, yf, 0], [DX + DW - T, yf, DH], [DX + T, yf, DH]]);
@@ -79,58 +83,152 @@ const VW = VH * 1.3;
 const minX = dcx - VW / 2;
 const minY = dTop - VH * 0.24;
 
-const Piece = ({ p, i }: { p: Part; i: number }) => (
-  <g className="as-rise" style={{ ["--i" as string]: i }}>
-    <Block b={p.b} u={U} face={p.face} grain={G} />
-  </g>
-);
-
 /**
- * The auth illustration: a tall door frame standing open among stacked blocks, the leaf swung out
- * in Signal, block trees behind, cloud slabs above. Drawn in code with the landing's iso kit; the
- * trees and blocks rise in from the back, then the door, then the leaf. Reduced motion shows it built.
+ * The door, lit or shut: its glow under everything in front, the frame, and the leaf, open or
+ * closed. Clicking it swings it; hovering brightens the light.
  */
-export function AccessScene({ className }: { className?: string }) {
+function Door({ open, onToggle, children }: { open: boolean; onToggle: () => void; children?: React.ReactNode }) {
   return (
-    <svg viewBox={`${minX} ${minY} ${VW} ${VH}`} preserveAspectRatio="xMidYMid slice" className={className} aria-hidden>
-      <defs>
-        <GrainDefs id={G} />
-        <filter id={`${G}-glow`} x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation={30} />
-        </filter>
-      </defs>
-      <g className="as-cloud">
-        {CLOUDS.map((b, k) => (
-          <Block key={k} b={b} u={U} grain={G} />
-        ))}
+    <>
+      <g className="as-lit" data-on={open || undefined}>
+        <g className="as-glow">
+          <polygon points={OPENING} fill="#FFD400" filter={`url(#${G}-glow)`} />
+          <polygon points={OPENING} fill="#FFD400" filter={`url(#${G}-glow)`} />
+          <polygon points={SPILL} fill="#FFD400" filter={`url(#${G}-glow)`} opacity={0.55} />
+        </g>
+        <g className="as-light">
+          <polygon points={SPILL} fill="#FFE45C" opacity={0.5} />
+          <polygon points={OPENING} fill="#FFF3B0" />
+        </g>
       </g>
-      {behind.map((p, k) => (
-        <Piece key={k} p={p} i={key(p.b)} />
-      ))}
-      <g className="as-glow">
-        <polygon points={OPENING} fill="#FFD400" filter={`url(#${G}-glow)`} />
-        <polygon points={OPENING} fill="#FFD400" filter={`url(#${G}-glow)`} />
-        <polygon points={SPILL} fill="#FFD400" filter={`url(#${G}-glow)`} opacity={0.55} />
-      </g>
-      <g className="as-light">
-        <polygon points={SPILL} fill="#FFE45C" opacity={0.5} />
-        <polygon points={OPENING} fill="#FFF3B0" />
-      </g>
-      <g className="as-door">
+      <g className="as-door as-doorhit" onClick={onToggle}>
         {FRAME.map((b, k) => (
           <Block key={k} b={b} u={U} face="ink" />
         ))}
+        <g className="as-leaf">
+          <g className="as-swing" data-on={open || undefined}>
+            <Block b={LEAF} u={U} face="signal" grain={G} />
+          </g>
+          <g className="as-swing" data-on={!open || undefined}>
+            <Block b={SHUT} u={U} face="signal" grain={G} />
+          </g>
+        </g>
       </g>
-      <g className="as-leaf">
-        <Block b={LEAF} u={U} face="signal" grain={G} />
+      {children}
+    </>
+  );
+}
+
+const Defs = () => (
+  <defs>
+    <GrainDefs id={G} />
+    <filter id={`${G}-glow`} x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation={30} />
+    </filter>
+  </defs>
+);
+
+const Piece = ({ p }: { p: Part }) => (
+  <g className="as-rise" style={{ ["--i" as string]: key(p.b) }}>
+    <g className="as-lift">
+      <Block b={p.b} u={U} face={p.face} grain={G} />
+    </g>
+  </g>
+);
+
+/** Pointer position over the figure as --mx / --my in -0.5..0.5, for the parallax layers. No re-render. */
+function useParallax() {
+  const ref = useRef<SVGSVGElement>(null);
+  const set = (x: number, y: number) => {
+    ref.current?.style.setProperty("--mx", x.toFixed(3));
+    ref.current?.style.setProperty("--my", y.toFixed(3));
+  };
+  return {
+    ref,
+    onPointerMove: (e: React.PointerEvent<SVGSVGElement>) => {
+      if (e.pointerType !== "mouse") return;
+      const r = e.currentTarget.getBoundingClientRect();
+      set((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5);
+    },
+    onPointerLeave: () => set(0, 0),
+  };
+}
+
+/**
+ * The auth illustration: a tall door frame standing open among stacked blocks, the leaf swung out
+ * in Signal and the doorway glowing, block trees behind, cloud slabs above. Drawn in code with the
+ * landing's iso kit. It builds in from the back; then it is a toy: the layers drift against the
+ * cursor, blocks lift under it, the door swings shut and open on a click.
+ */
+export function AccessScene({ className }: { className?: string }) {
+  const [open, setOpen] = useState(true);
+  const par = useParallax();
+  return (
+    <svg {...par} viewBox={`${minX} ${minY} ${VW} ${VH}`} preserveAspectRatio="xMidYMid slice" className={className} aria-hidden>
+      <Defs />
+      <g className="as-par" style={{ ["--d" as string]: 22 }}>
+        <g className="as-cloud">
+          {CLOUDS.map((b, k) => (
+            <Block key={k} b={b} u={U} grain={G} />
+          ))}
+        </g>
       </g>
-      {front.map((p, k) => (
-        <Piece key={k} p={p} i={key(p.b)} />
-      ))}
-      {/* The glow bleeds a little over the blocks in front, as light would. */}
-      <g className="as-glow" style={{ mixBlendMode: "multiply" }} opacity={0.35}>
-        <polygon points={OPENING} fill="#FFD400" filter={`url(#${G}-glow)`} />
-        <polygon points={SPILL} fill="#FFD400" filter={`url(#${G}-glow)`} />
+      <g className="as-par" style={{ ["--d" as string]: 8 }}>
+        {behind.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 4 }}>
+        <Door open={open} onToggle={() => setOpen((o) => !o)} />
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 0 }}>
+        {front.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+// The compact mark: the door on a small plate of blocks, framed tight, for the centred pages.
+const PLATE = box(DX - 2.4, DY - 1.2, -0.3, DW + 4.8, 7, 0.3);
+const SIDE: Part[] = [
+  { b: box(DX - 2.2, DY - 1, 0, 1.6, 1.6, 1.6), face: "white" },
+  { b: box(DX - 2.2, DY - 1, 1.6, 0.9, 0.9, 0.9), face: "graphite" },
+  { b: box(DX + DW + 0.6, DY - 1, 0, 1.6, 1.6, 2.4), face: "white" },
+  { b: box(DX + DW + 0.6, DY + 1.2, 0, 1.2, 1.2, 1.2), face: "graphite" },
+  { b: box(DX - 2, DY + 3.4, 0, 1.1, 1.1, 1.1), face: "white" },
+];
+const mark = [PLATE, ...FRAME, ...SIDE.map((p) => p.b)].flatMap(([x0, x1, y0, y1, z0, z1]) => [P(x0, y1, z0, U), P(x1, y0, z0, U), P(x1, y1, z0, U), P(x0, y0, z1, U)]);
+const MX = Math.min(...mark.map((p) => p[0])) - 60;
+const MY = Math.min(...mark.map((p) => p[1])) - 60;
+const MW = Math.max(...mark.map((p) => p[0])) + 60 - MX;
+const MH = Math.max(...mark.map((p) => p[1])) + 40 - MY;
+
+/** The door alone on a plate, glowing, for the early access page. Same toy: hover lifts, click swings. */
+export function DoorMark({ className }: { className?: string }) {
+  const [open, setOpen] = useState(true);
+  const par = useParallax();
+  const back = SIDE.filter((p) => p.b[2] < DY);
+  const fore = SIDE.filter((p) => p.b[2] >= DY);
+  return (
+    <svg {...par} viewBox={`${MX} ${MY} ${MW} ${MH}`} className={className} aria-hidden>
+      <Defs />
+      <g className="as-rise" style={{ ["--i" as string]: 0 }}>
+        <Block b={PLATE} u={U} face="white" grain={G} />
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 6 }}>
+        {back.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 3 }}>
+        <Door open={open} onToggle={() => setOpen((o) => !o)} />
+      </g>
+      <g className="as-par" style={{ ["--d" as string]: 0 }}>
+        {fore.map((p, k) => (
+          <Piece key={k} p={p} />
+        ))}
       </g>
     </svg>
   );
