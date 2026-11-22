@@ -1,10 +1,11 @@
-/* The auth illustration builds in: cubes rise from the back, the door lands, the light comes on, clouds drift. Transform and opacity only. */
+/* The auth illustration builds in: trees, blocks from the back, the frame, then the leaf; clouds drift. Transform and opacity only. */
 @keyframes as-rise { from { opacity: 0; transform: translateY(26px); } }
 @keyframes as-fade { from { opacity: 0; } }
 @keyframes as-drift { 50% { transform: translateX(14px); } }
 @media (prefers-reduced-motion: no-preference) {
-  .as-rise { animation: as-rise 0.6s cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: calc(var(--i) * 28ms); }
-  .as-door { animation: as-rise 0.9s cubic-bezier(0.23, 1, 0.32, 1) 0.9s both; }
-  .as-light { animation: as-fade 0.9s ease-out 1.7s both; }
+  .as-trees { animation: as-fade 0.8s ease-out both; }
+  .as-rise { animation: as-rise 0.6s cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: calc(var(--i) * 30ms + 0.2s); }
+  .as-door { animation: as-rise 0.9s cubic-bezier(0.23, 1, 0.32, 1) 1s both; }
+  .as-leaf { animation: as-fade 0.7s ease-out 1.8s both; }
   .as-cloud { animation: as-fade 1.2s ease-out 0.4s both, as-drift 14s ease-in-out 1.6s infinite; }
 }
