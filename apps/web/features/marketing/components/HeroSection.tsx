@@ -55,8 +55,7 @@ export function HeroSection({ hero }: { hero: HeroData }) {
     <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col justify-center overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-20">
       <div className="mx-auto grid w-full max-w-[1240px] items-center gap-y-6 px-4 sm:px-6 md:grid-cols-[minmax(0,6fr)_minmax(0,7fr)] md:gap-x-4 md:px-8 md:pb-16">
         <div className="relative z-10 flex flex-col items-start md:py-10">
-          <p className="tv-eyebrow text-tv-mute">TradeVantage / daily desk</p>
-          <h1 className="mt-5 text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
+          <h1 className="text-[clamp(2.75rem,5vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.035em]">
             <span className="block">Read the market.</span>
             <span className="block">
               Not the <Jitter text="noise" />.
@@ -78,11 +77,6 @@ export function HeroSection({ hero }: { hero: HeroData }) {
               <Roll label="Log in" />
             </Link>
           </div>
-          <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.08em] text-tv-mute">
-            Free tier, no card · 2% max risk built in<span className="hidden sm:inline"> · </span>
-            <br className="sm:hidden" />
-            No signals to copy
-          </p>
           <a href="#method" className="tv-link mt-6 text-[15px] font-medium">
             See the lab <span aria-hidden className="tv-arrow">↓</span>
           </a>
