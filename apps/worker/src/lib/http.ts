@@ -31,6 +31,9 @@ interface FetchOptions {
  * Thin wrapper over Node's global fetch. Handles redirects, retries, and
  * browser-like headers. All outbound scraping/API calls go through here.
  */
+/** Masks api keys in URLs before they reach logs or error messages. */
+export const redactUrl = (url: string) => url.replace(/((?:api_?key|token)=)[^&]+/gi, "$1***");
+
 export async function fetchText(
   url: string,
   opts: FetchOptions = {}
@@ -52,12 +55,12 @@ export async function fetchText(
         signal: ctrl.signal,
       });
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status} for ${url}`);
+        throw new Error(`HTTP ${res.status} for ${redactUrl(url)}`);
       }
       return await res.text();
     } catch (err) {
       lastErr = err;
-      logger.warn({ url, attempt, err: String(err) }, "http.fetch retry");
+      logger.warn({ url: redactUrl(url), attempt, err: String(err) }, "http.fetch retry");
       if (attempt < retries) {
         await sleep(500 * Math.pow(2, attempt));
       }

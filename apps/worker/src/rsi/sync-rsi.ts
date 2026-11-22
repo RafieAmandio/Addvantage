@@ -1,10 +1,11 @@
 import { z } from "zod";
 import * as Sentry from "@sentry/node";
 import { prisma } from "@tradevantage/db";
-import { FOREX_PAIRS, RSI_INTERVALS } from "@tradevantage/shared";
+import { RSI_INTERVALS } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
+import { twelvedataSymbols } from "../lib/twelvedata-symbols";
 import { toIsoUtc, delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -138,7 +139,7 @@ export async function syncRsi(): Promise<void> {
   }
 
   const delayMs = config.RSI_REFRESH_DELAY_MS;
-  const symbols = FOREX_PAIRS.map((p) => p.symbol);
+  const symbols = twelvedataSymbols();
   const results: RsiResult[] = [];
   let errors = 0;
 

@@ -1,10 +1,11 @@
 import { z } from "zod";
 import * as Sentry from "@sentry/node";
 import { prisma } from "@tradevantage/db";
-import { FOREX_PAIRS, ATR_PERIOD } from "@tradevantage/shared";
+import { ATR_PERIOD } from "@tradevantage/shared";
 import { config } from "../lib/config";
 import { retry } from "../lib/retry";
 import { logger } from "../lib/logger";
+import { twelvedataSymbols } from "../lib/twelvedata-symbols";
 import { toIsoUtc, delay } from "../lib/date";
 import { getNextApiKey } from "../lib/api-key-pool";
 
@@ -129,7 +130,7 @@ export async function syncAtr(): Promise<void> {
   }
 
   const delayMs = config.RSI_REFRESH_DELAY_MS;
-  const symbols = FOREX_PAIRS.map((p) => p.symbol);
+  const symbols = twelvedataSymbols();
   const results: AtrResult[] = [];
   let errors = 0;
 
