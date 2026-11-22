@@ -221,7 +221,7 @@ export function EarlyAccessWizard() {
                 <div>
                   <label htmlFor="ea-telegram" className={labelClass}>Telegram handle</label>
                   <div className="relative mt-2">
-                    <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[16px] text-tv-mute">
+                    <span aria-hidden className="pointer-events-none absolute inset-y-0 left-3.5 flex translate-y-[3px] items-center text-[16px] leading-none text-tv-mute">
                       @
                     </span>
                     <input
