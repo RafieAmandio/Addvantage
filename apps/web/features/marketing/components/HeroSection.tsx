@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CubeField } from "@/features/marketing/components/HeroField";
+import { HeroRidge } from "@/features/marketing/components/HeroRidge";
+import type { RidgeData } from "@/features/marketing/lib/landing";
 import { Magnet } from "@/features/marketing/components/Magnet";
 import { Roll } from "@/features/marketing/components/Roll";
 import { Jitter } from "@/features/marketing/components/ScrambleReveal";
@@ -52,7 +53,7 @@ export function MarketingNav({ home = "" }: { home?: "" | "/" }) {
 function Copy() {
   return (
     <div className="relative z-10 flex flex-col items-center text-center">
-      <h1 className="text-[clamp(3rem,8vw,7.5rem)] font-semibold leading-[0.92] tracking-[-0.04em]">
+      <h1 className="text-[clamp(2.75rem,6.6vw,6rem)] font-semibold leading-[0.92] tracking-[-0.04em]">
         <span className="block">Read the market.</span>
         <span className="block">
           Not the <Jitter text="noise" />.
@@ -84,13 +85,13 @@ function Copy() {
   );
 }
 
-export function HeroSection() {
+export function HeroSection({ ridge }: { ridge: RidgeData }) {
   return (
-    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex min-h-[640px] flex-1 flex-col overflow-hidden bg-tv-paper pt-28 text-tv-ink md:pt-32">
-      <CubeField className="absolute inset-0 h-full w-full" />
-      <div className="pointer-events-none relative mx-auto w-full max-w-[1100px] px-4 sm:px-6 [&_a]:pointer-events-auto [&_h1]:pointer-events-auto">
+    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex min-h-[600px] flex-1 flex-col overflow-hidden bg-tv-paper pt-24 text-tv-ink md:pt-28">
+      <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 sm:px-6">
         <Copy />
       </div>
+      <HeroRidge d={ridge} className="relative mt-4 min-h-[260px] flex-1 md:min-h-[340px]" />
     </section>
   );
 }
