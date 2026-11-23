@@ -1,6 +1,5 @@
 import Link from "next/link";
-import type { HeroData } from "@/features/marketing/lib/landing";
-import { HeroScene } from "@/features/marketing/components/HeroScene";
+import { CubeField } from "@/features/marketing/components/HeroField";
 import { Magnet } from "@/features/marketing/components/Magnet";
 import { Roll } from "@/features/marketing/components/Roll";
 import { Jitter } from "@/features/marketing/components/ScrambleReveal";
@@ -50,44 +49,48 @@ export function MarketingNav({ home = "" }: { home?: "" | "/" }) {
   );
 }
 
-export function HeroSection({ hero }: { hero: HeroData }) {
+function Copy() {
   return (
-    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex flex-1 flex-col overflow-hidden bg-tv-paper pt-28 text-tv-ink md:pt-32">
-      <div className="relative z-10 mx-auto flex w-full max-w-[880px] flex-col items-center px-4 text-center sm:px-6">
-        <h1 className="text-[clamp(2.75rem,6vw,5.25rem)] font-semibold leading-[0.96] tracking-[-0.04em]">
-          Read the market. <br className="hidden sm:block" />
+    <div className="relative z-10 flex flex-col items-center text-center">
+      <h1 className="text-[clamp(3rem,8vw,7.5rem)] font-semibold leading-[0.92] tracking-[-0.04em]">
+        <span className="block">Read the market.</span>
+        <span className="block">
           Not the <Jitter text="noise" />.
-        </h1>
-        <p className="mt-6 max-w-[36rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
-          Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
-        </p>
-        <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-          <Magnet>
-            <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
-              <Roll label="Request access" />
-              <span aria-hidden className="tv-arrow">
-                →
-              </span>
-            </Link>
-          </Magnet>
-          <Link href="/login" className="tv-btn tv-btn-line">
-            <Roll label="Log in" />
+        </span>
+      </h1>
+      <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.55] text-tv-graphite md:text-lg">
+        Directional outlook and macro alpha intelligence. A market radar powered by AI and professionals, built for experienced traders.
+      </p>
+      <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <Magnet>
+          <Link href="/signup" className="tv-btn tv-btn-ink w-full sm:w-auto">
+            <Roll label="Request access" />
+            <span aria-hidden className="tv-arrow">
+              →
+            </span>
           </Link>
-        </div>
-        {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
-        <p className="mt-7 flex items-center gap-4">
-          <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-5 w-auto" />
-        </p>
+        </Magnet>
+        <Link href="/login" className="tv-btn tv-btn-line">
+          <Roll label="Log in" />
+        </Link>
       </div>
+      {/* ponytail: partner claim pending the signed BingX deal and their official logo files; delete this block if it falls through. */}
+      <p className="mt-7 flex items-center gap-4">
+        <span className="tv-eyebrow text-tv-mute">Exchange partner</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/partners/bingx.svg" alt="BingX" width={83} height={24} className="tv-partner h-5 w-auto" />
+      </p>
+    </div>
+  );
+}
 
-      <figure className="relative mt-4 h-[380px] md:mt-2 md:h-[max(520px,68vh)]">
-        <HeroScene d={hero} className="absolute inset-0 h-full w-full" />
-        <a href="#method" className="tv-link absolute bottom-4 left-4 md:left-8 text-[15px] font-medium">
-          See the lab <span aria-hidden className="tv-arrow">↓</span>
-        </a>
-      </figure>
+export function HeroSection() {
+  return (
+    <section style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative z-10 flex min-h-[640px] flex-1 flex-col overflow-hidden bg-tv-paper pt-28 text-tv-ink md:pt-32">
+      <CubeField className="absolute inset-0 h-full w-full" />
+      <div className="pointer-events-none relative mx-auto w-full max-w-[1100px] px-4 sm:px-6 [&_a]:pointer-events-auto [&_h1]:pointer-events-auto">
+        <Copy />
+      </div>
     </section>
   );
 }

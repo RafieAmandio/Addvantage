@@ -1,0 +1,9 @@
+/* The hero's cube field: stacks rise in from the centre out, loose cubes float, a stack lifts under the pointer. */
+@keyframes hv-up { from { opacity: 0; transform: translateY(60px); } }
+@keyframes hv-bob { 50% { transform: translateY(-6px); } }
+.hv-lift { transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1); }
+.hv-lift:hover { transform: translateY(-10px); }
+@media (prefers-reduced-motion: no-preference) {
+  .hv-stack { animation: hv-up 0.9s cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: calc(var(--i) * 45ms + 0.1s); }
+  .hv-float { animation: hv-bob 6s ease-in-out infinite; animation-delay: calc(var(--j) * -650ms); }
+}

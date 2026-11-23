@@ -40,7 +40,7 @@ export default function LandingPage() {
       <MarketingNav />
       {/* The hero and the board strip share the first screen exactly. */}
       <div className="flex min-h-[100svh] flex-col">
-        <HeroSection hero={d.hero} />
+        <HeroSection />
         <BoardStrip board={d.board} asOf={d.asOf} />
       </div>
       <PositioningSection />
