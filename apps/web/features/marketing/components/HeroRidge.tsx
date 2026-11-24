@@ -13,8 +13,6 @@ const PALETTES = [
   ["#5D5F64", "#9A9CA1", "#CFCDC6"],
   ["#111214", "#3A3C40", "#FFD400", "#FFE87A"],
 ];
-// Gold under the spotlight: everything a step brighter.
-const LIT = ["#3A3C40", "#E2BB00", "#FFE87A", "#FFF6CC"];
 // Where each ridge sits: its highest and lowest point, as a share of the height.
 const BANDS: [number, number][] = [
   [0.02, 0.42],
@@ -77,13 +75,17 @@ function ridgeLine(series: number[], w: number, h: number, [top, bottom]: [numbe
   return out;
 }
 
-/** One range dithered into its own canvas (transparent above its ridge). */
-function paint(c: HTMLCanvasElement, line: Float32Array, k: number, w: number, h: number, palette: string[]) {
+/**
+ * One range into its own canvas (transparent above its ridge): ordered dither, or `clean`, the same
+ * shading blended smoothly between the palette's colours with no dither at all.
+ */
+function paint(c: HTMLCanvasElement, line: Float32Array, k: number, w: number, h: number, palette: string[], clean = false) {
   c.width = w;
   c.height = h;
   const ctx = c.getContext("2d")!;
   const img = ctx.createImageData(w, h);
   const p = palette.map(rgb);
+  const top = p.length - 1;
   for (let x = 0; x < w; x++)
     for (let y = Math.max(0, Math.floor(line[x]!)); y < h; y++) {
       const below = (y - line[x]!) / h;
@@ -92,33 +94,113 @@ function paint(c: HTMLCanvasElement, line: Float32Array, k: number, w: number, h
       const g = gully(x * 0.09 + k * 31, y * 0.022 + k * 17);
       let v = 0.42 + 0.55 * g + slope * 0.22 - below * (k === 2 ? 1.6 : 1.1);
       if (y - line[x]! < 1.2) v += 0.35; // a lit crest line
-      const q = Math.max(0, Math.min(p.length - 1, Math.floor(v * (p.length - 1) + BAYER[(y % 4) * 4 + (x % 4)]! - 0.25)));
-      img.data.set([...p[q]!, 255], (y * w + x) * 4);
+      const o = (y * w + x) * 4;
+      if (clean) {
+        const t = Math.max(0, Math.min(top, v * top - 0.25 + 0.5));
+        const i = Math.min(top - 1, Math.floor(t));
+        const f = t - i;
+        img.data.set([0, 1, 2].map((ch) => p[i]![ch]! + (p[i + 1]![ch]! - p[i]![ch]!) * f).concat(255), o);
+      } else {
+        const q = Math.max(0, Math.min(top, Math.floor(v * top + BAYER[(y % 4) * 4 + (x % 4)]! - 0.25)));
+        img.data.set([...p[q]!, 255], o);
+      }
     }
   ctx.putImageData(img, 0, 0);
+  return img;
 }
 
 const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
+ * Sand: pixels near the pointer are pushed outward and jittered, by how fast it moves, then settle.
+ * Redraws only the box around the pointer, restoring the last box from the untouched image.
+ */
+function sand(canvases: HTMLCanvasElement[], bases: ImageData[]) {
+  const R = 22; // radius, dither px
+  let cx = -999;
+  let cy = -999;
+  let lx = 0;
+  let ly = 0;
+  let power = 0;
+  let raf = 0;
+  let frame = 0;
+  let last: [number, number, number, number] | null = null;
+  const step = () => {
+    frame++;
+    power *= 0.9;
+    canvases.forEach((c, k) => {
+      const ctx = c.getContext("2d")!;
+      const base = bases[k]!;
+      const w = base.width;
+      const h = base.height;
+      if (last) ctx.putImageData(base, 0, 0, ...last);
+      if (power < 0.02) return;
+      const x0 = Math.max(0, Math.floor(cx - R));
+      const y0 = Math.max(0, Math.floor(cy - R));
+      const x1 = Math.min(w, Math.ceil(cx + R));
+      const y1 = Math.min(h, Math.ceil(cy + R));
+      if (x1 <= x0 || y1 <= y0) return;
+      const out = ctx.createImageData(x1 - x0, y1 - y0);
+      const amp = power * (k === 2 ? 1 : 0.6);
+      for (let y = y0; y < y1; y++)
+        for (let x = x0; x < x1; x++) {
+          const dx = x - cx;
+          const dy = y - cy;
+          const dist = Math.hypot(dx, dy) || 1;
+          const fall = Math.max(0, 1 - dist / R);
+          const push = amp * R * 0.8 * fall * fall;
+          const jit = (hash(x + frame, y) - 0.5) * 7 * amp * fall;
+          const sx = Math.round(x - (dx / dist) * push + jit);
+          const sy = Math.round(y - (dy / dist) * push - jit);
+          const o = ((y - y0) * (x1 - x0) + (x - x0)) * 4;
+          if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue;
+          const so = (sy * w + sx) * 4;
+          out.data[o] = base.data[so]!;
+          out.data[o + 1] = base.data[so + 1]!;
+          out.data[o + 2] = base.data[so + 2]!;
+          out.data[o + 3] = base.data[so + 3]!;
+        }
+      ctx.putImageData(out, x0, y0);
+    });
+    last = power < 0.02 ? null : [Math.max(0, Math.floor(cx - R)), Math.max(0, Math.floor(cy - R)), 2 * R + 2, 2 * R + 2];
+    raf = power < 0.02 && !last ? 0 : requestAnimationFrame(step);
+  };
+  return {
+    move(x: number, y: number) {
+      const speed = Math.hypot(x - lx, y - ly);
+      lx = x;
+      ly = y;
+      if (last) canvases.forEach((c, k) => c.getContext("2d")!.putImageData(bases[k]!, 0, 0, ...last!));
+      last = null;
+      cx = x;
+      cy = y;
+      power = Math.min(1, Math.max(power, speed / 6));
+      if (!raf) raf = requestAnimationFrame(step);
+    },
+    stop: () => cancelAnimationFrame(raf),
+  };
+}
+
+type Fx = "lens" | "sand";
+
+/**
  * The hero's landscape, Browserbase style: three mountain ranges in ordered dither, the front one
  * gold's real daily closes. The ranges drift against the pointer and the scroll at their own depth.
- * Over the gold ridge sits a chart crosshair (price on the right edge, date on the floor) with a
- * spotlight that brightens the gold under it. On load the
- * crosshair replays the series, then parks on the last close.
+ * Under the pointer, either the noise clears (`lens`: the dither resolves into smooth shading) or
+ * the pixels scatter like sand and settle (`sand`).
  */
 export function HeroRidge({ d, className }: { d: RidgeData; className?: string }) {
   const wrap = useRef<HTMLDivElement>(null);
   const layers = [useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null)];
-  const lit = useRef<HTMLCanvasElement>(null);
+  const clear = [useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null)];
   const [size, setSize] = useState<[number, number] | null>(null); // css px
-  const [hot, setHot] = useState<number | null>(null);
   const [over, setOver] = useState(false);
-  const [ridge, setRidge] = useState<Float32Array | null>(null);
-  const n = d.days.length;
-  const [replay, setReplay] = useState<number | null>(0);
+  // ponytail: ?fx=sand switches the effect while Dio compares; keep the winner, drop the switch.
+  const [fx, setFx] = useState<Fx>("lens");
+  const sandRef = useRef<ReturnType<typeof sand> | null>(null);
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("fx") === "sand") setFx("sand");
     const el = wrap.current!;
     const ro = new ResizeObserver(([e]) => setSize([e!.contentRect.width, e!.contentRect.height]));
     ro.observe(el);
@@ -131,59 +213,20 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
     };
   }, []);
 
-  // The intro: the crosshair runs the series once, in step with the wipe, then hands over.
-  useEffect(() => {
-    if (calm()) return setReplay(null);
-    const t0 = performance.now() + 200;
-    let raf = 0;
-    const tick = (t: number) => {
-      const k = Math.min(1, Math.max(0, (t - t0) / 1600));
-      const e = k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2;
-      setReplay(k >= 1 ? null : Math.round(e * (n - 1)));
-      if (k < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [n]);
-
   useEffect(() => {
     if (!size) return;
     const w = Math.ceil((size[0] * (1 + 2 * OVER)) / PX);
     const h = Math.ceil(size[1] / PX);
     const lines = [d.back, d.mid, d.front].map((s, k) => ridgeLine(s, w, h, BANDS[k]!));
-    lines.forEach((line, k) => paint(layers[k]!.current!, line, k, w, h, PALETTES[k]!));
-    paint(lit.current!, lines[2]!, 2, w, h, LIT);
-    setRidge(lines[2]!);
+    const bases = lines.map((line, k) => paint(layers[k]!.current!, line, k, w, h, PALETTES[k]!));
+    if (fx === "lens") lines.forEach((line, k) => paint(clear[k]!.current!, line, k, w, h, PALETTES[k]!, true));
+    sandRef.current?.stop();
+    sandRef.current = fx === "sand" && !calm() ? sand(layers.map((r) => r.current!), bases) : null;
+    return () => sandRef.current?.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, d]);
+  }, [size, d, fx]);
 
-  // Screen position of day i on the gold ridge, in CSS px of the wrapper.
-  const at = (i: number) => {
-    if (!ridge || !size) return [0, 0] as const;
-    const w = ridge.length;
-    const col = Math.round(((i / (n - 1)) * (1 - 2 * OVER) + OVER) * (w - 1));
-    return [(col + 0.5) * PX - size[0] * OVER, ridge[col]! * PX] as const;
-  };
-  const idx = replay ?? hot ?? n - 1;
-  const live = replay !== null || hot !== null; // at rest only the marker and its price show
-  const [cx, cy] = at(idx);
-  const day = d.days[idx]!;
-  const W = size?.[0] ?? 0;
-  const H = size?.[1] ?? 0;
-
-  const pick = (e: React.PointerEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - r.left;
-    const y = e.clientY - r.top;
-    const el = e.currentTarget;
-    el.style.setProperty("--lx", `${x + r.width * OVER}px`); // the spotlight canvas starts OVER to the left
-    el.style.setProperty("--ly", `${y}px`);
-    if (e.pointerType === "mouse") {
-      el.style.setProperty("--mx", ((x / r.width) - 0.5).toFixed(3));
-      el.style.setProperty("--my", ((y / r.height) - 0.5).toFixed(3));
-    }
-    return Math.max(0, Math.min(n - 1, Math.round((x / r.width) * (n - 1))));
-  };
+  const layerStyle = (k: number) => ({ left: `${-OVER * 100}%`, width: `${100 + 2 * OVER * 100}%`, ["--m" as string]: DEPTH[k]!.m, ["--s" as string]: DEPTH[k]!.s });
 
   return (
     <div
@@ -191,43 +234,33 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
       className={`${className ?? ""} hr-root`}
       data-over={over || undefined}
       onPointerEnter={() => setOver(true)}
-      onPointerMove={(e) => setHot(pick(e))}
+      onPointerMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - r.left;
+        const y = e.clientY - r.top;
+        const el = e.currentTarget;
+        el.style.setProperty("--lx", `${x}px`);
+        el.style.setProperty("--ly", `${y}px`);
+        if (e.pointerType === "mouse") {
+          el.style.setProperty("--mx", (x / r.width - 0.5).toFixed(3));
+          el.style.setProperty("--my", (y / r.height - 0.5).toFixed(3));
+        }
+        sandRef.current?.move((x + r.width * OVER) / PX, y / PX);
+      }}
       onPointerLeave={(e) => {
         setOver(false);
-        setHot(null);
         e.currentTarget.style.setProperty("--mx", "0");
         e.currentTarget.style.setProperty("--my", "0");
       }}
     >
       {layers.map((ref, k) => (
-        <canvas
-          key={k}
-          ref={ref}
-          aria-hidden
-          className="hr-layer hr-draw absolute inset-y-0 h-full [image-rendering:pixelated]"
-          style={{ left: `${-OVER * 100}%`, width: `${100 + 2 * OVER * 100}%`, ["--m" as string]: DEPTH[k]!.m, ["--s" as string]: DEPTH[k]!.s }}
-        />
+        <canvas key={k} ref={ref} aria-hidden className="hr-layer hr-draw absolute inset-y-0 h-full [image-rendering:pixelated]" style={layerStyle(k)} />
       ))}
-      <canvas
-        ref={lit}
-        aria-hidden
-        className="hr-lit absolute inset-y-0 h-full [image-rendering:pixelated]"
-        style={{ left: `${-OVER * 100}%`, width: `${100 + 2 * OVER * 100}%` }}
-      />
-      {ridge && (
-        <div aria-hidden className="hr-cursor pointer-events-none absolute inset-0 font-mono text-[11px] uppercase tracking-[0.06em]">
-          {/* The crosshair: dashed lines through the point, the price on the right edge, the date on the floor. */}
-          {live && <span className="absolute top-0 border-l border-dashed border-tv-ink/50" style={{ left: cx, height: H }} />}
-          {live && <span className="absolute left-0 border-t border-dashed border-tv-ink/50" style={{ top: cy, width: W }} />}
-          <span className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 border border-tv-ink bg-tv-signal" style={{ left: cx, top: cy }} />
-          <span className="absolute right-0 -translate-y-1/2 bg-tv-ink px-1.5 py-0.5 text-tv-white" style={{ top: cy }}>
-            {d.sym} {day.c}
-          </span>
-          {live && (
-            <span className="absolute bottom-2 -translate-x-1/2 whitespace-nowrap bg-tv-ink px-1.5 py-0.5 text-tv-white" style={{ left: Math.min(Math.max(cx, 60), W - 60) }}>
-              {day.d}
-            </span>
-          )}
+      {fx === "lens" && (
+        <div aria-hidden className="hr-lens pointer-events-none absolute inset-0">
+          {clear.map((ref, k) => (
+            <canvas key={k} ref={ref} className="hr-layer absolute inset-y-0 h-full" style={layerStyle(k)} />
+          ))}
         </div>
       )}
     </div>
