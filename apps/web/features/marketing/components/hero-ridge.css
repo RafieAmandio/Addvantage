@@ -1,7 +1,27 @@
-/* The hero landscape draws in left to right, then the cursor arrives. */
+/* The hero landscape. It wipes in left to right; the ranges drift against the pointer and the
+   scroll at their own depth; a spotlight brightens the gold under the pointer. Transform, opacity
+   and mask only. */
 @keyframes hr-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes hr-in { from { opacity: 0; } }
+@keyframes hr-drop { from { opacity: 0; transform: scaleX(0); } }
+
+.hr-root { cursor: crosshair; }
+.hr-lit {
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(circle 130px at var(--lx, -999px) var(--ly, -999px), #000 35%, transparent 100%);
+  mask-image: radial-gradient(circle 130px at var(--lx, -999px) var(--ly, -999px), #000 35%, transparent 100%);
+  transition: opacity 300ms ease-out;
+}
+.hr-root[data-over] .hr-lit { opacity: 1; }
+.hr-hint { opacity: 0; transition: opacity 300ms ease-out; }
+.hr-root[data-over] .hr-hint { opacity: 1; }
+
 @media (prefers-reduced-motion: no-preference) {
   .hr-draw { animation: hr-wipe 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
-  .hr-cursor { animation: hr-in 0.5s ease-out 1.7s both; }
+  .hr-layer {
+    transform: translate(calc(var(--mx, 0) * var(--m) * -1px), calc(var(--my, 0) * var(--m) * -0.4px + var(--scroll, 0) * var(--s) * 1px));
+    transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .hr-cursor { animation: hr-in 0.4s ease-out 0.2s both; }
+  .hr-mark > span:first-child { transform-origin: left; animation: hr-drop 450ms cubic-bezier(0.23, 1, 0.32, 1) both; }
 }
