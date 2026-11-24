@@ -91,7 +91,7 @@ export function HeroSection({ ridge }: { ridge: RidgeData }) {
       <div className="relative z-10 mx-auto w-full max-w-[1100px] px-4 sm:px-6">
         <Copy />
       </div>
-      <HeroRidge d={ridge} className="relative mt-4 min-h-[260px] flex-1 md:min-h-[340px]" />
+      <HeroRidge d={ridge} className="relative mt-4 min-h-[240px] flex-1 md:min-h-[300px]" />
     </section>
   );
 }

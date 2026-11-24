@@ -27,9 +27,6 @@ const row = (symbol: string): BoardRow => {
 /** Every saved market's board line, in the file's order. */
 export const allRows = () => Object.keys(data).map(row);
 
-/** Every saved market's raw rows, by symbol. */
-export const sampleSeries = () => data;
-
 /** Raw hourly and daily candles for one market. */
 export const candles = (symbol: string) => ({ hourly: toCandles(data[symbol]!.hourly), daily: toCandles(data[symbol]!.daily) });
 

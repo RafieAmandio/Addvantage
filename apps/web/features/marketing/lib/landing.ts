@@ -3,7 +3,7 @@ import { fmtPrice } from "@/features/dashboard/components/PriceStrip";
 import { checkPlan, killList, positionSize, riskTier, type Rule, type Trade } from "@/features/journal/lib/journal";
 import { buildDrills, gradeThrust } from "@/features/method/lib/practice";
 import { ATR_STATES, judgeAtr, judgeBreak, judgePattern, type Pattern } from "@/features/method/lib/scan";
-import { allRows, boardSample, candles, heroSample, planSample, sampleSeries, scanSample } from "./sample";
+import { allRows, boardSample, candles, heroSample, planSample, scanSample } from "./sample";
 
 /**
  * Everything the landing page shows, read once at build time from the saved
@@ -43,8 +43,8 @@ export interface KillData { sym: string; side: Level["side"]; risk: number; loss
 /** One "tap the level" round for the hero card: a real drill cut at the retest, graded in the browser by the app's gradeLevel. */
 export interface LevelRound { sym: string; bars: Bar[]; thrust: number; level: Level; daily: DailyRead }
 
-/** The hero's terrain: every saved market's daily closes over the same days, gold last (it stands in front). */
-export interface RidgeData { days: string[]; rows: { sym: string; closes: number[]; fmt: string[] }[] }
+/** The hero's landscape: gold's daily closes as the front ridge, two other markets behind it. */
+export interface RidgeData { sym: string; days: { d: string; c: string }[]; front: number[]; mid: number[]; back: number[] }
 
 export interface LandingData {
   ridge: RidgeData;
@@ -186,18 +186,10 @@ function wibStamp(iso: string) {
 }
 
 function ridge(): RidgeData {
-  // Five markets behind gold, back to front; gold last, in front.
-  const syms = ["EUR/USD", "USD/JPY", "WTI/USD", "SPX", "NDX", "XAU/USD"].filter((s) => s in sampleSeries());
-  const n = Math.min(...syms.map((s) => candles(s).daily.length));
+  const g = candles("XAU/USD").daily;
+  const closes = (s: string) => candles(s).daily.slice(-g.length).map((c) => c.close);
   const day = (t: string) => new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).toUpperCase();
-  const gold = candles("XAU/USD").daily.slice(-n);
-  return {
-    days: gold.map((c) => day(c.time)),
-    rows: syms.map((s) => {
-      const d = candles(s).daily.slice(-n);
-      return { sym: sym(s), closes: d.map((c) => c.close), fmt: d.map((c) => exact(c.close)) };
-    }),
-  };
+  return { sym: "XAUUSD", days: g.map((c) => ({ d: day(c.time), c: exact(c.close) })), front: g.map((c) => c.close), mid: closes("NDX"), back: closes("EUR/USD") };
 }
 
 export function landingData(): LandingData {
