@@ -52,7 +52,7 @@ export function PositioningSection() {
             ))}
             <li className="px-4 pb-2 pt-6 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-tv-mute sm:px-8 md:px-12">Not for</li>
             {NOT.map((n) => (
-              <li key={n} className="border-b border-dashed border-tv-stone px-4 py-4 text-[clamp(1.1rem,1.6vw,1.4rem)] font-semibold uppercase tracking-[-0.01em] text-tv-mutedesk line-through decoration-tv-ink decoration-2 sm:px-8 md:px-12">
+              <li key={n} className="border-b border-dashed border-tv-stone px-4 py-4 text-[clamp(1.1rem,1.6vw,1.4rem)] font-semibold uppercase tracking-[-0.01em] text-tv-mutedesk line-through decoration-1 sm:px-8 md:px-12">
                 {n}
               </li>
             ))}
