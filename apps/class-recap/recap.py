@@ -212,7 +212,7 @@ def process(stem):
     publish_site(date, start, title, summary, minutes, video_id, pdf_id)
 
     calls = re.sub(r"^• ([^|]+?) \| (\w+) \| ", lambda m: f"• {m.group(1)} ({m.group(2).lower()}): ", summary, flags=re.M)
-    caption = (f"{calls}\n\nRecording: https://drive.google.com/file/d/{video_id}/view"
+    caption = (f"{calls}\n\nRecording: {SITE}/app/education/videos/{date}-tradevantage-class"
                f"\nOn the site: {SITE}/app/education/reports")[:1024]
     with open(pdf, "rb") as f:
         tg("sendDocument", data={"chat_id": E("TELEGRAM_CHAT_ID"), "caption": caption},
