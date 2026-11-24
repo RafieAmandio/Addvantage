@@ -3,7 +3,6 @@
    and mask only. */
 @keyframes hr-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes hr-in { from { opacity: 0; } }
-@keyframes hr-drop { from { opacity: 0; transform: scaleX(0); } }
 
 .hr-root { cursor: crosshair; }
 .hr-lit {
@@ -13,8 +12,6 @@
   transition: opacity 300ms ease-out;
 }
 .hr-root[data-over] .hr-lit { opacity: 1; }
-.hr-hint { opacity: 0; transition: opacity 300ms ease-out; }
-.hr-root[data-over] .hr-hint { opacity: 1; }
 
 @media (prefers-reduced-motion: no-preference) {
   .hr-draw { animation: hr-wipe 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
@@ -23,5 +20,4 @@
     transition: transform 700ms cubic-bezier(0.23, 1, 0.32, 1);
   }
   .hr-cursor { animation: hr-in 0.4s ease-out 0.2s both; }
-  .hr-mark > span:first-child { transform-origin: left; animation: hr-drop 450ms cubic-bezier(0.23, 1, 0.32, 1) both; }
 }

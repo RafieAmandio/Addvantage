@@ -104,7 +104,7 @@ const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-
  * The hero's landscape, Browserbase style: three mountain ranges in ordered dither, the front one
  * gold's real daily closes. The ranges drift against the pointer and the scroll at their own depth.
  * Over the gold ridge sits a chart crosshair (price on the right edge, date on the floor) with a
- * spotlight that brightens the gold under it; a click marks a level at that close. On load the
+ * spotlight that brightens the gold under it. On load the
  * crosshair replays the series, then parks on the last close.
  */
 export function HeroRidge({ d, className }: { d: RidgeData; className?: string }) {
@@ -114,7 +114,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
   const [size, setSize] = useState<[number, number] | null>(null); // css px
   const [hot, setHot] = useState<number | null>(null);
   const [over, setOver] = useState(false);
-  const [mark, setMark] = useState<number | null>(null);
   const [ridge, setRidge] = useState<Float32Array | null>(null);
   const n = d.days.length;
   const [replay, setReplay] = useState<number | null>(0);
@@ -169,7 +168,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
   const live = replay !== null || hot !== null; // at rest only the marker and its price show
   const [cx, cy] = at(idx);
   const day = d.days[idx]!;
-  const [, my] = mark === null ? [0, 0] : at(mark);
   const W = size?.[0] ?? 0;
   const H = size?.[1] ?? 0;
 
@@ -200,7 +198,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
         e.currentTarget.style.setProperty("--mx", "0");
         e.currentTarget.style.setProperty("--my", "0");
       }}
-      onPointerUp={(e) => setMark(pick(e))}
     >
       {layers.map((ref, k) => (
         <canvas
@@ -219,14 +216,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
       />
       {ridge && (
         <div aria-hidden className="hr-cursor pointer-events-none absolute inset-0 font-mono text-[11px] uppercase tracking-[0.06em]">
-          {mark !== null && (
-            <div className="hr-mark absolute inset-x-0" style={{ top: my }}>
-              <span className="absolute inset-x-0 top-0 h-0.5 bg-tv-signal shadow-[0_0_0_1px_#111214]" />
-              <span className="absolute right-0 top-0 -translate-y-1/2 border border-tv-ink bg-tv-signal px-1.5 py-0.5 text-tv-ink">
-                Level {d.days[mark]!.c}
-              </span>
-            </div>
-          )}
           {/* The crosshair: dashed lines through the point, the price on the right edge, the date on the floor. */}
           {live && <span className="absolute top-0 border-l border-dashed border-tv-ink/50" style={{ left: cx, height: H }} />}
           {live && <span className="absolute left-0 border-t border-dashed border-tv-ink/50" style={{ top: cy, width: W }} />}
@@ -239,7 +228,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
               {day.d}
             </span>
           )}
-          <span className="hr-hint absolute bottom-2 left-3 text-tv-white mix-blend-difference">Click to mark a level</span>
         </div>
       )}
     </div>
