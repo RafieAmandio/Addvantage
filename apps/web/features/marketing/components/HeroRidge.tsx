@@ -80,10 +80,10 @@ function ridgeLine(series: number[], w: number, h: number, [top, bottom]: [numbe
  * shading blended smoothly between the palette's colours with no dither at all.
  */
 function paint(c: HTMLCanvasElement, line: Float32Array, k: number, w: number, h: number, palette: string[], clean = false) {
-  c.width = w;
-  c.height = h;
-  const ctx = c.getContext("2d")!;
-  const img = ctx.createImageData(w, h);
+  const small = document.createElement("canvas");
+  small.width = w;
+  small.height = h;
+  const img = small.getContext("2d")!.createImageData(w, h);
   const p = palette.map(rgb);
   const top = p.length - 1;
   for (let x = 0; x < w; x++)
@@ -105,89 +105,21 @@ function paint(c: HTMLCanvasElement, line: Float32Array, k: number, w: number, h
         img.data.set([...p[q]!, 255], o);
       }
     }
-  ctx.putImageData(img, 0, 0);
-  return img;
+  small.getContext("2d")!.putImageData(img, 0, 0);
+  // Drawn at full resolution in whole device pixels per dither pixel, so the browser never
+  // resamples the dither when the layer moves; a fractional parallax offset just glides.
+  const dpr = Math.max(1, Math.round(window.devicePixelRatio || 1));
+  c.width = w * PX * dpr;
+  c.height = h * PX * dpr;
+  const ctx = c.getContext("2d")!;
+  ctx.imageSmoothingEnabled = clean;
+  ctx.drawImage(small, 0, 0, c.width, c.height);
 }
-
-const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-/**
- * Sand: pixels near the pointer are pushed outward and jittered, by how fast it moves, then settle.
- * Redraws only the box around the pointer, restoring the last box from the untouched image.
- */
-function sand(canvases: HTMLCanvasElement[], bases: ImageData[]) {
-  const R = 22; // radius, dither px
-  let cx = -999;
-  let cy = -999;
-  let lx = 0;
-  let ly = 0;
-  let power = 0;
-  let raf = 0;
-  let frame = 0;
-  let last: [number, number, number, number] | null = null;
-  const step = () => {
-    frame++;
-    power *= 0.9;
-    canvases.forEach((c, k) => {
-      const ctx = c.getContext("2d")!;
-      const base = bases[k]!;
-      const w = base.width;
-      const h = base.height;
-      if (last) ctx.putImageData(base, 0, 0, ...last);
-      if (power < 0.02) return;
-      const x0 = Math.max(0, Math.floor(cx - R));
-      const y0 = Math.max(0, Math.floor(cy - R));
-      const x1 = Math.min(w, Math.ceil(cx + R));
-      const y1 = Math.min(h, Math.ceil(cy + R));
-      if (x1 <= x0 || y1 <= y0) return;
-      const out = ctx.createImageData(x1 - x0, y1 - y0);
-      const amp = power * (k === 2 ? 1 : 0.6);
-      for (let y = y0; y < y1; y++)
-        for (let x = x0; x < x1; x++) {
-          const dx = x - cx;
-          const dy = y - cy;
-          const dist = Math.hypot(dx, dy) || 1;
-          const fall = Math.max(0, 1 - dist / R);
-          const push = amp * R * 0.8 * fall * fall;
-          const jit = (hash(x + frame, y) - 0.5) * 7 * amp * fall;
-          const sx = Math.round(x - (dx / dist) * push + jit);
-          const sy = Math.round(y - (dy / dist) * push - jit);
-          const o = ((y - y0) * (x1 - x0) + (x - x0)) * 4;
-          if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue;
-          const so = (sy * w + sx) * 4;
-          out.data[o] = base.data[so]!;
-          out.data[o + 1] = base.data[so + 1]!;
-          out.data[o + 2] = base.data[so + 2]!;
-          out.data[o + 3] = base.data[so + 3]!;
-        }
-      ctx.putImageData(out, x0, y0);
-    });
-    last = power < 0.02 ? null : [Math.max(0, Math.floor(cx - R)), Math.max(0, Math.floor(cy - R)), 2 * R + 2, 2 * R + 2];
-    raf = power < 0.02 && !last ? 0 : requestAnimationFrame(step);
-  };
-  return {
-    move(x: number, y: number) {
-      const speed = Math.hypot(x - lx, y - ly);
-      lx = x;
-      ly = y;
-      if (last) canvases.forEach((c, k) => c.getContext("2d")!.putImageData(bases[k]!, 0, 0, ...last!));
-      last = null;
-      cx = x;
-      cy = y;
-      power = Math.min(1, Math.max(power, speed / 6));
-      if (!raf) raf = requestAnimationFrame(step);
-    },
-    stop: () => cancelAnimationFrame(raf),
-  };
-}
-
-type Fx = "lens" | "sand";
 
 /**
  * The hero's landscape, Browserbase style: three mountain ranges in ordered dither, the front one
  * gold's real daily closes. The ranges drift against the pointer and the scroll at their own depth.
- * Under the pointer, either the noise clears (`lens`: the dither resolves into smooth shading) or
- * the pixels scatter like sand and settle (`sand`).
+ * Under the pointer a lens clears the noise: the dither resolves into smooth shading.
  */
 export function HeroRidge({ d, className }: { d: RidgeData; className?: string }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -195,12 +127,8 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
   const clear = [useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null), useRef<HTMLCanvasElement>(null)];
   const [size, setSize] = useState<[number, number] | null>(null); // css px
   const [over, setOver] = useState(false);
-  // ponytail: ?fx=sand switches the effect while Dio compares; keep the winner, drop the switch.
-  const [fx, setFx] = useState<Fx>("lens");
-  const sandRef = useRef<ReturnType<typeof sand> | null>(null);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("fx") === "sand") setFx("sand");
     const el = wrap.current!;
     const ro = new ResizeObserver(([e]) => setSize([e!.contentRect.width, e!.contentRect.height]));
     ro.observe(el);
@@ -218,15 +146,17 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
     const w = Math.ceil((size[0] * (1 + 2 * OVER)) / PX);
     const h = Math.ceil(size[1] / PX);
     const lines = [d.back, d.mid, d.front].map((s, k) => ridgeLine(s, w, h, BANDS[k]!));
-    const bases = lines.map((line, k) => paint(layers[k]!.current!, line, k, w, h, PALETTES[k]!));
-    if (fx === "lens") lines.forEach((line, k) => paint(clear[k]!.current!, line, k, w, h, PALETTES[k]!, true));
-    sandRef.current?.stop();
-    sandRef.current = fx === "sand" && !calm() ? sand(layers.map((r) => r.current!), bases) : null;
-    return () => sandRef.current?.stop();
+    lines.forEach((line, k) => {
+      paint(layers[k]!.current!, line, k, w, h, PALETTES[k]!);
+      paint(clear[k]!.current!, line, k, w, h, PALETTES[k]!, true);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, d, fx]);
+  }, [size, d]);
 
-  const layerStyle = (k: number) => ({ left: `${-OVER * 100}%`, width: `${100 + 2 * OVER * 100}%`, ["--m" as string]: DEPTH[k]!.m, ["--s" as string]: DEPTH[k]!.s });
+  // Exact CSS size, a whole number of dither pixels, so a dither pixel is always PX by PX.
+  const cw = size ? Math.ceil((size[0] * (1 + 2 * OVER)) / PX) * PX : 0;
+  const ch = size ? Math.ceil(size[1] / PX) * PX : 0;
+  const layerStyle = (k: number) => ({ left: size ? -Math.round(size[0] * OVER) : 0, width: cw, height: ch, ["--m" as string]: DEPTH[k]!.m, ["--s" as string]: DEPTH[k]!.s });
 
   return (
     <div
@@ -245,7 +175,6 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
           el.style.setProperty("--mx", (x / r.width - 0.5).toFixed(3));
           el.style.setProperty("--my", (y / r.height - 0.5).toFixed(3));
         }
-        sandRef.current?.move((x + r.width * OVER) / PX, y / PX);
       }}
       onPointerLeave={(e) => {
         setOver(false);
@@ -254,15 +183,13 @@ export function HeroRidge({ d, className }: { d: RidgeData; className?: string }
       }}
     >
       {layers.map((ref, k) => (
-        <canvas key={k} ref={ref} aria-hidden className="hr-layer hr-draw absolute inset-y-0 h-full [image-rendering:pixelated]" style={layerStyle(k)} />
+        <canvas key={k} ref={ref} aria-hidden className="hr-layer hr-draw absolute top-0" style={layerStyle(k)} />
       ))}
-      {fx === "lens" && (
-        <div aria-hidden className="hr-lens pointer-events-none absolute inset-0">
-          {clear.map((ref, k) => (
-            <canvas key={k} ref={ref} className="hr-layer absolute inset-y-0 h-full" style={layerStyle(k)} />
-          ))}
-        </div>
-      )}
+      <div aria-hidden className="hr-lens pointer-events-none absolute inset-0">
+        {clear.map((ref, k) => (
+          <canvas key={k} ref={ref} className="hr-layer absolute top-0" style={layerStyle(k)} />
+        ))}
+      </div>
     </div>
   );
 }
