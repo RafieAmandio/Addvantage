@@ -1,11 +1,11 @@
 import { GRAIN_URL } from "@/features/marketing/components/iso/Iso";
-import { GateScene } from "@/features/marketing/components/GateScene";
+import { RadarScene } from "@/features/marketing/components/RadarScene";
 
 const FOR = ["Experienced market participants leveling up their edge.", "Traders who need a second-opinion copilot for blind-spot coverage.", "Anyone who wants to activate Six Eyes on the market."];
 const NOT = ["Beginners", "Gamblers", "Hobbyists"];
 
 /**
- * What this is, laid out like the auth pages: the words on the left, the gate scene in a full
+ * What this is, laid out like the auth pages: the words on the left, the radar scene in a full
  * height panel on the right.
  */
 export function PositioningSection() {
@@ -46,7 +46,7 @@ export function PositioningSection() {
         </div>
       </div>
       <div style={{ ["--tv-grain" as string]: `url("${GRAIN_URL}")` }} className="tv-grain relative h-[115vw] max-h-[640px] overflow-hidden md:h-auto md:max-h-none border-t border-tv-stone md:border-l md:border-t-0">
-        <GateScene className="absolute inset-0 h-full w-full" />
+        <RadarScene className="absolute inset-0 h-full w-full" />
       </div>
     </section>
   );
