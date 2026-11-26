@@ -1,4 +1,5 @@
 import { config } from "../lib/config";
+import { viaFredProxy } from "../lib/fred-proxy";
 import { fetchJson } from "../lib/http";
 import type { AdapterContext, Candidate, SourceAdapter } from "./base";
 
@@ -51,9 +52,10 @@ export class FredAdapter implements SourceAdapter {
     let lastErr: unknown;
     for (const s of SERIES) {
       try {
-        const obs = await fetchJson<FredObservationsResponse>(
+        const req = viaFredProxy(
           `${BASE}/series/observations?series_id=${s.id}&api_key=${config.FRED_API_KEY}&file_type=json&sort_order=desc&limit=2`
         );
+        const obs = await fetchJson<FredObservationsResponse>(req.url, { headers: req.headers });
         const [latest, prev] = obs.observations;
         if (!latest || latest.value === ".") continue;
 
