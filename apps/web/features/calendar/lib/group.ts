@@ -14,7 +14,7 @@ export function groupByDay(
   return Array.from(map.entries())
     .map(([ymd, events]) => ({
       ymd,
-      events: events.sort((a, b) => a.ts.localeCompare(b.ts)),
+      events: events.sort((a, b) => b.ts.localeCompare(a.ts)),
     }))
-    .sort((a, b) => a.ymd.localeCompare(b.ymd));
+    .sort((a, b) => b.ymd.localeCompare(a.ymd)); // newest first
 }

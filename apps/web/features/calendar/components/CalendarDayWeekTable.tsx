@@ -41,12 +41,12 @@ function NowLine({ now }: { now: number }) {
 export function CalendarDayWeekTable({ groups, emptyState, now, className }: Props) {
   if (groups.length === 0) return <div className={cn("py-12", className)}>{emptyState}</div>;
   const nowIso = new Date(now).toISOString();
-  const nextId = groups.flatMap((g) => g.events).find((e) => e.ts > nowIso)?.id;
+  const nextId = groups.flatMap((g) => g.events).findLast((e) => e.ts > nowIso)?.id;
   return (
     <div className={className}>
       {groups.map(({ ymd, events }) => {
         const today = ymd === TODAY_YMD;
-        const cut = today ? events.findIndex((e) => e.ts > nowIso) : -2;
+        const cut = today ? events.findIndex((e) => e.ts <= nowIso) : -2;
         const nowAt = cut === -1 ? events.length : cut;
         return (
           <section key={ymd} aria-label={dayLabel(ymd)}>
