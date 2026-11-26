@@ -3,6 +3,7 @@ import { P, ellipse, faces, pts, rot, silhouette, type B, type View } from "@/fe
 /** Block faces, lit from the back left (brand kit, "Faces, grain and floor shadow"). */
 export const FACE = {
   white: { top: "#FFFFFF", left: "#EDECE8", right: "#1B1C1E", grain: true },
+  stone: { top: "#D9D8D3", left: "#C9C7C0", right: "#1B1C1E", grain: true },
   graphite: { top: "#4A4C51", left: "#3A3C40", right: "#1B1C1E", grain: true },
   signal: { top: "#FFE45C", left: "#FFD400", right: "#E2BB00", grain: true },
   ink: { top: "#1B1C1E", left: "#1B1C1E", right: "#111214", grain: false },
