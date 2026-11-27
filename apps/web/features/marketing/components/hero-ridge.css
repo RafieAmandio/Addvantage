@@ -1,0 +1,22 @@
+/* The hero landscape. It wipes in left to right; the ranges drift against the pointer and the
+   scroll at their own depth; a lens clears the noise under the pointer. Transform, opacity
+   and mask only. */
+@keyframes hr-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* The clarity lens: the clean ranges show through a soft circle around the pointer. */
+.hr-lens {
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(circle 150px at var(--lx, -999px) var(--ly, -999px), #000 45%, transparent 100%);
+  mask-image: radial-gradient(circle 150px at var(--lx, -999px) var(--ly, -999px), #000 45%, transparent 100%);
+  transition: opacity 350ms ease-out;
+}
+.hr-root[data-over] .hr-lens { opacity: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hr-draw { animation: hr-wipe 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
+  .hr-layer {
+    transform: translate(calc(var(--mx, 0) * var(--m) * -1px), calc(var(--my, 0) * var(--m) * -0.4px + var(--scroll, 0) * var(--s) * 1px));
+    transition: transform 900ms cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
+  }
+}
