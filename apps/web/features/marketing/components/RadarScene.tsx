@@ -70,95 +70,129 @@ const topFace = (b: B) => pts([[b[0], b[2], b[5]], [b[1], b[2], b[5]], [b[1], b[
 const angleOf = (b: B) => Math.atan2(b[2] + 0.5 - C0, b[0] + 0.5 - C0);
 const distOf = (b: B) => Math.hypot(b[2] + 0.5 - C0, b[0] + 0.5 - C0);
 
-const Piece = ({ p, roofRef }: { p: Part; roofRef?: (el: SVGPolygonElement | null) => void }) => (
-  <g className="as-rise" style={{ ["--i" as string]: key(p.b) / 2 }}>
-    <g className="as-lift">
-      <Block b={p.b} u={U} face={p.face} grain={G} />
-      {p.roof && <polygon ref={roofRef} className="rd-roof" points={topFace(p.b)} fill="#FFD400" stroke="#111214" strokeWidth={0.9} vectorEffect="non-scaling-stroke" />}
-    </g>
-  </g>
+// A wave top lights only if nothing in front stands taller, so the overlay never paints gold over a crest.
+const H = new Map(parts.map((p) => [`${p.b[0]},${p.b[2]}`, p.b[5]]));
+const lit = parts.filter(
+  (p) => p.roof && [0, 1, 2].every((i) => [0, 1, 2].every((j) => (i || j ? (H.get(`${p.b[0] + i},${p.b[2] + j}`) ?? 0) <= p.b[5] : true))),
+);
+const litBehind = lit.filter((p) => p.b[0] + p.b[2] < at - 1);
+const litFront = lit.filter((p) => p.b[0] + p.b[2] >= at - 1);
+
+const Tower = () => (
+  <>
+    {TOWER.map((p, k) => (
+      <Block key={k} b={p.b} u={U} face={p.face} grain={G} />
+    ))}
+  </>
 );
 
 /**
  * The positioning figure, in the auth pages' kit: a watchtower on a rock in a voxel sea, its
- * Signal beam sweeping round; the wave tops it crosses light gold and fade. Layers drift against
- * the cursor, voxels lift under it. With reduced motion the beam holds still.
+ * Signal beam sweeping round; the wave tops it crosses light gold and fade.
+ *
+ * Built for speed: the sea is a still picture on its own compositor layer (painted once), and
+ * parallax moves whole layers, never repaints them. Only the overlay (beam, lit tops, a copy of
+ * the tower to keep tops behind it hidden) repaints, and only while the section is on screen.
+ * With reduced motion the beam holds still.
  */
 export function RadarScene({ className }: { className?: string }) {
-  const svg = useRef<SVGSVGElement>(null);
+  const wrap = useRef<HTMLDivElement>(null);
   const beam = useRef<SVGPolygonElement>(null);
   const roofs = useRef(new Map<Part, SVGPolygonElement>());
 
   useEffect(() => {
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const on = new Map<Part, boolean>();
     let raf = 0;
     let a = -2.2;
     let last = performance.now();
     const draw = (now: number) => {
-      a += still ? 0 : ((now - last) / 1000) * 0.45;
+      a += still ? 0 : (Math.min(now - last, 100) / 1000) * 0.45;
       last = now;
       const g = (d: number) => P(C0 + REACH * Math.cos(a + d), C0 + REACH * Math.sin(a + d), 0, U);
       const [l, r] = [g(-BEAM), g(BEAM)];
       beam.current?.setAttribute("points", `${LAMP.join(",")} ${l.join(",")} ${r.join(",")}`);
       roofs.current.forEach((el, p) => {
         const d = Math.atan2(Math.sin(angleOf(p.b) - a), Math.cos(angleOf(p.b) - a));
-        el.toggleAttribute("data-on", Math.abs(d) < BEAM && distOf(p.b) < REACH);
+        const v = Math.abs(d) < BEAM && distOf(p.b) < REACH;
+        if (on.get(p) !== v) el.toggleAttribute("data-on", v), on.set(p, v);
       });
       if (!still) raf = requestAnimationFrame(draw);
     };
-    raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
+    // Run only while the figure is on screen.
+    const io = new IntersectionObserver(([e]) => {
+      cancelAnimationFrame(raf);
+      if (e!.isIntersecting) (last = performance.now()), (raf = requestAnimationFrame(draw));
+    });
+    io.observe(wrap.current!);
+    return () => (io.disconnect(), cancelAnimationFrame(raf));
   }, []);
 
-  const set = (x: number, y: number) => {
-    svg.current?.style.setProperty("--mx", x.toFixed(3));
-    svg.current?.style.setProperty("--my", y.toFixed(3));
-  };
+  // Parallax as a direct transform per layer: a custom property on an ancestor would restyle all
+  // ten thousand polygons on every pointer move.
+  const set = (x: number, y: number) =>
+    wrap.current?.querySelectorAll<HTMLElement>("[data-d]").forEach((el) => {
+      const d = Number(el.dataset.d);
+      el.style.transform = `translate(${(-x * d).toFixed(2)}px, ${(-y * d * 0.6).toFixed(2)}px)`;
+    });
   const ref = (p: Part) => (el: SVGPolygonElement | null) => void (el ? roofs.current.set(p, el) : roofs.current.delete(p));
+  const svg = { viewBox: `${minX} ${minY} ${VW} ${VH}`, preserveAspectRatio: "xMidYMid slice", className: "absolute inset-0 h-full w-full" };
+  const layer = "absolute inset-[-24px] [will-change:transform] motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)]";
+  const roof = (p: Part) => <polygon key={`${p.b[0]},${p.b[2]}`} ref={ref(p)} className="rd-roof" points={topFace(p.b)} fill="#FFD400" stroke="#111214" strokeWidth={0.9} vectorEffect="non-scaling-stroke" />;
 
   return (
-    <svg
-      ref={svg}
-      viewBox={`${minX} ${minY} ${VW} ${VH}`}
-      preserveAspectRatio="xMidYMid slice"
-      className={className}
+    <div
+      ref={wrap}
       aria-hidden
+      className={className}
       onPointerMove={(e) => {
-        if (e.pointerType !== "mouse") return;
+        if (e.pointerType !== "mouse" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const r = e.currentTarget.getBoundingClientRect();
         set((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5);
       }}
       onPointerLeave={() => set(0, 0)}
     >
-      <defs>
-        <GrainDefs id={G} />
-        <linearGradient id={`${G}-beam`} gradientUnits="userSpaceOnUse" x1={LAMP[0]} y1={LAMP[1]} x2={LAMP[0]} y2={LAMP[1] + 24 * U}>
-          <stop offset="0" stopColor="#FFD400" stopOpacity={0.75} />
-          <stop offset="1" stopColor="#FFD400" stopOpacity={0.05} />
-        </linearGradient>
-        <style>{`.rd-roof{opacity:0;transition:opacity 900ms ease-out}.rd-roof[data-on]{opacity:1;transition-duration:150ms}`}</style>
-      </defs>
-      <g className="as-par" style={{ ["--d" as string]: 22 }}>
-        <g className="as-cloud">
-          {CLOUDS.map((b, k) => (
-            <Block key={k} b={b} u={U} grain={G} />
-          ))}
-        </g>
-      </g>
-      <g className="as-par" style={{ ["--d" as string]: 6 }}>
-        {behind.map((p, k) => (
-          <Piece key={k} p={p} roofRef={p.roof && ref(p)} />
-        ))}
-        <g className="as-door">
-          {TOWER.map((p, k) => (
+      <div className={layer} data-d={22}>
+        <svg {...svg}>
+          <defs>
+            <GrainDefs id={`${G}-c`} />
+          </defs>
+          <g className="as-cloud">
+            {CLOUDS.map((b, k) => (
+              <Block key={k} b={b} u={U} grain={`${G}-c`} />
+            ))}
+          </g>
+        </svg>
+      </div>
+      <div className={layer} data-d={6}>
+        {/* The still sea: painted once. */}
+        <svg {...svg}>
+          <defs>
+            <GrainDefs id={G} />
+          </defs>
+          {behind.map((p, k) => (
             <Block key={k} b={p.b} u={U} face={p.face} grain={G} />
           ))}
-        </g>
-        {front.map((p, k) => (
-          <Piece key={k} p={p} roofRef={p.roof && ref(p)} />
-        ))}
-        <polygon ref={beam} fill={`url(#${G}-beam)`} style={{ mixBlendMode: "multiply" }} className="as-light" />
-      </g>
-    </svg>
+          <Tower />
+          {front.map((p, k) => (
+            <Block key={k} b={p.b} u={U} face={p.face} grain={G} />
+          ))}
+        </svg>
+        {/* The live overlay, on its own layer so its repaints never touch the sea. */}
+        <svg {...svg} className={`${svg.className} [will-change:transform]`}>
+          <defs>
+            <linearGradient id={`${G}-beam`} gradientUnits="userSpaceOnUse" x1={LAMP[0]} y1={LAMP[1]} x2={LAMP[0]} y2={LAMP[1] + 24 * U}>
+              <stop offset="0" stopColor="#FFD400" stopOpacity={0.55} />
+              <stop offset="1" stopColor="#FFD400" stopOpacity={0.04} />
+            </linearGradient>
+            <style>{`.rd-roof{opacity:0;transition:opacity 900ms ease-out}.rd-roof[data-on]{opacity:1;transition-duration:150ms}`}</style>
+          </defs>
+          {litBehind.map(roof)}
+          <Tower />
+          {litFront.map(roof)}
+          <polygon ref={beam} fill={`url(#${G}-beam)`} className="as-light" />
+        </svg>
+      </div>
+    </div>
   );
 }
